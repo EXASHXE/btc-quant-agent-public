@@ -1,0 +1,45 @@
+{
+  "TASK_ID": "g2_goal_entry_discovery_r2",
+  "EXACT_START_SHA": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "STAGE_1_FREEZE_SHA": "83c0ef60d9eacfd2440fa223c57f042cfff4912f",
+  "CONTROLLER_DISPATCH_SHA": "c02743fddccdf517582c371a47e82d8dcbb05923",
+  "BRANCH": "feature/v06-bline-gemini-goal-entry-discovery-r2",
+  "WORKTREE": "/root/workspace/project/quant-v0.6/gemini-entry-discovery-r2",
+  "PREFIX": "g2_goal_entry_discovery_r2",
+  "TERMINAL_DECISION": "ENTRY_GOAL_NO_SUPPORTED_NEW_LEADS",
+  "TERMINAL_SUMMARY": "Full 2021-2023 development replay across 35 folds completed for all 8 frozen candidate configurations. Zero candidate identities achieved PF >= 1.0 under primary STRESS friction or passed the simultaneous 95% maxT block bootstrap. Falsified across all 4 entry families.",
+  "ARTIFACTS": {
+    "STAGE_1_FREEZE_REMOTE_VERIFICATION.json": {
+      "sha256": "09a728a222a415338aaa0cbb32523be94fdda5439020f35d0faf2dc86e1b46dd",
+      "bytes": 812
+    },
+    "GOAL_A_FROZEN_CANDIDATE_REGISTRY.json": {
+      "sha256": "8ce14a7a43fbbcf2f863de662974128d9596616a747d7c427e20c58eb820553f",
+      "bytes": 4502
+    },
+    "GOAL_A_RUN_STRESS.json": {
+      "sha256": "82d2d0ba843967597a1b81e3538c8c8f058a500f719aff59eedc5f97dc77a29c",
+      "bytes": 1802200
+    },
+    "GOAL_A_RUN_BASE.json": {
+      "sha256": "2beba6cd821027a6ddf5a95f3932b117bb20dabd6060eb7a7a5e4a7e1c14ded0",
+      "bytes": 1803226
+    },
+    "GOAL_A_FRICTION_PRESSURE.json": {
+      "sha256": "53fc21aabf92db5dfe8ad0074347bb6201282b95620277cc26915109aa5c3f8f",
+      "bytes": 2047
+    },
+    "GOAL_A_ALL_CANDIDATES_SUMMARY.json": {
+      "sha256": "7d748c9500135719cc5f30fdaf0296eef0998fd7ee6b39b412fa66a97c4949fa",
+      "bytes": 3825193
+    },
+    "GOAL_A_COMPLETE_ANALYSIS_TABLES.json": {
+      "sha256": "0365696168d6986f1d651f736a367bede796f731dbe3fc98985e2677cd5a8cd9",
+      "bytes": 14777
+    },
+    "DECIMAL_AUDIT_RECEIPT.json": {
+      "sha256": "4dd6ff0eb4a08d3b77a4c31062e0f6138eed20fa3ee28b99f7cddf4ce2326905",
+      "bytes": 5653
+    }
+  }
+}

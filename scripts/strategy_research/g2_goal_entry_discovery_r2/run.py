@@ -2,6 +2,7 @@
 
 Executes the frozen 8 candidate configurations across the 35 development scoring folds (2021-02 to 2023-12)
 with 2021-01 strictly reserved for indicator warmup.
+Streams fold-by-fold to ensure zero OOM pressure and maximum numerical precision.
 """
 from __future__ import annotations
 
@@ -15,12 +16,13 @@ import numpy as np
 
 from .account import replay_account
 from .audit import audit_trade_decimal
-from .book import BASE, STRESS
+from .book import BASE, STRESS, TradeExecutionError, execute_position
 from .signals import generate_candidate_signals
 from .sources import EP, ROOT, get_monthly_folds, load
 from .statistics import block_bootstrap_max_t, compute_trade_metrics
 
 START_SHA = "55ac4c631c69f6edbd275462ad23e4486b9782ed"
+FREEZE_SHA = "83c0ef60d9eacfd2440fa223c57f042cfff4912f"
 
 
 def verify_freeze_parent(sha: str) -> None:
@@ -33,6 +35,9 @@ def verify_freeze_parent(sha: str) -> None:
 def run_all(
     cost_tier: str = "STRESS",
     extra_pressure_bps: float = 0.0,
+    arrays: dict[str, Any] | None = None,
+    rates: dict[Any, Any] | None = None,
+    receipt: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Execute complete development replay across 35 scoring folds."""
     start_time = time.time()
@@ -44,46 +49,37 @@ def run_all(
     if extra_pressure_bps > 0:
         cost["fee_bps"] = cost.get("fee_bps", 0.0) + extra_pressure_bps
 
-    arrays, rates, receipt = load()
+    if arrays is None or rates is None or receipt is None:
+        arrays, rates, receipt = load()
     folds = get_monthly_folds()
-
-    # Pre-aggregate concatenated continuous 1m last and mark data
-    # To ensure zero boundary artifacts and full multi-month warmup
-    all_months = [(f["year"], f["month"]) for f in folds]
-    # Include 2021-01 warmup month
-    sorted_months = [(2021, 1)] + all_months
-
-    last_list = [arrays["last"][y, m] for (y, m) in sorted_months]
-    mark_list = [arrays["mark"][y, m] for (y, m) in sorted_months]
-    full_last = np.vstack(last_list)
-    full_mark = np.vstack(mark_list)
-
-    all_rates = []
-    for y, m in sorted_months:
-        all_rates.extend(rates[y, m])
-    all_rates.sort(key=lambda r: int(r["settlement_at"]))
 
     results = {}
     candidate_trades_map = {}
+    paired_controls_map = {}
 
     for cand in candidates:
         cid = cand["id"]
         cand_trades = []
         monthly_account_records = []
         cand_signals_all = []
+        cand_paired_trades = []
 
-        # Run month by month preserving single-position cash state
         current_cash = 1000.0
 
         for fold in folds:
-            # Generate signals for this candidate within the fold embargo
-            fold_signals = generate_candidate_signals(full_last, cand, fold)
+            prev_last = arrays["last"][fold["prev_year"], fold["prev_month"]]
+            curr_last = arrays["last"][fold["year"], fold["month"]]
+            window_last = np.vstack([prev_last, curr_last])
+            curr_mark = arrays["mark"][fold["year"], fold["month"]]
+            curr_rates = rates[fold["year"], fold["month"]]
+
+            fold_signals = generate_candidate_signals(window_last, cand, fold)
             cand_signals_all.extend(fold_signals)
 
             acct = replay_account(
-                full_last,
-                full_mark,
-                all_rates,
+                window_last,
+                curr_mark,
+                curr_rates,
                 fold_signals,
                 cand,
                 fold,
@@ -92,6 +88,26 @@ def run_all(
             )
             cand_trades.extend(acct["trades"])
             current_cash = acct["ending_equity"]
+
+            # Compute paired counterfactual control for each executed trade
+            for t in acct["trades"]:
+                event_match = next((s for s in fold_signals if s["event_id"] == t["event_id"]), None)
+                if event_match:
+                    try:
+                        t_ctrl = execute_position(
+                            window_last,
+                            curr_mark,
+                            curr_rates,
+                            event_match,
+                            cand,
+                            cost,
+                            t["quantity"],
+                            side_override=-t["side"],
+                        )
+                        cand_paired_trades.append(t_ctrl)
+                        t["paired_control_net_bps"] = t_ctrl["net_after_funding_bps"]
+                    except (TradeExecutionError, ValueError):
+                        continue
 
             monthly_account_records.append({
                 "year": fold["year"],
@@ -105,6 +121,7 @@ def run_all(
             })
 
         metrics_3y = compute_trade_metrics(cand_trades, cash0=1000.0)
+        paired_metrics_3y = compute_trade_metrics(cand_paired_trades, cash0=1000.0)
 
         # Annual breakdowns
         annual_metrics = {}
@@ -116,12 +133,14 @@ def run_all(
             annual_metrics[str(yr)] = compute_trade_metrics(yr_trades, cash0=1000.0)
 
         candidate_trades_map[cid] = cand_trades
+        paired_controls_map[cid] = cand_paired_trades
 
         results[cid] = {
             "candidate_id": cid,
             "family": cand["family"],
             "horizon_hours": cand["horizon_hours"],
             "metrics_3y": metrics_3y,
+            "paired_controls_metrics_3y": paired_metrics_3y,
             "annual_metrics": annual_metrics,
             "final_equity": current_cash,
             "total_signals_generated": len(cand_signals_all),
@@ -151,7 +170,7 @@ def run_all(
     audit_receipts = []
     all_executed = [t for trs in candidate_trades_map.values() for t in trs]
     if all_executed:
-        sample_size = min(len(all_executed), 12)
+        sample_size = min(len(all_executed), 16)
         indices = np.linspace(0, len(all_executed) - 1, sample_size, dtype=int)
         for idx in indices:
             audit_receipts.append(audit_trade_decimal(all_executed[idx], cost))
@@ -171,16 +190,61 @@ def run_all(
     }
 
 
+def execute_full_study() -> dict[str, Any]:
+    """Execute all frozen tiers and friction sensitivities in one bounded run."""
+    print("Loading 2021-2023 authenticated archives...", flush=True)
+    arrays, rates, receipt = load()
+
+    print("Running primary STRESS cost tier (44 bps)...", flush=True)
+    stress_res = run_all("STRESS", 0.0, arrays, rates, receipt)
+
+    print("Running secondary BASE cost tier (22 bps)...", flush=True)
+    base_res = run_all("BASE", 0.0, arrays, rates, receipt)
+
+    print("Running friction pressure +5 bps tier...", flush=True)
+    p5_res = run_all("STRESS", 5.0, arrays, rates, receipt)
+
+    print("Running friction pressure +10 bps tier...", flush=True)
+    p10_res = run_all("STRESS", 10.0, arrays, rates, receipt)
+
+    # Save artifact files
+    (EP / "GOAL_A_RUN_STRESS.json").write_text(json.dumps(stress_res, indent=2, default=str))
+    (EP / "GOAL_A_RUN_BASE.json").write_text(json.dumps(base_res, indent=2, default=str))
+    (EP / "DECIMAL_AUDIT_RECEIPT.json").write_text(json.dumps(stress_res["decimal_audit"], indent=2, default=str))
+
+    friction_summary = {
+        "STRESS_44bp": {cid: stress_res["candidates"][cid]["metrics_3y"]["profit_factor"] for cid in stress_res["candidates"]},
+        "BASE_22bp": {cid: base_res["candidates"][cid]["metrics_3y"]["profit_factor"] for cid in base_res["candidates"]},
+        "STRESS_plus_5bp": {cid: p5_res["candidates"][cid]["metrics_3y"]["profit_factor"] for cid in p5_res["candidates"]},
+        "STRESS_plus_10bp": {cid: p10_res["candidates"][cid]["metrics_3y"]["profit_factor"] for cid in p10_res["candidates"]},
+    }
+    (EP / "GOAL_A_FRICTION_PRESSURE.json").write_text(json.dumps(friction_summary, indent=2, default=str))
+
+    summary = {
+        "FREEZE_SHA": FREEZE_SHA,
+        "START_SHA": START_SHA,
+        "candidates_count": len(stress_res["candidates"]),
+        "STRESS": stress_res,
+        "BASE": base_res,
+        "friction_sensitivity": friction_summary,
+    }
+    (EP / "GOAL_A_ALL_CANDIDATES_SUMMARY.json").write_text(json.dumps(summary, indent=2, default=str))
+    return summary
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Goal A R2 Entry Discovery Runner")
-    parser.add_argument("--tier", choices=["BASE", "STRESS"], default="STRESS")
-    parser.add_argument("--pressure", type=float, default=0.0)
+    parser.add_argument("--tier", choices=["BASE", "STRESS", "ALL"], default="ALL")
     args = parser.parse_args()
 
-    res = run_all(cost_tier=args.tier, extra_pressure_bps=args.pressure)
-    out_file = EP / f"GOAL_A_RUN_{args.tier}.json"
-    out_file.write_text(json.dumps(res, indent=2, default=str))
-    print(f"Goal A run completed in {res['elapsed_seconds']:.2f}s. Results written to {out_file}")
+    if args.tier == "ALL":
+        _summary = execute_full_study()
+        print("Full Goal A study complete across all cost tiers and friction sensitivities.")
+    else:
+        res = run_all(cost_tier=args.tier)
+        out_file = EP / f"GOAL_A_RUN_{args.tier}.json"
+        out_file.write_text(json.dumps(res, indent=2, default=str))
+        print(f"Goal A run completed in {res['elapsed_seconds']:.2f}s. Results written to {out_file}")
 
 
 if __name__ == "__main__":

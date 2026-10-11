@@ -1,0 +1,162 @@
+[
+  {
+    "event_id": "C01_MACRO_PULLBACK_RECLAIM_12H_1612229820000_1",
+    "side": 1,
+    "quantity": "0.027",
+    "decimal_gross_usdt": "12.30903",
+    "engine_net_after_funding_usdt": 8.279105039999997,
+    "decimal_net_after_funding_usdt": "8.27910504",
+    "max_absolute_error": 7.275957614183426e-12,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C01_MACRO_PULLBACK_RECLAIM_12H_1624857120000_1",
+    "side": 1,
+    "quantity": "0.006",
+    "decimal_gross_usdt": "3.81630",
+    "engine_net_after_funding_usdt": 2.8987116,
+    "decimal_net_after_funding_usdt": "2.89871160",
+    "max_absolute_error": 0.0,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C01_MACRO_PULLBACK_RECLAIM_12H_1637833320000_1",
+    "side": 1,
+    "quantity": "0.001",
+    "decimal_gross_usdt": "0.78923",
+    "engine_net_after_funding_usdt": 0.5340494399999971,
+    "decimal_net_after_funding_usdt": "0.53404944",
+    "max_absolute_error": 2.886579864025407e-15,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C01_MACRO_PULLBACK_RECLAIM_12H_1650780720000_-1",
+    "side": -1,
+    "quantity": "0.001",
+    "decimal_gross_usdt": "-0.0680",
+    "engine_net_after_funding_usdt": -0.24279908,
+    "decimal_net_after_funding_usdt": "-0.24279908",
+    "max_absolute_error": 7.275957614183426e-12,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C01_MACRO_PULLBACK_RECLAIM_12H_1664194020000_-1",
+    "side": -1,
+    "quantity": "0.001",
+    "decimal_gross_usdt": "-0.3245",
+    "engine_net_after_funding_usdt": -0.4081630400000022,
+    "decimal_net_after_funding_usdt": "-0.40816304",
+    "max_absolute_error": 2.220446049250313e-15,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C01_MACRO_PULLBACK_RECLAIM_18H_1624521420000_-1",
+    "side": -1,
+    "quantity": "0.01",
+    "decimal_gross_usdt": "-5.1675",
+    "engine_net_after_funding_usdt": -6.592922448028766,
+    "decimal_net_after_funding_usdt": "-6.592922448028780000",
+    "max_absolute_error": 7.275957614183426e-12,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C01_MACRO_PULLBACK_RECLAIM_18H_1638544020000_-1",
+    "side": -1,
+    "quantity": "0.002",
+    "decimal_gross_usdt": "3.68250",
+    "engine_net_after_funding_usdt": 3.2261253828238674,
+    "decimal_net_after_funding_usdt": "3.2261253828238700572",
+    "max_absolute_error": 2.6645352591003757e-15,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C01_MACRO_PULLBACK_RECLAIM_18H_1651940820000_-1",
+    "side": -1,
+    "quantity": "0.001",
+    "decimal_gross_usdt": "0.5270",
+    "engine_net_after_funding_usdt": 0.3700399999999986,
+    "decimal_net_after_funding_usdt": "0.37004000",
+    "max_absolute_error": 7.275957614183426e-12,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C01_MACRO_PULLBACK_RECLAIM_18H_1665346020000_-1",
+    "side": -1,
+    "quantity": "0.001",
+    "decimal_gross_usdt": "0.2549",
+    "engine_net_after_funding_usdt": 0.1722224276924459,
+    "decimal_net_after_funding_usdt": "0.1722224276924451834",
+    "max_absolute_error": 3.637978807091713e-12,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C02_FAILED_BREAKOUT_EXHAUSTION_12H_1627963320000_1",
+    "side": 1,
+    "quantity": "0.015",
+    "decimal_gross_usdt": "-4.258499999999940",
+    "engine_net_after_funding_usdt": -6.8016408,
+    "decimal_net_after_funding_usdt": "-6.80164080",
+    "max_absolute_error": 0.0,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C02_FAILED_BREAKOUT_EXHAUSTION_12H_1695919620000_-1",
+    "side": -1,
+    "quantity": "0.005",
+    "decimal_gross_usdt": "0.7840",
+    "engine_net_after_funding_usdt": 0.18336592693931242,
+    "decimal_net_after_funding_usdt": "0.183365926939319730",
+    "max_absolute_error": 3.637978807091713e-12,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C02_FAILED_BREAKOUT_EXHAUSTION_18H_1659835020000_1",
+    "side": 1,
+    "quantity": "0.009000000000000001",
+    "decimal_gross_usdt": "2.2941000000000002549",
+    "engine_net_after_funding_usdt": 1.3835130101009938,
+    "decimal_net_after_funding_usdt": "1.383513010101000153723667789",
+    "max_absolute_error": 6.439293542825908e-15,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C04_INTRADAY_RANGE_REVERSION_12H_1625800620000_-1",
+    "side": -1,
+    "quantity": "0.022",
+    "decimal_gross_usdt": "-5.88566",
+    "engine_net_after_funding_usdt": -9.090752000000064,
+    "decimal_net_after_funding_usdt": "-9.09075200",
+    "max_absolute_error": 6.394884621840902e-14,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C04_INTRADAY_RANGE_REVERSION_12H_1680407220000_-1",
+    "side": -1,
+    "quantity": "0.006",
+    "decimal_gross_usdt": "1.6758",
+    "engine_net_after_funding_usdt": 0.9394653974649515,
+    "decimal_net_after_funding_usdt": "0.9394653974649384078",
+    "max_absolute_error": 3.637978807091713e-12,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C04_INTRADAY_RANGE_REVERSION_18H_1645327920000_1",
+    "side": 1,
+    "quantity": "0.01",
+    "decimal_gross_usdt": "-2.05299999999996",
+    "engine_net_after_funding_usdt": -3.8019308000000143,
+    "decimal_net_after_funding_usdt": "-3.8019308",
+    "max_absolute_error": 1.4210854715202004e-14,
+    "status": "EXACT_DECIMAL_MATCH"
+  },
+  {
+    "event_id": "C04_INTRADAY_RANGE_REVERSION_18H_1703836020000_1",
+    "side": 1,
+    "quantity": "0.003",
+    "decimal_gross_usdt": "1.4016",
+    "engine_net_after_funding_usdt": 0.7757249377776114,
+    "decimal_net_after_funding_usdt": "0.7757249377776071256",
+    "max_absolute_error": 7.275957614183426e-12,
+    "status": "EXACT_DECIMAL_MATCH"
+  }
+]
