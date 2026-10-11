@@ -5,6 +5,10 @@
 **Original umbrella dispatch SHA:** c02743fddccdf517582c371a47e82d8dcbb05923
 **Shared immutable source start:** 55ac4c631c69f6edbd275462ad23e4486b9782ed
 
+## Post-publication exact GitHub CI reconciliation (no change to scientific L2 verdict)
+
+A final result run [38161124788](https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38161124788) subsequently completed **SUCCESS** at exact commit `efa0b302233800f6474b3dda5775be56a77d0860`. The risk-based quality job ran **3095 passed, 2 skipped, 9 warnings**, and the separate manual compatibility job was SKIPPED. This supersedes only the earlier "in progress" CI observation above. A scientific acceptance remains BLOCKED by frozen `run.py` changes and human/machine annual table disagreements; green CI cannot retroactively freeze a different method. B final CI remains FAILURE (unrelated H40 digest assertion), and Goal B's after-entry regime leakage remains BLOCKED independently.
+
 ## 1. GitHub exact-SHA verification and CI classification
 
 | Work | Frozen commit | Result commit | Remote ancestry / scope |
