@@ -1,0 +1,660 @@
+{
+  "task_id": "V06_G2_GEMINI_A_CODE_AS_EXECUTED_23_TRIAL_ACTUAL_MARKET_REPLAY_R2",
+  "scientific_grade": "EX_POST_CODE_AS_EXECUTED_DEV_ONLY_NOT_REGISTERED_TEXT_METHOD",
+  "identity": {
+    "original_code_sha": "a37721eaa1f3cd176146df6bdb63fbd17746189e",
+    "exact_start_sha": "d1f9f4316a2485f5d09ee1c910d7797ecfc6be7e",
+    "corrected_code_sha": null,
+    "signal_function_ast_sha256": "2c0e03fd3525ea1e578f0e50a17691ec780969fb47a902e182649fffee42b92f",
+    "candidate_branch_ast_sha256": {
+      "W1_C01_MULTISCALE_TREND_ADOPTION_08H": "7e3ae2b6ab9459c9ae8201a3c523a335b8ad12c29d8042148a335c5b9f6a9843",
+      "W1_C02_PERSISTENT_TAKER_PRESSURE_08H": "1324ab9933bfd7946f7a86d6bff9f219630e7f847e0ac26ca887d6f39b384d78",
+      "W1_C03_BREAKOUT_RETEST_WITH_FLOW_04H": "b47abdf783b725ef977d93ee550eec867b520d15dea6e1a04d92bca7c580e55c",
+      "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H": "639ab2fb4cb1b3299feda9ef5146603303eb7145a8c102929ae8a063978e358c",
+      "W1_C05_CROSS_SESSION_CONTINUATION_08H": "b241d29419924fb7934aecd54d9727babf7374ecf4f9b4b04b84da7620ff7881",
+      "W2_C01_VOLUME_WEIGHTED_MOMENTUM_SURGE_08H": "d773a6645b1e196d768683e88f2337a3a8aeb5450e96e930ccdeec9810ee461b",
+      "W2_C02_MULTI_TIMEFRAME_CHOP_EXIT_TREND_12H": "8bc627240d92b1f3f5876ea19d9c5e2228dfd9efef0fd1b2f94dd9b3fc036282",
+      "W2_C03_AGGRESSIVE_FLOW_CUMULATIVE_DELTA_DIVERGENCE_08H": "8f9a115ddd1b3780634ed361f3a4563b8043e618c60b4777bef21dbffe1b0785",
+      "W2_C04_DONCHIAN_MIDLINE_PULLBACK_CONTINUATION_08H": "46f39d9c2cce701fcbdf330ea0b7175fabc5ef99c89901e14fb0d5167a12c446",
+      "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H": "a03ad33a80c365bd51e67394bce84ce67d883ad15dc0c5a913522b584528a2b2",
+      "W2_C06_EXTREME_FLOW_EXHAUSTION_REVERSAL_TO_TREND_04H": "92ba690f6936200c85a8bed0722d6917cd1ce03a7e6be216924c73f2d140eb1e",
+      "W3_C01_EMA_CROSS_MULTI_HORIZON_TREND_FILTER_08H": "2b5d94aaa054e648fa7b873906f97f5ed8402c4139deb1ee5c6619bc26bb83a8",
+      "W3_C02_KAUFMAN_EFFICIENCY_RATIO_EXPANSION_08H": "10f33e5471690417610f9606daeb04de30d8fe6df8c7d92ac80ddead5e949453",
+      "W3_C03_BOLLINGER_BAND_WIDTH_SQUEEZE_EXPLOSION_12H": "07d7561b17b9c116b97ca65595ad622c567f2bfaab8b65a084212c5b84d42b35",
+      "W3_C04_ASYMMETRIC_LONG_BIASED_TREND_FLOW_12H": "b77a5c28849c11815cfb01ec385a6b5508916b1d3af8a3b36f4736e11c71f058",
+      "W3_C05_ASYMMETRIC_SHORT_BIASED_FLOW_COLLAPSE_08H": "85eaa8e5d00fa595e08f63e5a5d49cc2d8f7a229690a105634b4370a439bf482",
+      "W3_C06_TIME_WEIGHTED_SESSION_PULLBACK_08H": "aa596382c6245e4f48d1ce5dd574a7ce1434a9a9b53421966328469db14d5b66",
+      "W4_C01_DUAL_TIMEFRAME_VOLATILITY_EXPANSION_08H": "2e4632951beee38e69678ae1251255a27accddf9c415ab4a6d35bbce02dfd0a6",
+      "W4_C02_VWAP_MEAN_DRIFT_ACCELERATION_08H": "b9a30e2359552de953bfbafe3cbedddfb44d0a7410f433eed9160554912a5eb4",
+      "W4_C03_TREND_MOMENTUM_CONVERGENCE_DIVERGENCE_12H": "e037b17679f90502e2786492225de4d4dca6e3ecf337ee578ba773727cce9860",
+      "W4_C04_DONCHIAN_CHANNEL_VOLATILITY_BREAKOUT_08H": "1cacdc30f91c048bf51a2bec08689235789b768a66aa9cf7ba06184dd92bcdec",
+      "W4_C05_CUMULATIVE_FLOW_PERCENTILE_SURGE_08H": "82ceb10a465d641d5712051695d7eda241dd40bd53067025cec729affd123af2",
+      "W4_C06_ASYMMETRIC_MOMENTUM_EXHAUSTION_CONTINUATION_24H": "ec418d263d4adbdcca1dae616b29e0d68a3e7ffa290c22110fd62010db6dae9f"
+    },
+    "unchanged_registries": [
+      {
+        "wave": 1,
+        "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_FROZEN_REGISTRY.json",
+        "sha256": "d05f2361c59bf3d0c0f2b75d2ea91293e4e3f95a5720f8c0feb587b86ede3249"
+      },
+      {
+        "wave": 2,
+        "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_FROZEN_REGISTRY.json",
+        "sha256": "7d0fcc73ce81180ac5c90de5dc4ac7528dc94ff26f3a5735e86b946f9e1d9423"
+      },
+      {
+        "wave": 3,
+        "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_FROZEN_REGISTRY.json",
+        "sha256": "d42458d2c454dc2658eb52f459aafa39dcab87cdfc95a2b58756321d51092490"
+      },
+      {
+        "wave": 4,
+        "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_FROZEN_REGISTRY.json",
+        "sha256": "bc625fb62537b01958618ab55e308d01144c67dfa1e2d2d6e99b59b19687d668"
+      }
+    ],
+    "excluded": {
+      "id": "W1_C06_PERSISTENT_TREND_24H",
+      "status": "METHOD_INVALID_EXCLUDED_FROM_PROMOTION",
+      "numeric_rerun": false
+    },
+    "entry_clock": "event_time=t_round-60000;decision_at=t_round;entry_at=t_round+60000",
+    "time_cap": "first minute-open at/after entry+horizon, capped at target, original priority",
+    "controller_dispatch_sha": "bfe9f5df1bf55e7738cfbff58ce32e674edab683",
+    "prompt_sha": "681087557fb774a110500282fcd5e20fa17bc949",
+    "scientific_grade": "EX_POST_CODE_AS_EXECUTED_DEV_ONLY_NOT_REGISTERED_TEXT_METHOD",
+    "controller_scientific_grade": "EX_POST_CODE_AS_EXECUTED_REANALYSIS_EXPOSED_DEV_ONLY__NOT_PREREG_CONFIRMED"
+  },
+  "exact_start_sha": "d1f9f4316a2485f5d09ee1c910d7797ecfc6be7e",
+  "fixed_configs": [
+    {
+      "id": "W1_C01_MULTISCALE_TREND_ADOPTION_08H",
+      "family": "MULTISCALE_TREND_ADOPTION",
+      "horizon_hours": 8,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Trend adoption across multiple scales: 4h structural trend filtered by EMA20/50 and slope; 1h structural trend confirmation; 15m non-chase entry with 2 consecutive bars of aligned taker buy volume pressure.",
+      "math_formulation": {
+        "long_entry": "(4h_close > 4h_EMA20 > 4h_EMA50) and (4h_EMA20 - 4h_EMA20[3] > 0) and (1h_close > 1h_EMA20) and (15m_return < 1.5*15m_ATR) and (15m_signed_taker_ratio > 0.15 for last 2 bars)",
+        "short_entry": "(4h_close < 4h_EMA20 < 4h_EMA50) and (4h_EMA20 - 4h_EMA20[3] < 0) and (1h_close < 1h_EMA20) and (15m_return > -1.5*15m_ATR) and (15m_signed_taker_ratio < -0.15 for last 2 bars)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Net bps <= 0 under 44 bp stress roundtrip, profit factor < 1.15, or failure across equal-weighted calendar years."
+    },
+    {
+      "id": "W1_C02_PERSISTENT_TAKER_PRESSURE_08H",
+      "family": "PERSISTENT_TAKER_PRESSURE",
+      "horizon_hours": 8,
+      "timeframes": [
+        "4h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Persistent order flow imbalance: 3 consecutive 15m bars with sustained signed taker ratio > 0.10 (or < -0.10) accompanied by volume > 1.2x 20-bar average, aligned with 4h EMA20 > EMA50 trend regime.",
+      "math_formulation": {
+        "long_entry": "(4h_EMA20 > 4h_EMA50) and (all last 3 15m bars: signed_taker_ratio > 0.10) and (15m_vol > 1.2 * 15m_vol_SMA20)",
+        "short_entry": "(4h_EMA20 < 4h_EMA50) and (all last 3 15m bars: signed_taker_ratio < -0.10) and (15m_vol > 1.2 * 15m_vol_SMA20)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Taker pressure fails to sustain drift beyond 44 bp roundtrip cost; net bps <= 0 or trade count < 100."
+    },
+    {
+      "id": "W1_C03_BREAKOUT_RETEST_WITH_FLOW_04H",
+      "family": "MULTIHOUR_BREAKOUT_RETEST_WITH_FLOW",
+      "horizon_hours": 4,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.2,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Breakout and retest acceptance: 4h 20-bar Donchian channel breakout within last 12h, followed by a pullback retest touching within 0.5 * 1h ATR of the breakout level, followed by immediate 15m re-affirmation with positive taker flow.",
+      "math_formulation": {
+        "long_entry": "(Recent 4h breakout of 20-bar high) and (15m_low <= 4h_prev_high + 0.5*1h_ATR) and (15m_close > 4h_prev_high) and (15m_signed_taker_ratio > 0.10)",
+        "short_entry": "(Recent 4h breakout of 20-bar low) and (15m_high >= 4h_prev_low - 0.5*1h_ATR) and (15m_close < 4h_prev_low) and (15m_signed_taker_ratio < -0.10)",
+        "stop_rule": "Entry +/- 1.2 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Chop and false retests cause repeated stop outs, yielding negative stress net bps."
+    },
+    {
+      "id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "family": "ATR_EXPANSION_TREND_FOLLOW",
+      "horizon_hours": 12,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 2.0,
+      "target_R": 2.0,
+      "cooldown_hours": 6,
+      "economic_rationale": "Volatility expansion momentum: After volatility compression (1h ATR(14) / ATR(56) < 0.75), an expansion bar triggers with ATR expansion > 1.25x and price breakout of 20-bar 1h channel, entry gated by chase limit (< 1.0 * ATR).",
+      "math_formulation": {
+        "long_entry": "(1h_ATR14 / 1h_ATR56 < 0.75 in prior 12h) and (1h_ATR14 > 1.25 * 1h_ATR14[10]) and (1h_close > 1h_high_20) and (1h_close - 1h_high_20 < 1.0 * 1h_ATR)",
+        "short_entry": "(1h_ATR14 / 1h_ATR56 < 0.75 in prior 12h) and (1h_ATR14 > 1.25 * 1h_ATR14[10]) and (1h_close < 1h_low_20) and (1h_low_20 - 1h_close < 1.0 * 1h_ATR)",
+        "stop_rule": "Entry +/- 2.0 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Post-expansion mean reversion causes drawdown > 12% or negative net returns under stress costs."
+    },
+    {
+      "id": "W1_C05_CROSS_SESSION_CONTINUATION_08H",
+      "family": "CROSS_SESSION_CONTINUATION",
+      "horizon_hours": 8,
+      "timeframes": [
+        "1h",
+        "session"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 8,
+      "economic_rationale": "Cross-session momentum continuation: At London open (08:00 UTC) or NY open (13:00 UTC), if the preceding 2 1h bars showed strong unidirectional momentum with above-average volume (> 1.2x) and aligned flow, enter for 8h continuation.",
+      "math_formulation": {
+        "long_entry": "(hour in {8, 13}) and (last 2 1h bars: close > open and vol > 1.2 * 1h_vol_SMA20 and signed_taker_ratio > 0.10)",
+        "short_entry": "(hour in {8, 13}) and (last 2 1h bars: close < open and vol > 1.2 * 1h_vol_SMA20 and signed_taker_ratio < -0.10)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Session opens result in mean-reverting traps ('fakeouts') rather than sustained trend continuation."
+    },
+    {
+      "id": "W2_C01_VOLUME_WEIGHTED_MOMENTUM_SURGE_08H",
+      "family": "VOLUME_WEIGHTED_MOMENTUM_SURGE",
+      "horizon_hours": 8,
+      "timeframes": [
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Volume-weighted momentum breakout: 1h close breaks above 24h rolling VWAP by > 0.5 * 1h ATR with volume surge (> 1.5x 20h SMA) and strong signed taker flow (> 0.15). Symmetrical short for break below VWAP.",
+      "math_formulation": {
+        "long_entry": "(1h_close > 24h_VWAP + 0.5 * 1h_ATR) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(1h_close < 24h_VWAP - 0.5 * 1h_ATR) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Volume surge leads to immediate liquidity exhaustion and reversal under 44 bp stress."
+    },
+    {
+      "id": "W2_C02_MULTI_TIMEFRAME_CHOP_EXIT_TREND_12H",
+      "family": "MULTI_TIMEFRAME_CHOP_EXIT_TREND",
+      "horizon_hours": 12,
+      "timeframes": [
+        "4h",
+        "1h"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 2.0,
+      "target_R": 2.0,
+      "cooldown_hours": 6,
+      "economic_rationale": "Regime transition from consolidation to directional expansion: 4h ADX(14) was below 18 for >= 3 bars (chop) and crosses above 20 with DI directional confirmation and 1h 12-hour high/low breakout.",
+      "math_formulation": {
+        "long_entry": "(min(4h_ADX[h4-3:h4]) < 18) and (4h_ADX > 20) and (4h_DI_plus > 4h_DI_minus) and (1h_close > max(1h_high[h1-12:h1]))",
+        "short_entry": "(min(4h_ADX[h4-3:h4]) < 18) and (4h_ADX > 20) and (4h_DI_minus > 4h_DI_plus) and (1h_close < min(1h_low[h1-12:h1]))",
+        "stop_rule": "Entry +/- 2.0 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Chop exit signals produce false starts that quickly collapse back into range."
+    },
+    {
+      "id": "W2_C03_AGGRESSIVE_FLOW_CUMULATIVE_DELTA_DIVERGENCE_08H",
+      "family": "FLOW_CUMULATIVE_DELTA_CONFIRMATION",
+      "horizon_hours": 8,
+      "timeframes": [
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Cumulative Volume Delta (CVD) momentum confirmation: 12h price breakout accompanied by simultaneous new 12h high in cumulative taker buy volume delta, verifying aggressive buying dominance.",
+      "math_formulation": {
+        "long_entry": "(1h_close > max(1h_high[h1-12:h1])) and (12h_CVD > max(12h_CVD[h1-12:h1])) and (15m_signed_taker_ratio > 0.10)",
+        "short_entry": "(1h_close < min(1h_low[h1-12:h1])) and (12h_CVD < min(12h_CVD[h1-12:h1])) and (15m_signed_taker_ratio < -0.10)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Aggressive CVD surges fail to sustain drift and suffer negative net returns under stress fees."
+    },
+    {
+      "id": "W2_C04_DONCHIAN_MIDLINE_PULLBACK_CONTINUATION_08H",
+      "family": "DONCHIAN_MIDLINE_PULLBACK_CONTINUATION",
+      "horizon_hours": 8,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Trend continuation on shallow pullbacks: In a 4h structural trend (EMA20 > EMA50 and close > EMA20), enter on a 15m pullback touching the 20-bar 1h Donchian midline when 15m close recovers with positive flow (> 0.10).",
+      "math_formulation": {
+        "long_entry": "(4h_close > 4h_EMA20 > 4h_EMA50) and (15m_low <= 1h_Donchian_Mid <= 15m_high) and (15m_close > 1h_Donchian_Mid) and (15m_signed_taker_ratio > 0.10)",
+        "short_entry": "(4h_close < 4h_EMA20 < 4h_EMA50) and (15m_low <= 1h_Donchian_Mid <= 15m_high) and (15m_close < 1h_Donchian_Mid) and (15m_signed_taker_ratio < -0.10)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Midline pullbacks break through into deep trend reversals, hitting stop losses."
+    },
+    {
+      "id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "family": "ASYMMETRIC_VOLATILITY_BREAKOUT",
+      "horizon_hours": 12,
+      "timeframes": [
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.8,
+      "target_R": 2.5,
+      "cooldown_hours": 6,
+      "economic_rationale": "Calibrated volatility expansion: 1h ATR compression (< 0.85 of 56-bar ATR) followed by 1h expansion (> 1.2x SMA10) with volume confirmation (> 1.5x) and 15m taker flow confirmation.",
+      "math_formulation": {
+        "long_entry": "(min(1h_ATR14/1h_ATR56 in prior 12h) < 0.85) and (1h_ATR14 > 1.20 * 1h_ATR14_SMA10) and (1h_vol > 1.5 * 1h_vol_SMA20) and (1h_close > 1h_high_20) and (15m_signed_taker_ratio > 0.10)",
+        "short_entry": "(min(1h_ATR14/1h_ATR56 in prior 12h) < 0.85) and (1h_ATR14 > 1.20 * 1h_ATR14_SMA10) and (1h_vol > 1.5 * 1h_vol_SMA20) and (1h_close < 1h_low_20) and (15m_signed_taker_ratio < -0.10)",
+        "stop_rule": "Entry +/- 1.8 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.5 * StopDistance"
+      },
+      "falsification_criteria": "Sample size remains under 100 or net bps under stress fails to exceed 0."
+    },
+    {
+      "id": "W2_C06_EXTREME_FLOW_EXHAUSTION_REVERSAL_TO_TREND_04H",
+      "family": "FLOW_EXHAUSTION_REVERSAL_TO_TREND",
+      "horizon_hours": 4,
+      "timeframes": [
+        "4h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.2,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Liquidity sweep exhaustion into trend: In 4h uptrend (EMA20 > EMA50), a temporary sharp sell-off occurs with 15m signed taker ratio < -0.30 and long lower wick (rejection), entering on the next 15m bar with positive flow (> 0.10). Symmetrical short for buying climax into downtrend.",
+      "math_formulation": {
+        "long_entry": "(4h_EMA20 > 4h_EMA50) and (prev 15m: flow < -0.30 and lower_wick > 2 * upper_wick) and (current 15m: close > prev_close and flow > 0.10)",
+        "short_entry": "(4h_EMA20 < 4h_EMA50) and (prev 15m: flow > 0.30 and upper_wick > 2 * lower_wick) and (current 15m: close < prev_close and flow < -0.10)",
+        "stop_rule": "Entry +/- 1.2 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Counter-trend momentum continues through stop loss, failing to revert to higher timeframe trend."
+    },
+    {
+      "id": "W3_C01_EMA_CROSS_MULTI_HORIZON_TREND_FILTER_08H",
+      "family": "EMA_CROSS_MULTI_HORIZON_TREND",
+      "horizon_hours": 8,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Fresh 1h moving average cross aligned with 4h macro trend: 1h EMA10 crosses 1h EMA30 within the last 2 hours, confirmed by 4h EMA20 > EMA50, and current 15m signed flow ratio > 0.20.",
+      "math_formulation": {
+        "long_entry": "(4h_EMA20 > 4h_EMA50) and (1h_EMA10 crosses above 1h_EMA30 within 2h) and (15m_signed_taker_ratio > 0.20)",
+        "short_entry": "(4h_EMA20 < 4h_EMA50) and (1h_EMA10 crosses below 1h_EMA30 within 2h) and (15m_signed_taker_ratio < -0.20)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "MA crosses suffer from whipsaws and lagging entries under 44 bp stress fees."
+    },
+    {
+      "id": "W3_C02_KAUFMAN_EFFICIENCY_RATIO_EXPANSION_08H",
+      "family": "KAUFMAN_EFFICIENCY_RATIO_EXPANSION",
+      "horizon_hours": 8,
+      "timeframes": [
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Efficiency ratio transition: Kaufman ER on 1h bars surges from chop (< 0.30 in prior 12h) to directional trend (> 0.65), entering in the direction of the price change with 15m taker flow confirmation.",
+      "math_formulation": {
+        "long_entry": "(min(1h_ER[h1-12:h1]) < 0.30) and (1h_ER > 0.65) and (1h_close > 1h_close[h1-10]) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(min(1h_ER[h1-12:h1]) < 0.30) and (1h_ER > 0.65) and (1h_close < 1h_close[h1-10]) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "ER surges represent terminal exhaustion moves rather than persistent trends."
+    },
+    {
+      "id": "W3_C03_BOLLINGER_BAND_WIDTH_SQUEEZE_EXPLOSION_12H",
+      "family": "BOLLINGER_BAND_WIDTH_SQUEEZE",
+      "horizon_hours": 12,
+      "timeframes": [
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.8,
+      "target_R": 2.5,
+      "cooldown_hours": 6,
+      "economic_rationale": "Volatility squeeze explosion: 1h Bollinger Bandwidth hits a 30-bar low, followed by a close breaking outside the outer band with volume > 1.5x and 15m signed flow > 0.15.",
+      "math_formulation": {
+        "long_entry": "(1h_BW < min(1h_BW[h1-30:h1-1])) and (1h_close > 1h_BB_upper) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(1h_BW < min(1h_BW[h1-30:h1-1])) and (1h_close < 1h_BB_lower) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 1.8 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.5 * StopDistance"
+      },
+      "falsification_criteria": "Bandwidth squeezes produce false breakouts with negative net returns after 44 bp friction."
+    },
+    {
+      "id": "W3_C04_ASYMMETRIC_LONG_BIASED_TREND_FLOW_12H",
+      "family": "ASYMMETRIC_LONG_BIASED_TREND",
+      "horizon_hours": 12,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "LONG_ONLY",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.5,
+      "cooldown_hours": 6,
+      "economic_rationale": "Asymmetric long trend riding: Exploit BTC structural upward drift in bull regimes. Require 4h EMA20 > EMA50, 1h close > EMA20, 1h ATR expanding, and 2 consecutive 15m bars of strong taker buy flow (> 0.15).",
+      "math_formulation": {
+        "long_entry": "(4h_EMA20 > 4h_EMA50) and (1h_close > 1h_EMA20) and (1h_ATR14 > 1h_ATR14_SMA10) and (all last 2 15m bars: signed_taker_ratio > 0.15)",
+        "short_entry": "NONE (LONG ONLY)",
+        "stop_rule": "Entry - 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry + 2.5 * StopDistance"
+      },
+      "falsification_criteria": "Long-only bias fails during bear year (2022) with equal-year net bps <= 0 or drawdown > 12%."
+    },
+    {
+      "id": "W3_C05_ASYMMETRIC_SHORT_BIASED_FLOW_COLLAPSE_08H",
+      "family": "ASYMMETRIC_SHORT_BIASED_COLLAPSE",
+      "horizon_hours": 8,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "SHORT_ONLY",
+      "stop_atr_multiplier": 1.2,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Short-biased cascade expansion: In 4h downtrend (EMA20 < EMA50), a sharp 1h drop (> 1.5x ATR) occurs with heavy negative flow (< -0.25) and volume surge (> 2.0x), entering short for rapid cascade continuation over 8h.",
+      "math_formulation": {
+        "long_entry": "NONE (SHORT ONLY)",
+        "short_entry": "(4h_EMA20 < 4h_EMA50) and (1h_open - 1h_close > 1.5 * 1h_ATR) and (1h_vol > 2.0 * 1h_vol_SMA20) and (15m_signed_taker_ratio < -0.25)",
+        "stop_rule": "Entry + 1.2 * 1h_ATR(14)",
+        "target_rule": "Entry - 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Cascade extensions reverse sharply (short squeeze) resulting in stop hits under stress."
+    },
+    {
+      "id": "W3_C06_TIME_WEIGHTED_SESSION_PULLBACK_08H",
+      "family": "SESSION_PULLBACK_TREND",
+      "horizon_hours": 8,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 6,
+      "economic_rationale": "Liquid session pullback continuation: During peak European/US liquidity hours (10:00 to 18:00 UTC), in aligned 4h trend, a 15m pullback touches 1h EMA10 and recovers with strong taker flow (> 0.15).",
+      "math_formulation": {
+        "long_entry": "(UTC_hour in [10..18]) and (4h_close > 4h_EMA20 > 4h_EMA50) and (15m_low <= 1h_EMA10 <= 15m_high) and (15m_close > 1h_EMA10) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(UTC_hour in [10..18]) and (4h_close < 4h_EMA20 < 4h_EMA50) and (15m_low <= 1h_EMA10 <= 15m_high) and (15m_close < 1h_EMA10) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Session pullbacks continue moving against position, failing 44 bp stress roundtrip."
+    },
+    {
+      "id": "W4_C01_DUAL_TIMEFRAME_VOLATILITY_EXPANSION_08H",
+      "family": "DUAL_TIMEFRAME_VOLATILITY_EXPANSION",
+      "horizon_hours": 8,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.5,
+      "cooldown_hours": 4,
+      "economic_rationale": "Dual timeframe volatility expansion: 4h ATR(14) > 4h ATR(56), 1h ATR(14) surges > 1.25x its 10-bar SMA with volume > 1.3x 20h SMA, and 15m signed flow ratio > 0.15 (long) or < -0.15 (short).",
+      "math_formulation": {
+        "long_entry": "(4h_ATR14 > 4h_ATR56) and (1h_ATR14 > 1.25 * 1h_ATR14_SMA10) and (1h_vol > 1.3 * 1h_vol_SMA20) and (1h_close > 1h_open) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(4h_ATR14 > 4h_ATR56) and (1h_ATR14 > 1.25 * 1h_ATR14_SMA10) and (1h_vol > 1.3 * 1h_vol_SMA20) and (1h_close < 1h_open) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.5 * StopDistance"
+      },
+      "falsification_criteria": "Dual expansion produces insufficient edge to cover 44 bp roundtrip friction."
+    },
+    {
+      "id": "W4_C02_VWAP_MEAN_DRIFT_ACCELERATION_08H",
+      "family": "VWAP_MEAN_DRIFT_ACCELERATION",
+      "horizon_hours": 8,
+      "timeframes": [
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "24h rolling VWAP acceleration: Price holds above 24h VWAP for 3 consecutive 1h bars with positive VWAP slope and 15m signed flow > 0.20. Symmetrical short for below VWAP with negative slope.",
+      "math_formulation": {
+        "long_entry": "(all last 3 1h bars: close > 24h_VWAP) and (24h_VWAP > 24h_VWAP[h1-3]) and (15m_signed_taker_ratio > 0.20)",
+        "short_entry": "(all last 3 1h bars: close < 24h_VWAP) and (24h_VWAP < 24h_VWAP[h1-3]) and (15m_signed_taker_ratio < -0.20)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "VWAP drift stalls and mean-reverts back through stop loss."
+    },
+    {
+      "id": "W4_C03_TREND_MOMENTUM_CONVERGENCE_DIVERGENCE_12H",
+      "family": "TREND_MOMENTUM_CONVERGENCE",
+      "horizon_hours": 12,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.8,
+      "target_R": 2.5,
+      "cooldown_hours": 6,
+      "economic_rationale": "Multi-timeframe MACD momentum ignition: 4h MACD histogram crosses above zero within last 2 bars, 1h close > 1h EMA20, and 15m signed taker ratio > 0.15. Symmetrical short for 4h MACD histogram crossing below zero.",
+      "math_formulation": {
+        "long_entry": "(4h_MACD_hist > 0 and 4h_MACD_hist[h4-1] <= 0) and (1h_close > 1h_EMA20) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(4h_MACD_hist < 0 and 4h_MACD_hist[h4-1] >= 0) and (1h_close < 1h_EMA20) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 1.8 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.5 * StopDistance"
+      },
+      "falsification_criteria": "MACD momentum ignition lags and suffers negative net returns under stress fees."
+    },
+    {
+      "id": "W4_C04_DONCHIAN_CHANNEL_VOLATILITY_BREAKOUT_08H",
+      "family": "DONCHIAN_VOLATILITY_BREAKOUT",
+      "horizon_hours": 8,
+      "timeframes": [
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.2,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Donchian 24-bar 1h breakout with tight stop: 1h close breaks above 24-bar high, volume > 1.5x 20h SMA, signed flow > 0.15, with tight 1.2x stop and 2.0R target to limit friction loss.",
+      "math_formulation": {
+        "long_entry": "(1h_close > max(1h_high[h1-24:h1])) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(1h_close < min(1h_low[h1-24:h1])) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 1.2 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Breakouts fail and tight stops trigger frequently, yielding negative net bps."
+    },
+    {
+      "id": "W4_C05_CUMULATIVE_FLOW_PERCENTILE_SURGE_08H",
+      "family": "CUMULATIVE_FLOW_PERCENTILE_SURGE",
+      "horizon_hours": 8,
+      "timeframes": [
+        "4h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Percentile flow surge: 15m signed taker ratio is in top 95th percentile of past 48 15m bars (12h), volume > 1.5x 20-bar SMA, aligned with 4h EMA20 > EMA50 trend. Symmetrical short for bottom 5th percentile.",
+      "math_formulation": {
+        "long_entry": "(4h_EMA20 > 4h_EMA50) and (15m_flow > quantile(15m_flow[i-48:i], 0.95)) and (15m_vol > 1.5 * 15m_vol_SMA20)",
+        "short_entry": "(4h_EMA20 < 4h_EMA50) and (15m_flow < quantile(15m_flow[i-48:i], 0.05)) and (15m_vol > 1.5 * 15m_vol_SMA20)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Flow surges fail to predict directional continuation beyond 44 bp stress roundtrip."
+    },
+    {
+      "id": "W4_C06_ASYMMETRIC_MOMENTUM_EXHAUSTION_CONTINUATION_24H",
+      "family": "ASYMMETRIC_MOMENTUM_CONTINUATION",
+      "horizon_hours": 24,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 2.0,
+      "target_R": 3.0,
+      "cooldown_hours": 12,
+      "economic_rationale": "Secular 24h trend riding with asymmetric 3R payoff: 4h EMA20 > EMA50, 4h ADX > 22, 1h close > 1h EMA20, 15m signed flow > 0.15, aiming for large tail gains to overcome stress roundtrip cost.",
+      "math_formulation": {
+        "long_entry": "(4h_close > 4h_EMA20 > 4h_EMA50) and (4h_ADX > 22) and (1h_close > 1h_EMA20) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(4h_close < 4h_EMA20 < 4h_EMA50) and (4h_ADX > 22) and (1h_close < 1h_EMA20) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 2.0 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 3.0 * StopDistance"
+      },
+      "falsification_criteria": "24h horizon suffers deep intra-trade drawdowns and fails 12% max MTM DD limit, or net bps <= 0."
+    }
+  ],
+  "invalid_config_omitted": {
+    "id": "W1_C06_PERSISTENT_TREND_24H",
+    "status": "METHOD_INVALID_EXCLUDED_FROM_PROMOTION",
+    "numeric_rerun": false
+  },
+  "source_months": [
+    "2021-01",
+    "2021-02",
+    "2021-03",
+    "2021-04",
+    "2021-05",
+    "2021-06",
+    "2021-07",
+    "2021-08",
+    "2021-09",
+    "2021-10",
+    "2021-11",
+    "2021-12",
+    "2022-01",
+    "2022-02",
+    "2022-03",
+    "2022-04",
+    "2022-05",
+    "2022-06",
+    "2022-07",
+    "2022-08",
+    "2022-09",
+    "2022-10",
+    "2022-11",
+    "2022-12",
+    "2023-01",
+    "2023-02",
+    "2023-03",
+    "2023-04",
+    "2023-05",
+    "2023-06",
+    "2023-07",
+    "2023-08",
+    "2023-09",
+    "2023-10",
+    "2023-11",
+    "2023-12"
+  ],
+  "source_prefix": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/",
+  "source_checksum_fresh_fetch": true,
+  "authorized_scratch": "/tmp/gemini_goal_trend_flow_r1",
+  "new_run_scratch": "/tmp/gemini-a-code-identity-replay-r2",
+  "scoring": "2021-02..2023-12;35 months;old24h signal purge;exante maximumhold+ACK check",
+  "economic_grade": "COST_PROXY_DEV_ONLY",
+  "fixed_per_leg_bps": {
+    "BASE": {
+      "fee": 6,
+      "halfspread": 2,
+      "slip": 3
+    },
+    "STRESS": {
+      "fee": 12,
+      "halfspread": 4,
+      "slip": 6
+    }
+  },
+  "cash_account": "continuous1000USDT;1x admissioncap;5%reserve;no newkill;cooldownfromexit withACKfloor",
+  "controls": "PAUSE;peracceptedentry nontradable 50-50LONGSHORT pair halfq each, same rawrisk/targetR/hold/cost; reportoverlap notpooledportfolio",
+  "inference": {
+    "blocks_days": [
+      7,
+      14
+    ],
+    "iterations": 10000,
+    "seed": 42,
+    "family_size": 48,
+    "one_sided_alpha": 0.0010416666666666667,
+    "no_trade_calendar_blocks_retained": true,
+    "undefined_lower_bound": null
+  },
+  "positive_row_definition": "observed mean_net_bps>0 in either cost with n>0; exploratory only, descriptive strict gate independent; no automaticpromotion",
+  "methods_unchanged": "23 original signalfunction andbranchAST hashes;immutable registries and R1",
+  "actual_market_read_before_this_code_commit": false,
+  "planned_validation": {
+    "scoped_synthetic_tests_passed": 82,
+    "real_decimal_minimum": 5,
+    "real_decimal_exit_support": [
+      "STOP",
+      "TIME_CAP",
+      "TARGET"
+    ],
+    "real_decimal_sides": [
+      1,
+      -1
+    ],
+    "selected_real_determinism_replays": 3
+  },
+  "root_model_requested": "Codex GPT-6 Sol High",
+  "root_model_observed": "NOT_EXPOSED",
+  "root_effort_observed": "NOT_EXPOSED"
+}

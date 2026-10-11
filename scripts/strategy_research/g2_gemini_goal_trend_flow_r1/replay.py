@@ -329,10 +329,11 @@ def simulate_fold(
         equity += tr["net_usdt"]
         if equity <= 0:
             raise ValueError("Insolvent account after gap fill")
+        tr["cash_before_entry"] = equity - tr["net_usdt"]
         tr["cash_after_ack"] = equity
         trades.append(tr)
         close_equities.append(equity)
-        next_allowed_entry = tr["exit_ack_at"] + cooldown_ms
+        next_allowed_entry = max(tr["exit_ack_at"], tr["exit_at"] + cooldown_ms)
         curve_cursor = i_exit + 1
         counts["FILLED"] += 1
 
