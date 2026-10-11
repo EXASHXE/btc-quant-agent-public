@@ -1,0 +1,20 @@
+{
+  "stage": "STAGE_1_FREEZE",
+  "verification_timestamp": "2026-10-12T03:50:12+08:00",
+  "branch": "feature/v06-bline-gemini-goal-a-conformance-r2",
+  "commit_sha": "d45b9e9f2c82203336c263662ecc7c6e742f7b84",
+  "parent_sha": "efa0b302233800f6474b3dda5775be56a77d0860",
+  "remote_url": "https://github.com/EXASHXE/btc-quant-agent-public.git",
+  "remote_ref": "refs/heads/feature/v06-bline-gemini-goal-a-conformance-r2",
+  "remote_head_sha": "d45b9e9f2c82203336c263662ecc7c6e742f7b84",
+  "exact_head_match": true,
+  "frozen_paths": [
+    "docs/strategy_research/g2_goal_a_conformance_r2/GOAL_A_CONFORMANCE_FROZEN_PLAN.md",
+    "evidence/v0.6/b_line/g2_goal_a_conformance_r2/GOAL_A_CONFORMANCE_CONTRACT.json",
+    "scripts/strategy_research/g2_goal_a_conformance_r2/__init__.py",
+    "scripts/strategy_research/g2_goal_a_conformance_r2/differential_harness.py",
+    "tests/test_v06_g2_goal_a_conformance_r2_suite.py"
+  ],
+  "verification_method": "git ls-remote origin feature/v06-bline-gemini-goal-a-conformance-r2",
+  "status": "STAGE_1_FROZEN_AND_VERIFIED"
+}

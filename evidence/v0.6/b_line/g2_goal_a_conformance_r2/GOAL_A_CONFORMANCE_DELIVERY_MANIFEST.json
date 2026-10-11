@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "manifest_name": "GOAL_A_CONFORMANCE_DELIVERY_MANIFEST",
+  "version": "1.0.0",
+  "generated_at": "2026-10-12T04:30:00+08:00",
+  "dispatch_authority": {
+    "controller_dispatch_sha": "1172d3a91324c1a7379bc9e5c24ef601076547c2",
+    "authority_document": "reviews/v0.6/b_line/V06_G2_GEMINI_ABC_GOAL_R2_CONTROLLER_EVIDENCE_REPAIR_AUTHORITY.md",
+    "repository": "EXASHXE/btc-quant-agent-public",
+    "branch": "feature/v06-bline-gemini-goal-a-conformance-r2",
+    "start_sha": "efa0b302233800f6474b3dda5775be56a77d0860",
+    "frozen_r1_sha": "83c0ef60d9eacfd2440fa223c57f042cfff4912f",
+    "final_r1_sha": "efa0b302233800f6474b3dda5775be56a77d0860",
+    "stage_1_freeze_sha": "d45b9e9f2c82203336c263662ecc7c6e742f7b84",
+    "own_worktree": "/root/workspace/project/quant-v0.6/gemini-goal-a-conformance-r2",
+    "own_scratch": "/tmp/btc-gemini-goal-a-conformance-r2"
+  },
+  "scientific_determination": {
+    "terminal_verdict": "A_R2_NON_EQUIVALENT_R1_FROZEN_METHOD_INVALID",
+    "replay_equivalence_summary": {
+      "equivalent_candidates": [
+        "C01_MACRO_PULLBACK_RECLAIM_12H",
+        "C01_MACRO_PULLBACK_RECLAIM_18H",
+        "C02_FAILED_BREAKOUT_EXHAUSTION_12H",
+        "C02_FAILED_BREAKOUT_EXHAUSTION_18H",
+        "C03_VOLATILITY_SHOCK_EXHAUSTION_12H",
+        "C03_VOLATILITY_SHOCK_EXHAUSTION_18H"
+      ],
+      "non_equivalent_candidates": [
+        "C04_INTRADAY_RANGE_REVERSION_12H",
+        "C04_INTRADAY_RANGE_REVERSION_18H"
+      ],
+      "c04_divergence_cause": "168-hour Wilder ATR memory decay ((167/168)^720 ≈ 1.35%) under 1-month windowing vs continuous 3-year array compilation, inducing 2 signal differences and 1 trade phase shift."
+    },
+    "c01_2023_zero_trade_exposure": {
+      "signals_generated_2023": 6288,
+      "signals_rejected_insufficient_budget": 6288,
+      "rejection_rate_pct": 100.0,
+      "diagnosis": "CAPITAL_EXHAUSTION_PROVEN: Ending 2022 cash ($17.02 USDT) was insufficient to purchase the minimum lot (0.001 BTC) under the 1x budget cap, rejecting all 6,288 market signals."
+    },
+    "human_vs_machine_reconciliation": {
+      "authoritative_source": "evidence/v0.6/b_line/g2_goal_entry_discovery_r2/GOAL_A_RUN_STRESS.json",
+      "verdict": "Machine JSON is 100% self-consistent; human report discrepancies were transcription typos (569/549 vs 619/499 for C01, 4/7 vs 5/6 for C03)."
+    },
+    "paired_controls_audit": {
+      "coverage_rate_pct": 100.0,
+      "total_trades_paired": 3673,
+      "symmetry_verified": true,
+      "alpha_found": false
+    }
+  },
+  "delivered_artifacts": [
+    {
+      "path": "docs/strategy_research/g2_goal_a_conformance_r2/GOAL_A_CONFORMANCE_FROZEN_PLAN.md",
+      "sha256": "ec935234f6809dd46ff49fd2d7f0772c5b5f997cc7c69a19a434ed5d05907f65",
+      "bytes": 6640,
+      "role": "Stage 1 Pre-Execution Frozen Research Plan"
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_goal_a_conformance_r2/GOAL_A_CONFORMANCE_CONTRACT.json",
+      "sha256": "d0069479234a8dcf7f5350255827cbe2a3a105cc0ac434c2af8f80209a69852a",
+      "bytes": 5243,
+      "role": "Stage 1 Machine Conformance Contract"
+    },
+    {
+      "path": "scripts/strategy_research/g2_goal_a_conformance_r2/__init__.py",
+      "sha256": "0b71575d7e76571abdeddce728346761dfcb822ad545a350a4ed9a7ee39a4bb5",
+      "bytes": 37,
+      "role": "Package initialization"
+    },
+    {
+      "path": "scripts/strategy_research/g2_goal_a_conformance_r2/differential_harness.py",
+      "sha256": "9ad2d49839f9388114d2c98e28f859c55d030d71e1a70757efda7da72b8a5084",
+      "bytes": 24929,
+      "role": "Dual-Engine Differential Replay & Audit Harness"
+    },
+    {
+      "path": "tests/test_v06_g2_goal_a_conformance_r2_suite.py",
+      "sha256": "1893d28ef0bb5bcb395bb0c493bee06ec6a70c82aea26b1d8477dbaa6095851c",
+      "bytes": 25561,
+      "role": "Deterministic Synthetic Unit Test Suite (43 tests)"
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_goal_a_conformance_r2/STAGE_1_FREEZE_REMOTE_VERIFICATION.json",
+      "sha256": "81837e9f1dec04ece859ccad8ba068eb2da9b2889e92ae01d53dc71705105bff",
+      "bytes": 1060,
+      "role": "Stage 1 Freeze Push & Remote Verification Proof"
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_goal_a_conformance_r2/DIFFERENTIAL_REPLAY_EVIDENCE_STRESS.json",
+      "sha256": "eee0c93ebaae47e169389d4225d90bc1d0af5ab24b9937d6c5b4773c4c550d7c",
+      "bytes": 103884,
+      "role": "Primary STRESS (44 bps) Differential Audit Evidence"
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_goal_a_conformance_r2/DIFFERENTIAL_REPLAY_EVIDENCE_BASE.json",
+      "sha256": "8cbe8b750d9552a8af6edcc68b055e06e20fa028f360e27782368e540f96f129",
+      "bytes": 106506,
+      "role": "Secondary BASE (22 bps) Differential Audit Evidence"
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_goal_a_conformance_r2/MACHINE_HUMAN_RECONCILIATION_TABLES.json",
+      "sha256": "534a31f60cff1dcd1d1e918080450ea9d85c55b45ef7245f1d855540611bca44",
+      "bytes": 5679,
+      "role": "Machine JSON vs Human Publication Reconciliation Tables"
+    },
+    {
+      "path": "docs/strategy_research/g2_goal_a_conformance_r2/GOAL_A_CONFORMANCE_REPORT.md",
+      "sha256": "43b3d9ac83e8a9d640b1296f22cb129d82c535babd5763b8b133c7ace03a9e8b",
+      "bytes": 17180,
+      "role": "Final Comprehensive Conformance & Reconciliation Research Report"
+    }
+  ]
+}

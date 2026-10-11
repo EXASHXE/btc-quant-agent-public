@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import time
 from pathlib import Path
 from typing import Any
 
@@ -103,7 +104,7 @@ def run_candidate_engine_frozen(
     metrics_3y = compute_trade_metrics(cand_trades, cash0=cash0)
     annual_metrics: dict[str, Any] = {}
     for yr in (2021, 2022, 2023):
-        yr_trades = [t for t in cand_trades if t["exit_year"] == yr]
+        yr_trades = [t for t in cand_trades if time.gmtime(t["entry_at"] / 1000).tm_year == yr]
         annual_metrics[str(yr)] = compute_trade_metrics(yr_trades, cash0=cash0)
 
     return {
@@ -195,7 +196,7 @@ def run_candidate_engine_final(
 
     annual_metrics: dict[str, Any] = {}
     for yr in (2021, 2022, 2023):
-        yr_trades = [t for t in cand_trades if t["exit_year"] == yr]
+        yr_trades = [t for t in cand_trades if time.gmtime(t["entry_at"] / 1000).tm_year == yr]
         annual_metrics[str(yr)] = compute_trade_metrics(yr_trades, cash0=cash0)
 
     return {
@@ -274,7 +275,9 @@ def compare_candidate_replays(
         d_xp = abs(float(t1["effective_exit"]) - float(t2["effective_exit"]))
         d_q = abs(float(t1["quantity"]) - float(t2["quantity"]))
         d_g = abs(float(t1["gross_usdt"]) - float(t2["gross_usdt"]))
-        d_f = abs(float(t1["fee_total_usdt"]) - float(t2["fee_total_usdt"]))
+        fee1 = float(t1["fee_entry"]) + float(t1["fee_exit"])
+        fee2 = float(t2["fee_entry"]) + float(t2["fee_exit"])
+        d_f = abs(fee1 - fee2)
         d_fund = abs(float(t1["funding_cash_usdt"]) - float(t2["funding_cash_usdt"]))
         d_net = abs(float(t1["net_after_funding_usdt"]) - float(t2["net_after_funding_usdt"]))
 
