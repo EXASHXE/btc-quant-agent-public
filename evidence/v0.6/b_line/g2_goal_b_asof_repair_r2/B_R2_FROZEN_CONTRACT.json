@@ -1,0 +1,73 @@
+{
+  "task_id": "g2_goal_b_asof_repair_r2",
+  "controller_authority": "https://github.com/EXASHXE/btc-quant-agent-public/blob/1172d3a91324c1a7379bc9e5c24ef601076547c2/reviews/v0.6/b_line/V06_G2_GEMINI_ABC_GOAL_R2_CONTROLLER_EVIDENCE_REPAIR_AUTHORITY.md",
+  "controller_dispatch_sha": "1172d3a91324c1a7379bc9e5c24ef601076547c2",
+  "parent_commit_sha": "397a62c1a0fbd6ad14a569a5be0058b1f684f08e",
+  "shared_base_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "r1_frozen_sha": "ebb33b7f96e5ab0c753beab14363632a0a221416",
+  "candidates": [
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H"
+  ],
+  "horizons": [
+    "E0",
+    "H1",
+    "H2"
+  ],
+  "cost_models": {
+    "BASE": {
+      "fee_bps": 12.0,
+      "spread_bps": 4.0,
+      "slippage_bps": 6.0,
+      "total_bps": 22.0
+    },
+    "STRESS": {
+      "fee_bps": 24.0,
+      "spread_bps": 8.0,
+      "slippage_bps": 12.0,
+      "total_bps": 44.0
+    }
+  },
+  "expected_ledger_digests": {
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_paired.jsonl": {
+      "sha256": "acda3f0996931b551750e41eebc5a124127e1dac84821197264f76a3e63b00a5",
+      "expected_events": 34,
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "cost": "BASE"
+    },
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_paired.jsonl": {
+      "sha256": "f8d10f8a8e7d16046c2d207bf12250d63f3cc1c1ec0b3d26a692c4317f8d2d8a",
+      "expected_events": 34,
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "cost": "STRESS"
+    },
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_paired.jsonl": {
+      "sha256": "4e417da29f07c85884199647c284031ca4c84801b48b0170bfd8f9f5e06be4b2",
+      "expected_events": 55,
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "cost": "BASE"
+    },
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_paired.jsonl": {
+      "sha256": "c27a8dabafd4b8e9949aa94fe76f524104481395294e812ca630a73c28db7847",
+      "expected_events": 55,
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "cost": "STRESS"
+    }
+  },
+  "timing_constants": {
+    "signal_decision_lag_ms": 60000,
+    "trend_bars_count": 240,
+    "atr_period": 14,
+    "atr_lookback_hours": 2160,
+    "min_events_per_stratum": 10
+  },
+  "formal_revocations": {
+    "R1_TREND_LEAKAGE": "REVOKED: Goal B R1 run.py (lines 136-142) assigned trend alignment using path24h.before12h.Last_MFE_R vs Last_MAE_R, which leaks the post-entry [0, 12h) in-trade price path. All R1 claims asserting predictive trend regimes are WITHDRAWN.",
+    "R1_VOLATILITY_SUBSTITUTION": "REVOKED: Goal B R1 run.py (lines 145-146) binned volatility via risk_bps > 300 instead of the predeclared expanding prior-only 90d completed 1h ATR14 percentile. All R1 claims asserting high/low volatility regime performance are WITHDRAWN.",
+    "R1_FUNDING_LEAKAGE": "REVOKED: Goal B R1 run.py (lines 149-154) extracted funding state from e0['funding_settlements'][0], which is the first settlement settling AFTER trade entry. All R1 claims asserting positive/negative funding regime advantages are WITHDRAWN.",
+    "R1_W2_YEAR_MISSTATEMENT": "RECONCILED: Goal B R1 human report Table 4 misstated W2 annual trade counts as 2021: 14, 2022: 17, 2023: 24. Verified primary Exit R1 machine records are 2021: 10, 2022: 21, 2023: 24 (total 55). The machine truth is strictly preserved.",
+    "R1_SKIPPED_SIGNALS_MISSTATEMENT": "RECONCILED: Goal B R1 human report Table 3 stated 0 skipped signals for E0, masking that E0 single-position account simulation also blocked candidate signals arriving during its 12h hold and cooldown.",
+    "R1_SLIPPAGE_VECTOR_DIFF": "RECONCILED: In R1 Commit 1 slippage was temporarily set to 16/8 bp before being corrected in Commit 2 to 12/6 bp to match frozen STRESS44 (24 fee + 8 spread + 12 slip = 44 bp) and BASE22 (12 fee + 4 spread + 6 slip = 22 bp). STRESS44 / BASE22 are strictly frozen.",
+    "NO_STRATEGY_SEARCH": "ATTESTED: Post-hoc causal repair is an observational diagnostic addendum only. Zero new entry rules, exit policies, parameter sweeps, or conditional switching variants are tested or promoted."
+  }
+}
