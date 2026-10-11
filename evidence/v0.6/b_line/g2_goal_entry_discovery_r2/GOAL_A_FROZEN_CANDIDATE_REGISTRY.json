@@ -1,0 +1,111 @@
+{
+  "TASK_ID": "g2_goal_entry_discovery_r2",
+  "START_SHA": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "CONTROLLER_DISPATCH_SHA": "c02743fddccdf517582c371a47e82d8dcbb05923",
+  "MAX_EXPLORATORY_CONFIGURATIONS": 12,
+  "REGISTERED_CONFIGURATIONS_COUNT": 8,
+  "PRIOR_EXPOSURE": {
+    "prior_entry_trials": 48,
+    "prior_exit_contrasts": 8,
+    "status": "EX_POST_DEVELOPMENT_EXPOSURE_ACKNOWLEDGED"
+  },
+  "ACCOUNT_CONTRACT": {
+    "cash0": 1000.0,
+    "max_exposure": 1.0,
+    "budget_multiplier": 0.95,
+    "lot_size": 0.001,
+    "min_notional": 5.0,
+    "tick_size": 0.1,
+    "cooldown_hours": 4,
+    "gap_veto_atr_fraction": 0.25,
+    "collision_priority": "STOP_BEFORE_TARGET",
+    "cost_tiers": {
+      "BASE": {
+        "fee_bps": 6.0,
+        "spread_bps": 4.0,
+        "slip_bps": 3.0,
+        "nominal_roundtrip_bps": 22.0
+      },
+      "STRESS": {
+        "fee_bps": 12.0,
+        "spread_bps": 8.0,
+        "slip_bps": 6.0,
+        "nominal_roundtrip_bps": 44.0
+      }
+    }
+  },
+  "CANDIDATES": [
+    {
+      "id": "C01_MACRO_PULLBACK_RECLAIM_12H",
+      "family": "MACRO_PULLBACK_RECLAIM",
+      "horizon_hours": 12,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "description": "1h EMA(20) vs EMA(50) alignment + 15m value dip below EMA(20) + 5m flow-confirmed reclaim, 12h deadline",
+      "mechanism": "Institutional trend continuation upon micro liquidity reclaim rather than chasing breakout peaks"
+    },
+    {
+      "id": "C01_MACRO_PULLBACK_RECLAIM_18H",
+      "family": "MACRO_PULLBACK_RECLAIM",
+      "horizon_hours": 18,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "description": "1h EMA(20) vs EMA(50) alignment + 15m value dip below EMA(20) + 5m flow-confirmed reclaim, 18h deadline sensitivity",
+      "mechanism": "Institutional trend continuation upon micro liquidity reclaim rather than chasing breakout peaks"
+    },
+    {
+      "id": "C02_FAILED_BREAKOUT_EXHAUSTION_12H",
+      "family": "FAILED_BREAKOUT_EXHAUSTION",
+      "horizon_hours": 12,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "description": "24h boundary penetration (>0.1 ATR) + 2-bar reclaim inside range + 15m volume absorption (>1.25x 24h avg), 12h deadline",
+      "mechanism": "Trapped breakout liquidity absorption forcing counter-directional inventory liquidation"
+    },
+    {
+      "id": "C02_FAILED_BREAKOUT_EXHAUSTION_18H",
+      "family": "FAILED_BREAKOUT_EXHAUSTION",
+      "horizon_hours": 18,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "description": "24h boundary penetration (>0.1 ATR) + 2-bar reclaim inside range + 15m volume absorption (>1.25x 24h avg), 18h deadline sensitivity",
+      "mechanism": "Trapped breakout liquidity absorption forcing counter-directional inventory liquidation"
+    },
+    {
+      "id": "C03_VOLATILITY_SHOCK_EXHAUSTION_12H",
+      "family": "VOLATILITY_SHOCK_EXHAUSTION",
+      "horizon_hours": 12,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "description": "15m liquidation-proxy shock (|C-O|>2.0 ATR, vol z-score>3.0) + stabilization bar reclaiming >=30% shock body, 12h deadline",
+      "mechanism": "Depleted liquidation cascade followed by order book replenishment and sharp mean reversion"
+    },
+    {
+      "id": "C03_VOLATILITY_SHOCK_EXHAUSTION_18H",
+      "family": "VOLATILITY_SHOCK_EXHAUSTION",
+      "horizon_hours": 18,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "description": "15m liquidation-proxy shock (|C-O|>2.0 ATR, vol z-score>3.0) + stabilization bar reclaiming >=30% shock body, 18h deadline sensitivity",
+      "mechanism": "Depleted liquidation cascade followed by order book replenishment and sharp mean reversion"
+    },
+    {
+      "id": "C04_INTRADAY_RANGE_REVERSION_12H",
+      "family": "INTRADAY_RANGE_REVERSION",
+      "horizon_hours": 12,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "description": "1h Choppiness Index > 55.0 + 20-period 1h BB touch with >=40% rejection wick, 12h deadline",
+      "mechanism": "Statistical range boundary mean-reversion toward fair-value midline in non-trending regime"
+    },
+    {
+      "id": "C04_INTRADAY_RANGE_REVERSION_18H",
+      "family": "INTRADAY_RANGE_REVERSION",
+      "horizon_hours": 18,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "description": "1h Choppiness Index > 55.0 + 20-period 1h BB touch with >=40% rejection wick, 18h deadline sensitivity",
+      "mechanism": "Statistical range boundary mean-reversion toward fair-value midline in non-trending regime"
+    }
+  ]
+}
