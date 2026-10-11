@@ -38,8 +38,8 @@ def audit_single_trade(data: np.ndarray, trade: dict[str, Any], costs: dict[str,
     entry = d(float(data[i, 1]))
     assert entry == d(trade["raw_entry"])
     slip_val = costs.get("slippage_bps", costs.get("slip_bps"))
-    drag = (d(costs["spread_bps"]) + d(slip_val)) / Decimal("10000")
-    effective_entry = rounded(entry * (Decimal("1") + side * drag), side > 0)
+    drag = (d(costs["spread_bps"]) + d(slip_val)) / Decimal(10000)
+    effective_entry = rounded(entry * (Decimal(1) + side * drag), side > 0)
     stop = d(trade["stop"])
     risk = side * (effective_entry - stop)
     target_r = d(trade.get("target_r", 2.0))
@@ -73,8 +73,8 @@ def audit_single_trade(data: np.ndarray, trade: dict[str, Any], costs: dict[str,
     assert reason == trade["exit_reason"] and exit_at == int(trade["exit_at"])
     assert abs(raw - d(trade["raw_exit"])) < Decimal("0.000001")
 
-    effective_exit = rounded(raw * (Decimal("1") - side * drag), side < 0)
-    fee_rate = d(costs["fee_bps"]) / Decimal("10000")
+    effective_exit = rounded(raw * (Decimal(1) - side * drag), side < 0)
+    fee_rate = d(costs["fee_bps"]) / Decimal(10000)
     entry_fee = effective_entry * qty * fee_rate
     exit_fee = effective_exit * qty * fee_rate
     net = side * (effective_exit - effective_entry) * qty - entry_fee - exit_fee

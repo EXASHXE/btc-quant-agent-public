@@ -125,8 +125,7 @@ def parse_month_with_taker(raw: bytes, year: int, month: int) -> tuple[np.ndarra
             )
         tb_v_clamped = min(v, max(0.0, tb_v))
         bar_range_bps = (h - l) / l * 10_000.0
-        if bar_range_bps > max_range_bps:
-            max_range_bps = bar_range_bps
+        max_range_bps = max(max_range_bps, bar_range_bps)
         if bar_range_bps > 1500.0:
             extreme_bars += 1
         zero_volume += int(v == 0.0)

@@ -2,9 +2,7 @@
 from __future__ import annotations
 
 import copy
-import io
 import sys
-import zipfile
 from pathlib import Path
 
 import numpy as np
@@ -14,9 +12,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.strategy_research.g2_btc_empirical_fast_r1 import (
     replay as r1_replay,
+)
+from scripts.strategy_research.g2_btc_empirical_fast_r1 import (
     signals as r1_signals,
 )
-from scripts.strategy_research.g2_btc_empirical_fast_r1.sources import FIELDS, ms
+from scripts.strategy_research.g2_btc_empirical_fast_r1.replay import BASE, STRESS
+from scripts.strategy_research.g2_btc_empirical_fast_r1.sources import ms
 from scripts.strategy_research.g2_gemini_goal_range_reversal_r1 import (
     audit,
     metrics,
@@ -26,8 +27,6 @@ from scripts.strategy_research.g2_gemini_goal_range_reversal_r1 import (
 )
 
 MINUTE = replay.MINUTE
-BASE = replay.BASE
-STRESS = replay.STRESS
 
 
 def make_bars(count: int = 600, price: float = 1000.0) -> np.ndarray:

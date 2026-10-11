@@ -10,10 +10,8 @@ import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
 
 from scripts.strategy_research.g2_btc_empirical_fast_r1.signals import (
-    FOUR_HOUR_MS,
     HOUR_MS,
     MINUTE_MS,
-    _ema,
     _last_complete,
 )
 

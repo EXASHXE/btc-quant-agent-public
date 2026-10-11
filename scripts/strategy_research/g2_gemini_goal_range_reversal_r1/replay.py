@@ -15,20 +15,14 @@ from typing import Any
 import numpy as np
 
 from scripts.strategy_research.g2_btc_empirical_fast_r1.replay import (
-    BASE,
     HOUR,
     LOT,
-    MIN_NOTIONAL,
     MINUTE,
-    STRESS,
-    TICK,
     _effective,
     _event_clock,
     _exit,
     _fee,
     _fold,
-    _hours,
-    _id,
     _index,
     _size,
     _tick,
