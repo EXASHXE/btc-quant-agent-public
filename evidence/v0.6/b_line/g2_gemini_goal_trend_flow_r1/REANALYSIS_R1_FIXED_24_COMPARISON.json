@@ -1,0 +1,1516 @@
+{
+  "original_sha": "a37721eaa1f3cd176146df6bdb63fbd17746189e",
+  "registered_candidate_ids_verified": 24,
+  "parameter_checks_passed": 72,
+  "signal_function_ast_unchanged": true,
+  "four_original_freezes": [
+    {
+      "wave": 1,
+      "sha": "5295eff5c63797fd28a5b7b5733a009536e4fdf3",
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_FROZEN_REGISTRY.json",
+      "sha256": "d05f2361c59bf3d0c0f2b75d2ea91293e4e3f95a5720f8c0feb587b86ede3249"
+    },
+    {
+      "wave": 2,
+      "sha": "f82eda7d930e5e158be7cc2fa60967b871e84f0f",
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_FROZEN_REGISTRY.json",
+      "sha256": "7d0fcc73ce81180ac5c90de5dc4ac7528dc94ff26f3a5735e86b946f9e1d9423"
+    },
+    {
+      "wave": 3,
+      "sha": "99b443b87a0551519c87df28d63edc8e56808b98",
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_FROZEN_REGISTRY.json",
+      "sha256": "d42458d2c454dc2658eb52f459aafa39dcab87cdfc95a2b58756321d51092490"
+    },
+    {
+      "wave": 4,
+      "sha": "8b7b4318db3f1f8344653cb649f2dd05b5ca9dd4",
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_FROZEN_REGISTRY.json",
+      "sha256": "bc625fb62537b01958618ab55e308d01144c67dfa1e2d2d6e99b59b19687d668"
+    }
+  ],
+  "candidate_comparison": [
+    {
+      "id": "W1_C01_MULTISCALE_TREND_ADOPTION_08H",
+      "registered_parameters": {
+        "id": "W1_C01_MULTISCALE_TREND_ADOPTION_08H",
+        "family": "MULTISCALE_TREND_ADOPTION",
+        "horizon_hours": 8,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Trend adoption across multiple scales: 4h structural trend filtered by EMA20/50 and slope; 1h structural trend confirmation; 15m non-chase entry with 2 consecutive bars of aligned taker buy volume pressure.",
+        "math_formulation": {
+          "long_entry": "(4h_close > 4h_EMA20 > 4h_EMA50) and (4h_EMA20 - 4h_EMA20[3] > 0) and (1h_close > 1h_EMA20) and (15m_return < 1.5*15m_ATR) and (15m_signed_taker_ratio > 0.15 for last 2 bars)",
+          "short_entry": "(4h_close < 4h_EMA20 < 4h_EMA50) and (4h_EMA20 - 4h_EMA20[3] < 0) and (1h_close < 1h_EMA20) and (15m_return > -1.5*15m_ATR) and (15m_signed_taker_ratio < -0.15 for last 2 bars)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Net bps <= 0 under 44 bp stress roundtrip, profit factor < 1.15, or failure across equal-weighted calendar years."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 400,
+        "win_rate_pct": 19.5,
+        "profit_factor": 1.3034625211541906,
+        "mean_gross_bps": 3.4373124624948126,
+        "median_gross_bps": -18.184351781088186,
+        "mean_net_bps": -76.57977479826062,
+        "median_net_bps": -98.22650519814769,
+        "equal_year_net_bps": -66.09360720509498,
+        "worst_year_net_bps": -88.5369219720218,
+        "years_covered": 3,
+        "months_covered": 34,
+        "max_mtm_drawdown_pct": 94.39684066732242,
+        "mean_duration_minutes": 373.7699928333332,
+        "exit_reasons": {
+          "TARGET": 32,
+          "TIME_CAP": 228,
+          "STOP": 140
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 63,
+            "mean_net_bps": -25.04437042695279
+          },
+          "2022": {
+            "n_trades": 133,
+            "mean_net_bps": -88.5369219720218
+          },
+          "2023": {
+            "n_trades": 204,
+            "mean_net_bps": -84.69952921631037
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W1_C02_PERSISTENT_TAKER_PRESSURE_08H",
+      "registered_parameters": {
+        "id": "W1_C02_PERSISTENT_TAKER_PRESSURE_08H",
+        "family": "PERSISTENT_TAKER_PRESSURE",
+        "horizon_hours": 8,
+        "timeframes": [
+          "4h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Persistent order flow imbalance: 3 consecutive 15m bars with sustained signed taker ratio > 0.10 (or < -0.10) accompanied by volume > 1.2x 20-bar average, aligned with 4h EMA20 > EMA50 trend regime.",
+        "math_formulation": {
+          "long_entry": "(4h_EMA20 > 4h_EMA50) and (all last 3 15m bars: signed_taker_ratio > 0.10) and (15m_vol > 1.2 * 15m_vol_SMA20)",
+          "short_entry": "(4h_EMA20 < 4h_EMA50) and (all last 3 15m bars: signed_taker_ratio < -0.10) and (15m_vol > 1.2 * 15m_vol_SMA20)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Taker pressure fails to sustain drift beyond 44 bp roundtrip cost; net bps <= 0 or trade count < 100."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 304,
+        "win_rate_pct": 19.407894736842106,
+        "profit_factor": 1.1805739325831592,
+        "mean_gross_bps": 4.506391512535834,
+        "median_gross_bps": -26.968337479200777,
+        "mean_net_bps": -75.54861737437992,
+        "median_net_bps": -107.10565637472786,
+        "equal_year_net_bps": -68.99800855610584,
+        "worst_year_net_bps": -89.51321775252653,
+        "years_covered": 3,
+        "months_covered": 35,
+        "max_mtm_drawdown_pct": 89.65094141486772,
+        "mean_duration_minutes": 348.6184126096491,
+        "exit_reasons": {
+          "TIME_CAP": 150,
+          "STOP": 129,
+          "TARGET": 25
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 50,
+            "mean_net_bps": -38.39577887302756
+          },
+          "2022": {
+            "n_trades": 92,
+            "mean_net_bps": -89.51321775252653
+          },
+          "2023": {
+            "n_trades": 162,
+            "mean_net_bps": -79.08502904276345
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W1_C03_BREAKOUT_RETEST_WITH_FLOW_04H",
+      "registered_parameters": {
+        "id": "W1_C03_BREAKOUT_RETEST_WITH_FLOW_04H",
+        "family": "MULTIHOUR_BREAKOUT_RETEST_WITH_FLOW",
+        "horizon_hours": 4,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.2,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Breakout and retest acceptance: 4h 20-bar Donchian channel breakout within last 12h, followed by a pullback retest touching within 0.5 * 1h ATR of the breakout level, followed by immediate 15m re-affirmation with positive taker flow.",
+        "math_formulation": {
+          "long_entry": "(Recent 4h breakout of 20-bar high) and (15m_low <= 4h_prev_high + 0.5*1h_ATR) and (15m_close > 4h_prev_high) and (15m_signed_taker_ratio > 0.10)",
+          "short_entry": "(Recent 4h breakout of 20-bar low) and (15m_high >= 4h_prev_low - 0.5*1h_ATR) and (15m_close < 4h_prev_low) and (15m_signed_taker_ratio < -0.10)",
+          "stop_rule": "Entry +/- 1.2 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Chop and false retests cause repeated stop outs, yielding negative stress net bps."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 386,
+        "win_rate_pct": 16.580310880829018,
+        "profit_factor": 0.6919659025170801,
+        "mean_gross_bps": -11.912818480336428,
+        "median_gross_bps": -22.5263769540867,
+        "mean_net_bps": -91.95279292284764,
+        "median_net_bps": -102.5621278603641,
+        "equal_year_net_bps": -89.9092651495123,
+        "worst_year_net_bps": -101.63530004208712,
+        "years_covered": 3,
+        "months_covered": 35,
+        "max_mtm_drawdown_pct": 95.95046864608379,
+        "mean_duration_minutes": 196.63470893782386,
+        "exit_reasons": {
+          "TIME_CAP": 245,
+          "STOP": 123,
+          "TARGET": 18
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 136,
+            "mean_net_bps": -101.63530004208712
+          },
+          "2022": {
+            "n_trades": 145,
+            "mean_net_bps": -100.54163112045283
+          },
+          "2023": {
+            "n_trades": 105,
+            "mean_net_bps": -67.55086428599692
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "registered_parameters": {
+        "id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "family": "ATR_EXPANSION_TREND_FOLLOW",
+        "horizon_hours": 12,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 2.0,
+        "target_R": 2.0,
+        "cooldown_hours": 6,
+        "economic_rationale": "Volatility expansion momentum: After volatility compression (1h ATR(14) / ATR(56) < 0.75), an expansion bar triggers with ATR expansion > 1.25x and price breakout of 20-bar 1h channel, entry gated by chase limit (< 1.0 * ATR).",
+        "math_formulation": {
+          "long_entry": "(1h_ATR14 / 1h_ATR56 < 0.75 in prior 12h) and (1h_ATR14 > 1.25 * 1h_ATR14[10]) and (1h_close > 1h_high_20) and (1h_close - 1h_high_20 < 1.0 * 1h_ATR)",
+          "short_entry": "(1h_ATR14 / 1h_ATR56 < 0.75 in prior 12h) and (1h_ATR14 > 1.25 * 1h_ATR14[10]) and (1h_close < 1h_low_20) and (1h_low_20 - 1h_close < 1.0 * 1h_ATR)",
+          "stop_rule": "Entry +/- 2.0 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Post-expansion mean reversion causes drawdown > 12% or negative net returns under stress costs."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 34,
+        "win_rate_pct": 35.294117647058826,
+        "profit_factor": 2.305191554016654,
+        "mean_gross_bps": 61.580846656444265,
+        "median_gross_bps": 37.46618367397315,
+        "mean_net_bps": -18.37794156442559,
+        "median_net_bps": -42.43050541367672,
+        "equal_year_net_bps": -5.397867056312134,
+        "worst_year_net_bps": -50.653858654905186,
+        "years_covered": 3,
+        "months_covered": 22,
+        "max_mtm_drawdown_pct": 15.082660979852792,
+        "mean_duration_minutes": 554.9705818627451,
+        "exit_reasons": {
+          "TIME_CAP": 21,
+          "STOP": 9,
+          "TARGET": 4
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 8,
+            "mean_net_bps": 83.70944330211488
+          },
+          "2022": {
+            "n_trades": 10,
+            "mean_net_bps": -50.653858654905186
+          },
+          "2023": {
+            "n_trades": 16,
+            "mean_net_bps": -49.249185816146095
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W1_C05_CROSS_SESSION_CONTINUATION_08H",
+      "registered_parameters": {
+        "id": "W1_C05_CROSS_SESSION_CONTINUATION_08H",
+        "family": "CROSS_SESSION_CONTINUATION",
+        "horizon_hours": 8,
+        "timeframes": [
+          "1h",
+          "session"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.0,
+        "cooldown_hours": 8,
+        "economic_rationale": "Cross-session momentum continuation: At London open (08:00 UTC) or NY open (13:00 UTC), if the preceding 2 1h bars showed strong unidirectional momentum with above-average volume (> 1.2x) and aligned flow, enter for 8h continuation.",
+        "math_formulation": {
+          "long_entry": "(hour in {8, 13}) and (last 2 1h bars: close > open and vol > 1.2 * 1h_vol_SMA20 and signed_taker_ratio > 0.10)",
+          "short_entry": "(hour in {8, 13}) and (last 2 1h bars: close < open and vol > 1.2 * 1h_vol_SMA20 and signed_taker_ratio < -0.10)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Session opens result in mean-reverting traps ('fakeouts') rather than sustained trend continuation."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 85,
+        "win_rate_pct": 18.823529411764707,
+        "profit_factor": 0.746564325721993,
+        "mean_gross_bps": -19.65974009748755,
+        "median_gross_bps": -51.82518755174393,
+        "mean_net_bps": -99.65669745966458,
+        "median_net_bps": -132.0541885036338,
+        "equal_year_net_bps": -99.31755799667268,
+        "worst_year_net_bps": -118.5001772168541,
+        "years_covered": 3,
+        "months_covered": 30,
+        "max_mtm_drawdown_pct": 56.70749853,
+        "mean_duration_minutes": 320.7176374509804,
+        "exit_reasons": {
+          "TIME_CAP": 36,
+          "STOP": 45,
+          "TARGET": 4
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 29,
+            "mean_net_bps": -77.75034275497794
+          },
+          "2022": {
+            "n_trades": 31,
+            "mean_net_bps": -118.5001772168541
+          },
+          "2023": {
+            "n_trades": 25,
+            "mean_net_bps": -101.70215401818598
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W1_C06_PERSISTENT_TREND_24H",
+      "registered_parameters": {
+        "id": "W1_C06_PERSISTENT_TREND_24H",
+        "family": "PERSISTENT_TREND_24H",
+        "horizon_hours": 24,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 2.5,
+        "target_R": 2.5,
+        "cooldown_hours": 12,
+        "economic_rationale": "Secular 24h trend riding: Strong 4h trend (EMA20 > EMA50, ADX > 25), cumulative 4-hour signed taker flow > 0, shallow pullback entry on 15m bar touching 1h EMA20.",
+        "math_formulation": {
+          "long_entry": "(4h_EMA20 > 4h_EMA50) and (4h_ADX > 25) and (cumulative 4h signed taker volume > 0) and (15m_low <= 1h_EMA20 <= 15m_high) and (15m_close > 1h_EMA20)",
+          "short_entry": "(4h_EMA20 < 4h_EMA50) and (4h_ADX > 25) and (cumulative 4h signed taker volume < 0) and (15m_low <= 1h_EMA20 <= 15m_high) and (15m_close < 1h_EMA20)",
+          "stop_rule": "Entry +/- 2.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.5 * StopDistance"
+        },
+        "falsification_criteria": "24h horizon suffers deep intra-trade drawdowns and fails 12% max MTM DD limit, or has net bps <= 0."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 240,
+        "win_rate_pct": 32.083333333333336,
+        "profit_factor": 1.2169537868522906,
+        "mean_gross_bps": 15.821752700276242,
+        "median_gross_bps": -9.010819540959176,
+        "mean_net_bps": -64.24215252047563,
+        "median_net_bps": -89.04594392316145,
+        "equal_year_net_bps": -63.797489562386716,
+        "worst_year_net_bps": -93.42306012609883,
+        "years_covered": 3,
+        "months_covered": 35,
+        "max_mtm_drawdown_pct": 85.0505748783521,
+        "mean_duration_minutes": 1128.0124929166666,
+        "exit_reasons": {
+          "STOP": 87,
+          "TARGET": 15,
+          "TIME_CAP": 138
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 78,
+            "mean_net_bps": -22.30492679519691
+          },
+          "2022": {
+            "n_trades": 80,
+            "mean_net_bps": -93.42306012609883
+          },
+          "2023": {
+            "n_trades": 82,
+            "mean_net_bps": -75.66448176586442
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W2_C01_VOLUME_WEIGHTED_MOMENTUM_SURGE_08H",
+      "registered_parameters": {
+        "id": "W2_C01_VOLUME_WEIGHTED_MOMENTUM_SURGE_08H",
+        "family": "VOLUME_WEIGHTED_MOMENTUM_SURGE",
+        "horizon_hours": 8,
+        "timeframes": [
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Volume-weighted momentum breakout: 1h close breaks above 24h rolling VWAP by > 0.5 * 1h ATR with volume surge (> 1.5x 20h SMA) and strong signed taker flow (> 0.15). Symmetrical short for break below VWAP.",
+        "math_formulation": {
+          "long_entry": "(1h_close > 24h_VWAP + 0.5 * 1h_ATR) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio > 0.15)",
+          "short_entry": "(1h_close < 24h_VWAP - 0.5 * 1h_ATR) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio < -0.15)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Volume surge leads to immediate liquidity exhaustion and reversal under 44 bp stress."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 583,
+        "win_rate_pct": 25.04288164665523,
+        "profit_factor": 1.2122997217709026,
+        "mean_gross_bps": 8.592545952510324,
+        "median_gross_bps": -22.65967741935451,
+        "mean_net_bps": -71.43462432513843,
+        "median_net_bps": -102.6263607576653,
+        "equal_year_net_bps": -69.68188793919086,
+        "worst_year_net_bps": -86.51422186617458,
+        "years_covered": 3,
+        "months_covered": 32,
+        "max_mtm_drawdown_pct": 97.51542192502255,
+        "mean_duration_minutes": 349.2778648656375,
+        "exit_reasons": {
+          "TIME_CAP": 296,
+          "STOP": 230,
+          "TARGET": 57
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 168,
+            "mean_net_bps": -56.544491233508595
+          },
+          "2022": {
+            "n_trades": 232,
+            "mean_net_bps": -86.51422186617458
+          },
+          "2023": {
+            "n_trades": 183,
+            "mean_net_bps": -65.9869507178894
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W2_C02_MULTI_TIMEFRAME_CHOP_EXIT_TREND_12H",
+      "registered_parameters": {
+        "id": "W2_C02_MULTI_TIMEFRAME_CHOP_EXIT_TREND_12H",
+        "family": "MULTI_TIMEFRAME_CHOP_EXIT_TREND",
+        "horizon_hours": 12,
+        "timeframes": [
+          "4h",
+          "1h"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 2.0,
+        "target_R": 2.0,
+        "cooldown_hours": 6,
+        "economic_rationale": "Regime transition from consolidation to directional expansion: 4h ADX(14) was below 18 for >= 3 bars (chop) and crosses above 20 with DI directional confirmation and 1h 12-hour high/low breakout.",
+        "math_formulation": {
+          "long_entry": "(min(4h_ADX[h4-3:h4]) < 18) and (4h_ADX > 20) and (4h_DI_plus > 4h_DI_minus) and (1h_close > max(1h_high[h1-12:h1]))",
+          "short_entry": "(min(4h_ADX[h4-3:h4]) < 18) and (4h_ADX > 20) and (4h_DI_minus > 4h_DI_plus) and (1h_close < min(1h_low[h1-12:h1]))",
+          "stop_rule": "Entry +/- 2.0 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Chop exit signals produce false starts that quickly collapse back into range."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 20,
+        "win_rate_pct": 15.0,
+        "profit_factor": 0.42993040383567516,
+        "mean_gross_bps": -53.87993983656459,
+        "median_gross_bps": -67.40267834055962,
+        "mean_net_bps": -134.03570885404739,
+        "median_net_bps": -147.7177658589377,
+        "equal_year_net_bps": -123.15781285927527,
+        "worst_year_net_bps": -152.42004323504872,
+        "years_covered": 3,
+        "months_covered": 16,
+        "max_mtm_drawdown_pct": 23.433142150000048,
+        "mean_duration_minutes": 559.4999925,
+        "exit_reasons": {
+          "TIME_CAP": 11,
+          "STOP": 8,
+          "TARGET": 1
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 12,
+            "mean_net_bps": -152.42004323504872
+          },
+          "2022": {
+            "n_trades": 5,
+            "mean_net_bps": -100.25673611601624
+          },
+          "2023": {
+            "n_trades": 3,
+            "mean_net_bps": -116.79665922676082
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W2_C03_AGGRESSIVE_FLOW_CUMULATIVE_DELTA_DIVERGENCE_08H",
+      "registered_parameters": {
+        "id": "W2_C03_AGGRESSIVE_FLOW_CUMULATIVE_DELTA_DIVERGENCE_08H",
+        "family": "FLOW_CUMULATIVE_DELTA_CONFIRMATION",
+        "horizon_hours": 8,
+        "timeframes": [
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Cumulative Volume Delta (CVD) momentum confirmation: 12h price breakout accompanied by simultaneous new 12h high in cumulative taker buy volume delta, verifying aggressive buying dominance.",
+        "math_formulation": {
+          "long_entry": "(1h_close > max(1h_high[h1-12:h1])) and (12h_CVD > max(12h_CVD[h1-12:h1])) and (15m_signed_taker_ratio > 0.10)",
+          "short_entry": "(1h_close < min(1h_low[h1-12:h1])) and (12h_CVD < min(12h_CVD[h1-12:h1])) and (15m_signed_taker_ratio < -0.10)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Aggressive CVD surges fail to sustain drift and suffer negative net returns under stress fees."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 504,
+        "win_rate_pct": 28.373015873015873,
+        "profit_factor": 0.9754010199207876,
+        "mean_gross_bps": 0.6763210353010666,
+        "median_gross_bps": -26.528856646352537,
+        "mean_net_bps": -79.35795238127541,
+        "median_net_bps": -106.44284937533166,
+        "equal_year_net_bps": -79.95470096173032,
+        "worst_year_net_bps": -82.58727998416873,
+        "years_covered": 3,
+        "months_covered": 30,
+        "max_mtm_drawdown_pct": 97.43467484000008,
+        "mean_duration_minutes": 350.220229861111,
+        "exit_reasons": {
+          "STOP": 200,
+          "TIME_CAP": 255,
+          "TARGET": 49
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 201,
+            "mean_net_bps": -76.69634098324728
+          },
+          "2022": {
+            "n_trades": 221,
+            "mean_net_bps": -80.58048191777497
+          },
+          "2023": {
+            "n_trades": 82,
+            "mean_net_bps": -82.58727998416873
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W2_C04_DONCHIAN_MIDLINE_PULLBACK_CONTINUATION_08H",
+      "registered_parameters": {
+        "id": "W2_C04_DONCHIAN_MIDLINE_PULLBACK_CONTINUATION_08H",
+        "family": "DONCHIAN_MIDLINE_PULLBACK_CONTINUATION",
+        "horizon_hours": 8,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Trend continuation on shallow pullbacks: In a 4h structural trend (EMA20 > EMA50 and close > EMA20), enter on a 15m pullback touching the 20-bar 1h Donchian midline when 15m close recovers with positive flow (> 0.10).",
+        "math_formulation": {
+          "long_entry": "(4h_close > 4h_EMA20 > 4h_EMA50) and (15m_low <= 1h_Donchian_Mid <= 15m_high) and (15m_close > 1h_Donchian_Mid) and (15m_signed_taker_ratio > 0.10)",
+          "short_entry": "(4h_close < 4h_EMA20 < 4h_EMA50) and (15m_low <= 1h_Donchian_Mid <= 15m_high) and (15m_close < 1h_Donchian_Mid) and (15m_signed_taker_ratio < -0.10)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Midline pullbacks break through into deep trend reversals, hitting stop losses."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 472,
+        "win_rate_pct": 23.30508474576271,
+        "profit_factor": 1.0094101774490047,
+        "mean_gross_bps": -6.460485656228311,
+        "median_gross_bps": -30.87978649864894,
+        "mean_net_bps": -86.54127862239551,
+        "median_net_bps": -111.03341807651269,
+        "equal_year_net_bps": -85.41581704778746,
+        "worst_year_net_bps": -93.69509284272368,
+        "years_covered": 3,
+        "months_covered": 29,
+        "max_mtm_drawdown_pct": 97.55068023149144,
+        "mean_duration_minutes": 364.0762637005649,
+        "exit_reasons": {
+          "TARGET": 29,
+          "STOP": 183,
+          "TIME_CAP": 260
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 171,
+            "mean_net_bps": -81.12019744111761
+          },
+          "2022": {
+            "n_trades": 201,
+            "mean_net_bps": -93.69509284272368
+          },
+          "2023": {
+            "n_trades": 100,
+            "mean_net_bps": -81.43216085952103
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "registered_parameters": {
+        "id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+        "family": "ASYMMETRIC_VOLATILITY_BREAKOUT",
+        "horizon_hours": 12,
+        "timeframes": [
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.8,
+        "target_R": 2.5,
+        "cooldown_hours": 6,
+        "economic_rationale": "Calibrated volatility expansion: 1h ATR compression (< 0.85 of 56-bar ATR) followed by 1h expansion (> 1.2x SMA10) with volume confirmation (> 1.5x) and 15m taker flow confirmation.",
+        "math_formulation": {
+          "long_entry": "(min(1h_ATR14/1h_ATR56 in prior 12h) < 0.85) and (1h_ATR14 > 1.20 * 1h_ATR14_SMA10) and (1h_vol > 1.5 * 1h_vol_SMA20) and (1h_close > 1h_high_20) and (15m_signed_taker_ratio > 0.10)",
+          "short_entry": "(min(1h_ATR14/1h_ATR56 in prior 12h) < 0.85) and (1h_ATR14 > 1.20 * 1h_ATR14_SMA10) and (1h_vol > 1.5 * 1h_vol_SMA20) and (1h_close < 1h_low_20) and (15m_signed_taker_ratio < -0.10)",
+          "stop_rule": "Entry +/- 1.8 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.5 * StopDistance"
+        },
+        "falsification_criteria": "Sample size remains under 100 or net bps under stress fails to exceed 0."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 55,
+        "win_rate_pct": 38.18181818181819,
+        "profit_factor": 2.987089782680842,
+        "mean_gross_bps": 63.26352070116412,
+        "median_gross_bps": 35.091398866211875,
+        "mean_net_bps": -16.847958901321146,
+        "median_net_bps": -45.05398623876752,
+        "equal_year_net_bps": 0.8990992052335306,
+        "worst_year_net_bps": -72.75771890227405,
+        "years_covered": 3,
+        "months_covered": 27,
+        "max_mtm_drawdown_pct": 16.189245299191633,
+        "mean_duration_minutes": 608.7090857575758,
+        "exit_reasons": {
+          "TIME_CAP": 38,
+          "TARGET": 5,
+          "STOP": 12
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 10,
+            "mean_net_bps": 69.5461666177776
+          },
+          "2022": {
+            "n_trades": 21,
+            "mean_net_bps": 5.908849900197047
+          },
+          "2023": {
+            "n_trades": 24,
+            "mean_net_bps": -72.75771890227405
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W2_C06_EXTREME_FLOW_EXHAUSTION_REVERSAL_TO_TREND_04H",
+      "registered_parameters": {
+        "id": "W2_C06_EXTREME_FLOW_EXHAUSTION_REVERSAL_TO_TREND_04H",
+        "family": "FLOW_EXHAUSTION_REVERSAL_TO_TREND",
+        "horizon_hours": 4,
+        "timeframes": [
+          "4h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.2,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Liquidity sweep exhaustion into trend: In 4h uptrend (EMA20 > EMA50), a temporary sharp sell-off occurs with 15m signed taker ratio < -0.30 and long lower wick (rejection), entering on the next 15m bar with positive flow (> 0.10). Symmetrical short for buying climax into downtrend.",
+        "math_formulation": {
+          "long_entry": "(4h_EMA20 > 4h_EMA50) and (prev 15m: flow < -0.30 and lower_wick > 2 * upper_wick) and (current 15m: close > prev_close and flow > 0.10)",
+          "short_entry": "(4h_EMA20 < 4h_EMA50) and (prev 15m: flow > 0.30 and upper_wick > 2 * lower_wick) and (current 15m: close < prev_close and flow < -0.10)",
+          "stop_rule": "Entry +/- 1.2 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Counter-trend momentum continues through stop loss, failing to revert to higher timeframe trend."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 169,
+        "win_rate_pct": 7.6923076923076925,
+        "profit_factor": 1.0017570049858908,
+        "mean_gross_bps": 2.9278929739866526,
+        "median_gross_bps": -2.6998131729284327,
+        "mean_net_bps": -77.10899755932904,
+        "median_net_bps": -82.74095832568361,
+        "equal_year_net_bps": -78.07637325566849,
+        "worst_year_net_bps": -86.57672060651954,
+        "years_covered": 3,
+        "months_covered": 27,
+        "max_mtm_drawdown_pct": 72.40690416388456,
+        "mean_duration_minutes": 208.34910798816574,
+        "exit_reasons": {
+          "TIME_CAP": 124,
+          "STOP": 42,
+          "TARGET": 3
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 15,
+            "mean_net_bps": -73.89177922961792
+          },
+          "2022": {
+            "n_trades": 44,
+            "mean_net_bps": -86.57672060651954
+          },
+          "2023": {
+            "n_trades": 110,
+            "mean_net_bps": -73.76061993086799
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W3_C01_EMA_CROSS_MULTI_HORIZON_TREND_FILTER_08H",
+      "registered_parameters": {
+        "id": "W3_C01_EMA_CROSS_MULTI_HORIZON_TREND_FILTER_08H",
+        "family": "EMA_CROSS_MULTI_HORIZON_TREND",
+        "horizon_hours": 8,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Fresh 1h moving average cross aligned with 4h macro trend: 1h EMA10 crosses 1h EMA30 within the last 2 hours, confirmed by 4h EMA20 > EMA50, and current 15m signed flow ratio > 0.20.",
+        "math_formulation": {
+          "long_entry": "(4h_EMA20 > 4h_EMA50) and (1h_EMA10 crosses above 1h_EMA30 within 2h) and (15m_signed_taker_ratio > 0.20)",
+          "short_entry": "(4h_EMA20 < 4h_EMA50) and (1h_EMA10 crosses below 1h_EMA30 within 2h) and (15m_signed_taker_ratio < -0.20)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "MA crosses suffer from whipsaws and lagging entries under 44 bp stress fees."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 137,
+        "win_rate_pct": 17.51824817518248,
+        "profit_factor": 0.9397942759051635,
+        "mean_gross_bps": -2.1256963767960015,
+        "median_gross_bps": -12.914909333523267,
+        "mean_net_bps": -82.1791060154647,
+        "median_net_bps": -92.90156551576239,
+        "equal_year_net_bps": -80.42715922139878,
+        "worst_year_net_bps": -85.96396648827287,
+        "years_covered": 3,
+        "months_covered": 31,
+        "max_mtm_drawdown_pct": 66.95886068,
+        "mean_duration_minutes": 368.5182403892944,
+        "exit_reasons": {
+          "STOP": 55,
+          "TIME_CAP": 73,
+          "TARGET": 9
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 18,
+            "mean_net_bps": -74.84200199673859
+          },
+          "2022": {
+            "n_trades": 58,
+            "mean_net_bps": -80.47550917918487
+          },
+          "2023": {
+            "n_trades": 61,
+            "mean_net_bps": -85.96396648827287
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W3_C02_KAUFMAN_EFFICIENCY_RATIO_EXPANSION_08H",
+      "registered_parameters": {
+        "id": "W3_C02_KAUFMAN_EFFICIENCY_RATIO_EXPANSION_08H",
+        "family": "KAUFMAN_EFFICIENCY_RATIO_EXPANSION",
+        "horizon_hours": 8,
+        "timeframes": [
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Efficiency ratio transition: Kaufman ER on 1h bars surges from chop (< 0.30 in prior 12h) to directional trend (> 0.65), entering in the direction of the price change with 15m taker flow confirmation.",
+        "math_formulation": {
+          "long_entry": "(min(1h_ER[h1-12:h1]) < 0.30) and (1h_ER > 0.65) and (1h_close > 1h_close[h1-10]) and (15m_signed_taker_ratio > 0.15)",
+          "short_entry": "(min(1h_ER[h1-12:h1]) < 0.30) and (1h_ER > 0.65) and (1h_close < 1h_close[h1-10]) and (15m_signed_taker_ratio < -0.15)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "ER surges represent terminal exhaustion moves rather than persistent trends."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 346,
+        "win_rate_pct": 23.121387283236995,
+        "profit_factor": 1.1057535958986962,
+        "mean_gross_bps": 5.166106376604394,
+        "median_gross_bps": -23.058297332334178,
+        "mean_net_bps": -74.8528043572798,
+        "median_net_bps": -103.02962736933026,
+        "equal_year_net_bps": -74.76032808069864,
+        "worst_year_net_bps": -82.16022381444554,
+        "years_covered": 3,
+        "months_covered": 35,
+        "max_mtm_drawdown_pct": 91.96025495199599,
+        "mean_duration_minutes": 367.0866978323699,
+        "exit_reasons": {
+          "STOP": 123,
+          "TIME_CAP": 193,
+          "TARGET": 30
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 110,
+            "mean_net_bps": -67.81522207164747
+          },
+          "2022": {
+            "n_trades": 121,
+            "mean_net_bps": -74.3055383560029
+          },
+          "2023": {
+            "n_trades": 115,
+            "mean_net_bps": -82.16022381444554
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W3_C03_BOLLINGER_BAND_WIDTH_SQUEEZE_EXPLOSION_12H",
+      "registered_parameters": {
+        "id": "W3_C03_BOLLINGER_BAND_WIDTH_SQUEEZE_EXPLOSION_12H",
+        "family": "BOLLINGER_BAND_WIDTH_SQUEEZE",
+        "horizon_hours": 12,
+        "timeframes": [
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.8,
+        "target_R": 2.5,
+        "cooldown_hours": 6,
+        "economic_rationale": "Volatility squeeze explosion: 1h Bollinger Bandwidth hits a 30-bar low, followed by a close breaking outside the outer band with volume > 1.5x and 15m signed flow > 0.15.",
+        "math_formulation": {
+          "long_entry": "(1h_BW < min(1h_BW[h1-30:h1-1])) and (1h_close > 1h_BB_upper) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio > 0.15)",
+          "short_entry": "(1h_BW < min(1h_BW[h1-30:h1-1])) and (1h_close < 1h_BB_lower) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio < -0.15)",
+          "stop_rule": "Entry +/- 1.8 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.5 * StopDistance"
+        },
+        "falsification_criteria": "Bandwidth squeezes produce false breakouts with negative net returns after 44 bp friction."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 20,
+        "win_rate_pct": 25.0,
+        "profit_factor": 0.9129824894460143,
+        "mean_gross_bps": -5.145330769528341,
+        "median_gross_bps": -29.12661551993946,
+        "mean_net_bps": -85.20791594488549,
+        "median_net_bps": -109.04891182945482,
+        "equal_year_net_bps": -94.37184244004645,
+        "worst_year_net_bps": -136.67446532468765,
+        "years_covered": 3,
+        "months_covered": 15,
+        "max_mtm_drawdown_pct": 15.476340659999993,
+        "mean_duration_minutes": 571.5499925,
+        "exit_reasons": {
+          "STOP": 8,
+          "TIME_CAP": 11,
+          "TARGET": 1
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 5,
+            "mean_net_bps": -136.67446532468765
+          },
+          "2022": {
+            "n_trades": 9,
+            "mean_net_bps": -47.3798734338537
+          },
+          "2023": {
+            "n_trades": 6,
+            "mean_net_bps": -99.06118856159799
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W3_C04_ASYMMETRIC_LONG_BIASED_TREND_FLOW_12H",
+      "registered_parameters": {
+        "id": "W3_C04_ASYMMETRIC_LONG_BIASED_TREND_FLOW_12H",
+        "family": "ASYMMETRIC_LONG_BIASED_TREND",
+        "horizon_hours": 12,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "LONG_ONLY",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.5,
+        "cooldown_hours": 6,
+        "economic_rationale": "Asymmetric long trend riding: Exploit BTC structural upward drift in bull regimes. Require 4h EMA20 > EMA50, 1h close > EMA20, 1h ATR expanding, and 2 consecutive 15m bars of strong taker buy flow (> 0.15).",
+        "math_formulation": {
+          "long_entry": "(4h_EMA20 > 4h_EMA50) and (1h_close > 1h_EMA20) and (1h_ATR14 > 1h_ATR14_SMA10) and (all last 2 15m bars: signed_taker_ratio > 0.15)",
+          "short_entry": "NONE (LONG ONLY)",
+          "stop_rule": "Entry - 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry + 2.5 * StopDistance"
+        },
+        "falsification_criteria": "Long-only bias fails during bear year (2022) with equal-year net bps <= 0 or drawdown > 12%."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 101,
+        "win_rate_pct": 27.722772277227726,
+        "profit_factor": 1.5834791367207959,
+        "mean_gross_bps": 23.69417886864201,
+        "median_gross_bps": -16.369456268020482,
+        "mean_net_bps": -56.432784156844185,
+        "median_net_bps": -96.33871258410029,
+        "equal_year_net_bps": -51.10400083185882,
+        "worst_year_net_bps": -78.1677226534657,
+        "years_covered": 3,
+        "months_covered": 29,
+        "max_mtm_drawdown_pct": 46.682016242008636,
+        "mean_duration_minutes": 547.5148435643564,
+        "exit_reasons": {
+          "TIME_CAP": 53,
+          "STOP": 40,
+          "TARGET": 8
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 27,
+            "mean_net_bps": -0.04387779726057088
+          },
+          "2022": {
+            "n_trades": 28,
+            "mean_net_bps": -75.10040204485017
+          },
+          "2023": {
+            "n_trades": 46,
+            "mean_net_bps": -78.1677226534657
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W3_C05_ASYMMETRIC_SHORT_BIASED_FLOW_COLLAPSE_08H",
+      "registered_parameters": {
+        "id": "W3_C05_ASYMMETRIC_SHORT_BIASED_FLOW_COLLAPSE_08H",
+        "family": "ASYMMETRIC_SHORT_BIASED_COLLAPSE",
+        "horizon_hours": 8,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "SHORT_ONLY",
+        "stop_atr_multiplier": 1.2,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Short-biased cascade expansion: In 4h downtrend (EMA20 < EMA50), a sharp 1h drop (> 1.5x ATR) occurs with heavy negative flow (< -0.25) and volume surge (> 2.0x), entering short for rapid cascade continuation over 8h.",
+        "math_formulation": {
+          "long_entry": "NONE (SHORT ONLY)",
+          "short_entry": "(4h_EMA20 < 4h_EMA50) and (1h_open - 1h_close > 1.5 * 1h_ATR) and (1h_vol > 2.0 * 1h_vol_SMA20) and (15m_signed_taker_ratio < -0.25)",
+          "stop_rule": "Entry + 1.2 * 1h_ATR(14)",
+          "target_rule": "Entry - 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Cascade extensions reverse sharply (short squeeze) resulting in stop hits under stress."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 4,
+        "win_rate_pct": 50.0,
+        "profit_factor": 6.43021226282289,
+        "mean_gross_bps": 72.63683739919178,
+        "median_gross_bps": 53.97041169626629,
+        "mean_net_bps": -7.110754580373246,
+        "median_net_bps": -25.859743588881937,
+        "equal_year_net_bps": 46.33779124629068,
+        "worst_year_net_bps": -60.55930040703717,
+        "years_covered": 2,
+        "months_covered": 4,
+        "max_mtm_drawdown_pct": 1.739156990090521,
+        "mean_duration_minutes": 370.24999583333334,
+        "exit_reasons": {
+          "TIME_CAP": 3,
+          "STOP": 1
+        },
+        "yearly_breakdown": {
+          "2022": {
+            "n_trades": 1,
+            "mean_net_bps": 153.23488289961853
+          },
+          "2023": {
+            "n_trades": 3,
+            "mean_net_bps": -60.55930040703717
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W3_C06_TIME_WEIGHTED_SESSION_PULLBACK_08H",
+      "registered_parameters": {
+        "id": "W3_C06_TIME_WEIGHTED_SESSION_PULLBACK_08H",
+        "family": "SESSION_PULLBACK_TREND",
+        "horizon_hours": 8,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.0,
+        "cooldown_hours": 6,
+        "economic_rationale": "Liquid session pullback continuation: During peak European/US liquidity hours (10:00 to 18:00 UTC), in aligned 4h trend, a 15m pullback touches 1h EMA10 and recovers with strong taker flow (> 0.15).",
+        "math_formulation": {
+          "long_entry": "(UTC_hour in [10..18]) and (4h_close > 4h_EMA20 > 4h_EMA50) and (15m_low <= 1h_EMA10 <= 15m_high) and (15m_close > 1h_EMA10) and (15m_signed_taker_ratio > 0.15)",
+          "short_entry": "(UTC_hour in [10..18]) and (4h_close < 4h_EMA20 < 4h_EMA50) and (15m_low <= 1h_EMA10 <= 15m_high) and (15m_close < 1h_EMA10) and (15m_signed_taker_ratio < -0.15)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Session pullbacks continue moving against position, failing 44 bp stress roundtrip."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 375,
+        "win_rate_pct": 20.0,
+        "profit_factor": 0.8987567319536602,
+        "mean_gross_bps": -6.368398450814118,
+        "median_gross_bps": -33.44049112601925,
+        "mean_net_bps": -86.45132055964791,
+        "median_net_bps": -113.32326791187498,
+        "equal_year_net_bps": -86.41268982198744,
+        "worst_year_net_bps": -87.00721451271409,
+        "years_covered": 3,
+        "months_covered": 35,
+        "max_mtm_drawdown_pct": 94.90507249019494,
+        "mean_duration_minutes": 345.3733246222222,
+        "exit_reasons": {
+          "TIME_CAP": 179,
+          "STOP": 173,
+          "TARGET": 23
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 90,
+            "mean_net_bps": -86.67632425579549
+          },
+          "2022": {
+            "n_trades": 123,
+            "mean_net_bps": -85.55453069745275
+          },
+          "2023": {
+            "n_trades": 162,
+            "mean_net_bps": -87.00721451271409
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W4_C01_DUAL_TIMEFRAME_VOLATILITY_EXPANSION_08H",
+      "registered_parameters": {
+        "id": "W4_C01_DUAL_TIMEFRAME_VOLATILITY_EXPANSION_08H",
+        "family": "DUAL_TIMEFRAME_VOLATILITY_EXPANSION",
+        "horizon_hours": 8,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.5,
+        "cooldown_hours": 4,
+        "economic_rationale": "Dual timeframe volatility expansion: 4h ATR(14) > 4h ATR(56), 1h ATR(14) surges > 1.25x its 10-bar SMA with volume > 1.3x 20h SMA, and 15m signed flow ratio > 0.15 (long) or < -0.15 (short).",
+        "math_formulation": {
+          "long_entry": "(4h_ATR14 > 4h_ATR56) and (1h_ATR14 > 1.25 * 1h_ATR14_SMA10) and (1h_vol > 1.3 * 1h_vol_SMA20) and (1h_close > 1h_open) and (15m_signed_taker_ratio > 0.15)",
+          "short_entry": "(4h_ATR14 > 4h_ATR56) and (1h_ATR14 > 1.25 * 1h_ATR14_SMA10) and (1h_vol > 1.3 * 1h_vol_SMA20) and (1h_close < 1h_open) and (15m_signed_taker_ratio < -0.15)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.5 * StopDistance"
+        },
+        "falsification_criteria": "Dual expansion produces insufficient edge to cover 44 bp roundtrip friction."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 37,
+        "win_rate_pct": 18.91891891891892,
+        "profit_factor": 0.6366314345583923,
+        "mean_gross_bps": -21.733788202384325,
+        "median_gross_bps": -13.293949028955277,
+        "mean_net_bps": -101.78514290317284,
+        "median_net_bps": -93.25786125139196,
+        "equal_year_net_bps": -111.47594608050332,
+        "worst_year_net_bps": -203.53533846998215,
+        "years_covered": 3,
+        "months_covered": 22,
+        "max_mtm_drawdown_pct": 31.29143375000002,
+        "mean_duration_minutes": 431.0270238738739,
+        "exit_reasons": {
+          "STOP": 7,
+          "TIME_CAP": 30
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 10,
+            "mean_net_bps": -203.53533846998215
+          },
+          "2022": {
+            "n_trades": 13,
+            "mean_net_bps": -101.79809408381594
+          },
+          "2023": {
+            "n_trades": 14,
+            "mean_net_bps": -29.09440568771186
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W4_C02_VWAP_MEAN_DRIFT_ACCELERATION_08H",
+      "registered_parameters": {
+        "id": "W4_C02_VWAP_MEAN_DRIFT_ACCELERATION_08H",
+        "family": "VWAP_MEAN_DRIFT_ACCELERATION",
+        "horizon_hours": 8,
+        "timeframes": [
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "24h rolling VWAP acceleration: Price holds above 24h VWAP for 3 consecutive 1h bars with positive VWAP slope and 15m signed flow > 0.20. Symmetrical short for below VWAP with negative slope.",
+        "math_formulation": {
+          "long_entry": "(all last 3 1h bars: close > 24h_VWAP) and (24h_VWAP > 24h_VWAP[h1-3]) and (15m_signed_taker_ratio > 0.20)",
+          "short_entry": "(all last 3 1h bars: close < 24h_VWAP) and (24h_VWAP < 24h_VWAP[h1-3]) and (15m_signed_taker_ratio < -0.20)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "VWAP drift stalls and mean-reverts back through stop loss."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 573,
+        "win_rate_pct": 24.781849912739965,
+        "profit_factor": 0.9710159109931704,
+        "mean_gross_bps": -2.7555206840280384,
+        "median_gross_bps": -28.3701794465249,
+        "mean_net_bps": -82.74223973567437,
+        "median_net_bps": -108.50748518274379,
+        "equal_year_net_bps": -82.7334217150208,
+        "worst_year_net_bps": -82.79286554836786,
+        "years_covered": 2,
+        "months_covered": 21,
+        "max_mtm_drawdown_pct": 98.41634070908144,
+        "mean_duration_minutes": 374.1588063408958,
+        "exit_reasons": {
+          "TIME_CAP": 335,
+          "STOP": 197,
+          "TARGET": 41
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 329,
+            "mean_net_bps": -82.79286554836786
+          },
+          "2022": {
+            "n_trades": 244,
+            "mean_net_bps": -82.67397788167375
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W4_C03_TREND_MOMENTUM_CONVERGENCE_DIVERGENCE_12H",
+      "registered_parameters": {
+        "id": "W4_C03_TREND_MOMENTUM_CONVERGENCE_DIVERGENCE_12H",
+        "family": "TREND_MOMENTUM_CONVERGENCE",
+        "horizon_hours": 12,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.8,
+        "target_R": 2.5,
+        "cooldown_hours": 6,
+        "economic_rationale": "Multi-timeframe MACD momentum ignition: 4h MACD histogram crosses above zero within last 2 bars, 1h close > 1h EMA20, and 15m signed taker ratio > 0.15. Symmetrical short for 4h MACD histogram crossing below zero.",
+        "math_formulation": {
+          "long_entry": "(4h_MACD_hist > 0 and 4h_MACD_hist[h4-1] <= 0) and (1h_close > 1h_EMA20) and (15m_signed_taker_ratio > 0.15)",
+          "short_entry": "(4h_MACD_hist < 0 and 4h_MACD_hist[h4-1] >= 0) and (1h_close < 1h_EMA20) and (15m_signed_taker_ratio < -0.15)",
+          "stop_rule": "Entry +/- 1.8 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.5 * StopDistance"
+        },
+        "falsification_criteria": "MACD momentum ignition lags and suffers negative net returns under stress fees."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 306,
+        "win_rate_pct": 28.104575163398692,
+        "profit_factor": 1.535078382169371,
+        "mean_gross_bps": 21.75938099415818,
+        "median_gross_bps": -4.371681811279188,
+        "mean_net_bps": -58.32216824887227,
+        "median_net_bps": -84.42373407033915,
+        "equal_year_net_bps": -56.00626350781412,
+        "worst_year_net_bps": -81.49492106994892,
+        "years_covered": 3,
+        "months_covered": 35,
+        "max_mtm_drawdown_pct": 84.48030928144671,
+        "mean_duration_minutes": 597.7908440087145,
+        "exit_reasons": {
+          "TIME_CAP": 202,
+          "STOP": 91,
+          "TARGET": 13
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 90,
+            "mean_net_bps": -13.064518440200573
+          },
+          "2022": {
+            "n_trades": 116,
+            "mean_net_bps": -73.45935101329289
+          },
+          "2023": {
+            "n_trades": 100,
+            "mean_net_bps": -81.49492106994892
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W4_C04_DONCHIAN_CHANNEL_VOLATILITY_BREAKOUT_08H",
+      "registered_parameters": {
+        "id": "W4_C04_DONCHIAN_CHANNEL_VOLATILITY_BREAKOUT_08H",
+        "family": "DONCHIAN_VOLATILITY_BREAKOUT",
+        "horizon_hours": 8,
+        "timeframes": [
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.2,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Donchian 24-bar 1h breakout with tight stop: 1h close breaks above 24-bar high, volume > 1.5x 20h SMA, signed flow > 0.15, with tight 1.2x stop and 2.0R target to limit friction loss.",
+        "math_formulation": {
+          "long_entry": "(1h_close > max(1h_high[h1-24:h1])) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio > 0.15)",
+          "short_entry": "(1h_close < min(1h_low[h1-24:h1])) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio < -0.15)",
+          "stop_rule": "Entry +/- 1.2 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Breakouts fail and tight stops trigger frequently, yielding negative net bps."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 256,
+        "win_rate_pct": 25.78125,
+        "profit_factor": 1.2284909926637393,
+        "mean_gross_bps": 11.577926218111731,
+        "median_gross_bps": -42.409718100622015,
+        "mean_net_bps": -68.46386838885306,
+        "median_net_bps": -122.52829340413918,
+        "equal_year_net_bps": -68.27741635941824,
+        "worst_year_net_bps": -76.048332514101,
+        "years_covered": 3,
+        "months_covered": 35,
+        "max_mtm_drawdown_pct": 81.96987145507964,
+        "mean_duration_minutes": 289.7734264973958,
+        "exit_reasons": {
+          "STOP": 129,
+          "TIME_CAP": 87,
+          "TARGET": 40
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 83,
+            "mean_net_bps": -53.568670743486145
+          },
+          "2022": {
+            "n_trades": 91,
+            "mean_net_bps": -75.2152458206676
+          },
+          "2023": {
+            "n_trades": 82,
+            "mean_net_bps": -76.048332514101
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W4_C05_CUMULATIVE_FLOW_PERCENTILE_SURGE_08H",
+      "registered_parameters": {
+        "id": "W4_C05_CUMULATIVE_FLOW_PERCENTILE_SURGE_08H",
+        "family": "CUMULATIVE_FLOW_PERCENTILE_SURGE",
+        "horizon_hours": 8,
+        "timeframes": [
+          "4h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 1.5,
+        "target_R": 2.0,
+        "cooldown_hours": 4,
+        "economic_rationale": "Percentile flow surge: 15m signed taker ratio is in top 95th percentile of past 48 15m bars (12h), volume > 1.5x 20-bar SMA, aligned with 4h EMA20 > EMA50 trend. Symmetrical short for bottom 5th percentile.",
+        "math_formulation": {
+          "long_entry": "(4h_EMA20 > 4h_EMA50) and (15m_flow > quantile(15m_flow[i-48:i], 0.95)) and (15m_vol > 1.5 * 15m_vol_SMA20)",
+          "short_entry": "(4h_EMA20 < 4h_EMA50) and (15m_flow < quantile(15m_flow[i-48:i], 0.05)) and (15m_vol > 1.5 * 15m_vol_SMA20)",
+          "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 2.0 * StopDistance"
+        },
+        "falsification_criteria": "Flow surges fail to predict directional continuation beyond 44 bp stress roundtrip."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 509,
+        "win_rate_pct": 24.95088408644401,
+        "profit_factor": 1.074444968072932,
+        "mean_gross_bps": -7.101182508139961,
+        "median_gross_bps": -30.151848118522057,
+        "mean_net_bps": -87.20157594643821,
+        "median_net_bps": -110.2875361556261,
+        "equal_year_net_bps": -88.16892120126046,
+        "worst_year_net_bps": -94.87316302864049,
+        "years_covered": 3,
+        "months_covered": 26,
+        "max_mtm_drawdown_pct": 97.96937821934858,
+        "mean_duration_minutes": 351.5481254747872,
+        "exit_reasons": {
+          "TIME_CAP": 261,
+          "TARGET": 41,
+          "STOP": 207
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 239,
+            "mean_net_bps": -78.95626808320047
+          },
+          "2022": {
+            "n_trades": 246,
+            "mean_net_bps": -94.87316302864049
+          },
+          "2023": {
+            "n_trades": 24,
+            "mean_net_bps": -90.67733249194043
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    },
+    {
+      "id": "W4_C06_ASYMMETRIC_MOMENTUM_EXHAUSTION_CONTINUATION_24H",
+      "registered_parameters": {
+        "id": "W4_C06_ASYMMETRIC_MOMENTUM_EXHAUSTION_CONTINUATION_24H",
+        "family": "ASYMMETRIC_MOMENTUM_CONTINUATION",
+        "horizon_hours": 24,
+        "timeframes": [
+          "4h",
+          "1h",
+          "15m"
+        ],
+        "side": "SYMMETRIC_LONG_SHORT",
+        "stop_atr_multiplier": 2.0,
+        "target_R": 3.0,
+        "cooldown_hours": 12,
+        "economic_rationale": "Secular 24h trend riding with asymmetric 3R payoff: 4h EMA20 > EMA50, 4h ADX > 22, 1h close > 1h EMA20, 15m signed flow > 0.15, aiming for large tail gains to overcome stress roundtrip cost.",
+        "math_formulation": {
+          "long_entry": "(4h_close > 4h_EMA20 > 4h_EMA50) and (4h_ADX > 22) and (1h_close > 1h_EMA20) and (15m_signed_taker_ratio > 0.15)",
+          "short_entry": "(4h_close < 4h_EMA20 < 4h_EMA50) and (4h_ADX > 22) and (1h_close < 1h_EMA20) and (15m_signed_taker_ratio < -0.15)",
+          "stop_rule": "Entry +/- 2.0 * 1h_ATR(14)",
+          "target_rule": "Entry +/- 3.0 * StopDistance"
+        },
+        "falsification_criteria": "24h horizon suffers deep intra-trade drawdowns and fails 12% max MTM DD limit, or net bps <= 0."
+      },
+      "original_published_stress_metrics_untrusted": {
+        "cost_model": "STRESS",
+        "trade_count": 404,
+        "win_rate_pct": 28.71287128712871,
+        "profit_factor": 0.9313371630447177,
+        "mean_gross_bps": -3.530193833291182,
+        "median_gross_bps": -77.8692772430885,
+        "mean_net_bps": -83.56443566627026,
+        "median_net_bps": -157.61644322218757,
+        "equal_year_net_bps": -83.54703624808052,
+        "worst_year_net_bps": -86.06600029547783,
+        "years_covered": 3,
+        "months_covered": 35,
+        "max_mtm_drawdown_pct": 96.03796774462194,
+        "mean_duration_minutes": 971.0990004125412,
+        "exit_reasons": {
+          "STOP": 208,
+          "TIME_CAP": 174,
+          "TARGET": 22
+        },
+        "yearly_breakdown": {
+          "2021": {
+            "n_trades": 122,
+            "mean_net_bps": -82.73250190816438
+          },
+          "2022": {
+            "n_trades": 139,
+            "mean_net_bps": -86.06600029547783
+          },
+          "2023": {
+            "n_trades": 143,
+            "mean_net_bps": -81.84260654059935
+          }
+        }
+      },
+      "corrected_empirical_metrics": null
+    }
+  ],
+  "method_conflicts": [
+    {
+      "id": "W1_C06_FLOW_CLOCK_AND_DIMENSION",
+      "candidate": "W1_C06_PERSISTENT_TREND_24H",
+      "frozen": {
+        "long_entry": "(4h_EMA20 > 4h_EMA50) and (4h_ADX > 25) and (cumulative 4h signed taker volume > 0) and (15m_low <= 1h_EMA20 <= 15m_high) and (15m_close > 1h_EMA20)",
+        "short_entry": "(4h_EMA20 < 4h_EMA50) and (4h_ADX > 25) and (cumulative 4h signed taker volume < 0) and (15m_low <= 1h_EMA20 <= 15m_high) and (15m_close < 1h_EMA20)",
+        "stop_rule": "Entry +/- 2.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.5 * StopDistance"
+      },
+      "original_code": "flow_4h_cum = np.sum(agg60[\"signed_flow_ratio\"][h4_idx - 3 : h4_idx + 1])",
+      "reason": "4h bar index selects old 1h bars; summing normalized ratios is not cumulative signed base volume",
+      "resolution_needed": "Controller must choose frozen textual formula versus original executable identity"
+    },
+    {
+      "id": "TIME_CAP_OPEN_VERSUS_CLOSE",
+      "frozen": "market exit on horizon bar close if neither stop nor target hit",
+      "original_code": "minute>=deadline: raw_exit=min(op,target) for LONG/max(op,target) for SHORT; exit_at=minute",
+      "reason": "Registered horizon-bar close and implemented horizon-bar open have different price and fill clocks",
+      "resolution_needed": "Controller must authorize exact temporal semantics before empirical recomputation"
+    },
+    {
+      "id": "FIRST_ELIGIBLE_OPEN_VERSUS_SECOND_OPEN",
+      "frozen": "closed 1m bar t -> available t+59999ms -> enter next open t+60000ms",
+      "original_code": "event_time=t_round-60000; decision_at=t_round; entry_at=t_round+60000",
+      "reason": "Actual entry is one minute later than frozen next-open clock for the last closed 1m signal bar",
+      "resolution_needed": "Controller must choose frozen next-open versus original 60-second additional delay"
+    }
+  ],
+  "complete_formula_and_execution_identity_verified": false,
+  "source_bodies_read_this_task": 0,
+  "source_cache_stat_or_list_this_task": "Existence/count only of authorized A-owned 2021-2023 scratch; no body/header/footer reads",
+  "real_recompute_status": "NOT_STARTED_BLOCKED_FIXED_REGISTRY_REPLAY",
+  "terminal": "CORRECTION_INCOMPLETE_FAIL_CLOSED",
+  "task_id": "V06_G2_GEMINI_A_FROZEN_24_HYPOTHESIS_ECONOMIC_MODEL_CORRECTION_AND_RECOMPUTE_R1",
+  "corrected_code_commit_sha": "6c6218081476e1c15e2ad611eb9b3ff75c242058",
+  "parent_sha": "a37721eaa1f3cd176146df6bdb63fbd17746189e",
+  "classification": "CORRECTED_REANALYSIS_OF_EXPOSED_DEVELOPMENT_DATA__NOT_EMPIRICALLY_EXECUTED",
+  "promotion_ids": [],
+  "promotion_evaluation": "UNKNOWN_NOT_RUN; no candidate promoted; not evidence of NO_EDGE"
+}

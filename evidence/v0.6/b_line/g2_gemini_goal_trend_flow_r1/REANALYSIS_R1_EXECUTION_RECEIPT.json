@@ -1,0 +1,210 @@
+{
+  "task_id": "V06_G2_GEMINI_A_FROZEN_24_HYPOTHESIS_ECONOMIC_MODEL_CORRECTION_AND_RECOMPUTE_R1",
+  "terminal": "CORRECTION_INCOMPLETE_FAIL_CLOSED",
+  "controller_dispatch_sha": "62723dcc25dab88187e2d3f96e032a562121324e",
+  "prompt_sha": "ed36be58f6c6a539a92322a2274b58ee23bae8a8",
+  "exact_start_sha": "a37721eaa1f3cd176146df6bdb63fbd17746189e",
+  "frozen_corrected_code_sha": "6c6218081476e1c15e2ad611eb9b3ff75c242058",
+  "corrected_code_direct_parent": "a37721eaa1f3cd176146df6bdb63fbd17746189e",
+  "created_at_utc": "2026-10-11T08:27:00.205535+00:00",
+  "branch": "feature/v06-bline-gemini-a-sol-economic-recompute-r1",
+  "worktree": "/root/workspace/project/quant-v0.6/gemini-a-sol-economic-recompute-r1",
+  "role": "independent scientific/economic reviewer and bounded correction implementer",
+  "requested_model": "Codex GPT-6 Sol High",
+  "observable_root_model": "NOT_EXPOSED",
+  "observable_root_effort": "NOT_EXPOSED",
+  "engineering_changes_sha256": {
+    "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/REANALYSIS_R1_ENGINEERING_METHOD.md": "a19d09cb2cfc0d94abdeb903e7a912da02d6c413c6012a49c662e4af88ffb0f2",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R1_ENGINEERING_METHOD.json": "ec9746c62ac7422f730d86c0ac3d7c53736f792240018b70beb4e761811795e8",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/audit.py": "0b8606b7f2ca2f25ecdac9073faeb8469b8371cce64e8c1733ad7e81a05f66d0",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/metrics.py": "ee50ee4ebc1df08b7d1c88c183dfe9cdc681ea4cc5d73cadccfc2c2fcaef4d8c",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_preflight.py": "520523f5f91d75523af674c0ad8b7c7299b4a5fc5e4da1afd5efa3e32eb52bb3",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py": "1539c29a0b993bdf51f0a2a0e5a5aaca4642f64f4f47ca9fae1a34158ccfee1b",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/run_wave.py": "f5d218cc16a5ea1287f4c8ec7ada093ef8cf3b639ad26ff9c1591c849d51a9bf",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/signals.py": "ea4f0d13c60b22cf69d9467804a96e4665e23d9471f86db322c0636ba7d082da",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/sources.py": "d3f521ba15aeaeca8c3691df624d5b2a0fcad8f8e06a300f3656ded4074692fd",
+    "tests/test_v06_gemini_goal_trend_flow_r1_economics.py": "d5cdb50409055c270c037276ce7ffe710b1d62711c3e8065954d631930c4da4a",
+    "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_contract.py": "4b37a41ebdff5f7377922fc949a923e9c2380ebf875e5d880f75393251b24878",
+    "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_metrics.py": "e8ae265f72ec726785dfa7e087e202bc57095db632004437dfc2d99a73816b68",
+    "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_replay.py": "26914d993871331484b79bed6fb25e8a346a7e16ac07ffb804757b9aac45a608"
+  },
+  "original_artifacts_verified": [
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/FINAL_GOAL_RESEARCH_REPORT.md",
+      "sha256": "b934315e05c17f9cc114a74ec62e5b73e851ee8c82349f4a7d78df9deef0f370",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_01_DECISION.md",
+      "sha256": "38bb83b4b45e65d289c699259f3f675b2a879d3f354b6e5b5bcc380e31a091a6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_01_HYPOTHESIS_FREEZE.md",
+      "sha256": "2206d3296813e9a5d7b5fd25186e8a44454c359afd26aca6f5f73d2ec971de00",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_02_DECISION.md",
+      "sha256": "f9fa471395a0e97e6edd9d15241df73f403d1997bced154a979cf3ce0d3bb479",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_02_HYPOTHESIS_FREEZE.md",
+      "sha256": "63d4e44b7270818c6fced04f65562288d0a87c028f271494a6b2a006b79f62fb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_03_DECISION.md",
+      "sha256": "d2d40762587a1d72e2352ade9a8da9e3f455791a4e3fd7ae4d8ae57637071246",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_03_HYPOTHESIS_FREEZE.md",
+      "sha256": "76d6531a853a3860de33267118deba8fce07a9f71a3fd83c1bdbfb403007b484",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_04_DECISION.md",
+      "sha256": "af137c5c8f37c9eca58f26ac6ba7fb7f8dc51ff17018d99e5a551541375affcc",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_04_HYPOTHESIS_FREEZE.md",
+      "sha256": "44fa1184f07f4ee7c0ed095dfa621a64a071deedb602e0b9ea867490065af2c5",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/CUMULATIVE_TRIAL_BUDGET_LEDGER.json",
+      "sha256": "efba0b75623fd1f6827e6670999486ac192a3c49d5f1bad54e09cb74cbd9bb7c",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_FROZEN_REGISTRY.json",
+      "sha256": "d05f2361c59bf3d0c0f2b75d2ea91293e4e3f95a5720f8c0feb587b86ede3249",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_RESULT.json",
+      "sha256": "899d389cf8342f9ba4bfa0939fe7aa92c2a848c6307f878b100ba5eee6bb5365",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_FROZEN_REGISTRY.json",
+      "sha256": "7d0fcc73ce81180ac5c90de5dc4ac7528dc94ff26f3a5735e86b946f9e1d9423",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_RESULT.json",
+      "sha256": "2607fa9d415b6c22c54fa91c98b0a884e0efee848e2e02d317e02ca3bf908e4e",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_FROZEN_REGISTRY.json",
+      "sha256": "d42458d2c454dc2658eb52f459aafa39dcab87cdfc95a2b58756321d51092490",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_RESULT.json",
+      "sha256": "deb984e642364bab3519445aae5d1da539ad64843e05c79b7d12cc3f26544747",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_FROZEN_REGISTRY.json",
+      "sha256": "bc625fb62537b01958618ab55e308d01144c67dfa1e2d2d6e99b59b19687d668",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_RESULT.json",
+      "sha256": "c33540b5cf93a603e44e322cd96fb73f3e2e054e946e82a31b41792241b2ad1d",
+      "unchanged": true
+    }
+  ],
+  "checks": {
+    "pytest": {
+      "command": "python3.12 -m pytest -q tests/test_v06_gemini_goal_trend_flow_r1_*.py --tb=short",
+      "actual_passed": 44,
+      "actual_failed": 0,
+      "duration_seconds": 0.46
+    },
+    "ruff": "PASS: scoped script/test namespace",
+    "compileall": "PASS: scoped script namespace",
+    "diff_check": "PASS",
+    "json_validity": "PASS",
+    "mypy": {
+      "command": "mypy scripts/strategy_research/g2_gemini_goal_trend_flow_r1 --follow-imports=skip",
+      "actual_status": "FAIL",
+      "actual_error_count": 53,
+      "actual_files_with_errors": 6,
+      "configuration_target": "src/btc_quant_agent (scripts are outside default target)",
+      "whole_repository_repair_performed": false
+    }
+  },
+  "independent_read_only_review": {
+    "actual_role": "reviewer",
+    "confirmed_material_conflicts": 3,
+    "real_data_access": false
+  },
+  "empirical_phase": {
+    "status": "STOP_BLOCKED_FIXED_REGISTRY_REPLAY",
+    "real_source_bodies_read": 0,
+    "real_minutes_read": 0,
+    "official_zip_checksums_revalidated": 0,
+    "real_episode_decimal_audits_completed": 0,
+    "at_least_five_real_audits_requirement_met": false,
+    "24_real_replays_requirement_met": false,
+    "actual_corrected_returns": null,
+    "actual_promotion": null,
+    "future_controls": "time-matched balanced LONG/SHORT same event, quantity, raw-stop distance, horizon/target and per-leg costs; cannot execute before frozen method choice"
+  },
+  "source_access_boundary": {
+    "authorized_development_if_resolved": "official public Binance Vision BTCUSDT USD-M 1m 2021-01..2023-12",
+    "prior_A_scratch_exists_and_archive_count_only": 36,
+    "prior_A_scratch_body_or_schema_access": false,
+    "owner_Quant_agent_data_or_sanitized_access": false,
+    "2024_2025_2026_body_or_outcome_access": false,
+    "exchange_account_or_api_access": false,
+    "new_downloads": 0,
+    "rights_or_source_admission": "UNKNOWN_NOT_REVALIDATED",
+    "economic_grade": "COST_PROXY_DEV_ONLY; no empirical cost-adjusted result"
+  },
+  "method_conflicts": [
+    {
+      "id": "W1_C06_FLOW_CLOCK_AND_DIMENSION",
+      "candidate": "W1_C06_PERSISTENT_TREND_24H",
+      "frozen": {
+        "long_entry": "(4h_EMA20 > 4h_EMA50) and (4h_ADX > 25) and (cumulative 4h signed taker volume > 0) and (15m_low <= 1h_EMA20 <= 15m_high) and (15m_close > 1h_EMA20)",
+        "short_entry": "(4h_EMA20 < 4h_EMA50) and (4h_ADX > 25) and (cumulative 4h signed taker volume < 0) and (15m_low <= 1h_EMA20 <= 15m_high) and (15m_close < 1h_EMA20)",
+        "stop_rule": "Entry +/- 2.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.5 * StopDistance"
+      },
+      "original_code": "flow_4h_cum = np.sum(agg60[\"signed_flow_ratio\"][h4_idx - 3 : h4_idx + 1])",
+      "reason": "4h bar index selects old 1h bars; summing normalized ratios is not cumulative signed base volume",
+      "resolution_needed": "Controller must choose frozen textual formula versus original executable identity"
+    },
+    {
+      "id": "TIME_CAP_OPEN_VERSUS_CLOSE",
+      "frozen": "market exit on horizon bar close if neither stop nor target hit",
+      "original_code": "minute>=deadline: raw_exit=min(op,target) for LONG/max(op,target) for SHORT; exit_at=minute",
+      "reason": "Registered horizon-bar close and implemented horizon-bar open have different price and fill clocks",
+      "resolution_needed": "Controller must authorize exact temporal semantics before empirical recomputation"
+    },
+    {
+      "id": "FIRST_ELIGIBLE_OPEN_VERSUS_SECOND_OPEN",
+      "frozen": "closed 1m bar t -> available t+59999ms -> enter next open t+60000ms",
+      "original_code": "event_time=t_round-60000; decision_at=t_round; entry_at=t_round+60000",
+      "reason": "Actual entry is one minute later than frozen next-open clock for the last closed 1m signal bar",
+      "resolution_needed": "Controller must choose frozen next-open versus original 60-second additional delay"
+    }
+  ],
+  "authority": {
+    "extra_trials": 0,
+    "prereg_effective": false,
+    "blind_holdout": false,
+    "alpha": false,
+    "validation": false,
+    "testnet_live": false
+  },
+  "push_proof_location": "Final CLI git ls-remote verification outside self-referential committed receipt; second commit must directly parent frozen_corrected_code_sha",
+  "ci": "query exact final SHA after push; no success claim before completion"
+}
