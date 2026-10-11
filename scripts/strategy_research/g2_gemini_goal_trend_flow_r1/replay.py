@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import math
+from collections import Counter
 from typing import Any
+
 import numpy as np
 
 MINUTE = 60_000
@@ -11,8 +13,9 @@ TICK = 0.1
 LOT = 0.001
 MIN_NOTIONAL = 5.0
 
-BASE = {"fee_bps": 8.0, "spread_bps": 4.0, "slip_bps": 10.0, "nominal_roundtrip_bps": 22.0}
-STRESS = {"fee_bps": 10.0, "spread_bps": 8.0, "slip_bps": 26.0, "nominal_roundtrip_bps": 44.0}
+# A spread_bps is the *full* spread. _effective charges half on each leg.
+BASE = {"fee_bps": 6.0, "spread_bps": 4.0, "slip_bps": 3.0, "nominal_roundtrip_bps": 22.0}
+STRESS = {"fee_bps": 12.0, "spread_bps": 8.0, "slip_bps": 6.0, "nominal_roundtrip_bps": 44.0}
 
 
 def _tick(price: float, upwards: bool) -> float:
@@ -57,7 +60,8 @@ def _proposed(
     t_decision = int(event["decision_at"])
     t_entry = int(event["entry_at"])
 
-    if t_decision <= t_end or t_entry <= t_decision:
+    if (t_end % MINUTE or t_decision % MINUTE or t_entry % MINUTE
+            or t_decision < t_end + MINUTE or t_entry < t_decision + MINUTE):
         raise ValueError("Availability order violated")
 
     i = _index(data, t_entry)
@@ -65,6 +69,8 @@ def _proposed(
         raise ValueError("Lacks two completed bars before entry")
 
     side = int(event["side"] if side_override is None else side_override)
+    if side not in (-1, 1):
+        raise ValueError("Invalid signed side")
     raw_open = float(data[i, 1])
     filled = _effective(raw_open, side, cost, entry=True)
 
@@ -117,6 +123,8 @@ def episode(
     quantity: float = 1.0,
 ) -> dict[str, Any]:
     """Execute a single trade episode from entry to exit."""
+    if quantity <= 0 or not math.isfinite(quantity):
+        raise ValueError("Quantity must be finite and positive")
     proposal = _proposed(data, event, candidate, cost, side_override=side_override)
     side = proposal["side"]
     stop = proposal["stop"]
@@ -134,7 +142,6 @@ def episode(
         op = float(data[idx, 1])
         hi = float(data[idx, 2])
         lo = float(data[idx, 3])
-        cl = float(data[idx, 4])
 
         # Priority 1: STOP GAP (adverse gap through stop on bar open)
         if side * (op - stop) <= 0:
@@ -178,11 +185,7 @@ def episode(
             break
 
     if not exit_reason:
-        # Reached end of data before deadline
-        raw_exit = float(data[-1, 4])
-        exit_reason = "DATA_END"
-        exit_at = int(data[-1, 0])
-        exit_idx = len(data) - 1
+        raise ValueError("Missing complete minute path through time cap")
 
     eff_entry = proposal["effective_entry"]
     eff_exit = _effective(raw_exit, side, cost, entry=False)
@@ -197,6 +200,8 @@ def episode(
     notional = proposal["raw_entry"] * quantity
     gross_bps = 10_000.0 * gross_usdt / notional
     net_bps = 10_000.0 * net_usdt / notional
+    # A raw open fill and an intraminute stop both need a subsequent ACK.
+    exit_ack_at = (exit_at // MINUTE + 1) * MINUTE + (MINUTE if exit_at % MINUTE else 0)
 
     return {
         "candidate": candidate.get("id", "UNKNOWN"),
@@ -206,6 +211,7 @@ def episode(
         "decision_at": proposal["decision_at"],
         "entry_at": proposal["entry_at"],
         "exit_at": exit_at,
+        "exit_ack_at": exit_ack_at,
         "entry_index": start_idx,
         "exit_index": exit_idx,
         "raw_entry": proposal["raw_entry"],
@@ -216,6 +222,7 @@ def episode(
         "target": target,
         "exit_reason": exit_reason,
         "quantity": quantity,
+        "entry_notional": notional,
         "fee_entry": fee_entry,
         "fee_exit": fee_exit,
         "gross_usdt": gross_usdt,
@@ -234,49 +241,107 @@ def simulate_fold(
     cost: dict[str, float],
     initial_equity: float = 1000.0,
 ) -> dict[str, Any]:
-    """Simulate single-position trading over a monthly fold with cooldown and cash conservation."""
-    fold_start = fold["start_ms"]
-    fold_end = fold["end_ms"]
+    """One cash account; minute marks are measurement, never future trading input.
 
+    ``initial_equity`` is the preceding fold's ending equity. A trade changes
+    spendable equity only at its exit ACK. The full minute path is measured
+    after each accepted event, but later decisions use only settled equity.
+    """
+    start = int(fold["start_ms"])
+    end = int(fold["end_ms"])
+    if start % MINUTE or end % MINUTE or end <= start or initial_equity <= 0:
+        raise ValueError("Invalid fold or starting equity")
+    first = _index(data, start)
+    last = _index(data, end - MINUTE)
+    if np.any(np.diff(data[first:last + 1, 0]) != MINUTE):
+        raise ValueError("Missing, duplicate or unsorted UTC scoring minute")
+    curve = np.full(last - first + 1, initial_equity, dtype=np.float64)
+    counts: Counter[str] = Counter()
+    trades: list[dict[str, Any]] = []
+    equity = float(initial_equity)
     cooldown_ms = int(candidate.get("cooldown_hours", 4)) * HOUR
-    valid_events = [
-        e for e in events
-        if fold_start <= e["entry_at"] < fold_end
-    ]
-    valid_events.sort(key=lambda x: x["entry_at"])
+    next_allowed_entry = start
+    curve_cursor = first
+    close_equities = [equity]
+    max_marked_exposure_ratio = 0.0
+    marked_exposure_breach_minutes = 0
 
-    equity = initial_equity
-    trades = []
-    next_allowed_entry = 0
-
-    for ev in valid_events:
-        if ev["entry_at"] < next_allowed_entry:
+    for ev in sorted(events, key=lambda x: (int(x["entry_at"]), str(x.get("event_id", "")))):
+        entry_at = int(ev["entry_at"])
+        if not start <= entry_at < end:
             continue
-
-        raw_price = float(ev["decision_close"])
-        if equity <= 10.0:
-            break
-
-        # 1x position sizing, 1000 USDT capital limit
-        notional_target = min(equity, 1000.0)
-        qty = math.floor((notional_target / raw_price) / LOT) * LOT
-        if qty * raw_price < MIN_NOTIONAL:
+        if entry_at < next_allowed_entry:
+            counts["POSITION_ACK_OR_COOLDOWN"] += 1
             continue
-
         try:
-            tr = episode(data[:, :6], ev, candidate, cost, quantity=qty)
+            proposal = _proposed(data, ev, candidate, cost)
+        except ValueError as exc:
+            counts["LOOKAHEAD_OR_CLOCK" if "Availability" in str(exc) else "ENTRY_OR_SOURCE_REJECTED"] += 1
+            continue
+        # Frozen 1x account cap, 5% cash reserve, conservative entry/exit
+        # execution and unknown-cadence funding *reservation* (not a cash bill).
+        # A floor to LOT cannot increase a budget or create leverage.
+        budget = 0.95 * min(equity, 1000.0)
+        raw = proposal["raw_entry"]
+        worst_entry = max(proposal["effective_entry"], _effective(raw + 0.25 * float(ev["atr_hour"]), 1, cost, True))
+        fee_unit = worst_entry * float(cost["fee_bps"]) / 10_000
+        exit_reserve = 1.10 * worst_entry * (
+            float(cost["fee_bps"]) + 0.5 * float(cost["spread_bps"]) + _slippage(cost)
+        ) / 10_000
+        funding_reserve = 1.10 * raw * 8.0 * proposal["horizon_hours"] / 10_000
+        per_unit = worst_entry + fee_unit + exit_reserve + funding_reserve
+        qty = math.floor(budget / per_unit / LOT + 1e-10) * LOT
+        if qty <= 0 or qty * raw < MIN_NOTIONAL:
+            counts["SIZE_OR_MIN_NOTIONAL"] += 1
+            continue
+        if qty * proposal["effective_entry"] + _fee(proposal["effective_entry"], qty, cost) > budget + 1e-8:
+            raise ValueError("Entry would breach 1x/reserve budget")
+        try:
+            tr = episode(data, ev, candidate, cost, quantity=qty)
         except ValueError:
-            # Quarter-ATR gap veto or boundary error
+            counts["INCOMPLETE_EPISODE"] += 1
             continue
-
-        # Check if trade touches boundaries
-        if tr["entry_at"] < fold_start or tr["exit_at"] >= fold_end:
+        if tr["exit_ack_at"] >= end:
+            counts["EXIT_ACK_OUTSIDE_FOLD"] += 1
             continue
-
+        i_entry, i_exit = tr["entry_index"], tr["exit_index"]
+        curve[curve_cursor - first:i_entry - first] = equity
+        entry_fee = tr["fee_entry"]
+        for i in range(i_entry, i_exit + 1):
+            minute = int(data[i, 0])
+            if minute >= tr["exit_at"] or i == i_exit:
+                mark = equity + tr["net_usdt"]
+            else:
+                raw_close = float(data[i, 4])
+                liquidation = _effective(raw_close, tr["side"], cost, False)
+                mark = (
+                    equity + tr["side"] * (liquidation - tr["effective_entry"]) * qty
+                    - entry_fee - _fee(liquidation, qty, cost)
+                )
+                if mark <= 0:
+                    raise ValueError("Insolvent liquidation-cost minute mark")
+                exposure_ratio = raw_close * qty / mark
+                max_marked_exposure_ratio = max(max_marked_exposure_ratio, exposure_ratio)
+                marked_exposure_breach_minutes += exposure_ratio > 1.0 + 1e-9
+            curve[i - first] = mark
+        # On a raw-open exit, this recorded mark is a completed-bar equity;
+        # entry decisions remain blocked until the later ACK.
         equity += tr["net_usdt"]
+        if equity <= 0:
+            raise ValueError("Insolvent account after gap fill")
+        tr["cash_after_ack"] = equity
         trades.append(tr)
-        next_allowed_entry = tr["exit_at"] + cooldown_ms
+        close_equities.append(equity)
+        next_allowed_entry = tr["exit_ack_at"] + cooldown_ms
+        curve_cursor = i_exit + 1
+        counts["FILLED"] += 1
 
+    curve[curve_cursor - first:] = equity
+    peaks = np.maximum.accumulate(np.concatenate(([initial_equity], curve)))
+    max_mtm_dd = float(np.max((peaks - np.concatenate(([initial_equity], curve))) / peaks) * 100)
+    close_arr = np.array(close_equities)
+    close_peaks = np.maximum.accumulate(close_arr)
+    trade_dd = float(np.max((close_peaks - close_arr) / close_peaks) * 100)
     return {
         "candidate": candidate.get("id", "UNKNOWN"),
         "year": fold.get("year", 0),
@@ -284,4 +349,10 @@ def simulate_fold(
         "starting_equity": initial_equity,
         "ending_equity": equity,
         "trades": trades,
+        "minute_equity_curve": np.column_stack((data[first:last + 1, 0] + MINUTE - 1, curve)),
+        "max_mtm_drawdown_pct": max_mtm_dd,
+        "trade_close_drawdown_pct": trade_dd,
+        "max_position_notional_to_marked_equity": max_marked_exposure_ratio,
+        "marked_exposure_breach_minutes": marked_exposure_breach_minutes,
+        "event_fates": dict(counts),
     }

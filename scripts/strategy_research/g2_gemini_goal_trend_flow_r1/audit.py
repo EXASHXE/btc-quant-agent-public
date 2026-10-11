@@ -1,14 +1,15 @@
 """Independent Decimal walkthrough and anti-lookahead audit for trade episodes."""
 from __future__ import annotations
 
-from decimal import Decimal, ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP
+from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP, Decimal
 from typing import Any
+
 import numpy as np
 
 TICK_DECIMAL = Decimal("0.1")
 
 
-def d(val: float | int | str) -> Decimal:
+def d(val: float | str) -> Decimal:
     return Decimal(str(val))
 
 
@@ -18,7 +19,7 @@ def rounded(val: Decimal, precision: str = "0.00000001") -> Decimal:
 
 def _tick_decimal(val: Decimal, upwards: bool) -> Decimal:
     scaled = val / TICK_DECIMAL
-    q = scaled.quantize(Decimal("1"), rounding=ROUND_CEILING if upwards else ROUND_FLOOR)
+    q = scaled.quantize(Decimal(1), rounding=ROUND_CEILING if upwards else ROUND_FLOOR)
     return q * TICK_DECIMAL
 
 
@@ -34,19 +35,19 @@ def audit_single_trade(data_1m: np.ndarray, tr: dict[str, Any], cost: dict[str, 
     slip_bps = d(cost.get("slip_bps", cost.get("slippage_bps", 0.0)))
 
     # Half-spread + slippage adverse shift
-    adverse_fraction = (spread_bps / Decimal("2") + slip_bps) / Decimal("10000")
+    adverse_fraction = (spread_bps / Decimal(2) + slip_bps) / Decimal(10000)
 
     # Effective entry
     sign_entry = Decimal(side)
-    eff_entry_calc = _tick_decimal(raw_entry * (Decimal("1") + sign_entry * adverse_fraction), upwards=sign_entry > 0)
+    eff_entry_calc = _tick_decimal(raw_entry * (Decimal(1) + sign_entry * adverse_fraction), upwards=sign_entry > 0)
 
     # Effective exit
     sign_exit = Decimal(-side)
-    eff_exit_calc = _tick_decimal(raw_exit * (Decimal("1") + sign_exit * adverse_fraction), upwards=sign_exit > 0)
+    eff_exit_calc = _tick_decimal(raw_exit * (Decimal(1) + sign_exit * adverse_fraction), upwards=sign_exit > 0)
 
     # Fees
-    fee_entry_calc = eff_entry_calc * qty * (fee_bps / Decimal("10000"))
-    fee_exit_calc = eff_exit_calc * qty * (fee_bps / Decimal("10000"))
+    fee_entry_calc = eff_entry_calc * qty * (fee_bps / Decimal(10000))
+    fee_exit_calc = eff_exit_calc * qty * (fee_bps / Decimal(10000))
 
     # PnL
     gross_calc = Decimal(side) * (raw_exit - raw_entry) * qty
@@ -54,7 +55,7 @@ def audit_single_trade(data_1m: np.ndarray, tr: dict[str, Any], cost: dict[str, 
     net_calc = gross_calc - drag_calc - fee_entry_calc - fee_exit_calc
 
     notional = raw_entry * qty
-    net_bps_calc = (net_calc / notional) * Decimal("10000")
+    net_bps_calc = (net_calc / notional) * Decimal(10000)
 
     diff_net = abs(float(net_calc) - float(tr["net_usdt"]))
     diff_bps = abs(float(net_bps_calc) - float(tr["net_bps"]))

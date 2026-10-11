@@ -1,7 +1,6 @@
 """Signal calculation and multi-scale feature extractors for Waves 1, 2, 3, and 4 Trend & Flow candidates."""
 from __future__ import annotations
 
-import math
 import numpy as np
 
 

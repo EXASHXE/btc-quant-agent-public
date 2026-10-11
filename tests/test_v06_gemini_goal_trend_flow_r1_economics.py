@@ -1,25 +1,19 @@
 """Comprehensive unit tests for execution economics, cost accounting, and anti-lookahead rules."""
 from __future__ import annotations
 
-import math
-from decimal import Decimal
 import numpy as np
 import pytest
 
 from scripts.strategy_research.g2_gemini_goal_trend_flow_r1.audit import (
     audit_single_trade,
-    d,
-    rounded,
 )
 from scripts.strategy_research.g2_gemini_goal_trend_flow_r1.metrics import (
-    compute_drawdown,
     block_bootstrap,
+    compute_drawdown,
 )
 from scripts.strategy_research.g2_gemini_goal_trend_flow_r1.replay import (
     BASE,
-    MINUTE,
     STRESS,
-    TICK,
     _effective,
     _fee,
     _proposed,
@@ -29,8 +23,6 @@ from scripts.strategy_research.g2_gemini_goal_trend_flow_r1.replay import (
 )
 from scripts.strategy_research.g2_gemini_goal_trend_flow_r1.signals import (
     aggregate_bars,
-    _atr_fast,
-    _ema_fast,
 )
 
 
@@ -46,13 +38,13 @@ def test_02_effective_price_costs():
     """Verify spread and slip adverse shifts for entry and exit under BASE and STRESS."""
     raw = 50000.0
     eff_long_entry = _effective(raw, side=1, cost=BASE, entry=True)
-    assert np.isclose(eff_long_entry, 50060.0)  # 50000 * (1 + (2 + 10)/10000) = 50060.0
+    assert np.isclose(eff_long_entry, 50025.0)  # 50000 * (1 + (2 + 3)/10000) = 50025.0
 
     eff_long_exit = _effective(raw, side=1, cost=BASE, entry=False)
-    assert np.isclose(eff_long_exit, 49940.0)  # 50000 * (1 - (2 + 10)/10000) = 49940.0
+    assert np.isclose(eff_long_exit, 49975.0)  # 50000 * (1 - (2 + 3)/10000) = 49975.0
 
-    assert np.isclose(_effective(raw, side=1, cost=STRESS, entry=True), 50150.0)  # 50000 * (1 + 30/10000)
-    assert np.isclose(_effective(raw, side=1, cost=STRESS, entry=False), 49850.0)
+    assert np.isclose(_effective(raw, side=1, cost=STRESS, entry=True), 50050.0)  # 50000 * (1 + 10/10000)
+    assert np.isclose(_effective(raw, side=1, cost=STRESS, entry=False), 49950.0)
 
 
 def test_03_fee_deducted_properly():
@@ -60,7 +52,7 @@ def test_03_fee_deducted_properly():
     price = 50000.0
     qty = 0.02
     fee = _fee(price, qty, STRESS)
-    assert abs(fee - 1.0) < 1e-9  # 1000 * 10 / 10000 = 1.0
+    assert abs(fee - 1.2) < 1e-9  # 1000 * 12 / 10000 = 1.2
 
 
 def test_04_stop_before_target_same_minute():
@@ -337,7 +329,7 @@ def test_12_drawdown_computation():
 def test_13_block_bootstrap_reproducibility():
     """Verify block bootstrap reproducibility with random seed."""
     trades = [
-        {"entry_at": 1609459200000 + i * 86400000, "net_bps": float(i % 10 - 4)}
+        {"entry_at": 1612137600000 + i * 86400000, "net_bps": float(i % 10 - 4)}
         for i in range(50)
     ]
     res1 = block_bootstrap(trades, block_days=7, n_iter=500, seed=123)

@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
-from pathlib import Path
 import subprocess
-import sys
+from pathlib import Path
+
 import numpy as np
 
 from scripts.strategy_research.g2_gemini_goal_trend_flow_r1.audit import audit_candidate_trades
@@ -56,6 +55,10 @@ def verify_freeze_commit(wave: str, freeze_sha: str) -> dict:
 
 
 def execute_wave(wave: str, freeze_sha: str) -> None:
+    raise RuntimeError(
+        "Original wave artifacts are immutable; fixed-roster reanalysis requires "
+        "Controller resolution of the recorded frozen registry/code conflicts."
+    )
     print(f"=== Starting Execution of {wave} (Freeze SHA: {freeze_sha}) ===")
     registry = verify_freeze_commit(wave, freeze_sha)
     candidates = registry["candidates"]
@@ -89,7 +92,7 @@ def execute_wave(wave: str, freeze_sha: str) -> None:
         print(f"\n--- Evaluating Candidate: {cand_id} ---")
 
         # Two-pass determinism verification
-        def run_pass(cost_model, pass_num=1):
+        def run_pass(cost_model, pass_num=1, cand=cand, cand_id=cand_id):
             all_trades = []
             curr_equity = 1000.0
             for fold in folds:
@@ -222,7 +225,7 @@ def write_decision_markdown(path: Path, results: dict, registry: dict) -> None:
         f"- **TASK_ID**: `{results.get('task_id', '')}`",
         f"- **FREEZE_COMMIT_SHA**: `{freeze_sha}`",
         f"- **WAVE_DECISION**: `{decision}`",
-        f"- **DATE_RANGE**: `2021-02 to 2023-12 (35 scored monthly folds, 2021-01 warmup)`",
+        "- **DATE_RANGE**: `2021-02 to 2023-12 (35 scored monthly folds, 2021-01 warmup)`",
         "- **SEALED_HOLDOUT**: `2024–2026 strictly untouched`",
         "",
         "## 1. Candidate Performance Summary Table (STRESS 44 bp)",

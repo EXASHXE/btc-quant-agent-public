@@ -5,9 +5,9 @@ import calendar
 import csv
 import hashlib
 import io
-import math
-from pathlib import Path
 import zipfile
+from pathlib import Path
+
 import numpy as np
 
 DATA_DIR = Path("/tmp/gemini_goal_trend_flow_r1")

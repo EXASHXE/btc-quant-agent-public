@@ -1,0 +1,97 @@
+{
+  "task_id": "V06_G2_GEMINI_A_FROZEN_24_HYPOTHESIS_ECONOMIC_MODEL_CORRECTION_AND_RECOMPUTE_R1",
+  "prompt_sha": "ed36be58f6c6a539a92322a2274b58ee23bae8a8",
+  "controller_dispatch_sha": "62723dcc25dab88187e2d3f96e032a562121324e",
+  "exact_start_sha": "a37721eaa1f3cd176146df6bdb63fbd17746189e",
+  "root_model_requested": "Codex GPT-6 Sol High",
+  "root_model_observed": "NOT_EXPOSED",
+  "root_reasoning_effort_observed": "NOT_EXPOSED",
+  "status": "SYNTHETIC_ENGINEERING_CORRECTIONS_ONLY__REAL_REPLAY_METHOD_BLOCKED",
+  "economic_grade": "COST_PROXY_DEV_ONLY",
+  "corrected_per_leg_costs_bps": {
+    "BASE": {
+      "fee": 6,
+      "half_spread": 2,
+      "slippage": 3,
+      "nominal_roundtrip": 22
+    },
+    "STRESS": {
+      "fee": 12,
+      "half_spread": 4,
+      "slippage": 6,
+      "nominal_roundtrip": 44
+    }
+  },
+  "unchanged_hypothesis_authority": [
+    {
+      "wave": 1,
+      "sha": "5295eff5c63797fd28a5b7b5733a009536e4fdf3",
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_FROZEN_REGISTRY.json",
+      "sha256": "d05f2361c59bf3d0c0f2b75d2ea91293e4e3f95a5720f8c0feb587b86ede3249"
+    },
+    {
+      "wave": 2,
+      "sha": "f82eda7d930e5e158be7cc2fa60967b871e84f0f",
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_FROZEN_REGISTRY.json",
+      "sha256": "7d0fcc73ce81180ac5c90de5dc4ac7528dc94ff26f3a5735e86b946f9e1d9423"
+    },
+    {
+      "wave": 3,
+      "sha": "99b443b87a0551519c87df28d63edc8e56808b98",
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_FROZEN_REGISTRY.json",
+      "sha256": "d42458d2c454dc2658eb52f459aafa39dcab87cdfc95a2b58756321d51092490"
+    },
+    {
+      "wave": 4,
+      "sha": "8b7b4318db3f1f8344653cb649f2dd05b5ca9dd4",
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_FROZEN_REGISTRY.json",
+      "sha256": "bc625fb62537b01958618ab55e308d01144c67dfa1e2d2d6e99b59b19687d668"
+    }
+  ],
+  "registered_candidate_ids_verified": 24,
+  "numeric_horizon_stop_multiplier_target_R_checks": 72,
+  "complete_formula_and_execution_identity_verified": false,
+  "method_conflicts": [
+    {
+      "id": "W1_C06_FLOW_CLOCK_AND_DIMENSION",
+      "candidate": "W1_C06_PERSISTENT_TREND_24H",
+      "frozen": {
+        "long_entry": "(4h_EMA20 > 4h_EMA50) and (4h_ADX > 25) and (cumulative 4h signed taker volume > 0) and (15m_low <= 1h_EMA20 <= 15m_high) and (15m_close > 1h_EMA20)",
+        "short_entry": "(4h_EMA20 < 4h_EMA50) and (4h_ADX > 25) and (cumulative 4h signed taker volume < 0) and (15m_low <= 1h_EMA20 <= 15m_high) and (15m_close < 1h_EMA20)",
+        "stop_rule": "Entry +/- 2.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.5 * StopDistance"
+      },
+      "original_code": "flow_4h_cum = np.sum(agg60[\"signed_flow_ratio\"][h4_idx - 3 : h4_idx + 1])",
+      "reason": "4h bar index selects old 1h bars; summing normalized ratios is not cumulative signed base volume",
+      "resolution_needed": "Controller must choose frozen textual formula versus original executable identity"
+    },
+    {
+      "id": "TIME_CAP_OPEN_VERSUS_CLOSE",
+      "frozen": "market exit on horizon bar close if neither stop nor target hit",
+      "original_code": "minute>=deadline: raw_exit=min(op,target) for LONG/max(op,target) for SHORT; exit_at=minute",
+      "reason": "Registered horizon-bar close and implemented horizon-bar open have different price and fill clocks",
+      "resolution_needed": "Controller must authorize exact temporal semantics before empirical recomputation"
+    },
+    {
+      "id": "FIRST_ELIGIBLE_OPEN_VERSUS_SECOND_OPEN",
+      "frozen": "closed 1m bar t -> available t+59999ms -> enter next open t+60000ms",
+      "original_code": "event_time=t_round-60000; decision_at=t_round; entry_at=t_round+60000",
+      "reason": "Actual entry is one minute later than frozen next-open clock for the last closed 1m signal bar",
+      "resolution_needed": "Controller must choose frozen next-open versus original 60-second additional delay"
+    }
+  ],
+  "empirical_read_gate": "STOP_BLOCKED_FIXED_REGISTRY_REPLAY",
+  "authorized_months_if_methods_resolved": "2021-01..2023-12 ONLY; 2021-01 warmup, 35 original score months",
+  "new_candidate_trials": 0,
+  "terminal": "CORRECTION_INCOMPLETE_FAIL_CLOSED",
+  "source_bodies_read": 0,
+  "checks": {
+    "focused_pytest": {
+      "passed": 44,
+      "failed": 0
+    },
+    "ruff": "PASS",
+    "compileall": "PASS",
+    "strict_manual_mypy": "FAIL:53 errors /6 files; scripts outside configured src/btc_quant_agent mypy target; no broad typing/CI repair"
+  }
+}
