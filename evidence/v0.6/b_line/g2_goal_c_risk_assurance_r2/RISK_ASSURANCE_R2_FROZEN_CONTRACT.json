@@ -1,0 +1,66 @@
+{
+  "TASK_ID": "V06_G2_GOAL_C_RISK_ASSURANCE_R2",
+  "CONTROLLER_DISPATCH_SHA": "1172d3a91324c1a7379bc9e5c24ef601076547c2",
+  "AUTHORITY_URL": "https://github.com/EXASHXE/btc-quant-agent-public/blob/1172d3a91324c1a7379bc9e5c24ef601076547c2/reviews/v0.6/b_line/V06_G2_GEMINI_ABC_GOAL_R2_CONTROLLER_EVIDENCE_REPAIR_AUTHORITY.md",
+  "REPOSITORY": "EXASHXE/btc-quant-agent-public",
+  "BRANCH": "feature/v06-bline-gemini-goal-c-risk-assurance-r2",
+  "OWN_PREFIX": "g2_goal_c_risk_assurance_r2",
+  "EXACT_START_SHA": "f381dd73a8c583e2a28dcab2e354b019b1d946fa",
+  "C_R1_FROZEN_SHA": "8db2e3ff36011c6a65458f8cf4c2ba5e90d5fee2",
+  "C_R1_MID_REPAIR_SHA": "4c0bac051767f788e6de173f6563a7b47af2ac69",
+  "C_R1_FINAL_SHA": "f381dd73a8c583e2a28dcab2e354b019b1d946fa",
+  "ORIGINAL_EXIT_R1_FROZEN_SHA": "de2c1fb222970a93ca797868b91b8544261ebaad",
+  "ORIGINAL_EXIT_R1_FINAL_SHA": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "r3_source_manifest_sha256": "5b47dcb9738e401ac4858f9a4dfcc643f8164425fd420327deed2d1c95729b3f",
+  "r31_source_manifest_sha256": "1f06a24b892a24430f3d2f9e5f2c46e926ed24a437785614c400a1fa536b677c",
+  "c_r1_evidence_artifact_digests": {
+    "EXECUTION_ASSURANCE_R1_FROZEN_CONTRACT.json": {
+      "sha256": "2783e31230218dbac44fdd6b2c581ea88cd1ee05110d219856436c9dad91a421",
+      "bytes": 13984
+    },
+    "EXECUTION_ASSURANCE_R1_RESULTS.json": {
+      "sha256": "1278fdd172bd38f349006b10a6e6ec2fc3c007261ea33364e2a4b861506d0180",
+      "bytes": 257385
+    },
+    "DECIMAL_FORENSIC_EPISODE_AUDIT.json": {
+      "sha256": "3fc5e4e23b2b6d1032f5ff1efad5f9a365cbb098ac67ca2bef84c3baa226087f",
+      "bytes": 285255
+    },
+    "ADVERSARIAL_COLLISION_MATRIX_RESULTS.json": {
+      "sha256": "d2262a6476841edd1ef5f66e3381e4826e254b9d2148d6ebe1c6b06bd9dd52d9",
+      "bytes": 20616
+    },
+    "EXECUTION_SENSITIVITY_AND_ATTRIBUTION.json": {
+      "sha256": "14eeccccfcc7a88d0db692a953dbad63319c706f80d3158ecfcb5391c866b405",
+      "bytes": 130460
+    },
+    "SYNTHETIC_MARGIN_AND_LEVERAGE_STRESS.json": {
+      "sha256": "8f9f427e93de09cfcd8b2a62944be8fcf5bece43387738240df5100d47882f55",
+      "bytes": 50093
+    },
+    "SOURCE_VS_ALGO_VS_EXECUTION_UNKNOWN.json": {
+      "sha256": "2ef3216e20dbdd73b41b484b74580c57d5193b39a221e050cf8a89f5d6e8db7e",
+      "bytes": 10492
+    },
+    "EXECUTION_ASSURANCE_R1_DELIVERY_MANIFEST.json": {
+      "sha256": "0037814c9cd28d82b67fa4b98e4fd2e878e0fafa42c0ecb9728702c5ac355d03",
+      "bytes": 1315
+    }
+  },
+  "frozen_c_r2_file_sha256": {
+    "docs/strategy_research/g2_goal_c_risk_assurance_r2/RISK_ASSURANCE_R2_FROZEN_METHOD.md": "6a61e8673cdf6e82287c823916368cfa37748177869c7139393debc41fb304be",
+    "scripts/strategy_research/g2_goal_c_risk_assurance_r2/__init__.py": "a23c44955e9538d65a31fb69ce1c114d60422164b9c7662643f53a7bbd18727c",
+    "scripts/strategy_research/g2_goal_c_risk_assurance_r2/decimal_margin_engine.py": "7e827178bd993eedbd36892de101907cd27ba2ad205813beb2b657eaa8dcf7b8",
+    "scripts/strategy_research/g2_goal_c_risk_assurance_r2/exposure_and_stop_audit.py": "599592b88f796a3c7d3b75e635715416080f69d1258454b915fdff720a1a64e0",
+    "scripts/strategy_research/g2_goal_c_risk_assurance_r2/forensic_ledger_reaudit.py": "9da05c0e9e9f01657756228f5cff4f06b5c7e45e09ce46d7f5b5e5d9cb441e06",
+    "scripts/strategy_research/g2_goal_c_risk_assurance_r2/freeze_provenance_audit.py": "fe84a3e225b167b1839998dae223d20abe55e9393bb72b82e0006fabb4ff9f39",
+    "scripts/strategy_research/g2_goal_c_risk_assurance_r2/reconcile_c_r1_scenarios.py": "2f22cc693a42ad41d5464b0d3c89b04fc96d598428392dadbf1da1dbd8c91f47",
+    "scripts/strategy_research/g2_goal_c_risk_assurance_r2/run.py": "63d42f01d59dc01c9d9a104e4a4c0c6bd567f2992a18b08a122db352de13c385",
+    "tests/test_v06_g2_goal_c_risk_assurance_r2_real_ledger_and_exposure.py": "5b511206155f93213d75b2c2a842836158b28e04f232884b7f080727d9c3b2f0",
+    "tests/test_v06_g2_goal_c_risk_assurance_r2_synthetic_margin.py": "18fb668b2c30040e4f5bea7cb958daa6ff39d93b5421d2aa5fc7d157aabb2194"
+  },
+  "synthetic_fixture_scenarios_count": 56,
+  "real_ledger_deep_episodes_count": 24,
+  "real_order_ledger_trades_count": 890,
+  "pytest_cases_count": 87
+}
