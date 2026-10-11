@@ -1,0 +1,69 @@
+# V06 G2 — Post-R3.1 Exit Policy × Holding Horizon Research Design R1
+
+**Date:** 2026-10-11. **Owner:** B-line Primary Controller (ChatGPT-0). **Scope:** EX_POST_EXPOSED_DEV_ONLY, 2021-01–2023-12 public BTCUSDT USD-M Last/Mark/Funding. **Status:** prospectively designed *new* exploratory exit family; neither a R2 preregistration nor Alpha. A-line, Performance, P1, P2 S3A, H39/H40/H41/Forward, owner files, 2024–26 reserved outcomes, credentials, TESTNET/LIVE and funds remain outside authority.
+
+## 1. Parent evidence and why one small experiment is informative
+
+R3.1 source/result branch feature/v06-bline-btc-two-lead-mark-gap-repair-r31 at 990c02b5479b3b14996f90fdbf677cb672ada81e, frozen implementation c36df02a438dd0b46a02168d910479853c294dd4, authorized by 6b08af95335a4d577e1367a9b0652258bad1ca35. Full 1,576,800 Mark minutes after 11,520 checksum-authenticated daily gap additions; authentic 3,285 signed funding rate events. Settlement notional uses latest completed 1m Mark (approximation, not exchange's exact settlement mark). No-funding R2 trade/curve digests match. STRESS44 observed-funding means: W1 n34 +11.2047 bp; W2 n55 +19.0135 bp; adjusted 14d LCBs -89.5697/-44.7969 bp. W1 2023 -21.0260 bp/trade, W2 -45.4933 bp/trade. No OOS/Alpha/promotion.
+
+Measured from committed R3.1 STRESS funded attribution rows: E0 TIME_CAP W1=20/34 (58.82%), W2=36/55 (65.45%). This creates a *mechanism-identification* question about censored trends, not evidence that extending exits is profitable. A small, frozen eight-comparison development study has useful diagnostic value; no second outcome-driven search wave.
+
+## 2. Identity, 10 total cells / exactly 8 new configurations
+
+Keep two code-as-executed candidate IDs unchanged:
+- W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H, original target 2R, cooldown 6h;
+- W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H, original target 2.5R, candidate's original cooldown.
+
+Freeze original signal/event generation, event IDs, directions, ATR source/stop distance, entry availability (+1m extra lag), gap veto, initial sizing, tick=0.1, lot=0.001, min notional=5, 5% cash reserve, 1x account admission, cost vectors BASE22 and STRESS44, risk and 24h purge. No modifications to earlier R2/R3/R3.1 code or results.
+
+| Exit | Max duration | Rule | Primary paired contrast and mechanism |
+|---|---:|---|---|
+| E0 | 12h | Original single target (W1 2R/W2 2.5R), stop, first time-cap minute OPEN | byte/ledger-identical baseline |
+| H1 | 18h | Only time cap increases; same stop and target | H1-E0: 12–18h additional trend capture versus reversal/funding |
+| H2 | 24h | Only time cap increases; same stop and target | H2-E0: 12–24h extension, exposure/opportunity cost |
+| E1 | 12h | 50% at 1R, remaining 50% at original 2R/2.5R, original stop for all remaining; original time cap | E1-E0: early-profit harvest versus winner truncation |
+| E2 | 12h | E1 plus remaining stop to net execution breakeven *only after TP1 execution/ACK* | E2-E1: incremental protection, not double-counted TP1 benefit |
+
+Eight new cells: {W1,W2} × {H1,H2,E1,E2}; E0 per candidate is reused unchanged = 10 total cells. No alternative fractions, extra R-multiples, ATR multipliers or horizons. W1/W2 may yield different actual fills under each cost schedule, but configurations are not new independent optimizer runs.
+
+**Frozen E2 BE:** for remaining portion, smallest tick-legal non-loss raw stop on the remainder's own entry+exit execution proxy after spread/slippage and both-side fees; do not include realized first-half TP1 profit in computing BE. Long BE moves only up, short only down, never enlarges risk. BE activation at earliest subsequent minute *after TP1 execution is acknowledged*, never in the same 1m OHLC bar. Document exact tick rounding, fee formula and last-price versus effective-fill distinction before reading outcomes; BE is a modeled stop price, not a guaranteed zero realized cash if gap/slippage.
+
+## 3. Frozen execution and causality specification
+
+**Price and fills:** Last trade 1m governs entries, stop/targets, time cap. Mark 1m only for settled funding-notional approximation and risk/MTM. Preserve original E0's stop gap > time cap > target gap > intraminute stop before target sequence and first time-cap bar OPEN. For new tiers, a STOP and TP1/TP2 within the same minute resolves adversely to STOP for any quantity not already executed on an earlier bar. Intraminute TP1+TP2 without provable ordering may not take both optimistic fills: use TP1 then defer residual TP2 to the next bar, except an opening gap through both levels where each receives no better than its capped tier price. New BE cannot stop out retroactively in the triggering bar. Settle stop market-gap at adverse bar OPEN when breached, with adverse friction; enforce ACK before new instructions/entries.
+
+**Limit TP uncertainty:** OHLC touch does not prove maker fill. Frozen BASE/STRESS conservative marketable/taker-equivalent proxy applies original cost components per executed unit and per exit tier. Base eligibility for a resting TP requires *strict trade-through* at least one tick beyond its limit or a favorable OPEN gap; an exact touch gives no fill. On this conservative proxy execute at limit (no optimistic price improvement); log touch-but-not-fill and perform fixed additional sensitivity: one-bar delayed TP fill versus unfilled-until-next-confirmation, without making either post hoc primary. Never assert historic queue position, actual maker/taker tier or slippage established.
+
+**Quantity/cash conservation:** Entry creates whole quantity Q; E1/E2 tier one closes floor(Q/2/LOT)*LOT and remainder Q-q1, both positive and min-notional compliant at limit. If either tranche would violate lot/min-notional, reject the partial variant's *event* with a predeclared INELIGIBLE_PARTIAL_SIZE marker in paired accounting; keep its baseline and report coverage instead of re-sizing ex post. Every tier has its own effective fill, fee and completion/ACK; entry fee charged once on Q. Per-minute identity: equity = starting cash + realized price P&L - all actual charged fees + settled funding + unrealized marked value, with no double counting. Accrue funding only for settled signed events at the actual open remaining Q at settlement time; no full-Q charge after TP1. Funding cash enters availability only after settlement. Ignore funding rate as future signal. All partial quantities, cost reservations, cash movements, margin proxy and same-minute event ordering must be journaled.
+
+**Account replay:** One position at a time as current R2 account; partial TP does *not* release the signal gate for another position until full exit ACK + original cooldown. A new horizon changes signal fates and eligible entry opportunities, so regenerate positions from the *full frozen signal stream*, not from E0 accepted trade lists or edited exit_price. Equity sizing uses then-settled cash, 5% reserve, ≤1x entry and no post hoc investment of freed partial margin while residual is open. Mark MTM includes residual q and actual earned/paid funding; never treat 1x as a liquidation model. Report marked notional/equity >1x minutes separately. No 10–15x simulation without separately authorized margin/maintenance/Mark-liquidation semantics.
+
+**Folds/availability:** Jan2021 warmup; Feb2021–Dec2023 35 scored monthly folds. Preserve original 24h purge and prove 24h exit+ACK stays within scored fold or deterministically censor *before* calculating outcome. No outcomes in next fold/2024. Maintain cross-month cash continuity but never carry a position into an unauthorized scoring window. All signal inputs and any D1 eligibility use only completed bars; no use of uncompleted 12h bar/future Mark/funding.
+
+## 4. Two deliberately separate estimands
+
+**A. Same-event paired exit effects:** Take fixed E0-accepted candidate event IDs (34/55 under STRESS) and run each exit on the same complete prospective 24h last-price/Mark/funding path with frozen entry quantity and initial risk. Do not prune after seeing outcomes. Report valid-path denominator, excluded/censored IDs, exit/TP/stop/funding reasons, traded tier quantities and timestamps, fee drag, observed settlement counts, MFE/MAE, first 12h versus 12–18/18–24h incremental path, effective holding time to flat and quantity-weighted exit age, baseline full-time TIME_CAP share, signed paired net bp/Net R differences by year/side/regime and sensitivity to limit proxies. Paired episode work answers mechanism, **not** portfolio feasibility.
+
+**B. Full executable single-account replay:** For E0/H1/H2/E1/E2 independently reprocess the *full frozen signal event stream* from scratch, preserving position occupancy, ACK, cooldown, order tiers, lot rounding, risk reservations and 35-month cash chain. Compute trade count, skipped next-signals, realized net cash, side/portfolio PF, Net R, hit rate, 1m Mark max drawdown, worst year, monthly/annual returns, notional occupancy/peak exposure, partial-fill and funding ledgers. E0 must exactly reproduce R3.1 R2-baseline price trades and R3.1 funded full account/curve digests at BASE/STRESS; failure STOP with no result comparison.
+
+## 5. Inference, budget and stop rules
+
+Exactly eight new contrasts: two candidates × (H1-E0, H2-E0, E1-E0, E2-E1). Separately show E2-E0 only as decomposed diagnostic, *not* a ninth selection target. Evaluate both BASE22/STRESS44 without choosing the better cost condition post hoc: STRESS44 primary, BASE22 sensitivity. Fixed fee stress ±2/±5/±10 bp roundtrip, costs allocated by actual tier not by simply subtracting a repeated full-trade fee. Single deterministic UTC 7d and 14d calendar-block paired resampling (pre-frozen seed, e.g. 42; 10,000 draws including zero-trade blocks); simultaneous maxT adjustment across the 8 new contrasts. Prior 48 exposed historical searches create selection bias: if the historical 48 null comparison vectors can be *jointly* reconstructed, publish a conservative 56-comparison sensitivity; otherwise label eight-way adjustment **conditional-on-exposed-selected-leads**, never a confirmatory 56-family correction. No nominal p-value, bootstrap lower bound or dev profit implies eligible Alpha.
+
+Deliver time-cap conditional exposure counts (W1 20/34, W2 36/55), 2021 versus 2022/2023 effects, 2023 adverse mechanism, trade N and effective number of independent event blocks, per-year/side net and minimum fill eligibility. If 24h complete source path missing for >10% of the originally TIME_CAP events, or E0 exact account reproducibility fails, terminate as INCOMPLETE rather than cherry-picking a shortened cohort. No 2024–25/2026 reading, no additional strategy candidate/regime optimization, no new data downloads outside frozen 2021–23 public provider scope.
+
+**Stop after one source-preserving implementation freeze and one bounded result run/assessment.** Maximum 8 new configurations / 2 seeds? **Only ONE preregistered seed=42**, no adaptive rerun or follow-on parameter search. Scoped deterministic synthetic tests ≥20 including STOP/TP1/TP2/time cap collision, gap, queue nonfill, fee allocation, funding after partial, settlement boundary, BE activation, cross-fold purge, cooldown and reproducibility. Include >=5 independent Decimal partial-ledger episodes across LONG/SHORT, two years, positive/negative funding, and TP1 exactly near settlement. Full CI may be skipped based on risk plan; describe truthfully, and run scoped test evidence explicitly. On baseline/provenance/book failures: FAIL_CLOSED and no 8-cell outcome summary; no P1 engine resurrection or infinite CI repair.
+
+**Acceptable research terminals:** EXIT_R1_EXPLORATORY_ACCOUNT_AND_PAIRED_COMPLETE_DEVELOPMENT_ONLY / EXIT_R1_DIAGNOSTIC_INSUFFICIENT_SUPPORT / EXIT_R1_FAIL_CLOSED_EXECUTION_OR_SOURCE. None is POLICY_VALIDATED, OOS, TESTNET, LIVE or real-funds authority.
+
+## 6. Future options — NOT part of R1's 8 configs
+
+D1: 12→24h conditional extension solely at the 12h decision bar's *completed* information, fixed price/trend/momentum rule and max24h; if unconfirmed, original TIME_CAP. Must predefine bar closure, latency, missed execution and sample-universe rules before any results; no outcome-aware trend filter.
+
+D2: E1 partial TP1 followed by non-widening ATR trailing stop for residual, max24h, using fixed 1h completed ATR(14), watermark updated only from prior completed bars, deterministic trailing multiple specified in a *future new frozen authorization*, minimum one-bar instruction latency, failure-to-amend scenario, gap/slippage/funding and occupied capital. R1 results cannot retroactively fit the ATR multiple, choose the favorable D1 trigger or count D1/D2 as previously tested.
+
+## 7. Minimal implementation and handoff
+
+Do not edit or resurrect P1 VirtualBook. Extend only sidecar research files in scripts/strategy_research/g2_exit_horizon_r1/**, scoped tests/test_v06_g2_exit_horizon_r1_*.py, new docs/strategy_research/g2_exit_horizon_r1/** and evidence/v0.6/b_line/g2_exit_horizon_r1/**. Reuse R2 episode/proposal for exact E0, R3 funded folds/Mark valuation as read-only reference, R3.1 source manifests/authenticated public scratch only in task-specific allowlists. Build a local deterministic per-position multi-tier book and cash ledger, *not* a generic broker, order execution system, or live API.
+
+**Resource cap:** one implementation+freeze commit before reading any newly computed exit outcomes; one complete development run producing paired+account results and source/ledger manifests; one L2 Controller exact-SHA acceptance, with no outcome-guided follow-up tuning. Owner: GPT-6.1 Sol High for nontrivial accounting semantics; Gemini only for separable narrow deterministic tests on a different branch if explicitly authorized later. A design being published grants no 2024+ or real-trading rights.
