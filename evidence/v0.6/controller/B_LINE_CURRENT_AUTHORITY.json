@@ -2298,7 +2298,7 @@
     "future_holdout": "NOT_AUTHORIZED_UNREAD"
   },
   "v06_g2_btc_two_12h_funding_mark_economic_admission_r3": {
-    "status": "NEW_CODE_BRANCH_CREATED_FULL_SOL_PROMPT_PUBLISHED_UNEXECUTED",
+    "status": "TERMINAL_SOURCE_BLOCK_CONTROLLER_ACCEPTED_ZERO_ECONOMIC_OUTPUT",
     "task_id": "V06_G2_BTC_TWO_12H_FIXED_LEADS_ACTUAL_FUNDING_MARK_ECONOMICS_R3",
     "controller_dispatch_sha": "b351d5f193fda98f9f4274cb483a8d148eb797d9",
     "prompt_sha": "4833c245d868df160e93883ba1560fd1b97ba903",
@@ -2320,6 +2320,61 @@
     "terminal_choices": [
       "TWO_LEAD_REAL_FUNDING_MARK_ECONOMICS_COMPLETE_DEVELOPMENT_ONLY",
       "MARK_FUNDING_SOURCE_OR_CAUSALITY_BLOCKED"
-    ]
+    ],
+    "final_sha": "057c47a4bfd248131f4fd94d12d3deef73c65e1f",
+    "frozen_source_contract_sha": "e1218baa51fa503525aed1ecf687016821f6dfd5",
+    "ci": "PASS_RUN_38134889413",
+    "source_results": "LAST_36MONTHS_1576800_1M_ROWS_AND_FUNDING_36MONTHS_3285_EVENTS_FULL_MARK_MONTHLY_32COMPLETE_4GAPPED_11520MISSING",
+    "mark_missing_days": [
+      "2021-07-01",
+      "2021-07-24",
+      "2021-07-25",
+      "2021-07-26",
+      "2021-07-27",
+      "2022-07-31",
+      "2022-10-02",
+      "2023-02-24"
+    ],
+    "observed_funding_effect_on_strategy": "NOT_COMPUTED",
+    "mark_mtm_effect_on_strategy": "NOT_COMPUTED",
+    "controller_disposition_sha": "6b08af95335a4d577e1367a9b0652258bad1ca35",
+    "next": "R31_8_DAY_DAILY_THEN_PROVIDER_API_GAP_PATCH_PLUS_FUNDING_FIRST"
+  },
+  "v06_g2_btc_two_12h_mark_gap_repair_r31": {
+    "status": "CONTROLLER_BRANCH_CREATED_AND_PINNED_PROMPT_PUBLISHED_NOT_EXECUTED",
+    "priority": "P0_LAST_BOUNDED_PRE_HOLDOUT_ECONOMIC_RESCUE",
+    "task_id": "V06_G2_BTC_TWO_FIXED_12H_MARK_MISSING_8_DAYS_GAP_REPAIR_AND_REAL_FUNDING_REPLAY_R31",
+    "branch": "feature/v06-bline-btc-two-lead-mark-gap-repair-r31",
+    "exact_start_sha": "057c47a4bfd248131f4fd94d12d3deef73c65e1f",
+    "controller_dispatch_sha": "6b08af95335a4d577e1367a9b0652258bad1ca35",
+    "prompt_sha": "b1a62471791c46eb37c890bf2325f649d3471b3f",
+    "worktree": "/root/workspace/project/quant-v0.6/btc-two-lead-mark-gap-r31",
+    "executor": "Codex GPT-6 Sol High requested; actual model/effort not observable unless session proves",
+    "only_replacement_mark_utc_dates": [
+      "2021-07-01",
+      "2021-07-24",
+      "2021-07-25",
+      "2021-07-26",
+      "2021-07-27",
+      "2022-07-31",
+      "2022-10-02",
+      "2023-02-24"
+    ],
+    "source_precedence": "OFFICIAL_FUTURES_UM_DAILY_MARK_ZIP_CHECKSUM_THEN_PUBLIC_FAPI_MARK_PRICE_KLINES_ONLY_MISSING_WINDOWS",
+    "source_scope": "2021_2023_USDM_BTC_ONLY_NO_2024PLUS",
+    "fixed_candidate_ids": [
+      "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H"
+    ],
+    "new_candidate_trials": 0,
+    "required_partial_if_unrepaired": "FUNDING_EVENT_TRADE_COVERAGE_PUBLISH_KNOWN_AND_UNKNOWN_NO_FAKE_FULL_RETURNS",
+    "terminal_options": [
+      "R31_TWO_LEAD_OBSERVED_FUNDING_MARK_COMPLETE_DEVELOPMENT_ONLY",
+      "R31_MARK_GAPS_REMAIN_FUNDING_PARTIAL_ONLY",
+      "R31_FAIL_CLOSED_SOURCE_OR_ACCOUNTING"
+    ],
+    "regulatory_source_rights": "PUBLIC_NONCOMMERCIAL_RESEARCH_NOT_LIVE",
+    "protected_holdout": "UNREAD_NOT_GRANTED",
+    "real_funds": "NONE"
   }
 }
