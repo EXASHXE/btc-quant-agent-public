@@ -1,0 +1,100 @@
+{
+  "TASK_ID": "V06_G2_POST_EXIT_R1_GOAL_B_H18_MECHANISM_R1",
+  "CONTROLLER_DISPATCH_SHA": "c02743fddccdf517582c371a47e82d8dcbb05923",
+  "START_SHA": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "EXIT_R1_FROZEN_SHA": "de2c1fb222970a93ca797868b91b8544261ebaad",
+  "OWN_PREFIX": "g2_goal_h18_mechanism_r1",
+  "OWN_BRANCH": "feature/v06-bline-gemini-goal-h18-mechanism-r1",
+  "OWN_WORKTREE": "/root/workspace/project/quant-v0.6/gemini-h18-mechanism-r1",
+  "candidates": [
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H"
+  ],
+  "schemes": [
+    "E0",
+    "H1",
+    "H2"
+  ],
+  "cost_models": [
+    "STRESS",
+    "BASE"
+  ],
+  "min_events_per_stratum": 10,
+  "bootstrap": {
+    "draws": 10000,
+    "seed": 42,
+    "block_days": [
+      7,
+      14
+    ],
+    "zero_trade_blocks_retained": true
+  },
+  "predeclared_state_labels": {
+    "year": [
+      "2021",
+      "2022",
+      "2023"
+    ],
+    "side": [
+      "LONG",
+      "SHORT"
+    ],
+    "trend_alignment": [
+      "TREND_ALIGNED",
+      "COUNTERTREND",
+      "NEUTRAL"
+    ],
+    "volatility_regime": [
+      "HIGH_VOL",
+      "LOW_VOL",
+      "INCOMPLETE_LOOKBACK"
+    ],
+    "funding_regime": [
+      "POSITIVE",
+      "NEGATIVE",
+      "ZERO",
+      "UNKNOWN"
+    ]
+  },
+  "expected_e0_events": {
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H": 34,
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H": 55
+  },
+  "expected_e0_time_caps": {
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H": 20,
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H": 36
+  },
+  "expected_contrasts": [
+    "H1-E0",
+    "H2-E0",
+    "H2-H1"
+  ],
+  "analysis_objectives": {
+    "analysis_1_timecap_vs_early_exit": "Frozen E0-accepted time-cap censored vs early STOP/TARGET baseline strata, tracing 12-18h and 18-24h incremental favorable/adverse path, funding cash, fee changes, exit reason fates, MFE/MAE, risk-scaled returns, and actual timestamps.",
+    "analysis_2_whole_account_opportunity_cost": "Whole-account opportunity cost: independent E0/H1/H2 signal stream replays, logging signals declined due to prior position extension, exit ACK/cooldown, 5% cash reserve, 1x notional, cumulative cash, and minute Mark MTM. Distinguish matched same-event vs different account event set estimands.",
+    "analysis_3_time_execution_decomposition": "Post-12h incremental signed price PnL vs extra settled Funding vs fees/spread/slip, additional Mark drawdown/occupancy, 2021/2022/2023 attribution, and one-bar later exit ACK / worse slip fixed sensitivities under BASE and STRESS."
+  },
+  "falsification_gates": {
+    "gate_1_h18_continuation_coin_flip": "If >=45% of 12-18h time-cap continuation outcomes are adverse/reversals, the positive H1-E0 mean is an asymmetric right-tail outlier effect rather than a reliable continuation alpha.",
+    "gate_2_h24_momentum_exhaustion": "If 18-24h yields net negative mean continuation and increased stopouts, H2 underperformance relative to H1 is falsified as structural trend decay.",
+    "gate_3_2023_instability": "If W2 remains negative in 2023 under STRESS despite H1 extension, 18h holding cannot be claimed to rescue structural regime failure.",
+    "gate_4_regime_targeting_feasibility": "If as-of regime strata have N < 10 events, regime targeting is marked UNDERPOWERED and cannot support any selectable conditional exit policy.",
+    "gate_5_opportunity_blocking": "If extending horizon from 12h to 18h or 24h does not block new entries from the candidate stream (due to signal sparsity), account-level trade set equals the paired trade set, but capital occupancy increases."
+  },
+  "inherited_exit_r1_manifest_sha256": "4b9d5ef1c1ef223127e9f9b0d65c68908e5c0426ca0657583ae7f4ad9a02c381",
+  "frozen_code_files": {
+    "scripts/strategy_research/g2_goal_h18_mechanism_r1/__init__.py": "08c5f27a98dae017f0125db589c4b47db4e35564b8707c1f772be95aac26fdbd",
+    "scripts/strategy_research/g2_goal_h18_mechanism_r1/audit.py": "ee2eaba7f4af0817c30926f2368383a2da1a869a3e1054d7387fa70b1e250c56",
+    "scripts/strategy_research/g2_goal_h18_mechanism_r1/contract.py": "c62eb242aa36e09677d168b69585fa948dd43f066143e51ab14fd384349c03ad",
+    "scripts/strategy_research/g2_goal_h18_mechanism_r1/decomposition.py": "976d1793e5dad4607f73faec510f9b12cf78d7e9a7a81c89d89adebdd512e611",
+    "scripts/strategy_research/g2_goal_h18_mechanism_r1/opportunity.py": "9f4540d1cada066d5def2c0ce80abbe762e2baa8a30faa267628985ba937b4bc",
+    "scripts/strategy_research/g2_goal_h18_mechanism_r1/path_analysis.py": "26d17ab6c4f8651c24bbedaa00ad1ce3a913486ce34c1939a803c7c22805e054",
+    "scripts/strategy_research/g2_goal_h18_mechanism_r1/prospectus.py": "ff7fdd9666f89028498fbc9141d83936a35673d2175b5a2cedbb2315caa8d5f4",
+    "scripts/strategy_research/g2_goal_h18_mechanism_r1/regimes.py": "cb9466b67a6085c3bc60d797a0ecb24d69c7e523d499a93637321a01a98ea72a",
+    "scripts/strategy_research/g2_goal_h18_mechanism_r1/run.py": "cb691d2c57e174410b45a5bc7c4e529951ecb20374ca423bff0e800fedf36f2e",
+    "scripts/strategy_research/g2_goal_h18_mechanism_r1/statistics.py": "bd094fc47d80519d2daaabd945b5ee85d86fa989ddd40cb6b154ebadb80ee42c",
+    "tests/test_v06_g2_goal_h18_mechanism_r1_synthetic.py": "77bdd3c4a5d373a413fff06c88ba22c5b55a32524ddb50141d9b61445e634b3e"
+  },
+  "grade": "OBSERVATIONAL_MECHANISTIC_DIAGNOSTIC_DEV_ONLY",
+  "new_configurable_exit_policies_authorized": 0
+}

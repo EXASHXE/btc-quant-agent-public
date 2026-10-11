@@ -1,0 +1,16 @@
+{
+  "TASK_ID": "V06_G2_POST_EXIT_R1_GOAL_B_H18_MECHANISM_R1",
+  "stage": "COMMIT_1_FREEZE_ONLY",
+  "start_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "controller_dispatch_sha": "c02743fddccdf517582c371a47e82d8dcbb05923",
+  "exit_r1_frozen_sha": "de2c1fb222970a93ca797868b91b8544261ebaad",
+  "branch": "feature/v06-bline-gemini-goal-h18-mechanism-r1",
+  "worktree": "/root/workspace/project/quant-v0.6/gemini-h18-mechanism-r1",
+  "scratch": "/tmp/btc-gemini-h18-goal-r1",
+  "prefix": "g2_goal_h18_mechanism_r1",
+  "synthetic_tests_count": 29,
+  "synthetic_tests_status": "ALL_PASSED",
+  "ruff_status": "PASSED",
+  "compileall_status": "PASSED",
+  "status": "PRE_EXECUTION_FROZEN_READY_FOR_COMMIT_1"
+}
