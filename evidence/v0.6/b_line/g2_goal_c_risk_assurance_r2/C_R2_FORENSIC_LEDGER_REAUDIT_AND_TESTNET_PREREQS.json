@@ -1,0 +1,1421 @@
+{
+  "forensic_ledger_reaudit": {
+    "status": "PASS",
+    "total_order_ledger_trades_reaudited_n": 890,
+    "total_order_ledger_failures_n": 0,
+    "global_max_abs_decimal_diff_across_890_trades": 6e-12,
+    "c_r2_independent_deep_episodes_n": 24,
+    "c_r2_coverage_breakdown": {
+      "w1_count": 22,
+      "w2_count": 2,
+      "stress_count": 9,
+      "base_count": 15,
+      "long_count": 21,
+      "short_count": 3,
+      "schemes_covered": [
+        "E0",
+        "E1",
+        "E2",
+        "H1",
+        "H2"
+      ],
+      "years_covered": [
+        2021,
+        2022,
+        2023
+      ],
+      "funding_signs_covered": [
+        "NEGATIVE_DEBIT",
+        "POSITIVE_CREDIT"
+      ],
+      "post_tp1_reduced_qty_funding_cases_n": 10,
+      "partial_2tier_cases_n": 14
+    },
+    "c_r1_48_episode_cross_verification": {
+      "c_r1_deep_episodes_n": 48,
+      "c_r1_all_48_passed": true,
+      "c_r2_independent_890_superset_agreement": true
+    },
+    "selected_24_real_episode_receipts": [
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1627678800000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 2,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": true,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.022",
+        "cash_before_entry_usdt": "1034.459880788458",
+        "recomputed_net_after_funding_usdt": "20.70723441020520000",
+        "committed_net_after_funding_usdt": "20.70723441020519500",
+        "recomputed_cash_after_ack_usdt": "1055.16711519866320000",
+        "committed_cash_after_ack_usdt": "1055.1671151986632",
+        "max_abs_decimal_diff": 4e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1627689600000,
+            "asof_mark_close_at": 1627689599999,
+            "settlement_mark_price": "42209.59",
+            "remaining_qty_btc": "0.011",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0464305490000",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1627718400014,
+            "asof_mark_close_at": 1627718399999,
+            "settlement_mark_price": "41539.055268",
+            "remaining_qty_btc": "0.011",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.04569296079480000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1627689299999,
+            "exit_ack_at": 1627689360000,
+            "quantity": "0.011",
+            "eff_exit_diff": "6E-12",
+            "fee_exit_diff": "0E-8"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1627722060000,
+            "exit_ack_at": 1627722120000,
+            "quantity": "0.011",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "0E-8"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1637028000000_-1",
+        "year": 2021,
+        "side": -1,
+        "exit_reason": "TP2",
+        "tiers_n": 2,
+        "settlement_count": 1,
+        "funding_sign": "POSITIVE_CREDIT",
+        "has_post_tp1_reduced_qty_funding": true,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.015",
+        "cash_before_entry_usdt": "998.586336465482",
+        "recomputed_net_after_funding_usdt": "32.6409285186432560000",
+        "committed_net_after_funding_usdt": "32.6409285186432300000",
+        "recomputed_cash_after_ack_usdt": "1031.2272649841252560000",
+        "committed_cash_after_ack_usdt": "1031.2272649841252",
+        "max_abs_decimal_diff": 2.79520435389669e-13,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1637049600001,
+            "asof_mark_close_at": 1637049599999,
+            "settlement_mark_price": "60817.62330407",
+            "remaining_qty_btc": "0.008",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "0.0486540986432560000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1637033399999,
+            "exit_ack_at": 1637033460000,
+            "quantity": "0.007",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "3E-17"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TP2",
+            "exit_at": 1637057399999,
+            "exit_ack_at": 1637057460000,
+            "quantity": "0.008",
+            "eff_exit_diff": "6E-12",
+            "fee_exit_diff": "3E-17"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1654488000000_1",
+        "year": 2022,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 2,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": true,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.029",
+        "cash_before_entry_usdt": "1062.42141215757",
+        "recomputed_net_after_funding_usdt": "9.8878577173039750000",
+        "committed_net_after_funding_usdt": "9.8878577173039230000",
+        "recomputed_cash_after_ack_usdt": "1072.3092698748739750000",
+        "committed_cash_after_ack_usdt": "1072.309269874874",
+        "max_abs_decimal_diff": 3e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1654502400017,
+            "asof_mark_close_at": 1654502399999,
+            "settlement_mark_price": "31277.8",
+            "remaining_qty_btc": "0.029",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00009656",
+            "signed_cash_usdt": "-0.087585346672",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1654531200000,
+            "asof_mark_close_at": 1654531199999,
+            "settlement_mark_price": "31532.43734935",
+            "remaining_qty_btc": "0.015",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0472986560240250000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1654525679999,
+            "exit_ack_at": 1654525740000,
+            "quantity": "0.014",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "0E-8"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1654531260000,
+            "exit_ack_at": 1654531320000,
+            "quantity": "0.015",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "4E-17"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1658953800000_1",
+        "year": 2022,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 2,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": true,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.041",
+        "cash_before_entry_usdt": "1072.309269874874",
+        "recomputed_net_after_funding_usdt": "12.66521626528600",
+        "committed_net_after_funding_usdt": "12.665216265286044",
+        "recomputed_cash_after_ack_usdt": "1084.97448614016000",
+        "committed_cash_after_ack_usdt": "1084.97448614016",
+        "max_abs_decimal_diff": 4.860035116282998e-13,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1658966400009,
+            "asof_mark_close_at": 1658966399999,
+            "settlement_mark_price": "22942.6",
+            "remaining_qty_btc": "0.041",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00009229",
+            "signed_cash_usdt": "-0.086812274714",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1658995200008,
+            "asof_mark_close_at": 1658995199999,
+            "settlement_mark_price": "22920.6",
+            "remaining_qty_btc": "0.021",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.048133260000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1658976479999,
+            "exit_ack_at": 1658976540000,
+            "quantity": "0.02",
+            "eff_exit_diff": "2E-12",
+            "fee_exit_diff": "0E-7"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1658997060000,
+            "exit_ack_at": 1658997120000,
+            "quantity": "0.021",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "0E-8"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1674058500000_-1",
+        "year": 2023,
+        "side": -1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 1,
+        "funding_sign": "POSITIVE_CREDIT",
+        "has_post_tp1_reduced_qty_funding": true,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.044",
+        "cash_before_entry_usdt": "1085.5492555033923",
+        "recomputed_net_after_funding_usdt": "9.116453500000000",
+        "committed_net_after_funding_usdt": "9.116453500000049",
+        "recomputed_cash_after_ack_usdt": "1094.665709003392300",
+        "committed_cash_after_ack_usdt": "1094.6657090033923",
+        "max_abs_decimal_diff": 3e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1674086400000,
+            "asof_mark_close_at": 1674086399999,
+            "settlement_mark_price": "20681.1",
+            "remaining_qty_btc": "0.022",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "0.045498420000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1674060299999,
+            "exit_ack_at": 1674060360000,
+            "quantity": "0.022",
+            "eff_exit_diff": "2E-12",
+            "fee_exit_diff": "0E-8"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1674101760000,
+            "exit_ack_at": 1674101820000,
+            "quantity": "0.022",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "0E-8"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1696610700000_1",
+        "year": 2023,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 1,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": true,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.033",
+        "cash_before_entry_usdt": "1079.9105605914003",
+        "recomputed_net_after_funding_usdt": "4.7188836529065317308",
+        "committed_net_after_funding_usdt": "4.7188836529064957308",
+        "recomputed_cash_after_ack_usdt": "1084.6294442443068317308",
+        "committed_cash_after_ack_usdt": "1084.6294442443068",
+        "max_abs_decimal_diff": 2e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1696636800000,
+            "asof_mark_close_at": 1696636799999,
+            "settlement_mark_price": "27917.21251099",
+            "remaining_qty_btc": "0.017",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00002124",
+            "signed_cash_usdt": "-0.0100803470934682692",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1696628339999,
+            "exit_ack_at": 1696628400000,
+            "quantity": "0.016",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "0E-8"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1696653960000,
+            "exit_ack_at": 1696654020000,
+            "quantity": "0.017",
+            "eff_exit_diff": "2E-12",
+            "fee_exit_diff": "0E-8"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E2",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1627678800000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 2,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": true,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.022",
+        "cash_before_entry_usdt": "1034.459880788458",
+        "recomputed_net_after_funding_usdt": "20.70723441020520000",
+        "committed_net_after_funding_usdt": "20.70723441020519500",
+        "recomputed_cash_after_ack_usdt": "1055.16711519866320000",
+        "committed_cash_after_ack_usdt": "1055.1671151986632",
+        "max_abs_decimal_diff": 4e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1627689600000,
+            "asof_mark_close_at": 1627689599999,
+            "settlement_mark_price": "42209.59",
+            "remaining_qty_btc": "0.011",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0464305490000",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1627718400014,
+            "asof_mark_close_at": 1627718399999,
+            "settlement_mark_price": "41539.055268",
+            "remaining_qty_btc": "0.011",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.04569296079480000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1627689299999,
+            "exit_ack_at": 1627689360000,
+            "quantity": "0.011",
+            "eff_exit_diff": "6E-12",
+            "fee_exit_diff": "0E-8"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1627722060000,
+            "exit_ack_at": 1627722120000,
+            "quantity": "0.011",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "0E-8"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E2",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1637028000000_-1",
+        "year": 2021,
+        "side": -1,
+        "exit_reason": "TP2",
+        "tiers_n": 2,
+        "settlement_count": 1,
+        "funding_sign": "POSITIVE_CREDIT",
+        "has_post_tp1_reduced_qty_funding": true,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.015",
+        "cash_before_entry_usdt": "998.586336465482",
+        "recomputed_net_after_funding_usdt": "32.6409285186432560000",
+        "committed_net_after_funding_usdt": "32.6409285186432300000",
+        "recomputed_cash_after_ack_usdt": "1031.2272649841252560000",
+        "committed_cash_after_ack_usdt": "1031.2272649841252",
+        "max_abs_decimal_diff": 2.79520435389669e-13,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1637049600001,
+            "asof_mark_close_at": 1637049599999,
+            "settlement_mark_price": "60817.62330407",
+            "remaining_qty_btc": "0.008",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "0.0486540986432560000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1637033399999,
+            "exit_ack_at": 1637033460000,
+            "quantity": "0.007",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "3E-17"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TP2",
+            "exit_at": 1637057399999,
+            "exit_ack_at": 1637057460000,
+            "quantity": "0.008",
+            "eff_exit_diff": "6E-12",
+            "fee_exit_diff": "3E-17"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "STRESS",
+        "scheme": "E0",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 1,
+        "settlement_count": 1,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "35.4663398084577879407044231619760000",
+        "committed_net_after_funding_usdt": "35.46633980845775998943682316",
+        "recomputed_cash_after_ack_usdt": "1035.4663398084577879407044231619760000",
+        "committed_cash_after_ack_usdt": "1035.4663398084576",
+        "max_abs_decimal_diff": 4e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TIME_CAP",
+            "exit_at": 1619444760000,
+            "exit_ack_at": 1619444820000,
+            "quantity": "0.018000000000000002",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "7.101128E-17"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "STRESS",
+        "scheme": "H1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 1,
+        "settlement_count": 2,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "35.1703601917630059078177990847780000",
+        "committed_net_after_funding_usdt": "35.17036019176300197872355908",
+        "recomputed_cash_after_ack_usdt": "1035.1703601917630059078177990847780000",
+        "committed_cash_after_ack_usdt": "1035.170360191763",
+        "max_abs_decimal_diff": 4e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1619452800004,
+            "asof_mark_close_at": 1619452799999,
+            "settlement_mark_price": "53566.32038599",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0964193766947820107132640771980000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TIME_CAP",
+            "exit_at": 1619466360000,
+            "exit_ack_at": 1619466420000,
+            "quantity": "0.018000000000000002",
+            "eff_exit_diff": "4E-12",
+            "fee_exit_diff": "1.7103792E-16"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "STRESS",
+        "scheme": "H2",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 1,
+        "settlement_count": 3,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "34.2317926184656538035325131628500000",
+        "committed_net_after_funding_usdt": "34.23179261846559996792595316",
+        "recomputed_cash_after_ack_usdt": "1034.2317926184656538035325131628500000",
+        "committed_cash_after_ack_usdt": "1034.2317926184655",
+        "max_abs_decimal_diff": 4e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1619452800004,
+            "asof_mark_close_at": 1619452799999,
+            "settlement_mark_price": "53566.32038599",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0964193766947820107132640771980000",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1619481600000,
+            "asof_mark_close_at": 1619481599999,
+            "settlement_mark_price": "53988.02960964",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0971784532973520107976059219280000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TIME_CAP",
+            "exit_at": 1619487960000,
+            "exit_ack_at": 1619488020000,
+            "quantity": "0.018000000000000002",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "1.2884976E-16"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "STRESS",
+        "scheme": "E1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 1,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "32.8396955684577899783100631619760000",
+        "committed_net_after_funding_usdt": "32.83969556845778398943682316",
+        "recomputed_cash_after_ack_usdt": "1032.8396955684577899783100631619760000",
+        "committed_cash_after_ack_usdt": "1032.8396955684577",
+        "max_abs_decimal_diff": 4e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1619430599999,
+            "exit_ack_at": 1619430660000,
+            "quantity": "0.009",
+            "eff_exit_diff": "6E-12",
+            "fee_exit_diff": "1E-16"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1619444760000,
+            "exit_ack_at": 1619444820000,
+            "quantity": "0.009000000000000003",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "9.348308E-17"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "STRESS",
+        "scheme": "E1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1627678800000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 2,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": true,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.022",
+        "cash_before_entry_usdt": "1032.8396955684577",
+        "recomputed_net_after_funding_usdt": "19.15626697020520000",
+        "committed_net_after_funding_usdt": "19.15626697020508800",
+        "recomputed_cash_after_ack_usdt": "1051.99596253866290000",
+        "committed_cash_after_ack_usdt": "1051.9959625386628",
+        "max_abs_decimal_diff": 6e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1627689600000,
+            "asof_mark_close_at": 1627689599999,
+            "settlement_mark_price": "42209.59",
+            "remaining_qty_btc": "0.011",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0464305490000",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1627718400014,
+            "asof_mark_close_at": 1627718399999,
+            "settlement_mark_price": "41539.055268",
+            "remaining_qty_btc": "0.011",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.04569296079480000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1627689299999,
+            "exit_ack_at": 1627689360000,
+            "quantity": "0.011",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "0E-8"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1627722060000,
+            "exit_ack_at": 1627722120000,
+            "quantity": "0.011",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "1E-16"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "STRESS",
+        "scheme": "E2",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 1,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "32.8396955684577899783100631619760000",
+        "committed_net_after_funding_usdt": "32.83969556845778398943682316",
+        "recomputed_cash_after_ack_usdt": "1032.8396955684577899783100631619760000",
+        "committed_cash_after_ack_usdt": "1032.8396955684577",
+        "max_abs_decimal_diff": 4e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1619430599999,
+            "exit_ack_at": 1619430660000,
+            "quantity": "0.009",
+            "eff_exit_diff": "6E-12",
+            "fee_exit_diff": "1E-16"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1619444760000,
+            "exit_ack_at": 1619444820000,
+            "quantity": "0.009000000000000003",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "9.348308E-17"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "STRESS",
+        "scheme": "E2",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1627678800000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 2,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": true,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.022",
+        "cash_before_entry_usdt": "1032.8396955684577",
+        "recomputed_net_after_funding_usdt": "19.15626697020520000",
+        "committed_net_after_funding_usdt": "19.15626697020508800",
+        "recomputed_cash_after_ack_usdt": "1051.99596253866290000",
+        "committed_cash_after_ack_usdt": "1051.9959625386628",
+        "max_abs_decimal_diff": 6e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1627689600000,
+            "asof_mark_close_at": 1627689599999,
+            "settlement_mark_price": "42209.59",
+            "remaining_qty_btc": "0.011",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0464305490000",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1627718400014,
+            "asof_mark_close_at": 1627718399999,
+            "settlement_mark_price": "41539.055268",
+            "remaining_qty_btc": "0.011",
+            "reduced_after_tp1": true,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.04569296079480000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1627689299999,
+            "exit_ack_at": 1627689360000,
+            "quantity": "0.011",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "0E-8"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1627722060000,
+            "exit_ack_at": 1627722120000,
+            "quantity": "0.011",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "1E-16"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E0",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 1,
+        "settlement_count": 1,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "37.5531237284577881725693031619760000",
+        "committed_net_after_funding_usdt": "37.55312372845784398943682316",
+        "recomputed_cash_after_ack_usdt": "1037.5531237284577881725693031619760000",
+        "committed_cash_after_ack_usdt": "1037.5531237284579",
+        "max_abs_decimal_diff": 6.459871397834909e-13,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TIME_CAP",
+            "exit_at": 1619444760000,
+            "exit_ack_at": 1619444820000,
+            "quantity": "0.018000000000000002",
+            "eff_exit_diff": "4E-12",
+            "fee_exit_diff": "6.452664E-17"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "H1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 1,
+        "settlement_count": 2,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "37.2570242317630061396693590847780000",
+        "committed_net_after_funding_usdt": "37.25702423176308197872355908",
+        "recomputed_cash_after_ack_usdt": "1037.2570242317630061396693590847780000",
+        "committed_cash_after_ack_usdt": "1037.2570242317631",
+        "max_abs_decimal_diff": 8.612387382093205e-13,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1619452800004,
+            "asof_mark_close_at": 1619452799999,
+            "settlement_mark_price": "53566.32038599",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0964193766947820107132640771980000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TIME_CAP",
+            "exit_at": 1619466360000,
+            "exit_ack_at": 1619466420000,
+            "quantity": "0.018000000000000002",
+            "eff_exit_diff": "6E-12",
+            "fee_exit_diff": "3.548668E-17"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "H2",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 1,
+        "settlement_count": 3,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "36.3179512184656540353279131628500000",
+        "committed_net_after_funding_usdt": "36.31795121846567396792595316",
+        "recomputed_cash_after_ack_usdt": "1036.3179512184656540353279131628500000",
+        "committed_cash_after_ack_usdt": "1036.3179512184656",
+        "max_abs_decimal_diff": 2.580949705973835e-13,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1619452800004,
+            "asof_mark_close_at": 1619452799999,
+            "settlement_mark_price": "53566.32038599",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0964193766947820107132640771980000",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1619481600000,
+            "asof_mark_close_at": 1619481599999,
+            "settlement_mark_price": "53988.02960964",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0971784532973520107976059219280000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TIME_CAP",
+            "exit_at": 1619487960000,
+            "exit_ack_at": 1619488020000,
+            "quantity": "0.018000000000000002",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "3.554284E-17"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 1,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "34.4598807884577902951059831619760000",
+        "committed_net_after_funding_usdt": "34.45988078845782398943682316",
+        "recomputed_cash_after_ack_usdt": "1034.4598807884577902951059831619760000",
+        "committed_cash_after_ack_usdt": "1034.459880788458",
+        "max_abs_decimal_diff": 4.040629503327094e-13,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1619430539999,
+            "exit_ack_at": 1619430600000,
+            "quantity": "0.009",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "5E-17"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1619444760000,
+            "exit_ack_at": 1619444820000,
+            "quantity": "0.009000000000000003",
+            "eff_exit_diff": "4E-12",
+            "fee_exit_diff": "3.21004E-18"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E1",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1628190900000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "STOP",
+        "tiers_n": 1,
+        "settlement_count": 1,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.022",
+        "cash_before_entry_usdt": "1055.1671151986632",
+        "recomputed_net_after_funding_usdt": "-29.544239314297620000",
+        "committed_net_after_funding_usdt": "-29.544239314297617000",
+        "recomputed_cash_after_ack_usdt": "1025.622875884365580000",
+        "committed_cash_after_ack_usdt": "1025.6228758843656",
+        "max_abs_decimal_diff": 3.300367720370639e-14,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1628208000000,
+            "asof_mark_close_at": 1628207999999,
+            "settlement_mark_price": "40878.8883171",
+            "remaining_qty_btc": "0.022",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.089933554297620000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "STOP",
+            "exit_at": 1628211239999,
+            "exit_ack_at": 1628211300000,
+            "quantity": "0.022",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "1E-16"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E2",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 2,
+        "settlement_count": 1,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "34.4598807884577902951059831619760000",
+        "committed_net_after_funding_usdt": "34.45988078845782398943682316",
+        "recomputed_cash_after_ack_usdt": "1034.4598807884577902951059831619760000",
+        "committed_cash_after_ack_usdt": "1034.459880788458",
+        "max_abs_decimal_diff": 4.040629503327094e-13,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TP1",
+            "exit_at": 1619430539999,
+            "exit_ack_at": 1619430600000,
+            "quantity": "0.009",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "5E-17"
+          },
+          {
+            "tier_index": 1,
+            "reason": "TIME_CAP",
+            "exit_at": 1619444760000,
+            "exit_ack_at": 1619444820000,
+            "quantity": "0.009000000000000003",
+            "eff_exit_diff": "4E-12",
+            "fee_exit_diff": "3.21004E-18"
+          }
+        ]
+      },
+      {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost": "BASE",
+        "scheme": "E2",
+        "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1628190900000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "STOP",
+        "tiers_n": 1,
+        "settlement_count": 1,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.022",
+        "cash_before_entry_usdt": "1055.1671151986632",
+        "recomputed_net_after_funding_usdt": "-29.544239314297620000",
+        "committed_net_after_funding_usdt": "-29.544239314297617000",
+        "recomputed_cash_after_ack_usdt": "1025.622875884365580000",
+        "committed_cash_after_ack_usdt": "1025.6228758843656",
+        "max_abs_decimal_diff": 3.300367720370639e-14,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1628208000000,
+            "asof_mark_close_at": 1628207999999,
+            "settlement_mark_price": "40878.8883171",
+            "remaining_qty_btc": "0.022",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.089933554297620000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "STOP",
+            "exit_at": 1628211239999,
+            "exit_ack_at": 1628211300000,
+            "quantity": "0.022",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "1E-16"
+          }
+        ]
+      },
+      {
+        "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+        "cost": "STRESS",
+        "scheme": "E0",
+        "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 1,
+        "settlement_count": 1,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "35.4663398084577879407044231619760000",
+        "committed_net_after_funding_usdt": "35.46633980845775998943682316",
+        "recomputed_cash_after_ack_usdt": "1035.4663398084577879407044231619760000",
+        "committed_cash_after_ack_usdt": "1035.4663398084576",
+        "max_abs_decimal_diff": 4e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TIME_CAP",
+            "exit_at": 1619444760000,
+            "exit_ack_at": 1619444820000,
+            "quantity": "0.018000000000000002",
+            "eff_exit_diff": "0.0",
+            "fee_exit_diff": "7.101128E-17"
+          }
+        ]
+      },
+      {
+        "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+        "cost": "STRESS",
+        "scheme": "H1",
+        "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1619401500000_1",
+        "year": 2021,
+        "side": 1,
+        "exit_reason": "TIME_CAP",
+        "tiers_n": 1,
+        "settlement_count": 2,
+        "funding_sign": "NEGATIVE_DEBIT",
+        "has_post_tp1_reduced_qty_funding": false,
+        "lookahead_invariance_verified": true,
+        "quantity_btc": "0.018000000000000002",
+        "cash_before_entry_usdt": "1000.0",
+        "recomputed_net_after_funding_usdt": "35.1703601917630059078177990847780000",
+        "committed_net_after_funding_usdt": "35.17036019176300197872355908",
+        "recomputed_cash_after_ack_usdt": "1035.1703601917630059078177990847780000",
+        "committed_cash_after_ack_usdt": "1035.170360191763",
+        "max_abs_decimal_diff": 4e-12,
+        "passed_within_1e7": true,
+        "settlement_receipts": [
+          {
+            "settlement_at": 1619424000002,
+            "asof_mark_close_at": 1619423999999,
+            "settlement_mark_price": "52815.88419012",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0950685915422160105631768380240000",
+            "future_mark_perturbation_invariant": true
+          },
+          {
+            "settlement_at": 1619452800004,
+            "asof_mark_close_at": 1619452799999,
+            "settlement_mark_price": "53566.32038599",
+            "remaining_qty_btc": "0.018000000000000002",
+            "reduced_after_tp1": false,
+            "rate_fraction": "0.00010000",
+            "signed_cash_usdt": "-0.0964193766947820107132640771980000",
+            "future_mark_perturbation_invariant": true
+          }
+        ],
+        "tier_checks": [
+          {
+            "tier_index": 0,
+            "reason": "TIME_CAP",
+            "exit_at": 1619466360000,
+            "exit_ack_at": 1619466420000,
+            "quantity": "0.018000000000000002",
+            "eff_exit_diff": "4E-12",
+            "fee_exit_diff": "1.7103792E-16"
+          }
+        ]
+      }
+    ]
+  },
+  "testnet_readiness_prerequisites_design_only": {
+    "authorization_status": "DESIGN_ONLY__NO_TESTNET_OR_LIVE_EXECUTION_AUTHORIZED_IN_G2",
+    "testnet_connected": false,
+    "live_exchange_connected": false,
+    "prerequisites": [
+      {
+        "prerequisite_id": "TESTNET_PRE_01_RISK_BRACKET_AND_MMR_SNAPSHOT",
+        "component": "Exchange Risk & Maintenance Bracket Verifier",
+        "requirement": "Query and cryptographically log the active exchange `/fapi/v1/leverageBracket` schedule (notional floor, notional cap, `maintMarginRatio`, `cum` maintenance amount, max allowed leverage) before any session startup; reject startup if bracket parameters are missing or stale.",
+        "historical_2021_2023_status": "UNKNOWN_HISTORICAL_ASOF_SCHEDULE"
+      },
+      {
+        "prerequisite_id": "TESTNET_PRE_02_ISOLATED_LEVERAGE_AND_POSITION_MODE_GATE",
+        "requirement": "Explicitly assert and lock `marginType=ISOLATED`, target integer leverage `L`, and `dualSidePosition=false` (One-Way mode) via signed account configuration endpoints before enabling signal admission; forbid cross-margin collateral bleed unless explicitly authorized.",
+        "component": "Account Margin & Position Mode Guard",
+        "historical_2021_2023_status": "SIMULATED_1X_CASH_ACCOUNT_ONLY"
+      },
+      {
+        "prerequisite_id": "TESTNET_PRE_03_REDUCE_ONLY_AND_WORKING_TYPE_STOP_SEMANTICS",
+        "component": "Stop & Take-Profit Order Instruction Builder",
+        "requirement": "All protective stop (`STOP_MARKET`/`STOP`) and partial take-profit (`TAKE_PROFIT`/`LIMIT`) exit orders must set `reduceOnly=true` and explicitly declare `workingType` (`CONTRACT_PRICE` vs `MARK_PRICE`) so that Last-triggered strategy stops and Mark-triggered exchange liquidations have unambiguous trigger telemetry.",
+        "historical_2021_2023_status": "1M_OHLC_LAST_BAR_PROXY_ONLY"
+      },
+      {
+        "prerequisite_id": "TESTNET_PRE_04_CLIENT_ORDER_ID_IDEMPOTENCY_AND_CANCEL_REPLACE_FSM",
+        "component": "Deterministic Order State Machine",
+        "requirement": "Assign deterministic `newClientOrderId` keys per `(event_id, leg, revision)` and enforce a strict finite-state machine for the TP1 partial fill -> stop quantity amendment (`q -> q - q1`) and break-even price amendment (`stop -> eff_entry`) transition so in-flight cancel-replace races cannot over-close or flip net position.",
+        "historical_2021_2023_status": "INSTANT_1M_BOUNDARY_ACK_MODEL"
+      },
+      {
+        "prerequisite_id": "TESTNET_PRE_05_ACK_LATENCY_AND_WALLET_CASH_RECONCILIATION",
+        "component": "User-Data Stream & Wallet Cash Gate",
+        "requirement": "Reconcile WebSocket `ORDER_TRADE_UPDATE` and `ACCOUNT_UPDATE` events against REST order status; keep exited notional and realized P&L locked until terminal fill ACK and verified wallet balance update, with hard kill-switch on any unexpected position or margin ratio breach.",
+        "historical_2021_2023_status": "FIXED_1_MINUTE_ACK_DELAY_MODEL"
+      },
+      {
+        "prerequisite_id": "TESTNET_PRE_06_L2_QUEUE_FILL_AND_FUNDING_SETTLEMENT_LOGGING",
+        "component": "Microstructure & Funding Settlement Recorder",
+        "requirement": "Record top-of-book BBO/L2 depth at order submission/fill timestamps and capture exact exchange `FUNDING_FEE` income records (timestamp, symbol, income, asset, tradeId/info) at 00:00/08:00/16:00 UTC to replace the retrospective 1m Mark close approximation.",
+        "historical_2021_2023_status": "LATEST_COMPLETED_1M_MARK_CLOSE_APPROXIMATION"
+      }
+    ]
+  }
+}

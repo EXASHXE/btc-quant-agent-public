@@ -1,0 +1,46 @@
+{
+  "TASK_ID": "V06_G2_GOAL_C_RISK_ASSURANCE_R2",
+  "CONTROLLER_DISPATCH_SHA": "1172d3a91324c1a7379bc9e5c24ef601076547c2",
+  "AUTHORITY_URL": "https://github.com/EXASHXE/btc-quant-agent-public/blob/1172d3a91324c1a7379bc9e5c24ef601076547c2/reviews/v0.6/b_line/V06_G2_GEMINI_ABC_GOAL_R2_CONTROLLER_EVIDENCE_REPAIR_AUTHORITY.md",
+  "REPOSITORY": "EXASHXE/btc-quant-agent-public",
+  "BRANCH": "feature/v06-bline-gemini-goal-c-risk-assurance-r2",
+  "EXACT_START_SHA": "f381dd73a8c583e2a28dcab2e354b019b1d946fa",
+  "FROZEN_CODE_SHA": "0aa7c2fd8457ea64b343239ff7bc4c08d3c56b3f",
+  "C_R1_FROZEN_SHA": "8db2e3ff36011c6a65458f8cf4c2ba5e90d5fee2",
+  "C_R1_MID_REPAIR_SHA": "4c0bac051767f788e6de173f6563a7b47af2ac69",
+  "C_R1_FINAL_SHA": "f381dd73a8c583e2a28dcab2e354b019b1d946fa",
+  "ORIGINAL_EXIT_R1_FINAL_SHA": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "c_r1_procedural_freeze_status": "POST_FREEZE_REPAIR_NOT_PREACCEPTED",
+  "c_r1_ci_38162845456_mode": "docs-only",
+  "c_r1_32_scenarios_reconciled_n": 32,
+  "c_r1_naive_10x_15x_true_liquidated_before_stop_ratio": "5/10",
+  "c_r1_naive_10x_15x_true_gap_deficit_ratio": "7/10",
+  "c_r1_risk_capped_10x_15x_strict_nl_liquidated_ratio": "3/6",
+  "c_r2_synthetic_scenarios_n": 56,
+  "exit_r1_cells_reconstructed_n": 20,
+  "reconstructed_e0_peak_exposure_ratios": {
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H__BASE__E0": 0.9403696,
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H__STRESS__E0": 0.9439526,
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H__BASE__E0": 0.93433701,
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H__STRESS__E0": 0.93532303
+  },
+  "w1_max_historical_1r_stop_pct": 3.612,
+  "w2_max_historical_1r_stop_pct": 3.5591,
+  "real_ledger_trades_reaudited_n": 890,
+  "real_deep_episodes_reaudited_n": 24,
+  "claim_disposition_summary": {
+    "accepted": 2,
+    "invalid": 3,
+    "post_freeze_repair_not_preaccepted": 1,
+    "unknown": 1
+  },
+  "artifact_sha256_manifest": {
+    "C_R2_FREEZE_PROVENANCE_AND_SOURCE_ADMISSION.json": "10ba8a0ca26aa6e33c725b8479485d2105911f548c24acccf7e587b4c9f03956",
+    "C_R2_32_SCENARIO_RECONCILIATION_AND_56_FIXTURES.json": "c3c941294089a614dabd8c07fb34dc03d8d8ba5994d3ede3f7be18dc9929a2ed",
+    "C_R2_20_CELL_EXPOSURE_AND_STOP_INEQUALITY_AUDIT.json": "cde14d74f1548b4d25bb1cd6d2fc61b4797ad433d326738ca30d7866077a9418",
+    "C_R2_FORENSIC_LEDGER_REAUDIT_AND_TESTNET_PREREQS.json": "955c0cd2440ac75f437cea52cad39a05402c131bb37bdd02fcba49e9ffa8c90e",
+    "C_R2_CLAIM_DISPOSITION_MATRIX.json": "d186c9517336a01e268d2272538751f577044d1cb212a888f0c0d2186d462a80",
+    "BTC_GOAL_C_R2_RISK_ASSURANCE_RECONCILIATION_REPORT.md": "d136ee9c6fc29f786d4490149b43cb022bf8131c091f7bd8ca3b58b7a8b84999"
+  },
+  "terminal": "C_R2_MARGIN_RISK_EVIDENCE_RECONCILED_SYNTHETIC_ONLY"
+}

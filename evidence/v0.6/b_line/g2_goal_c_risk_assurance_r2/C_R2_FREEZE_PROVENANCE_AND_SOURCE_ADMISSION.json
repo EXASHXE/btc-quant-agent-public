@@ -1,0 +1,288 @@
+{
+  "c_r2_freeze_verification": {
+    "frozen_code_sha": "0aa7c2fd8457ea64b343239ff7bc4c08d3c56b3f",
+    "parent_sha": "f381dd73a8c583e2a28dcab2e354b019b1d946fa",
+    "exact_start_sha_matched": true,
+    "verified_files_count": 9,
+    "verified_file_sha256": {
+      "scripts/strategy_research/g2_goal_c_risk_assurance_r2/__init__.py": "a23c44955e9538d65a31fb69ce1c114d60422164b9c7662643f53a7bbd18727c",
+      "scripts/strategy_research/g2_goal_c_risk_assurance_r2/decimal_margin_engine.py": "7e827178bd993eedbd36892de101907cd27ba2ad205813beb2b657eaa8dcf7b8",
+      "scripts/strategy_research/g2_goal_c_risk_assurance_r2/exposure_and_stop_audit.py": "599592b88f796a3c7d3b75e635715416080f69d1258454b915fdff720a1a64e0",
+      "scripts/strategy_research/g2_goal_c_risk_assurance_r2/forensic_ledger_reaudit.py": "9da05c0e9e9f01657756228f5cff4f06b5c7e45e09ce46d7f5b5e5d9cb441e06",
+      "scripts/strategy_research/g2_goal_c_risk_assurance_r2/freeze_provenance_audit.py": "fe84a3e225b167b1839998dae223d20abe55e9393bb72b82e0006fabb4ff9f39",
+      "scripts/strategy_research/g2_goal_c_risk_assurance_r2/reconcile_c_r1_scenarios.py": "2f22cc693a42ad41d5464b0d3c89b04fc96d598428392dadbf1da1dbd8c91f47",
+      "scripts/strategy_research/g2_goal_c_risk_assurance_r2/run.py": "63d42f01d59dc01c9d9a104e4a4c0c6bd567f2992a18b08a122db352de13c385",
+      "tests/test_v06_g2_goal_c_risk_assurance_r2_real_ledger_and_exposure.py": "5b511206155f93213d75b2c2a842836158b28e04f232884b7f080727d9c3b2f0",
+      "tests/test_v06_g2_goal_c_risk_assurance_r2_synthetic_margin.py": "18fb668b2c30040e4f5bea7cb958daa6ff39d93b5421d2aa5fc7d157aabb2194"
+    }
+  },
+  "c_r1_three_commit_provenance_audit": {
+    "c_r1_procedural_freeze_status": "POST_FREEZE_REPAIR_NOT_PREACCEPTED",
+    "two_commit_rule_violated_in_c_r1": true,
+    "c_r1_commit_count_since_exit_r1": 3,
+    "commit_chain_verified": {
+      "original_exit_r1_parent_sha": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+      "original_exit_r1_frozen_sha": "de2c1fb222970a93ca797868b91b8544261ebaad",
+      "original_exit_r1_final_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+      "c_r1_commit_1_frozen_sha": "8db2e3ff36011c6a65458f8cf4c2ba5e90d5fee2",
+      "c_r1_commit_1_parent": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+      "c_r1_commit_2_mid_repair_sha": "4c0bac051767f788e6de173f6563a7b47af2ac69",
+      "c_r1_commit_2_parent": "8db2e3ff36011c6a65458f8cf4c2ba5e90d5fee2",
+      "c_r1_commit_3_final_evidence_sha": "f381dd73a8c583e2a28dcab2e354b019b1d946fa",
+      "c_r1_commit_3_parent": "4c0bac051767f788e6de173f6563a7b47af2ac69",
+      "c_r2_exact_start_sha": "f381dd73a8c583e2a28dcab2e354b019b1d946fa"
+    },
+    "changed_files_freeze_to_mid_repair": [
+      "evidence/v0.6/b_line/g2_goal_execution_assurance_r1/EXECUTION_ASSURANCE_R1_FROZEN_CONTRACT.json",
+      "scripts/strategy_research/g2_goal_execution_assurance_r1/attestation.py",
+      "scripts/strategy_research/g2_goal_execution_assurance_r1/run.py"
+    ],
+    "changed_files_mid_repair_to_final": [
+      "docs/strategy_research/g2_goal_execution_assurance_r1/EXECUTION_ASSURANCE_R1_AUDIT_REPORT.md",
+      "evidence/v0.6/b_line/g2_goal_execution_assurance_r1/ADVERSARIAL_COLLISION_MATRIX_RESULTS.json",
+      "evidence/v0.6/b_line/g2_goal_execution_assurance_r1/DECIMAL_FORENSIC_EPISODE_AUDIT.json",
+      "evidence/v0.6/b_line/g2_goal_execution_assurance_r1/EXECUTION_ASSURANCE_R1_DELIVERY_MANIFEST.json",
+      "evidence/v0.6/b_line/g2_goal_execution_assurance_r1/EXECUTION_ASSURANCE_R1_RESULTS.json",
+      "evidence/v0.6/b_line/g2_goal_execution_assurance_r1/EXECUTION_SENSITIVITY_AND_ATTRIBUTION.json",
+      "evidence/v0.6/b_line/g2_goal_execution_assurance_r1/SOURCE_VS_ALGO_VS_EXECUTION_UNKNOWN.json",
+      "evidence/v0.6/b_line/g2_goal_execution_assurance_r1/SYNTHETIC_MARGIN_AND_LEVERAGE_STRESS.json"
+    ],
+    "module_level_byte_and_ast_comparison": [
+      {
+        "path": "scripts/strategy_research/g2_goal_execution_assurance_r1/__init__.py",
+        "sha256_at_freeze_8db2e3ff": "00ba69bd82e4a57cc626253cf696fc98fc8ba7a8c000236810fa2479bb16385b",
+        "sha256_at_repair_4c0bac05": "00ba69bd82e4a57cc626253cf696fc98fc8ba7a8c000236810fa2479bb16385b",
+        "byte_identical": true,
+        "changed_ast_symbols": [],
+        "unchanged_ast_symbols": []
+      },
+      {
+        "path": "scripts/strategy_research/g2_goal_execution_assurance_r1/attestation.py",
+        "sha256_at_freeze_8db2e3ff": "d7d0c5757229526dd7568ed65f38daf6e4496c3abed8a4b8cf7551b53439474a",
+        "sha256_at_repair_4c0bac05": "4a5b262f5f7f98ca503267cdaaa8f8b742aef158c3e2e50aab7c4d05acd540a6",
+        "byte_identical": false,
+        "changed_ast_symbols": [
+          "verify_public_source_caches"
+        ],
+        "unchanged_ast_symbols": [
+          "_dir_metadata_fingerprint",
+          "_git_output",
+          "_git_text",
+          "run_all_attestations",
+          "verify_commits_and_frozen_bytes",
+          "verify_committed_ledgers",
+          "verify_e0_and_curve_identities"
+        ]
+      },
+      {
+        "path": "scripts/strategy_research/g2_goal_execution_assurance_r1/collision_matrix.py",
+        "sha256_at_freeze_8db2e3ff": "d39a7fb9d7368738e05d462e91b13d5a25f9ab0192a0ed3829acc6522f5223af",
+        "sha256_at_repair_4c0bac05": "d39a7fb9d7368738e05d462e91b13d5a25f9ab0192a0ed3829acc6522f5223af",
+        "byte_identical": true,
+        "changed_ast_symbols": [],
+        "unchanged_ast_symbols": [
+          "_base_fixture",
+          "_mark_dict",
+          "_targets",
+          "execute_collision_fixture",
+          "run_all_collision_fixtures"
+        ]
+      },
+      {
+        "path": "scripts/strategy_research/g2_goal_execution_assurance_r1/decimal_journal.py",
+        "sha256_at_freeze_8db2e3ff": "0cee8baa432c40e2c0d2db36e9c55115a0762c71c2d3a3d24f4eb8c90bbb5ccb",
+        "sha256_at_repair_4c0bac05": "0cee8baa432c40e2c0d2db36e9c55115a0762c71c2d3a3d24f4eb8c90bbb5ccb",
+        "byte_identical": true,
+        "changed_ast_symbols": [],
+        "unchanged_ast_symbols": [
+          "D",
+          "audit_real_r1_episodes",
+          "dec_ack_clock",
+          "dec_breakeven_stop",
+          "dec_effective_price",
+          "dec_fee",
+          "dec_size_admission",
+          "dec_split_quantity",
+          "dec_tick",
+          "read_zip_csv_member",
+          "verify_and_audit_episode",
+          "x_S"
+        ]
+      },
+      {
+        "path": "scripts/strategy_research/g2_goal_execution_assurance_r1/execution_sensitivity.py",
+        "sha256_at_freeze_8db2e3ff": "ad65a773444e2c61bcba4dded0faa5c5885ebf3eb3b91aee93afb5b0fb559fd8",
+        "sha256_at_repair_4c0bac05": "ad65a773444e2c61bcba4dded0faa5c5885ebf3eb3b91aee93afb5b0fb559fd8",
+        "byte_identical": true,
+        "changed_ast_symbols": [],
+        "unchanged_ast_symbols": [
+          "_mean",
+          "analyze_execution_sensitivity"
+        ]
+      },
+      {
+        "path": "scripts/strategy_research/g2_goal_execution_assurance_r1/lineage_audit.py",
+        "sha256_at_freeze_8db2e3ff": "cac6aa9f4b9305672f3d61d9209e4170317c4097330c3e6065f248e981bf6a59",
+        "sha256_at_repair_4c0bac05": "cac6aa9f4b9305672f3d61d9209e4170317c4097330c3e6065f248e981bf6a59",
+        "byte_identical": true,
+        "changed_ast_symbols": [],
+        "unchanged_ast_symbols": [
+          "_build_synthetic_signal_series",
+          "prove_synthetic_prefix_causality",
+          "run_all_lineage_audits",
+          "verify_folds_purge_and_ledger_lineage",
+          "verify_static_ast_causality"
+        ]
+      },
+      {
+        "path": "scripts/strategy_research/g2_goal_execution_assurance_r1/risk_envelope.py",
+        "sha256_at_freeze_8db2e3ff": "e852402291040bc422242cbdcd36dc7ded9249dabf59cf180a4f166b7f4d95da",
+        "sha256_at_repair_4c0bac05": "e852402291040bc422242cbdcd36dc7ded9249dabf59cf180a4f166b7f4d95da",
+        "byte_identical": true,
+        "changed_ast_symbols": [],
+        "unchanged_ast_symbols": [
+          "audit_real_r1_capital_and_exposure",
+          "build_synthetic_leverage_stress_matrix",
+          "run_synthetic_leverage_scenario"
+        ]
+      },
+      {
+        "path": "scripts/strategy_research/g2_goal_execution_assurance_r1/run.py",
+        "sha256_at_freeze_8db2e3ff": "071aaa32512aa308bdaf712172742816502bf4c095d62846c7a1d8da0289ebd1",
+        "sha256_at_repair_4c0bac05": "07dc7567c7be2f35b07c33e5fd270a0649ee9cb8b9871fc0c7b3500741d88ea0",
+        "byte_identical": false,
+        "changed_ast_symbols": [
+          "verify_freeze_contract"
+        ],
+        "unchanged_ast_symbols": [
+          "build_claim_matrix",
+          "build_worst_unknown_assumptions",
+          "main",
+          "render_markdown_report",
+          "run",
+          "write_strict_json"
+        ]
+      },
+      {
+        "path": "tests/test_v06_g2_goal_execution_assurance_r1_collision_matrix.py",
+        "sha256_at_freeze_8db2e3ff": "600a471d1f3fc2ea72907b980b6da987421ed2f894138464aacfbdc6212ec08e",
+        "sha256_at_repair_4c0bac05": "600a471d1f3fc2ea72907b980b6da987421ed2f894138464aacfbdc6212ec08e",
+        "byte_identical": true,
+        "changed_ast_symbols": [],
+        "unchanged_ast_symbols": [
+          "test_adversarial_collision_fixture",
+          "test_fixture_registry_has_at_least_40_unique_cases",
+          "test_run_all_collision_fixtures_summary"
+        ]
+      },
+      {
+        "path": "tests/test_v06_g2_goal_execution_assurance_r1_decimal_and_risk.py",
+        "sha256_at_freeze_8db2e3ff": "17e7ed008fa23fef42858c764ec6aa3502523e7916c5e6ea00d2ea692d9f9f7c",
+        "sha256_at_repair_4c0bac05": "17e7ed008fa23fef42858c764ec6aa3502523e7916c5e6ea00d2ea692d9f9f7c",
+        "byte_identical": true,
+        "changed_ast_symbols": [],
+        "unchanged_ast_symbols": [
+          "test_decimal_ack_clock_boundary_and_midbar",
+          "test_decimal_breakeven_stop_long_and_short",
+          "test_decimal_d_rejects_non_finite_or_invalid",
+          "test_decimal_effective_price_and_fee_long_and_short",
+          "test_decimal_size_admission_respects_1x_cap_and_5pct_reserve",
+          "test_decimal_split_quantity_odd_lot_and_min_notional",
+          "test_decimal_tick_rounding_direction",
+          "test_dual_decimal_verifier_detects_tampered_fee_and_funding",
+          "test_dual_decimal_verifier_matches_clean_synthetic_e1_episode",
+          "test_static_ast_and_synthetic_prefix_causality",
+          "test_synthetic_leverage_matrix_forbids_naive_pnl_multiplication",
+          "test_synthetic_leverage_naive_15x_liquidates_before_8pct_stop",
+          "test_synthetic_leverage_risk_capped_isolated_survives_shock",
+          "test_warmup_scoring_and_purge_folds_structure"
+        ]
+      }
+    ],
+    "untouched_modules_count": 8,
+    "modified_modules_count": 2,
+    "modified_modules_symbol_proof": {
+      "scripts/strategy_research/g2_goal_execution_assurance_r1/attestation.py": {
+        "changed_symbol": "verify_public_source_caches",
+        "exact_change": "Replaced `ref['zip_name']` with `Path(ref['source_url']).name` because `R3_SOURCE_ADMISSION_RECEIPT.json` stores the archive filename at the tail of `source_url` rather than under a `zip_name` key.",
+        "affects_economic_or_invariant_calculations": false
+      },
+      "scripts/strategy_research/g2_goal_execution_assurance_r1/run.py": {
+        "changed_symbol": "verify_freeze_commit",
+        "exact_change": "Relaxed `parent_sha != EXACT_START_SHA` to `git merge-base --is-ancestor` so the runner would accept the middle repair commit `4c0bac05` as `--code-sha` instead of failing on `4c0bac05^ == 8db2e3ff != 55ac4c63`.",
+        "affects_economic_or_invariant_calculations": false,
+        "procedural_impact": "Violated the strict two-commit rule (`freeze -> evidence`). Consequently, C R1's procedural freeze status is downgraded to `POST_FREEZE_REPAIR_NOT_PREACCEPTED`."
+      }
+    },
+    "ci_run_38162845456_truth_disclosure": {
+      "ci_run_id": 38162845456,
+      "head_sha": "f381dd73a8c583e2a28dcab2e354b019b1d946fa",
+      "overall_conclusion": "SUCCESS",
+      "change_filter_mode": "docs-only",
+      "executed_jobs": [
+        "change-filter",
+        "docs-lint"
+      ],
+      "skipped_jobs": [
+        "lint-and-typecheck",
+        "unit-tests"
+      ],
+      "pytest_executed_in_final_ci": false,
+      "ruff_executed_in_final_ci": false,
+      "mypy_executed_in_final_ci": false,
+      "audit_disposition": "C R1's final commit `f381dd73` modified only `docs/` and `evidence/`, so GitHub Actions workflow `ci.yml` (`change-filter`) skipped `lint-and-typecheck` and `unit-tests` on the final commit (`8db2e3ff` and `4c0bac05` ran full CI where 3088 passed and 1 unrelated pre-existing H40 graph-hash test failed). C R1's report statement must not be read as final-commit pytest execution."
+    },
+    "bounded_usability_separation": {
+      "c_r1_procedural_freeze_gate": "POST_FREEZE_REPAIR_NOT_PREACCEPTED",
+      "c_r1_decimal_journal_48_episodes_890_trades": "BOUNDED_USABLE__REVERIFIED_BY_INDEPENDENT_C_R2_DECIMAL_REAUDIT",
+      "c_r1_collision_matrix_48_fixtures": "BOUNDED_USABLE__UNTOUCHED_BY_MID_REPAIR",
+      "c_r1_risk_envelope_e0_exposure_and_15x_claims": "INVALID__SUPERSEDED_BY_C_R2_RECONCILIATION"
+    }
+  },
+  "read_only_source_and_ledger_admission": {
+    "status": "PASS",
+    "exit_r1_ledgers_verified_n": 24,
+    "total_order_ledger_trades_n": 890,
+    "total_paired_ledger_events_n": 178,
+    "monthly_public_zips_verified_n": 108,
+    "daily_gap_zips_verified_n": 8,
+    "e0_npz_curves_verified_n": 4,
+    "variant_npz_curves_verified_n": 16,
+    "r3_source_manifest_sha256": "5b47dcb9738e401ac4858f9a4dfcc643f8164425fd420327deed2d1c95729b3f",
+    "r31_source_manifest_sha256": "1f06a24b892a24430f3d2f9e5f2c46e926ed24a437785614c400a1fa536b677c",
+    "c_r1_evidence_artifact_digests": {
+      "EXECUTION_ASSURANCE_R1_FROZEN_CONTRACT.json": {
+        "sha256": "2783e31230218dbac44fdd6b2c581ea88cd1ee05110d219856436c9dad91a421",
+        "bytes": 13984
+      },
+      "EXECUTION_ASSURANCE_R1_RESULTS.json": {
+        "sha256": "1278fdd172bd38f349006b10a6e6ec2fc3c007261ea33364e2a4b861506d0180",
+        "bytes": 257385
+      },
+      "DECIMAL_FORENSIC_EPISODE_AUDIT.json": {
+        "sha256": "3fc5e4e23b2b6d1032f5ff1efad5f9a365cbb098ac67ca2bef84c3baa226087f",
+        "bytes": 285255
+      },
+      "ADVERSARIAL_COLLISION_MATRIX_RESULTS.json": {
+        "sha256": "d2262a6476841edd1ef5f66e3381e4826e254b9d2148d6ebe1c6b06bd9dd52d9",
+        "bytes": 20616
+      },
+      "EXECUTION_SENSITIVITY_AND_ATTRIBUTION.json": {
+        "sha256": "14eeccccfcc7a88d0db692a953dbad63319c706f80d3158ecfcb5391c866b405",
+        "bytes": 130460
+      },
+      "SYNTHETIC_MARGIN_AND_LEVERAGE_STRESS.json": {
+        "sha256": "8f9f427e93de09cfcd8b2a62944be8fcf5bece43387738240df5100d47882f55",
+        "bytes": 50093
+      },
+      "SOURCE_VS_ALGO_VS_EXECUTION_UNKNOWN.json": {
+        "sha256": "2ef3216e20dbdd73b41b484b74580c57d5193b39a221e050cf8a89f5d6e8db7e",
+        "bytes": 10492
+      },
+      "EXECUTION_ASSURANCE_R1_DELIVERY_MANIFEST.json": {
+        "sha256": "0037814c9cd28d82b67fa4b98e4fd2e878e0fafa42c0ecb9728702c5ac355d03",
+        "bytes": 1315
+      }
+    }
+  }
+}

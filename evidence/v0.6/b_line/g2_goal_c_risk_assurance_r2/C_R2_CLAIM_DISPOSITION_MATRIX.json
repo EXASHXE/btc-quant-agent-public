@@ -1,0 +1,51 @@
+{
+  "total_claims_evaluated": 7,
+  "accepted_count": 2,
+  "invalid_count": 3,
+  "post_freeze_repair_not_preaccepted_count": 1,
+  "unknown_count": 1,
+  "claims": [
+    {
+      "claim_id": "CLAIM_01_C_R1_FREEZE_AND_TWO_COMMIT_DISCIPLINE",
+      "source_Under_audit": "Goal C R1 commit chain (`8db2e3f -> 4c0bac0 -> f381dd7`) and CI run `38162845456`",
+      "disposition": "POST_FREEZE_REPAIR_NOT_PREACCEPTED",
+      "evidence_witness": "C R1 made 3 commits instead of <=2 (`8db2e3f -> 4c0bac0 -> f381dd7`). Static byte/AST diff proves `4c0bac0` modified only `attestation.py:verify_public_source_caches`, `run.py:verify_freeze_commit`, and `EXECUTION_ASSURANCE_R1_FROZEN_CONTRACT.json` while all 6 economic modules and both test files had 0 byte changes. Final CI `38162845456` ran in `docs-only` mode with pytest/Ruff/mypy skipped."
+    },
+    {
+      "claim_id": "CLAIM_02_C_R1_E0_ZERO_EXPOSURE_CELL_SUMMARIES",
+      "source_under_audit": "Goal C R1 `SYNTHETIC_MARGIN_AND_LEVERAGE_STRESS.json` `cell_exposure_summaries` for E0",
+      "disposition": "INVALID",
+      "evidence_witness": "C R1 reported `peak_mark_notional_to_equity_ratio = 0.0` for all 4 E0 cells due to a dictionary key lookup bug (`peak_exposure_ratio` vs `marked_exposure_ratio`). Independent Decimal reconstruction from read-only `*_E0_orders.jsonl` and 1m Mark bars proves E0 peak exposure ratios are W1/BASE=0.940370, W1/STRESS=0.943953, W2/BASE=0.934337, W2/STRESS=0.935323, matching R3.1 `.npz` curves within 5.68e-13 USDT."
+    },
+    {
+      "claim_id": "CLAIM_03_ALL_20_CELLS_1X_EXPOSURE_BOUND_AND_5PCT_RESERVE_GATE",
+      "source_under_audit": "Exit R1 20-cell 1x cash account (`0.95 * min(cash, 1000)` reserve gate, 0 minutes > 1x)",
+      "disposition": "ACCEPTED",
+      "evidence_witness": "Across all 20 cells (890 trades), 5% reserve breaches = 0, minutes with Notional/MarkEquity > 1.0 = 0, and peak ratio across all 20 cells is 0.950986 (in [0.932318, 0.950986])."
+    },
+    {
+      "claim_id": "CLAIM_04_C_R1_HISTORICAL_STOP_DISTANCE_7_5_TO_11_6_PCT_AND_15X_STRING",
+      "source_under_audit": "Goal C R1 human report (`7.5%-11.6%` 1R stop) and machine string (`3.61%` exceeds 15x margin)",
+      "disposition": "INVALID",
+      "evidence_witness": "Actual 2021-2023 initial 1R stop distances have max 3.6120% (W1, median 1.6507%) and 3.5591% (W2, median 1.4270%). C R1 conflated unstopped 24h Mark MAE excursion (up to 11.5861% W1 / 10.6083% W2) and synthetic 7.5% stops with historical 1R stop distances. Moreover, under 40-100 bps MMR + 75 bps clearance + STRESS fees/funding, the 15x liquidation threshold is 4.43%-5.02% > 3.6120%, so a 3.6120% stop move alone does NOT exceed 15x margin unless an intrabar Mark wick exceeds ~4.43%-5.02% or combined non-price buffers exceed 3.0547% (305.47 bps)."
+    },
+    {
+      "claim_id": "CLAIM_05_C_R1_IMPOSSIBLE_7_OVER_6_INSOLVENCY_AND_RISK_CAPPED_SOLVENCY",
+      "source_under_audit": "Goal C R1 human report (`5/6` liquidations, `7/6` insolvencies) and `RISK_BUDGET_CAPPED_ISOLATED`",
+      "disposition": "INVALID",
+      "evidence_witness": "C R1's `naive_10x_15x` filter matched Y=10 scenarios (6 from Loop 1 + 4 from Loop 2), yielding 5/10 pre-stop liquidations and 7/10 isolated gap deficits, which `run.py` divided by a hardcoded `/ 6`. Furthermore, C R1's `RISK_BUDGET_CAPPED_ISOLATED` topped up posted margin above `N/L` (~11.5%-12.1% of notional, reducing 15x to ~8.3x-8.7x); under strict `M0 = N/L`, 3/6 risk-capped 10x/15x scenarios still liquidate on the 6.8% Mark shock."
+    },
+    {
+      "claim_id": "CLAIM_06_EVENT_BOOK_FEE_FUNDING_ASOF_MARK_AND_ACK_CONSISTENCY",
+      "source_under_audit": "Exit R1 890 order-ledger trades and 24 independently re-audited deep episodes",
+      "disposition": "ACCEPTED",
+      "evidence_witness": "All 890 order-ledger trades and 24 stratified deep episodes pass independent Decimal recomputation with max diff 6.00e-12 USDT, strict `close_at <= settlement_at` as-of Mark causality, +50% future Mark perturbation invariance, and post-TP1 funding strictly on remaining quantity `q_rem = q - q1`."
+    },
+    {
+      "claim_id": "CLAIM_07_HISTORICAL_EXCHANGE_MAINTENANCE_TIERS_L2_QUEUE_AND_LIVE_SAFETY",
+      "source_under_audit": "Historical 2021-2023 Binance maintenance margin brackets, L2 limit queue, and settlement Mark",
+      "disposition": "UNKNOWN",
+      "evidence_witness": "Exact historical as-of Binance notional bracket schedules, sub-minute spot-index/basis settlement Mark at 00:00/08:00/16:00 UTC, and L2 limit maker queue depth are not present in 1m OHLCV archives. All 56 C R2 margin scenarios are synthetic-only and never authorize leveraged trading or TESTNET/LIVE deployment."
+    }
+  ]
+}
