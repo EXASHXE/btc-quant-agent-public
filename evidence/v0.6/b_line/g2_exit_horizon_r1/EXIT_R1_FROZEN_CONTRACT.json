@@ -1,0 +1,329 @@
+{
+  "TASK_ID": "V06_G2_POST_R31_EXIT_POLICY_HORIZON_R1_ONE_SHOT",
+  "CONTROLLER_DISPATCH_SHA": "7293d3f97f2d81167fd6ea17e69e424065e19e41",
+  "research_design_SHA": "9a3ba717e0c8eea062d74a038f743f87d7ae1b94",
+  "start_SHA": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+  "branch": "feature/v06-bline-exit-horizon-r1",
+  "worktree": "/root/workspace/project/quant-v0.6/exit-horizon-r1",
+  "requested_model_effort": "GPT-6.1 Sol High",
+  "observable_root_model_effort": "NOT_EXPOSED",
+  "registry": [
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "E0",
+      "horizon_hours": 12,
+      "TP1_R": null,
+      "TP2_R": 2.0,
+      "partial_fraction": null,
+      "BE": false
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "H1",
+      "horizon_hours": 18,
+      "TP1_R": null,
+      "TP2_R": 2.0,
+      "partial_fraction": null,
+      "BE": false
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "H2",
+      "horizon_hours": 24,
+      "TP1_R": null,
+      "TP2_R": 2.0,
+      "partial_fraction": null,
+      "BE": false
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "E1",
+      "horizon_hours": 12,
+      "TP1_R": 1,
+      "TP2_R": 2.0,
+      "partial_fraction": 0.5,
+      "BE": false
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "E2",
+      "horizon_hours": 12,
+      "TP1_R": 1,
+      "TP2_R": 2.0,
+      "partial_fraction": 0.5,
+      "BE": true
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "E0",
+      "horizon_hours": 12,
+      "TP1_R": null,
+      "TP2_R": 2.5,
+      "partial_fraction": null,
+      "BE": false
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "H1",
+      "horizon_hours": 18,
+      "TP1_R": null,
+      "TP2_R": 2.5,
+      "partial_fraction": null,
+      "BE": false
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "H2",
+      "horizon_hours": 24,
+      "TP1_R": null,
+      "TP2_R": 2.5,
+      "partial_fraction": null,
+      "BE": false
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "E1",
+      "horizon_hours": 12,
+      "TP1_R": 1,
+      "TP2_R": 2.5,
+      "partial_fraction": 0.5,
+      "BE": false
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "E2",
+      "horizon_hours": 12,
+      "TP1_R": 1,
+      "TP2_R": 2.5,
+      "partial_fraction": 0.5,
+      "BE": true
+    }
+  ],
+  "total_cells": 10,
+  "new_cells": 8,
+  "candidate_configs_immutable": [
+    {
+      "id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "family": "ATR_EXPANSION_TREND_FOLLOW",
+      "horizon_hours": 12,
+      "timeframes": [
+        "4h",
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 2.0,
+      "target_R": 2.0,
+      "cooldown_hours": 6,
+      "economic_rationale": "Volatility expansion momentum: After volatility compression (1h ATR(14) / ATR(56) < 0.75), an expansion bar triggers with ATR expansion > 1.25x and price breakout of 20-bar 1h channel, entry gated by chase limit (< 1.0 * ATR).",
+      "math_formulation": {
+        "long_entry": "(1h_ATR14 / 1h_ATR56 < 0.75 in prior 12h) and (1h_ATR14 > 1.25 * 1h_ATR14[10]) and (1h_close > 1h_high_20) and (1h_close - 1h_high_20 < 1.0 * 1h_ATR)",
+        "short_entry": "(1h_ATR14 / 1h_ATR56 < 0.75 in prior 12h) and (1h_ATR14 > 1.25 * 1h_ATR14[10]) and (1h_close < 1h_low_20) and (1h_low_20 - 1h_close < 1.0 * 1h_ATR)",
+        "stop_rule": "Entry +/- 2.0 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Post-expansion mean reversion causes drawdown > 12% or negative net returns under stress costs."
+    },
+    {
+      "id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "family": "ASYMMETRIC_VOLATILITY_BREAKOUT",
+      "horizon_hours": 12,
+      "timeframes": [
+        "1h",
+        "15m"
+      ],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.8,
+      "target_R": 2.5,
+      "cooldown_hours": 6,
+      "economic_rationale": "Calibrated volatility expansion: 1h ATR compression (< 0.85 of 56-bar ATR) followed by 1h expansion (> 1.2x SMA10) with volume confirmation (> 1.5x) and 15m taker flow confirmation.",
+      "math_formulation": {
+        "long_entry": "(min(1h_ATR14/1h_ATR56 in prior 12h) < 0.85) and (1h_ATR14 > 1.20 * 1h_ATR14_SMA10) and (1h_vol > 1.5 * 1h_vol_SMA20) and (1h_close > 1h_high_20) and (15m_signed_taker_ratio > 0.10)",
+        "short_entry": "(min(1h_ATR14/1h_ATR56 in prior 12h) < 0.85) and (1h_ATR14 > 1.20 * 1h_ATR14_SMA10) and (1h_vol > 1.5 * 1h_vol_SMA20) and (1h_close < 1h_low_20) and (15m_signed_taker_ratio < -0.10)",
+        "stop_rule": "Entry +/- 1.8 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.5 * StopDistance"
+      },
+      "falsification_criteria": "Sample size remains under 100 or net bps under stress fails to exceed 0."
+    }
+  ],
+  "frozen_implementation_sha256": {
+    "scripts/strategy_research/g2_exit_horizon_r1/account.py": "52255683f9061ac83a5868be1b74c33aff5808f94425d098fd3078059ec4a5a2",
+    "scripts/strategy_research/g2_exit_horizon_r1/audit.py": "698233f359d612b78ee2e466cac6041abec0440f527ed660c175f3c0e94b7ccc",
+    "scripts/strategy_research/g2_exit_horizon_r1/book.py": "89c44d7b40c7a3c4a109f0b64355e4b942ab011e6021fb73dabc98d4526ac69a",
+    "scripts/strategy_research/g2_exit_horizon_r1/report.py": "8948d698aa3cc0bd07a3f3d873b97831d8fd14eec736d5f75211aaeb7fa4f438",
+    "scripts/strategy_research/g2_exit_horizon_r1/run.py": "9c39328d6309991535394410b94907ff523f3d753240fc10d7e521f93abbd8a4",
+    "scripts/strategy_research/g2_exit_horizon_r1/sources.py": "c77d5788f6f030c7d83509809bc972f21ac8f99cc280faab2ec697108abc99d0",
+    "scripts/strategy_research/g2_exit_horizon_r1/statistics.py": "a055f88ca90c51b6cfcd6ff215fa2acc0c0119b611bca2a16e20401c493fa5de",
+    "tests/test_v06_g2_exit_horizon_r1_account.py": "61bc6b957e3954840dcd698ec196cb540e3cbe689150cc79c1427d9fc6fe9f7d",
+    "tests/test_v06_g2_exit_horizon_r1_audit.py": "d5b20d5dfec985af4dbb53e755f2d73ceef9604b0a2db48409dac7f7e1334d8a",
+    "tests/test_v06_g2_exit_horizon_r1_book.py": "9056b66e7e33cee7c7040fb151d5c1447679534f50fb04687ed7ca41c6ca3b0e",
+    "tests/test_v06_g2_exit_horizon_r1_statistics.py": "f35b91aa6992da4d07899ad185884e4f89355c47d2193768d93d2c0ce1e228d9"
+  },
+  "inherited_sha256": {
+    "docs/strategy_research/g2_r3/two_lead_mark_gap_r31/R31_TWO_LEAD_OBSERVED_FUNDING_MARK_REPORT.md": "63aa4121932a2e9d5d7025cf177767c22471c6d5e3d18e5ed31a22e236f32fec",
+    "evidence/v0.6/b_line/g2_btc_two_lead_funding_mark_r3/R3_BOUNDED_TRANSPORT_RETRIES.json": "fbd0c6af93c39c726a81257f389344a80fd961bcddd789277a68bcb51a4f4611",
+    "evidence/v0.6/b_line/g2_btc_two_lead_funding_mark_r3/R3_COMPLIANCE_LEDGER.json": "50ec3b9866e41c17bcac557f150918bd8b4725ce01a289e4e61235320282225a",
+    "evidence/v0.6/b_line/g2_btc_two_lead_funding_mark_r3/R3_ECONOMIC_RESULTS.json": "b30bdb27d8af602d2c989dd542d01c9bf46b0b17a2e0b3b5193072a3440aa900",
+    "evidence/v0.6/b_line/g2_btc_two_lead_funding_mark_r3/R3_EXECUTION_RECEIPT.json": "2a53c926bcf25d026d2acd6f28daf857ee5bade812cefc62252f58cc3037601e",
+    "evidence/v0.6/b_line/g2_btc_two_lead_funding_mark_r3/R3_FROZEN_TWO_LEAD_SOURCE_AND_ECONOMICS_CONTRACT.json": "caa7025704aea03ceeff98976ce29cbb3a91417328cc229974028d65442dc056",
+    "evidence/v0.6/b_line/g2_btc_two_lead_funding_mark_r3/R3_INDEPENDENT_MARK_GAP_WITNESSES.json": "f38a8f9b5b2218daa98408e3bdab57a10e147e88e98cce7085d3afde7760f6f5",
+    "evidence/v0.6/b_line/g2_btc_two_lead_funding_mark_r3/R3_OBSERVED_FUNDING_SOURCE_DIAGNOSTIC.json": "40eb9455732e110f4ceb3c2ac53b3c096d205b3d68cb0696df6072a884897529",
+    "evidence/v0.6/b_line/g2_btc_two_lead_funding_mark_r3/R3_SOURCE_ADMISSION_RESULTS.json": "d0d0574c65af0a92ca4b679abc844203d56357df9579a1988e3ee5c177e3fbeb",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_COMMITTED_ATTRIBUTION_LEDGER_MANIFEST.json": "f14242b2f3bbcdc5a67c0e3fee3a16de67b2d745901aafd99416e1703e1cad0d",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_COMPOSITE_SOURCE_MANIFEST.json": "bf96fa97133f976c688eb80afefba23b30bf6bd000d37c734dd82ed74ce4323a",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_DELIVERY_MANIFEST.json": "4da067c017234f601ced9e6cbab3ab82410f3e9b7a510ba3c929ca336d0ee73d",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_ECONOMIC_RESULTS.json": "85226f1905b6dae115582f84cb4d154f2e52e2f107e4f103e22781dd1c0d587c",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_FROZEN_MISSING_MARK_SOURCE_ROUTE_CONTRACT.json": "66b6cb378527eb625c91a5c1b50347f6f469eb0968cd99ce533fc307c2cb79d8",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_GAP_SOURCE_RECEIPTS.json": "3252b8103f8c7cd6032196c0ca825e9838f54485cb2d09ffbc74a29af3061527",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_INDEPENDENT_GAP_REPAIR_PROOF.json": "d3ff4579cfd343ccaca7a6929847d6869c583ed12dbaaa447dac5b4593be74d5",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_INDEPENDENT_REAL_DECIMAL_BOUNDARY_AUDIT.json": "2eecedda31bcc75d2aa4996c2f6bf53506821585dbb8c5e85f3f6926a1b31a97",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_INDEPENDENT_REAL_DECIMAL_BOUNDARY_AUDIT_METHOD.py": "98d6c059a6f191e5883467394587bbb319a170b2c50f2f209ea7fcea154425b1",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_SCIENCE_EXECUTION_RECEIPT.json": "dd41b08e471a99e3a018823f0881e6290793dfd34bee44fb73510ab716410e7b",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_full_attribution.jsonl": "0abd422b7972774e221df8e5c6232bc5a84ebafaf324142ad9144adbac678558",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_funded_full_attribution.jsonl": "d634594682c6565eb60758731cf1febd57cda96d6f8f2083ce64dae0a63827ab",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_full_attribution.jsonl": "8a6a46b86675e6bd9e5c92868c5c64217c6bb223a35436d8a192ed780693c5d8",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_funded_full_attribution.jsonl": "2c837dc91022a0b06454f36a1fcc401e5b0b680f065fc2a861377bb9ad3dca32",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_full_attribution.jsonl": "80add8f1a12f1ceaa005c838827854db311135d2650a947e26a8cc3f56f8d28c",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_funded_full_attribution.jsonl": "f816405076e0969311faaf6f15785ebc0c9f62e86aef72d4a40e25bc5624d202",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_full_attribution.jsonl": "126786cbaa7eee695cd19652e0303337d024721ccb5a23659b42f2034f69ff3a",
+    "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_funded_full_attribution.jsonl": "7c724bf39bc3f133f8709fa290184c89be0111dc10c71ac72ffed72dd4c03976",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/CUMULATIVE_TRIAL_BUDGET_LEDGER.json": "efba0b75623fd1f6827e6670999486ac192a3c49d5f1bad54e09cb74cbd9bb7c",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R1_ENGINEERING_METHOD.json": "ec9746c62ac7422f730d86c0ac3d7c53736f792240018b70beb4e761811795e8",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R1_EXECUTION_RECEIPT.json": "7dea8bbde6102d187f06064aea7b4920da59432a9a115f32a00c518e26e005ba",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R1_FIXED_24_COMPARISON.json": "b628de2ccaa612809d83491dbe6d41974d9f1639166057d567b8d46219bf83ad",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_DECIMAL_AUDITS.json": "509fabaab7c04dd4f988263b0a4525451976b05add30d96a12a6497f234806a3",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_DETERMINISM.json": "7196026709b3d11da380e639eab2356df88f46ec24e006a9f351157bd483d260",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_EXECUTABLE_PROTOCOL.json": "d5a930bd98983df9813bcddd7899baa90ecb4bebee8e06f82324f1b2fcf200a9",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_EXECUTION_RECEIPT.json": "d52d3c0029c9f64bd6c76f55710aedfa42aec7a37b61e2ccaac0f7e34f947f6e",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_OLD_VS_CORRECTED.json": "38db740fedde56b2545686306f522c6d2b9ab42916c9bcb339b65a60e905682c",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_RESULTS.json": "855d95175afdc5f4cb1b9edcc525db76855a28db5cda72d81e989b382a0cdb51",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_SOURCE_RECEIPT.json": "7acb54f6e18242109c5992a6a23c61edc0c89ca1807fd03458ff64c81b994c4a",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_FROZEN_REGISTRY.json": "d05f2361c59bf3d0c0f2b75d2ea91293e4e3f95a5720f8c0feb587b86ede3249",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_RESULT.json": "899d389cf8342f9ba4bfa0939fe7aa92c2a848c6307f878b100ba5eee6bb5365",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_FROZEN_REGISTRY.json": "7d0fcc73ce81180ac5c90de5dc4ac7528dc94ff26f3a5735e86b946f9e1d9423",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_RESULT.json": "2607fa9d415b6c22c54fa91c98b0a884e0efee848e2e02d317e02ca3bf908e4e",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_FROZEN_REGISTRY.json": "d42458d2c454dc2658eb52f459aafa39dcab87cdfc95a2b58756321d51092490",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_RESULT.json": "deb984e642364bab3519445aae5d1da539ad64843e05c79b7d12cc3f26544747",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_FROZEN_REGISTRY.json": "bc625fb62537b01958618ab55e308d01144c67dfa1e2d2d6e99b59b19687d668",
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_RESULT.json": "c33540b5cf93a603e44e322cd96fb73f3e2e054e946e82a31b41792241b2ad1d",
+    "scripts/strategy_research/g2_btc_two_lead_funding_mark_r3/economics.py": "4fc8578516bfb9fe5d4fe6f3a2ce82483c264af8986dd62c18271b4c3c47d53f",
+    "scripts/strategy_research/g2_btc_two_lead_funding_mark_r3/run.py": "bf2b070d042f3be4ad07f3051056b19fecdf2787b2b2f156d99b0c2207de8377",
+    "scripts/strategy_research/g2_btc_two_lead_funding_mark_r3/sources.py": "e740dfdea30cbf3104bce993c4a757f126e58b1aa5954a4e06e1b7ac74019c12",
+    "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/gaps.py": "83aa566974894830e169979789d184faa41d4349d1f43cba9a71919a5e78fe85",
+    "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/monthly.py": "459d7fc5d3d513bdd60f25cadc4f621dc30e62f60ffba0493100dad29c8705ea",
+    "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/partial.py": "d55d6a830ab5b104e0374bac3067f836509ff28ad404c357134870745fc07f94",
+    "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/report.py": "7a13648681027ad976001ae685ed0319e49ab0a06abd1e4b6c935c76d78ce7d8",
+    "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/run.py": "e8ccd9a06fb9c2669d2a5ae2f912c5c368d562f21c32d71a66b820bd45bf07bd",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/audit.py": "0b8606b7f2ca2f25ecdac9073faeb8469b8371cce64e8c1733ad7e81a05f66d0",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/metrics.py": "ee50ee4ebc1df08b7d1c88c183dfe9cdc681ea4cc5d73cadccfc2c2fcaef4d8c",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_preflight.py": "520523f5f91d75523af674c0ad8b7c7299b4a5fc5e4da1afd5efa3e32eb52bb3",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_audit.py": "471ced282d410f3735d04ceb5f67aa24e245bf43948b00f3c268e2d5ba846939",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_controls.py": "1a890a530b7f5ab888cc0244dfa6036b83949e1e420a1663bb9880c771a2d45f",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_report.py": "3f479e4a206e49ea4b66657f39f7fc554e07ad59b696f3c23c6e4eac495c53e6",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_run.py": "c7f391f1a931e714967c9d602c771ae7d9085fd9c2e273cbc7cb2c1c307b5b50",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_sources.py": "99afb24d98e93a5aad8a728db9ee55cd5372c17ae4d2cec65b32022b2f3dfc7f",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py": "ca4822b742bb11b0e8a9712af7a15ea258d2478d88cb44c8b3ae1a8f6b71cf16",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/run_wave.py": "f5d218cc16a5ea1287f4c8ec7ada093ef8cf3b639ad26ff9c1591c849d51a9bf",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/signals.py": "ea4f0d13c60b22cf69d9467804a96e4665e23d9471f86db322c0636ba7d082da",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/sources.py": "d3f521ba15aeaeca8c3691df624d5b2a0fcad8f8e06a300f3656ded4074692fd"
+  },
+  "frozen_at_UTC": "2026-10-11T15:33:20.063405+00:00",
+  "new_historical_exit_outcomes_inspected": false,
+  "commit1_push_exact_remote_before_outcomes": true,
+  "max_commits": 2,
+  "one_shot_marker": "/tmp/btc-exit-horizon-r1/ONE_SHOT_STARTED",
+  "source": {
+    "public_symbol": "BTCUSDT_USDM",
+    "months": "2021Jan-Dec2023 only",
+    "Last_rows": 1576800,
+    "Mark_rows": 1576800,
+    "funding_signed_events": 3285,
+    "R31_manifest_SHA256": "1f06a24b892a24430f3d2f9e5f2c46e926ed24a437785614c400a1fa536b677c",
+    "cache_roots_read_only": [
+      "/tmp/btc-two-lead-funding-mark-r3",
+      "/tmp/btc-two-lead-mark-gap-r31"
+    ],
+    "own_scratch": "/tmp/btc-exit-horizon-r1",
+    "unavailable_cache": "FAIL_CLOSED; no new download service",
+    "optimized_python": "Explicitly rejected before source reads to preserve inheritedassertgates",
+    "known_at": "UNKNOWN",
+    "settlement_Mark": "latest completed1mclose approximation; exactexchangeMark UNKNOWN"
+  },
+  "E0_identity": {
+    "fresh": "inherited R3study output destination redirected in memory only",
+    "required": "exact4 trade/event/control SHA + both R31 attribution/fundedledgerSHA + all baseline/overlay/funded uncompressed minute arrays",
+    "supplemental_order_journal": "everyfullbaseevent qty/prices/reasons/clocks/net/funding matched; originalbytes identities recorded separately",
+    "fail": "STOP beforenewcells"
+  },
+  "execution": {
+    "priority": "STOP_GAP > TIME_CAP_OPEN cappedfinaltarget > favorableOPENtargets > intraminuteSTOP > TP1 > residualTP2 nextbar; doubletierOPENgap allowed",
+    "tick": 0.1,
+    "lot": 0.001,
+    "minimum_notional": 5,
+    "quantity": "initialQ unchanged; halfroundeddownlot, Q2=Q-Q1; nearestlot representational ulps<=1e-12 only",
+    "new_TP": "strictone-ticktrade-through or favorableOPEN; cappedlimit no improvement; touches logged",
+    "BE": "smallest favorable tick where side*(effectiveexit-effectiveentry)-entryfee-exitfee>=0 per residualunit; noTP1profit/funding subsidy; neverloosen; effective>=TP1ACK only",
+    "ACK": "OPENfill+1minute; barendfill nextnextminute; fullACK/cooldown entrygate",
+    "journal": "entryfeeonce; exitfeeactualtieratfill; effectivepricePnL releasedatACK; actualsignedFunding remainingQ atsettlement; same-clock exits precedeFunding; entry precedesFunding",
+    "equity": "settledcash+pendingACKreceivable+remainingquantityconservativeMarkliquidationvalue; no redeploybeforefullflatACK",
+    "sizing": "exactoriginalR3budget/5%reserve/1x/12hfundingreservation forallvariants; H1/H2deadlineonly",
+    "entry": "immutable originalsignals+R2extra1m+0.25ATRgapveto; no futureMark/rates input",
+    "folds": "Jan2021warmup;35Feb2021-Dec2023scored; original24hpurge; newhorizonfullcapOPEN+ACK strictlywithinfold, censorbeforeoutcome",
+    "paired": "R31fundedE0acceptedIDs/Q; complete24hpath+ACK beforepairedqualification; allcensored/ineligibleIDs retained",
+    "account": "alloriginalsignals independently for4newvariants; singleposition residualgate;35monthcashcontinuity"
+  },
+  "diagnostic_sensitivities": {
+    "E0_fill_matched": "strictthrough diagnosticonly, no9th strategy",
+    "delay": "TP confirmation delayedonebar; fillnextOPEN onlyiffavorable andSTOP/capprecedence respected; reconfirmotherwise",
+    "unfilled": "skipfirstTPconfirmation includingOPEN; waitlaterconfirmation",
+    "scope": "fixedE0event/Q only; E0/E1/E2 costboth; no selectableexecution scenario",
+    "fee_stress_bps": [
+      -10,
+      -5,
+      -2,
+      2,
+      5,
+      10
+    ],
+    "fee_stress": "halfallocatedentryeffectiveQ+halfactualexittiernotionals; cashneutralpostledgerfee sensitivity, no repricingentry or new account choice"
+  },
+  "inference": {
+    "contrasts": [
+      "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H:H1-E0",
+      "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H:H2-E0",
+      "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H:E1-E0",
+      "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H:E2-E1",
+      "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H:H1-E0",
+      "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H:H2-E0",
+      "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H:E1-E0",
+      "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H:E2-E1"
+    ],
+    "STRESS": "primary44",
+    "BASE": "sensitivity22",
+    "UTC_calendar": "2021Feb1 to2024Jan1 exclusiveboundary ONLY, no2024data access",
+    "blocks_days": [
+      7,
+      14
+    ],
+    "draws": 10000,
+    "seed": 42,
+    "method": "sharedcalendarblockdraws inclzero-tradeblocks; eventratio means; centeredtwo-sidedmaxabsT studentizedbyfixedbootstrapSD; 8simultaneous95%intervals",
+    "joint56": "NOT_RECONSTRUCTED; prior48exposedselection, noAlpha",
+    "E2_E0": "diagnosticdecompositiononly"
+  },
+  "independent_Decimal_audit": {
+    "source": "CSVZIPSHAchecked separate stdlibDecoder; Decimalticks/fees/remainingqty/signedfunding/stagecash+asofMark/fullminuteequity independently checked; NumPy onlyreads ownsavedcurve",
+    "required": "atleast5 primarySTRESS actualpartial+Fundingepisodes, LONG/SHORT2022/23, positiverate/negative rate, postTP1remainingQ settlement",
+    "actual_nearTP1": "closestactualTP1/settlement; recorddistance; nofake fill shift; within60sec absent=>insufficientsupport"
+  },
+  "terminal_rule": {
+    "hard_failure": "source/E0/PIT/quantity/cash/Decimalmismatch=>EXIT_R1_FAIL_CLOSED_EXECUTION_OR_SOURCE and suppressnewcellPnL",
+    "support": "censoredTIME_CAPpairs>10%; anyprimarycontrastN<20/nonemptyblocks<8/95%intervalcontains0; auditepisodesscarce or noactualTP1within60sec=>EXIT_R1_DIAGNOSTIC_INSUFFICIENT_SUPPORT",
+    "complete": "allmeasurementandsupportgates=>EXIT_R1_EXPLORATORY_ACCOUNT_AND_PAIRED_COMPLETE_DEVELOPMENT_ONLY"
+  },
+  "pure_synthetic_tests_passed": 54,
+  "Ruff": "PASS",
+  "compile": "PASS",
+  "D1_D2": "DESIGN_ONLY_NO_EVALUATION",
+  "scope": "newtaskprefixesonly; noownerdata/protectedmonths/accounts/trading/oldedits; no resultconditionedmethodchanges/rerun"
+}
