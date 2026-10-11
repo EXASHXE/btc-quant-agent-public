@@ -1,0 +1,146 @@
+[
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_paired.jsonl",
+    "sha256": "f8d10f8a8e7d16046c2d207bf12250d63f3cc1c1ec0b3d26a692c4317f8d2d8a",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_paired.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E0_orders.jsonl",
+    "sha256": "1c083656fb4bb66c206c4d879fbf09d9ce1cf240c58c73f67b91c07c5c15f943",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E0_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_H1_orders.jsonl",
+    "sha256": "a7a1d8b01edad6f39bc156193a5040cf1949ee45c25be5e242892ab86e937444",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_H1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_H2_orders.jsonl",
+    "sha256": "aade2e083d9e3bad1b289aeccabc21afa6bc58c4317398317ad6342e619feecd",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_H2_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E1_orders.jsonl",
+    "sha256": "6e864751a8ab2af3462127915ce6a49d40da1fc865d430d3f15cbb05e52bf3ba",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E2_orders.jsonl",
+    "sha256": "9ef58057b84434c017d21f5987d56b0967c7b3439992807371a3df0638307211",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E2_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_paired.jsonl",
+    "sha256": "acda3f0996931b551750e41eebc5a124127e1dac84821197264f76a3e63b00a5",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_paired.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E0_orders.jsonl",
+    "sha256": "7d383d0256f4afea8a9956ddfe5f45afd129e167a45327f579f72ef84a4ef496",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E0_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_H1_orders.jsonl",
+    "sha256": "38437985dbb11ecfcd69e00fd305b09834725c3dcbffe23247be126f10729c6e",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_H1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_H2_orders.jsonl",
+    "sha256": "d4430fcb45564d450806c83f310864f17b9e37d451922cfbcbed0c3f73c000bc",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_H2_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E1_orders.jsonl",
+    "sha256": "98b85c828d90d4778b66ee3c4aab96a323d8530209b11654c8ef5a87b843077d",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E2_orders.jsonl",
+    "sha256": "d82fbc631b23f94dfc4d980dd00eb4a8ac5a14aa11ad7d6dc97c87266ab9dc7b",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E2_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_paired.jsonl",
+    "sha256": "c27a8dabafd4b8e9949aa94fe76f524104481395294e812ca630a73c28db7847",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_paired.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E0_orders.jsonl",
+    "sha256": "be22694a2737cf80af50d62741091b47778b71139deb3da861799432a44df445",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E0_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_H1_orders.jsonl",
+    "sha256": "1f034d1195955d64a5373d3456e7772809198216ceddf2e91bbd352807e6b02f",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_H1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_H2_orders.jsonl",
+    "sha256": "e182a48f06fa461979168f128e050be4b03db3f677cbdeea383d9c8f3299d7bd",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_H2_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E1_orders.jsonl",
+    "sha256": "9df48158c78c68c3544a140ef7cba7ea7943e0bc0d9cbaa7c77dd43cb5f39ed4",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E2_orders.jsonl",
+    "sha256": "6cb084fa4aefa9cf17cfd35ba56759a50cec492fdacd74cddfafcc4255c868f9",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E2_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_paired.jsonl",
+    "sha256": "4e417da29f07c85884199647c284031ca4c84801b48b0170bfd8f9f5e06be4b2",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_paired.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E0_orders.jsonl",
+    "sha256": "9fb80199d02ba5e3460c1c3ac35cb38b70a77d200cb189e2500db011f10a735f",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E0_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_H1_orders.jsonl",
+    "sha256": "28824ecf3df3c725030d38f8a495348baf74e468daf1cb443537b71ec312535d",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_H1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_H2_orders.jsonl",
+    "sha256": "ac57624c2a06f6c0ad4c47733501352a18124ffcac6cb1f60283a3291f8cfd08",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_H2_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E1_orders.jsonl",
+    "sha256": "97f9843b250636daed1eb4dfda9b2f261b99696366bc86cf8a1b44cea4cc13b5",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-exit-horizon-r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E2_orders.jsonl",
+    "sha256": "6db873f97b7554739e574492f25e078fbeb4c1eb99f363f5543231664140d52f",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E2_orders.jsonl"
+  }
+]

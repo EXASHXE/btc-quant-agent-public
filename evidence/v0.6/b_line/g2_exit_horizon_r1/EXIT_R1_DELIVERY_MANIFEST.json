@@ -1,0 +1,233 @@
+{
+  "start_sha": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+  "first_commit_sha": "de2c1fb222970a93ca797868b91b8544261ebaad",
+  "max_commits": 2,
+  "files_excluding_this_manifest": [
+    {
+      "path": "docs/strategy_research/g2_exit_horizon_r1/EXIT_R1_EMPIRICAL_REPORT.md",
+      "sha256": "31fca261da6caf860a69cd6ab16e118e550d8abf0bce46fd4f19f32497c7eecc",
+      "bytes": 42407
+    },
+    {
+      "path": "docs/strategy_research/g2_exit_horizon_r1/EXIT_R1_FROZEN_EXECUTION_METHOD.md",
+      "sha256": "67405c585f562a1cc3f82da61ecbe2036ac83c9aa16732fab7f32bb83ece02b6",
+      "bytes": 2160
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/COMMITTED_LEDGER_MANIFEST.json",
+      "sha256": "4b9d5ef1c1ef223127e9f9b0d65c68908e5c0426ca0657583ae7f4ad9a02c381",
+      "bytes": 8019
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/E0_EXACT_IDENTITY_RECEIPT.json",
+      "sha256": "6c997552ab41e2c05537100e9ffc7e8ee848abc36253610b155a0bdc829edba0",
+      "bytes": 2475
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_COMPLETE_ANALYSIS_TABLES.json",
+      "sha256": "c5c6e5a88b0074da83a60369e48d12c2a7cf32e310663a81428c4dffa084a857",
+      "bytes": 645645
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_FROZEN_CONTRACT.json",
+      "sha256": "1dd61c6f58c39f9cba144ecf266323c1166f2e167fa1215df1e3f559d5265c67",
+      "bytes": 23022
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_RESULTS.json",
+      "sha256": "3d4663ad697a496305321bdb7ed5ab437365e4c7d7c9c0a6eced08b8774b6e27",
+      "bytes": 1046791
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_SCIENCE_EXECUTION_RECEIPT.json",
+      "sha256": "92fb30875183d1693fc60152a0f2d8e98b10e15cc8f6f9a9b3f0efad2450e1ed",
+      "bytes": 3695
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/FIRST_FREEZE_REMOTE_VERIFICATION.json",
+      "sha256": "e3cb7a6a1d3a558813d63346c149d1e3e8ceb96a53c0bc34d7c82aaea9c3b22b",
+      "bytes": 441
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/SOURCE_IDENTITY.json",
+      "sha256": "fef1fdce6114af40a8084500f40db7a92e7ed4f9a14a8205d6325d12a12c9581",
+      "bytes": 1550735
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E0_orders.jsonl",
+      "sha256": "7d383d0256f4afea8a9956ddfe5f45afd129e167a45327f579f72ef84a4ef496",
+      "bytes": 79606
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E1_orders.jsonl",
+      "sha256": "98b85c828d90d4778b66ee3c4aab96a323d8530209b11654c8ef5a87b843077d",
+      "bytes": 99308
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E2_orders.jsonl",
+      "sha256": "d82fbc631b23f94dfc4d980dd00eb4a8ac5a14aa11ad7d6dc97c87266ab9dc7b",
+      "bytes": 100434
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_H1_orders.jsonl",
+      "sha256": "38437985dbb11ecfcd69e00fd305b09834725c3dcbffe23247be126f10729c6e",
+      "bytes": 94335
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_H2_orders.jsonl",
+      "sha256": "d4430fcb45564d450806c83f310864f17b9e37d451922cfbcbed0c3f73c000bc",
+      "bytes": 98503
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_paired.jsonl",
+      "sha256": "acda3f0996931b551750e41eebc5a124127e1dac84821197264f76a3e63b00a5",
+      "bytes": 630555
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E0_orders.jsonl",
+      "sha256": "1c083656fb4bb66c206c4d879fbf09d9ce1cf240c58c73f67b91c07c5c15f943",
+      "bytes": 80140
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E1_orders.jsonl",
+      "sha256": "6e864751a8ab2af3462127915ce6a49d40da1fc865d430d3f15cbb05e52bf3ba",
+      "bytes": 99002
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E2_orders.jsonl",
+      "sha256": "9ef58057b84434c017d21f5987d56b0967c7b3439992807371a3df0638307211",
+      "bytes": 100104
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_H1_orders.jsonl",
+      "sha256": "a7a1d8b01edad6f39bc156193a5040cf1949ee45c25be5e242892ab86e937444",
+      "bytes": 95247
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_H2_orders.jsonl",
+      "sha256": "aade2e083d9e3bad1b289aeccabc21afa6bc58c4317398317ad6342e619feecd",
+      "bytes": 99237
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_paired.jsonl",
+      "sha256": "f8d10f8a8e7d16046c2d207bf12250d63f3cc1c1ec0b3d26a692c4317f8d2d8a",
+      "bytes": 630197
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E0_orders.jsonl",
+      "sha256": "9fb80199d02ba5e3460c1c3ac35cb38b70a77d200cb189e2500db011f10a735f",
+      "bytes": 130429
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E1_orders.jsonl",
+      "sha256": "97f9843b250636daed1eb4dfda9b2f261b99696366bc86cf8a1b44cea4cc13b5",
+      "bytes": 163338
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E2_orders.jsonl",
+      "sha256": "6db873f97b7554739e574492f25e078fbeb4c1eb99f363f5543231664140d52f",
+      "bytes": 164078
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_H1_orders.jsonl",
+      "sha256": "28824ecf3df3c725030d38f8a495348baf74e468daf1cb443537b71ec312535d",
+      "bytes": 157011
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_H2_orders.jsonl",
+      "sha256": "ac57624c2a06f6c0ad4c47733501352a18124ffcac6cb1f60283a3291f8cfd08",
+      "bytes": 165049
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_paired.jsonl",
+      "sha256": "4e417da29f07c85884199647c284031ca4c84801b48b0170bfd8f9f5e06be4b2",
+      "bytes": 1044877
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E0_orders.jsonl",
+      "sha256": "be22694a2737cf80af50d62741091b47778b71139deb3da861799432a44df445",
+      "bytes": 130692
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E1_orders.jsonl",
+      "sha256": "9df48158c78c68c3544a140ef7cba7ea7943e0bc0d9cbaa7c77dd43cb5f39ed4",
+      "bytes": 162918
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E2_orders.jsonl",
+      "sha256": "6cb084fa4aefa9cf17cfd35ba56759a50cec492fdacd74cddfafcc4255c868f9",
+      "bytes": 162688
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_H1_orders.jsonl",
+      "sha256": "1f034d1195955d64a5373d3456e7772809198216ceddf2e91bbd352807e6b02f",
+      "bytes": 157721
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_H2_orders.jsonl",
+      "sha256": "e182a48f06fa461979168f128e050be4b03db3f677cbdeea383d9c8f3299d7bd",
+      "bytes": 166632
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_paired.jsonl",
+      "sha256": "c27a8dabafd4b8e9949aa94fe76f524104481395294e812ca630a73c28db7847",
+      "bytes": 1041627
+    },
+    {
+      "path": "scripts/strategy_research/g2_exit_horizon_r1/account.py",
+      "sha256": "52255683f9061ac83a5868be1b74c33aff5808f94425d098fd3078059ec4a5a2",
+      "bytes": 5917
+    },
+    {
+      "path": "scripts/strategy_research/g2_exit_horizon_r1/audit.py",
+      "sha256": "698233f359d612b78ee2e466cac6041abec0440f527ed660c175f3c0e94b7ccc",
+      "bytes": 12311
+    },
+    {
+      "path": "scripts/strategy_research/g2_exit_horizon_r1/book.py",
+      "sha256": "89c44d7b40c7a3c4a109f0b64355e4b942ab011e6021fb73dabc98d4526ac69a",
+      "bytes": 19162
+    },
+    {
+      "path": "scripts/strategy_research/g2_exit_horizon_r1/report.py",
+      "sha256": "8948d698aa3cc0bd07a3f3d873b97831d8fd14eec736d5f75211aaeb7fa4f438",
+      "bytes": 11083
+    },
+    {
+      "path": "scripts/strategy_research/g2_exit_horizon_r1/run.py",
+      "sha256": "9c39328d6309991535394410b94907ff523f3d753240fc10d7e521f93abbd8a4",
+      "bytes": 19902
+    },
+    {
+      "path": "scripts/strategy_research/g2_exit_horizon_r1/sources.py",
+      "sha256": "c77d5788f6f030c7d83509809bc972f21ac8f99cc280faab2ec697108abc99d0",
+      "bytes": 3566
+    },
+    {
+      "path": "scripts/strategy_research/g2_exit_horizon_r1/statistics.py",
+      "sha256": "a055f88ca90c51b6cfcd6ff215fa2acc0c0119b611bca2a16e20401c493fa5de",
+      "bytes": 6721
+    },
+    {
+      "path": "tests/test_v06_g2_exit_horizon_r1_account.py",
+      "sha256": "61bc6b957e3954840dcd698ec196cb540e3cbe689150cc79c1427d9fc6fe9f7d",
+      "bytes": 2212
+    },
+    {
+      "path": "tests/test_v06_g2_exit_horizon_r1_audit.py",
+      "sha256": "d5b20d5dfec985af4dbb53e755f2d73ceef9604b0a2db48409dac7f7e1334d8a",
+      "bytes": 7722
+    },
+    {
+      "path": "tests/test_v06_g2_exit_horizon_r1_book.py",
+      "sha256": "9056b66e7e33cee7c7040fb151d5c1447679534f50fb04687ed7ca41c6ca3b0e",
+      "bytes": 12501
+    },
+    {
+      "path": "tests/test_v06_g2_exit_horizon_r1_statistics.py",
+      "sha256": "f35b91aa6992da4d07899ad185884e4f89355c47d2193768d93d2c0ce1e228d9",
+      "bytes": 1484
+    }
+  ],
+  "self_digest": "intentionally not recursive; final Git commit provides identity"
+}

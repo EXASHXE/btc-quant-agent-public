@@ -1,0 +1,50 @@
+[
+  {
+    "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+    "cost": "BASE",
+    "R2_trade_event_control_sha256": "9050ddc8002903b6e879ae737b997cbc03ee8c6d7a3e00b268eb22c704352091",
+    "R31_funded_trade_sha256": "d634594682c6565eb60758731cf1febd57cda96d6f8f2083ce64dae0a63827ab",
+    "curve_uncompressed_sha256": {
+      "baseline": "3418cd4b01baa06fefdd4cd47b19485e8a1745e2c50f4750d0fd47657ee89f21",
+      "overlay": "b5334c831fd8b4299bb6c882c059808be12cc949c497ddf653333b0e7560d89f",
+      "funded": "b5334c831fd8b4299bb6c882c059808be12cc949c497ddf653333b0e7560d89f"
+    },
+    "status": "EXACT_MATCH"
+  },
+  {
+    "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+    "cost": "STRESS",
+    "R2_trade_event_control_sha256": "98baed952d2fdeabc95b975220d106f8988e885d1d715f3c7df18bc90b3cf87a",
+    "R31_funded_trade_sha256": "2c837dc91022a0b06454f36a1fcc401e5b0b680f065fc2a861377bb9ad3dca32",
+    "curve_uncompressed_sha256": {
+      "baseline": "07b6b3d5971fa830093435226b6b57754bf12f027eaa7515bffdcffef28af09d",
+      "overlay": "58caec3f5fe581a9d3e5909854b87eaf2d6345349310d842000e5f9bfd1995a6",
+      "funded": "58caec3f5fe581a9d3e5909854b87eaf2d6345349310d842000e5f9bfd1995a6"
+    },
+    "status": "EXACT_MATCH"
+  },
+  {
+    "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+    "cost": "BASE",
+    "R2_trade_event_control_sha256": "1fc79d113ab087bdb6c27a9e8a88c034d88478e8690ae5f94be45923f2140fb5",
+    "R31_funded_trade_sha256": "f816405076e0969311faaf6f15785ebc0c9f62e86aef72d4a40e25bc5624d202",
+    "curve_uncompressed_sha256": {
+      "baseline": "cfdc80d02be174f859d848f95761765b1d834840f49be02690447404bb807541",
+      "overlay": "57c166aea29b7ebc0f86d55ff941547a2f0da75945b9d566ecfcc017baecc841",
+      "funded": "57c166aea29b7ebc0f86d55ff941547a2f0da75945b9d566ecfcc017baecc841"
+    },
+    "status": "EXACT_MATCH"
+  },
+  {
+    "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+    "cost": "STRESS",
+    "R2_trade_event_control_sha256": "d408bda00827969b996aa069db52e3288e55363c77c7ba275f0c510bcb28da42",
+    "R31_funded_trade_sha256": "7c724bf39bc3f133f8709fa290184c89be0111dc10c71ac72ffed72dd4c03976",
+    "curve_uncompressed_sha256": {
+      "baseline": "c91e5c1f7509547fcc515a2ae4d6faeedd02289686f574f81f86f8f6e9154b8e",
+      "overlay": "cc870a4b5053e8a7aac5c806d1555b9989e247bc3725a3b7690cfbc002db6328",
+      "funded": "cc870a4b5053e8a7aac5c806d1555b9989e247bc3725a3b7690cfbc002db6328"
+    },
+    "status": "EXACT_MATCH"
+  }
+]

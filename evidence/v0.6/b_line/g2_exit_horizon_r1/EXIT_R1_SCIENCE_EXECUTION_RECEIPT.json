@@ -1,0 +1,74 @@
+{
+  "TASK_ID": "V06_G2_POST_R31_EXIT_POLICY_HORIZON_R1_ONE_SHOT",
+  "CONTROLLER_DISPATCH_SHA": "7293d3f97f2d81167fd6ea17e69e424065e19e41",
+  "research_design_SHA": "9a3ba717e0c8eea062d74a038f743f87d7ae1b94",
+  "prompt_SHA": "974d32c5cae75be7ef228826e33fd4edcb446be0",
+  "EXACT_START_SHA": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+  "first_frozen_commit_sha": "de2c1fb222970a93ca797868b91b8544261ebaad",
+  "first_remote_exact_sha_verified_before_new_exit_outcomes": true,
+  "final_result_commit_parent": "de2c1fb222970a93ca797868b91b8544261ebaad",
+  "branch": "feature/v06-bline-exit-horizon-r1",
+  "worktree": "/root/workspace/project/quant-v0.6/exit-horizon-r1",
+  "requested_model_effort": "GPT-6.1 Sol High",
+  "observable_root_model_effort": "NOT_EXPOSED (initial Codex session) + Gemini 3.8 Flash High (Antigravity continuation for final verification and Commit 2 delivery)",
+  "executor_attribution": {
+    "stage_1_and_one_shot_execution": "Initial Codex session (verified Controller/design/start SHA, implemented frozen sidecar book/account/statistics/audit/report/run/sources + 54 synthetic tests, committed & pushed Commit 1 de2c1fb222970a93ca797868b91b8544261ebaad, executed one-shot run, published initial evidence and report before 5h quota limit)",
+    "stage_2_verification_and_commit2_delivery": "Antigravity (Gemini 3.8 Flash High) continuation (verified frozen implementation/inherited SHA-256 immutability, verified all 24 committed ledgers and strict JSON validity, re-ran 54 scoped synthetic tests + Ruff + py_compile, added explicit handoff attribution to report, generated EXIT_R1_SCIENCE_EXECUTION_RECEIPT.json and EXIT_R1_DELIVERY_MANIFEST.json, committed & non-force pushed Commit 2, verified remote HEAD/parent/diff scope and GitHub Actions CI)"
+  },
+  "terminal": "EXIT_R1_DIAGNOSTIC_INSUFFICIENT_SUPPORT",
+  "grade": "DEVELOPMENT_ONLY_EX_POST_EXPOSED_SELECTED_LEADS",
+  "observed_at_UTC": "2026-10-11T16:26:09.131164+00:00",
+  "source_manifest_sha256": "1f06a24b892a24430f3d2f9e5f2c46e926ed24a437785614c400a1fa536b677c",
+  "monthly_archives_read_only_reused": 108,
+  "monthly_archives_redownloaded": 0,
+  "daily_zip_checksum_pairs_reused": 8,
+  "network_calls": 0,
+  "old_scratch_writes": 0,
+  "last_rows": 1576800,
+  "mark_rows": 1576800,
+  "actual_funding_events": 3285,
+  "total_cells": 10,
+  "new_configurations": 8,
+  "D1_D2": "DESIGN_ONLY_NOT_EXECUTED",
+  "E0_exact_identity_all_four_combinations": "EXACT_MATCH",
+  "E0_receipt_entries": 4,
+  "synthetic_pytest": {
+    "command": "python3.12 -m pytest -q tests/test_v06_g2_exit_horizon_r1_*.py",
+    "passed": 54,
+    "failed": 0
+  },
+  "scoped_Ruff": "PASS",
+  "compile": "PASS",
+  "JSON_validity": "PASS",
+  "frozen_code_and_test_files_verified": 11,
+  "old_inherited_files_immutable_verified": 66,
+  "committed_ledgers": 24,
+  "committed_ledger_rows_total": 1068,
+  "independent_Decimal_audit": {
+    "status": "PASS",
+    "episodes_audited": 24,
+    "per_cost_n": {
+      "STRESS": 12,
+      "BASE": 12
+    },
+    "post_TP1_residual_funding_episodes": 14,
+    "observed_rate_signs": [
+      -1,
+      1
+    ],
+    "actual_TP1_nearest_settlement": {
+      "distance_ms": 119999,
+      "settlement_at": 1670803200000,
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1670792400000_-1",
+      "TP1_at": 1670803319999
+    },
+    "actual_TP1_within_60sec_supported": false
+  },
+  "allowed_changed_prefixes": [
+    "scripts/strategy_research/g2_exit_horizon_r1/",
+    "tests/test_v06_g2_exit_horizon_r1_",
+    "docs/strategy_research/g2_exit_horizon_r1/",
+    "evidence/v0.6/b_line/g2_exit_horizon_r1/"
+  ],
+  "second_commit_ci": "PENDING_PUSH; exact remote SHA and observed CI reported after push"
+}
