@@ -2224,7 +2224,7 @@
     "controller_disposition_sha": "62723dcc25dab88187e2d3f96e032a562121324e"
   },
   "v06_g2_gemini_a_exact_roster_sol_economic_correction_r1": {
-    "status": "NEW_BRANCH_CREATED_PINNED_PROMPT_PUBLISHED_UNEXECUTED",
+    "status": "SYNTHETIC_ECONOMIC_CORRECTNESS_CI_PASS_BUT_REAL_RERUN_STOP_METHOD_CONFLICT_ACCEPTED_FAIL_CLOSED",
     "task_id": "V06_G2_GEMINI_A_FROZEN_24_HYPOTHESIS_ECONOMIC_MODEL_CORRECTION_AND_RECOMPUTE_R1",
     "priority": "P0_SCIENTIFIC_COST_CORRECTNESS_NO_NEW_HYPOTHESIS_SEARCH",
     "branch": "feature/v06-bline-gemini-a-sol-economic-recompute-r1",
@@ -2235,10 +2235,21 @@
     "budget": "SAME_24_FROZEN_FORMULAS_NO_EXTRA_TRIALS_ONE_REPLAY",
     "protected_2024plus": "NONE_READ_AUTHORIZED",
     "source": "OFFICIAL_2021_2023_PUBLIC_DATA_ONLY",
-    "experimental_status": "REANALYSIS_EXPOSED_DEVELOPMENT_PROXY_NOT_HOLDOUT"
+    "experimental_status": "REANALYSIS_EXPOSED_DEVELOPMENT_PROXY_NOT_HOLDOUT",
+    "final_sha": "d1f9f4316a2485f5d09ee1c910d7797ecfc6be7e",
+    "frozen_corrected_code_sha": "6c6218081476e1c15e2ad611eb9b3ff75c242058",
+    "ci": "PASS_RUN_38124979195_2882_PASSED_2_SKIPPED_9_WARNINGS",
+    "actual_real_data_replays": 0,
+    "corrected_real_returns": "UNKNOWN",
+    "method_conflicts": [
+      "W1C06_4H_VOLUME_INDEX_MISMATCH",
+      "TIME_CAP_OPEN_CODE_VS_CLOSE_TEXT",
+      "ENTRY_EXTRA_MINUTE_DELAY_CODE_VS_TEXT"
+    ],
+    "controller_disposition_sha": "bfe9f5df1bf55e7738cfbff58ce32e674edab683"
   },
   "v06_g2_gemini_b_scoped_ruff_cleanup_r1": {
-    "status": "NEW_BRANCH_CREATED_PROMPT_PUBLISHED_UNEXECUTED",
+    "status": "SCOPED_RUFF_ONLY_CLOSED_CONTROLLER_ACCEPTED",
     "task_id": "V06_G2_GEMINI_B_SCOPED_RUFF_ONLY_CLEANUP_R1",
     "priority": "P1_PARALLEL_SIMPLE_STYLE_ONLY",
     "branch": "feature/v06-bline-gemini-b-scoped-ruff-r1",
@@ -2247,6 +2258,28 @@
     "prompt_sha": "6fdf9879b52afcaaa00cf0a2cb811ed980feb946",
     "worktree": "/root/workspace/project/quant-v0.6/gemini-b-scoped-ruff-r1",
     "fixed_scope": "23_RUFF_F401_I001_NO_RESULTS_OR_STRATEGY_CHANGES",
-    "protected_2024plus": "NONE_READ_AUTHORIZED"
+    "protected_2024plus": "NONE_READ_AUTHORIZED",
+    "final_sha": "b51a0019c68c8539895ac1b48379f0045e5bfdae",
+    "parent_verified": "db0f01e9d8674c0ce9f0b083c5961f6d17f20eda",
+    "ci": "PASS_RUN_38124476677_2853_PASSED_2_SKIPPED_9_WARNINGS",
+    "original_strategy_results": "IMMUTABLE_NEGATIVE_STRESS_NO_DEVELOPMENT_PROMOTION",
+    "controller_closure_sha": "bfe9f5df1bf55e7738cfbff58ce32e674edab683"
+  },
+  "v06_g2_gemini_a_code_as_executed_real_reanalysis_r2": {
+    "status": "NEW_BRANCH_AND_PINNED_PROMPT_PUBLISHED_NOT_EXECUTED",
+    "task_id": "V06_G2_GEMINI_A_CODE_AS_EXECUTED_23_TRIAL_ACTUAL_MARKET_REPLAY_R2",
+    "priority": "P0_ONE_ACTUAL_REAL_PRICE_DEVELOPMENT_REANALYSIS_NOT_NEW_STRATEGIES",
+    "branch": "feature/v06-bline-gemini-a-code-identity-exploratory-replay-r2",
+    "start_sha": "d1f9f4316a2485f5d09ee1c910d7797ecfc6be7e",
+    "controller_dispatch_sha": "bfe9f5df1bf55e7738cfbff58ce32e674edab683",
+    "prompt_sha": "681087557fb774a110500282fcd5e20fa17bc949",
+    "worktree": "/root/workspace/project/quant-v0.6/gemini-a-code-identity-replay-r2",
+    "method_grade": "23_EXECUTABLE_AS_RUN_RETROSPECTIVE_DEV_ONLY_NOT_ORIGINAL_PREREG;W1C06_INVALID_EXCLUDED",
+    "data": "OFFICIAL_BINANCE_VISION_BTCUSDT_USDM_1M_2021_2023_ONLY",
+    "costs": "ACTUAL_22BP_BASE_44BP_STRESS_FUNDING_SEPARATE",
+    "checks": "REAL_DATA_23_CANDIDATE_REPLAY_35_DEV_FOLDS_PLUS_MATCHED_CONTROL_1X_MTM_48_TRIAL_ADJUSTMENT",
+    "protected_2024_2025_2026": "NO_ACCESS",
+    "owner_root": "NONE",
+    "p3_p4_testnet_live": "NONE"
   }
 }
