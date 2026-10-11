@@ -1,0 +1,266 @@
+[
+  {
+    "year": 2021,
+    "month": 6,
+    "kind": "mark",
+    "initial_failure": {
+      "year": 2021,
+      "month": 6,
+      "kind": "mark",
+      "plan": {
+        "kind": "mark",
+        "year": 2021,
+        "month": 6,
+        "zip_name": "BTCUSDT-1m-2021-06.zip",
+        "csv_name": "BTCUSDT-1m-2021-06.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2021-06.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2021-06.zip.CHECKSUM"
+      },
+      "diagnostic": null,
+      "failure": "source mark 2021-06 zip unavailable: {'requested_url': 'https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2021-06.zip', 'returned_url': 'https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2021-06.zip', 'http_status': 0, 'http_version': '0', 'curl_exit': 35, 'response_headers': 'HTTP/1.1 200 Connection established\\n\\n', 'fetched_at_utc': '2026-10-11T10:53:07.229802+00:00', 'stderr': 'curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to data.binance.vision:443 \\n', 'status': 'FETCH_FAILED'}",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "mark-BTCUSDT-1m-2021-06.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\n",
+          "sha256": "f55260227c507b4e203ec14ceb78ce8e64d11734111bed9bd18936a3bd4d48f3"
+        }
+      }
+    },
+    "retry_status": "PASS",
+    "rows": 43200
+  },
+  {
+    "year": 2021,
+    "month": 6,
+    "kind": "funding",
+    "initial_failure": {
+      "year": 2021,
+      "month": 6,
+      "kind": "funding",
+      "plan": {
+        "kind": "funding",
+        "year": 2021,
+        "month": 6,
+        "zip_name": "BTCUSDT-fundingRate-2021-06.zip",
+        "csv_name": "BTCUSDT-fundingRate-2021-06.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2021-06.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2021-06.zip.CHECKSUM"
+      },
+      "diagnostic": null,
+      "failure": "funding archive 2021-06 zip unavailable: {'requested_url': 'https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2021-06.zip', 'returned_url': 'https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2021-06.zip', 'http_status': 0, 'http_version': '0', 'curl_exit': 35, 'response_headers': 'HTTP/1.1 200 Connection established\\n\\n', 'fetched_at_utc': '2026-10-11T10:53:17.639027+00:00', 'stderr': 'curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to data.binance.vision:443 \\n', 'status': 'FETCH_FAILED'}",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "funding-BTCUSDT-fundingRate-2021-06.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\n",
+          "sha256": "f55260227c507b4e203ec14ceb78ce8e64d11734111bed9bd18936a3bd4d48f3"
+        }
+      }
+    },
+    "retry_status": "FAILED",
+    "exception": "funding archive 2021-06 checksum unavailable: {'requested_url': 'https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2021-06.zip.CHECKSUM', 'returned_url': 'https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2021-06.zip.CHECKSUM', 'http_status': 0, 'http_version': '0', 'curl_exit': 35, 'response_headers': 'HTTP/1.1 200 Connection established\\n\\n', 'fetched_at_utc': '2026-10-11T11:01:27.118020+00:00', 'stderr': 'curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to data.binance.vision:443 \\n', 'status': 'FETCH_FAILED'}"
+  },
+  {
+    "year": 2022,
+    "month": 10,
+    "kind": "funding",
+    "initial_failure": {
+      "year": 2022,
+      "month": 10,
+      "kind": "funding",
+      "plan": {
+        "kind": "funding",
+        "year": 2022,
+        "month": 10,
+        "zip_name": "BTCUSDT-fundingRate-2022-10.zip",
+        "csv_name": "BTCUSDT-fundingRate-2022-10.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2022-10.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2022-10.zip.CHECKSUM"
+      },
+      "diagnostic": null,
+      "failure": "funding archive 2022-10 zip unavailable: {'requested_url': 'https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2022-10.zip', 'returned_url': 'https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2022-10.zip', 'http_status': 0, 'http_version': '0', 'curl_exit': 35, 'response_headers': 'HTTP/1.1 200 Connection established\\n\\n', 'fetched_at_utc': '2026-10-11T10:55:21.487671+00:00', 'stderr': 'curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to data.binance.vision:443 \\n', 'status': 'FETCH_FAILED'}",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "funding-BTCUSDT-fundingRate-2022-10.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\n",
+          "sha256": "f55260227c507b4e203ec14ceb78ce8e64d11734111bed9bd18936a3bd4d48f3"
+        }
+      }
+    },
+    "retry_status": "PASS",
+    "rows": 93
+  },
+  {
+    "year": 2022,
+    "month": 11,
+    "kind": "mark",
+    "initial_failure": {
+      "year": 2022,
+      "month": 11,
+      "kind": "mark",
+      "plan": {
+        "kind": "mark",
+        "year": 2022,
+        "month": 11,
+        "zip_name": "BTCUSDT-1m-2022-11.zip",
+        "csv_name": "BTCUSDT-1m-2022-11.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2022-11.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2022-11.zip.CHECKSUM"
+      },
+      "diagnostic": null,
+      "failure": "source mark 2022-11 checksum unavailable: {'requested_url': 'https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2022-11.zip.CHECKSUM', 'returned_url': 'https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2022-11.zip.CHECKSUM', 'http_status': 0, 'http_version': '0', 'curl_exit': 35, 'response_headers': 'HTTP/1.1 200 Connection established\\n\\n', 'fetched_at_utc': '2026-10-11T10:55:39.330749+00:00', 'stderr': 'curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to data.binance.vision:443 \\n', 'status': 'FETCH_FAILED'}",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "mark-BTCUSDT-1m-2022-11.zip": {
+          "bytes": 1076530,
+          "sha256": "da02544e804f995ad34dfd84f4cda4a8c62200fc465329817f2881d772689806"
+        },
+        "mark-BTCUSDT-1m-2022-11.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\nHTTP/2 200 \ncontent-type: binary/octet-stream\ncontent-length: 1076530\nserver: AmazonS3\ndate: Sun, 11 Oct 2026 10:55:27 GMT\nlast-modified: Sun, 25 Dec 2022 15:31:50 GMT\netag: \"b1e717a8c06e044c5aa04e35ae5ff9a6\"\nx-amz-server-side-encryption: AES256\naccept-ranges: bytes\nx-cache: Miss from cloudfront\nvia: 1.1 2383ef6123aabc2603d88e63aa5c8934.cloudfront.net (CloudFront)\nx-amz-cf-pop: HKG54-P2\nx-amz-cf-id: pQEdnO87dO4KU1aqrGhpA5A6owrDDVpjlp5Z20NE2e7TkQDKwLWMAw==\n\n",
+          "sha256": "9b897b0c782a146b27590d87d44b6b9f71db7cbca7b921ae4d0014f7898dd0c8"
+        },
+        "mark-BTCUSDT-1m-2022-11.zip.CHECKSUM.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\n",
+          "sha256": "f55260227c507b4e203ec14ceb78ce8e64d11734111bed9bd18936a3bd4d48f3"
+        }
+      }
+    },
+    "retry_status": "PASS",
+    "rows": 43200
+  },
+  {
+    "year": 2022,
+    "month": 12,
+    "kind": "funding",
+    "initial_failure": {
+      "year": 2022,
+      "month": 12,
+      "kind": "funding",
+      "plan": {
+        "kind": "funding",
+        "year": 2022,
+        "month": 12,
+        "zip_name": "BTCUSDT-fundingRate-2022-12.zip",
+        "csv_name": "BTCUSDT-fundingRate-2022-12.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2022-12.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2022-12.zip.CHECKSUM"
+      },
+      "diagnostic": null,
+      "failure": "funding archive 2022-12 checksum unavailable: {'requested_url': 'https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2022-12.zip.CHECKSUM', 'returned_url': 'https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2022-12.zip.CHECKSUM', 'http_status': 0, 'http_version': '0', 'curl_exit': 35, 'response_headers': 'HTTP/1.1 200 Connection established\\n\\n', 'fetched_at_utc': '2026-10-11T10:55:59.209660+00:00', 'stderr': 'curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to data.binance.vision:443 \\n', 'status': 'FETCH_FAILED'}",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "funding-BTCUSDT-fundingRate-2022-12.zip": {
+          "bytes": 982,
+          "sha256": "4218c78331bcc4dbeb5768fa112242a880971c1f2cfd1d3f32aaa26ca34069af"
+        },
+        "funding-BTCUSDT-fundingRate-2022-12.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\nHTTP/2 200 \ncontent-type: binary/octet-stream\ncontent-length: 982\naccept-ranges: bytes\ndate: Sun, 11 Oct 2026 10:55:51 GMT\nserver: AmazonS3\nlast-modified: Tue, 09 May 2023 22:02:30 GMT\netag: \"7a98ebd623f728f665c7223c9a7f7b1a\"\nx-amz-server-side-encryption: AES256\nx-cache: Miss from cloudfront\nvia: 1.1 ff773c46b9656e6740829193cd32d18a.cloudfront.net (CloudFront)\nx-amz-cf-pop: HKG54-P2\nx-amz-cf-id: mLl2NuZB-vvIEAR0Zo2vZIrqRpyfxXAqJufQMcvRYpBVTH52cxrQwQ==\n\n",
+          "sha256": "874a287631ed95b7fc304a791cce3055617c52db3373b6dd9a1699bab9ce26a4"
+        },
+        "funding-BTCUSDT-fundingRate-2022-12.zip.CHECKSUM.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\n",
+          "sha256": "f55260227c507b4e203ec14ceb78ce8e64d11734111bed9bd18936a3bd4d48f3"
+        }
+      }
+    },
+    "retry_status": "PASS",
+    "rows": 93
+  },
+  {
+    "year": 2023,
+    "month": 3,
+    "kind": "last",
+    "initial_failure": {
+      "year": 2023,
+      "month": 3,
+      "kind": "last",
+      "plan": {
+        "kind": "last",
+        "year": 2023,
+        "month": 3,
+        "zip_name": "BTCUSDT-1m-2023-03.zip",
+        "csv_name": "BTCUSDT-1m-2023-03.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03.zip.CHECKSUM"
+      },
+      "diagnostic": null,
+      "failure": "source last 2023-03 zip unavailable: {'requested_url': 'https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03.zip', 'returned_url': 'https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03.zip', 'http_status': 0, 'http_version': '0', 'curl_exit': 35, 'response_headers': 'HTTP/1.1 200 Connection established\\n\\n', 'fetched_at_utc': '2026-10-11T10:57:57.624394+00:00', 'stderr': 'curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to data.binance.vision:443 \\n', 'status': 'FETCH_FAILED'}",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "last-BTCUSDT-1m-2023-03.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\n",
+          "sha256": "f55260227c507b4e203ec14ceb78ce8e64d11734111bed9bd18936a3bd4d48f3"
+        }
+      }
+    },
+    "retry_status": "PASS",
+    "rows": 44640
+  },
+  {
+    "year": 2023,
+    "month": 8,
+    "kind": "funding",
+    "initial_failure": {
+      "year": 2023,
+      "month": 8,
+      "kind": "funding",
+      "plan": {
+        "kind": "funding",
+        "year": 2023,
+        "month": 8,
+        "zip_name": "BTCUSDT-fundingRate-2023-08.zip",
+        "csv_name": "BTCUSDT-fundingRate-2023-08.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-08.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-08.zip.CHECKSUM"
+      },
+      "diagnostic": null,
+      "failure": "funding archive 2023-08 checksum unavailable: {'requested_url': 'https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-08.zip.CHECKSUM', 'returned_url': 'https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-08.zip.CHECKSUM', 'http_status': 0, 'http_version': '0', 'curl_exit': 35, 'response_headers': 'HTTP/1.1 200 Connection established\\n\\n', 'fetched_at_utc': '2026-10-11T10:58:41.418616+00:00', 'stderr': 'curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to data.binance.vision:443 \\n', 'status': 'FETCH_FAILED'}",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "funding-BTCUSDT-fundingRate-2023-08.zip": {
+          "bytes": 846,
+          "sha256": "516a8f50631c6ede6a9642f6d1590b6a22c33ba09935501d2ace8dc1396501fd"
+        },
+        "funding-BTCUSDT-fundingRate-2023-08.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\nHTTP/2 200 \ncontent-type: binary/octet-stream\ncontent-length: 846\nserver: AmazonS3\ndate: Sun, 11 Oct 2026 10:58:32 GMT\nlast-modified: Sun, 17 Sep 2023 10:01:59 GMT\netag: \"1280c13016487cc177428198c99d30ac\"\nx-amz-server-side-encryption: AES256\naccept-ranges: bytes\nx-cache: Miss from cloudfront\nvia: 1.1 9ceb6f6178c8096ab5d16ef9ff7d1016.cloudfront.net (CloudFront)\nx-amz-cf-pop: HKG54-P2\nx-amz-cf-id: LESdT5JjvmkqdRtnDXJDwLMI-zoDWmr-clMHRfXIf-H67xi6d4Y4Tg==\n\n",
+          "sha256": "1232d8b1d5d5f42a1f178778d6117e7ff11f67ca4b181b840470df164d75a132"
+        },
+        "funding-BTCUSDT-fundingRate-2023-08.zip.CHECKSUM.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\n",
+          "sha256": "f55260227c507b4e203ec14ceb78ce8e64d11734111bed9bd18936a3bd4d48f3"
+        }
+      }
+    },
+    "retry_status": "PASS",
+    "rows": 93
+  },
+  {
+    "year": 2023,
+    "month": 10,
+    "kind": "last",
+    "initial_failure": {
+      "year": 2023,
+      "month": 10,
+      "kind": "last",
+      "plan": {
+        "kind": "last",
+        "year": 2023,
+        "month": 10,
+        "zip_name": "BTCUSDT-1m-2023-10.zip",
+        "csv_name": "BTCUSDT-1m-2023-10.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-10.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-10.zip.CHECKSUM"
+      },
+      "diagnostic": null,
+      "failure": "source last 2023-10 zip unavailable: {'requested_url': 'https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-10.zip', 'returned_url': 'https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-10.zip', 'http_status': 0, 'http_version': '0', 'curl_exit': 35, 'response_headers': 'HTTP/1.1 200 Connection established\\n\\n', 'fetched_at_utc': '2026-10-11T10:58:54.751729+00:00', 'stderr': 'curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to data.binance.vision:443 \\n', 'status': 'FETCH_FAILED'}",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "last-BTCUSDT-1m-2023-10.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\n",
+          "sha256": "f55260227c507b4e203ec14ceb78ce8e64d11734111bed9bd18936a3bd4d48f3"
+        }
+      }
+    },
+    "retry_status": "PASS",
+    "rows": 44640
+  }
+]

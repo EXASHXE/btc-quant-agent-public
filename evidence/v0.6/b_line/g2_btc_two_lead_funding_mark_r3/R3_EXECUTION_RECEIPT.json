@@ -1,0 +1,314 @@
+{
+  "task_id": "V06_G2_BTC_TWO_12H_FIXED_LEADS_ACTUAL_FUNDING_MARK_ECONOMICS_R3",
+  "prompt_sha": "4833c245d868df160e93883ba1560fd1b97ba903",
+  "controller_dispatch_sha": "b351d5f193fda98f9f4274cb483a8d148eb797d9",
+  "terminal": "MARK_FUNDING_SOURCE_OR_CAUSALITY_BLOCKED",
+  "scientific_grade": "COST_PROXY_LAST_TRADE_PLUS_OBSERVED_FUNDING_AND_MARK_DEV_ONLY",
+  "root_model_requested": "Codex GPT-6 Sol High",
+  "root_model_observed": "NOT_EXPOSED",
+  "root_effort_observed": "NOT_EXPOSED",
+  "exact_start_sha": "d2477c1aaff601e0740a6899e60d85224c75a4dc",
+  "frozen_code_sha": "e1218baa51fa503525aed1ecf687016821f6dfd5",
+  "frozen_code_direct_parent": "d2477c1aaff601e0740a6899e60d85224c75a4dc",
+  "pre_body_remote_freeze_exact_sha_verified": "e1218baa51fa503525aed1ecf687016821f6dfd5",
+  "branch": "feature/v06-bline-btc-12h-funding-mark-economic-admission-r3",
+  "worktree": "/root/workspace/project/quant-v0.6/btc-12h-funding-mark-r3",
+  "created_at_utc": "2026-10-11T11:11:06.726591+00:00",
+  "executed_source_admission": {
+    "month_triplets": 108,
+    "last_months": 36,
+    "last_rows": 1576800,
+    "funding_months": 36,
+    "funding_events": 3285,
+    "funding_cross_month_observed_cadence": "PASS;observed8h,notassumed",
+    "Mark_dense_months": 32,
+    "Mark_dense_rows": 1402560,
+    "Mark_bad_authenticated_months": 4,
+    "Mark_missing_minutes": 11520,
+    "observed_total_Mark_rows": 1565280,
+    "API_requests": 0,
+    "source_manifest_sha256": "5b47dcb9738e401ac4858f9a4dfcc643f8164425fd420327deed2d1c95729b3f"
+  },
+  "economic_phase": {
+    "status": "NOT_EXECUTED_SOURCE_ADMISSION_FAILED",
+    "same_two_fixed_ids": [
+      "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H"
+    ],
+    "baseline_reference_only": {
+      "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H": {
+        "BASE": 37.62049607367666,
+        "STRESS": 11.503604910334033
+      },
+      "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H": {
+        "BASE": 46.04776806292657,
+        "STRESS": 19.132158228736902
+      }
+    },
+    "new_R3_baseline_replay": false,
+    "funding_cash_attribution": null,
+    "BASE_STRESS_after_observed_funding": null,
+    "Mark_MTM_drawdown": null,
+    "funding_aware_funded_replay": null,
+    "independent_real_funding_event_audits_completed": 0,
+    "minimum_five_real_event_audits_met": false,
+    "reason": "StrictfullMarkdensecoveragefailed;syntheticandgapchecksareNOTsubstitutesforrealtradefundingaudits"
+  },
+  "tests": {
+    "scoped_pytest_passed": 48,
+    "scoped_pytest_failed": 0,
+    "ruff": "PASS",
+    "compileall": "PASS",
+    "json": "PASS",
+    "diffcheck": "PASS",
+    "independent_Mark_clockset_reconciliation": 4,
+    "independent_source_aggregate_review": "PASS;sourceSHAcountsblockersreconciled",
+    "configured_mypy_local": "notrerun;configuredsrcunchanged;noCI/H40repairloop"
+  },
+  "engineering_code_sha256": {
+    "evidence/v0.6/b_line/g2_btc_two_lead_funding_mark_r3/R3_FROZEN_TWO_LEAD_SOURCE_AND_ECONOMICS_CONTRACT.json": "caa7025704aea03ceeff98976ce29cbb3a91417328cc229974028d65442dc056",
+    "scripts/strategy_research/g2_btc_two_lead_funding_mark_r3/economics.py": "4fc8578516bfb9fe5d4fe6f3a2ce82483c264af8986dd62c18271b4c3c47d53f",
+    "scripts/strategy_research/g2_btc_two_lead_funding_mark_r3/run.py": "bf2b070d042f3be4ad07f3051056b19fecdf2787b2b2f156d99b0c2207de8377",
+    "scripts/strategy_research/g2_btc_two_lead_funding_mark_r3/sources.py": "e740dfdea30cbf3104bce993c4a757f126e58b1aa5954a4e06e1b7ac74019c12",
+    "tests/test_v06_g2_btc_two_lead_funding_mark_r3_contract.py": "a892be33422805df97d9e43fa96c1d70dfb8e6fe9269bf8de29b82830e0adb7e",
+    "tests/test_v06_g2_btc_two_lead_funding_mark_r3_economics.py": "fe2e6cf0d28ac7b30271f9a8d128367051c16a3d18aa45e64c295e2e885cb18e",
+    "tests/test_v06_g2_btc_two_lead_funding_mark_r3_sources.py": "7e9b4e86c6b9314c8e1361b9cdf12a8141e806356000f082b1acec9f718e6586"
+  },
+  "preserved_R2_originals": [
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/FINAL_GOAL_RESEARCH_REPORT.md",
+      "sha256": "b934315e05c17f9cc114a74ec62e5b73e851ee8c82349f4a7d78df9deef0f370",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/REANALYSIS_R1_ENGINEERING_METHOD.md",
+      "sha256": "a19d09cb2cfc0d94abdeb903e7a912da02d6c413c6012a49c662e4af88ffb0f2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/REANALYSIS_R1_OUTCOME_REPORT.md",
+      "sha256": "1b130edfd2f17b32095ac57cff2cbc777808a6f69918b84e5a8d0ad301ba90f6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/REANALYSIS_R2_ACTUAL_PRICE_REPORT.md",
+      "sha256": "c0010b50774e68a9e5155afa0c9f5682bb63b7e3eba6ae8d1c4a211792a72c95",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_01_DECISION.md",
+      "sha256": "38bb83b4b45e65d289c699259f3f675b2a879d3f354b6e5b5bcc380e31a091a6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_01_HYPOTHESIS_FREEZE.md",
+      "sha256": "2206d3296813e9a5d7b5fd25186e8a44454c359afd26aca6f5f73d2ec971de00",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_02_DECISION.md",
+      "sha256": "f9fa471395a0e97e6edd9d15241df73f403d1997bced154a979cf3ce0d3bb479",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_02_HYPOTHESIS_FREEZE.md",
+      "sha256": "63d4e44b7270818c6fced04f65562288d0a87c028f271494a6b2a006b79f62fb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_03_DECISION.md",
+      "sha256": "d2d40762587a1d72e2352ade9a8da9e3f455791a4e3fd7ae4d8ae57637071246",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_03_HYPOTHESIS_FREEZE.md",
+      "sha256": "76d6531a853a3860de33267118deba8fce07a9f71a3fd83c1bdbfb403007b484",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_04_DECISION.md",
+      "sha256": "af137c5c8f37c9eca58f26ac6ba7fb7f8dc51ff17018d99e5a551541375affcc",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_04_HYPOTHESIS_FREEZE.md",
+      "sha256": "44fa1184f07f4ee7c0ed095dfa621a64a071deedb602e0b9ea867490065af2c5",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/CUMULATIVE_TRIAL_BUDGET_LEDGER.json",
+      "sha256": "efba0b75623fd1f6827e6670999486ac192a3c49d5f1bad54e09cb74cbd9bb7c",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R1_ENGINEERING_METHOD.json",
+      "sha256": "ec9746c62ac7422f730d86c0ac3d7c53736f792240018b70beb4e761811795e8",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R1_EXECUTION_RECEIPT.json",
+      "sha256": "7dea8bbde6102d187f06064aea7b4920da59432a9a115f32a00c518e26e005ba",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R1_FIXED_24_COMPARISON.json",
+      "sha256": "b628de2ccaa612809d83491dbe6d41974d9f1639166057d567b8d46219bf83ad",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_DECIMAL_AUDITS.json",
+      "sha256": "509fabaab7c04dd4f988263b0a4525451976b05add30d96a12a6497f234806a3",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_DETERMINISM.json",
+      "sha256": "7196026709b3d11da380e639eab2356df88f46ec24e006a9f351157bd483d260",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_EXECUTABLE_PROTOCOL.json",
+      "sha256": "d5a930bd98983df9813bcddd7899baa90ecb4bebee8e06f82324f1b2fcf200a9",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_EXECUTION_RECEIPT.json",
+      "sha256": "d52d3c0029c9f64bd6c76f55710aedfa42aec7a37b61e2ccaac0f7e34f947f6e",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_OLD_VS_CORRECTED.json",
+      "sha256": "38db740fedde56b2545686306f522c6d2b9ab42916c9bcb339b65a60e905682c",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_RESULTS.json",
+      "sha256": "855d95175afdc5f4cb1b9edcc525db76855a28db5cda72d81e989b382a0cdb51",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_SOURCE_RECEIPT.json",
+      "sha256": "7acb54f6e18242109c5992a6a23c61edc0c89ca1807fd03458ff64c81b994c4a",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_FROZEN_REGISTRY.json",
+      "sha256": "d05f2361c59bf3d0c0f2b75d2ea91293e4e3f95a5720f8c0feb587b86ede3249",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_RESULT.json",
+      "sha256": "899d389cf8342f9ba4bfa0939fe7aa92c2a848c6307f878b100ba5eee6bb5365",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_FROZEN_REGISTRY.json",
+      "sha256": "7d0fcc73ce81180ac5c90de5dc4ac7528dc94ff26f3a5735e86b946f9e1d9423",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_RESULT.json",
+      "sha256": "2607fa9d415b6c22c54fa91c98b0a884e0efee848e2e02d317e02ca3bf908e4e",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_FROZEN_REGISTRY.json",
+      "sha256": "d42458d2c454dc2658eb52f459aafa39dcab87cdfc95a2b58756321d51092490",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_RESULT.json",
+      "sha256": "deb984e642364bab3519445aae5d1da539ad64843e05c79b7d12cc3f26544747",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_FROZEN_REGISTRY.json",
+      "sha256": "bc625fb62537b01958618ab55e308d01144c67dfa1e2d2d6e99b59b19687d668",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_RESULT.json",
+      "sha256": "c33540b5cf93a603e44e322cd96fb73f3e2e054e946e82a31b41792241b2ad1d",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/audit.py",
+      "sha256": "0b8606b7f2ca2f25ecdac9073faeb8469b8371cce64e8c1733ad7e81a05f66d0",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/metrics.py",
+      "sha256": "ee50ee4ebc1df08b7d1c88c183dfe9cdc681ea4cc5d73cadccfc2c2fcaef4d8c",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_preflight.py",
+      "sha256": "520523f5f91d75523af674c0ad8b7c7299b4a5fc5e4da1afd5efa3e32eb52bb3",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_audit.py",
+      "sha256": "471ced282d410f3735d04ceb5f67aa24e245bf43948b00f3c268e2d5ba846939",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_controls.py",
+      "sha256": "1a890a530b7f5ab888cc0244dfa6036b83949e1e420a1663bb9880c771a2d45f",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_report.py",
+      "sha256": "3f479e4a206e49ea4b66657f39f7fc554e07ad59b696f3c23c6e4eac495c53e6",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_run.py",
+      "sha256": "c7f391f1a931e714967c9d602c771ae7d9085fd9c2e273cbc7cb2c1c307b5b50",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_sources.py",
+      "sha256": "99afb24d98e93a5aad8a728db9ee55cd5372c17ae4d2cec65b32022b2f3dfc7f",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py",
+      "sha256": "ca4822b742bb11b0e8a9712af7a15ea258d2478d88cb44c8b3ae1a8f6b71cf16",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/run_wave.py",
+      "sha256": "f5d218cc16a5ea1287f4c8ec7ada093ef8cf3b639ad26ff9c1591c849d51a9bf",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/signals.py",
+      "sha256": "ea4f0d13c60b22cf69d9467804a96e4665e23d9471f86db322c0636ba7d082da",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/sources.py",
+      "sha256": "d3f521ba15aeaeca8c3691df624d5b2a0fcad8f8e06a300f3656ded4074692fd",
+      "unchanged": true
+    }
+  ],
+  "aggregate_artifacts_sha256": {
+    "R3_INDEPENDENT_MARK_GAP_WITNESSES.json": "f38a8f9b5b2218daa98408e3bdab57a10e147e88e98cce7085d3afde7760f6f5",
+    "R3_COMPLIANCE_LEDGER.json": "50ec3b9866e41c17bcac557f150918bd8b4725ce01a289e4e61235320282225a",
+    "R3_OBSERVED_FUNDING_SOURCE_DIAGNOSTIC.json": "40eb9455732e110f4ceb3c2ac53b3c096d205b3d68cb0696df6072a884897529",
+    "R3_BOUNDED_TRANSPORT_RETRIES.json": "fbd0c6af93c39c726a81257f389344a80fd961bcddd789277a68bcb51a4f4611",
+    "R3_FROZEN_TWO_LEAD_SOURCE_AND_ECONOMICS_CONTRACT.json": "caa7025704aea03ceeff98976ce29cbb3a91417328cc229974028d65442dc056",
+    "R3_ECONOMIC_RESULTS.json": "b30bdb27d8af602d2c989dd542d01c9bf46b0b17a2e0b3b5193072a3440aa900",
+    "R3_SOURCE_ADMISSION_RESULTS.json": "d0d0574c65af0a92ca4b679abc844203d56357df9579a1988e3ee5c177e3fbeb"
+  },
+  "authority": {
+    "Alpha": false,
+    "OOS": false,
+    "automaticpromotion": false,
+    "holdoutread": false,
+    "P3_P4": false,
+    "TESTNET_LIVE": false
+  },
+  "final_git_proof": "Resultcommitdirectchildoffrozen_code_sha;nonforcepush+lsremoteexactSHAreportedoutsidecommittedselfreferentialreceipt",
+  "ci": "queryexactfinalSHAafterpush;notinferredPASS",
+  "report_sha256": "45b89cc9a327e26ce9142bc9f5a36a466fde1c7f380e3f9ec6bfd9a1a21ff32e"
+}

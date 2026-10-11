@@ -1,0 +1,335 @@
+{
+  "scientific_grade": "COST_PROXY_LAST_TRADE_PLUS_OBSERVED_FUNDING_AND_MARK_DEV_ONLY",
+  "code_sha": "e1218baa51fa503525aed1ecf687016821f6dfd5",
+  "source_sha256": "5b47dcb9738e401ac4858f9a4dfcc643f8164425fd420327deed2d1c95729b3f",
+  "terminal": "MARK_FUNDING_SOURCE_OR_CAUSALITY_BLOCKED",
+  "blockers": [
+    {
+      "year": 2021,
+      "month": 7,
+      "kind": "mark",
+      "plan": {
+        "kind": "mark",
+        "year": 2021,
+        "month": 7,
+        "zip_name": "BTCUSDT-1m-2021-07.zip",
+        "csv_name": "BTCUSDT-1m-2021-07.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2021-07.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2021-07.zip.CHECKSUM"
+      },
+      "diagnostic": {
+        "archive_authentication": {
+          "zip_sha256": "f803d5e91d9a932bee0b816abc7c6fdedcd9cf9c327474b195ef72d0c9693a06",
+          "checksum_sha256": "cb697f0743b24f075be1ffa7df9920f66a08b36b0856505726478ac93ffdd8ff",
+          "csv_sha256": "b034058ceb37b0f0b59398889792c60bbfb6601cc5d12be776933cc7f3b87605",
+          "csv_bytes": 3711699,
+          "csv_member": "BTCUSDT-1m-2021-07.csv"
+        },
+        "observed_rows": 37440,
+        "expected_rows": 44640,
+        "missing_minute_count": 7200,
+        "first_missing_utc_ms": [
+          1625097600000,
+          1625097660000,
+          1625097720000,
+          1625097780000,
+          1625097840000,
+          1625097900000,
+          1625097960000,
+          1625098020000,
+          1625098080000,
+          1625098140000,
+          1625098200000,
+          1625098260000
+        ],
+        "duplicates": 0,
+        "out_of_scope_minute_count": 0
+      },
+      "failure": "duplicate/gap/out-of-order/wrong minute close at row 1: expected_open=1625097600000; observed_open=1625184000000; observed_close=1625184059999; delta_ms=86400000",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "mark-BTCUSDT-1m-2021-07.zip": {
+          "bytes": 993150,
+          "sha256": "f803d5e91d9a932bee0b816abc7c6fdedcd9cf9c327474b195ef72d0c9693a06"
+        },
+        "mark-BTCUSDT-1m-2021-07.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\nHTTP/2 200 \ncontent-type: binary/octet-stream\ncontent-length: 993150\naccept-ranges: bytes\ndate: Sun, 11 Oct 2026 10:53:20 GMT\nserver: AmazonS3\nlast-modified: Sun, 01 Aug 2021 12:13:47 GMT\netag: \"484f1808db3898f10e371585cae1c119\"\nx-cache: Miss from cloudfront\nvia: 1.1 c5337f831ef13b6de20c6ba2cda2e028.cloudfront.net (CloudFront)\nx-amz-cf-pop: HKG54-P2\nx-amz-cf-id: 1mPz2aOVpFq8mqGqm7CpyMw08Wyp0g5CWJw7BcIKTPQHhyRQGUyiaw==\n\n",
+          "sha256": "d77381970110e324cab3dcf7f760cc72f95dfa6b02189a35837f28f9199f3831"
+        },
+        "mark-BTCUSDT-1m-2021-07.zip.CHECKSUM": {
+          "bytes": 89,
+          "sha256": "cb697f0743b24f075be1ffa7df9920f66a08b36b0856505726478ac93ffdd8ff"
+        },
+        "mark-BTCUSDT-1m-2021-07.zip.CHECKSUM.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\nHTTP/2 200 \ncontent-type: binary/octet-stream\ncontent-length: 89\nserver: AmazonS3\ndate: Sun, 11 Oct 2026 10:53:22 GMT\nlast-modified: Sun, 01 Aug 2021 12:13:47 GMT\netag: \"81d5fa549a470597ffea547d9bcb34b1\"\naccept-ranges: bytes\nx-cache: Miss from cloudfront\nvia: 1.1 ae5469138301e8d865a948ccb42090f4.cloudfront.net (CloudFront)\nx-amz-cf-pop: HKG54-P2\nx-amz-cf-id: hjt6FUu4u1_V_GS66TluzFS_deRrteFgbMTztBf06Hw9-P7CW3kdnQ==\n\n",
+          "sha256": "7b68f399f60a26adb476c0289d4f19d701d347167d1c62b64dce1b2edf364885"
+        }
+      }
+    },
+    {
+      "year": 2022,
+      "month": 7,
+      "kind": "mark",
+      "plan": {
+        "kind": "mark",
+        "year": 2022,
+        "month": 7,
+        "zip_name": "BTCUSDT-1m-2022-07.zip",
+        "csv_name": "BTCUSDT-1m-2022-07.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2022-07.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2022-07.zip.CHECKSUM"
+      },
+      "diagnostic": {
+        "archive_authentication": {
+          "zip_sha256": "35d2afc48289d0c9e75b311672aae21c6d635f62bb3836eb63694f554d39f1c6",
+          "checksum_sha256": "6074fadb51c9c82b27fe5f58417be627f5e503a4b61cd7a9c9765b803f4008e2",
+          "csv_sha256": "6063967b7a2f450ee474a204678eb9df59ad856827c24add3980664dc82df88f",
+          "csv_bytes": 4242420,
+          "csv_member": "BTCUSDT-1m-2022-07.csv"
+        },
+        "observed_rows": 43200,
+        "expected_rows": 44640,
+        "missing_minute_count": 1440,
+        "first_missing_utc_ms": [
+          1659225600000,
+          1659225660000,
+          1659225720000,
+          1659225780000,
+          1659225840000,
+          1659225900000,
+          1659225960000,
+          1659226020000,
+          1659226080000,
+          1659226140000,
+          1659226200000,
+          1659226260000
+        ],
+        "duplicates": 0,
+        "out_of_scope_minute_count": 0
+      },
+      "failure": "incomplete mark minute month: 43200 of 44640",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "mark-BTCUSDT-1m-2022-07.zip": {
+          "bytes": 1120026,
+          "sha256": "35d2afc48289d0c9e75b311672aae21c6d635f62bb3836eb63694f554d39f1c6"
+        },
+        "mark-BTCUSDT-1m-2022-07.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\nHTTP/2 200 \ncontent-type: binary/octet-stream\ncontent-length: 1120026\naccept-ranges: bytes\ndate: Sun, 11 Oct 2026 10:54:54 GMT\nserver: AmazonS3\nlast-modified: Thu, 08 Jun 2023 14:47:50 GMT\netag: \"75b52d16b5ab641424959d7e047b5599\"\nx-amz-server-side-encryption: AES256\nx-cache: Miss from cloudfront\nvia: 1.1 735c20de6ba58159f49e330896e77278.cloudfront.net (CloudFront)\nx-amz-cf-pop: HKG54-P2\nx-amz-cf-id: fsP0u6tSX5kJp_eB0KQW57caLTlLdIXY0ZJh7X4wyOfFltPqB-x1pA==\n\n",
+          "sha256": "6a6750fbc44247e981eded6e2541e332370dc8831b31dbc94ccf13997a371aa6"
+        },
+        "mark-BTCUSDT-1m-2022-07.zip.CHECKSUM": {
+          "bytes": 89,
+          "sha256": "6074fadb51c9c82b27fe5f58417be627f5e503a4b61cd7a9c9765b803f4008e2"
+        },
+        "mark-BTCUSDT-1m-2022-07.zip.CHECKSUM.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\nHTTP/2 200 \ncontent-type: binary/octet-stream\ncontent-length: 89\nserver: AmazonS3\ndate: Sun, 11 Oct 2026 10:54:57 GMT\nlast-modified: Thu, 08 Jun 2023 14:47:50 GMT\netag: \"bc0e232cc8e9acd825fc540047bdbae0\"\nx-amz-server-side-encryption: AES256\naccept-ranges: bytes\nx-cache: Miss from cloudfront\nvia: 1.1 061125c15858f6df0c7188ff78a179ce.cloudfront.net (CloudFront)\nx-amz-cf-pop: HKG54-P2\nx-amz-cf-id: UVj5MVll3DLFvLUe7252EzIAoQXXPCzQyC4Z5WIbRhujEkPbBqWrkA==\n\n",
+          "sha256": "b97b2a04148537c6d27b16274334a8168c4f46f0abd74260ff112f64e9c37d84"
+        }
+      }
+    },
+    {
+      "year": 2022,
+      "month": 10,
+      "kind": "mark",
+      "plan": {
+        "kind": "mark",
+        "year": 2022,
+        "month": 10,
+        "zip_name": "BTCUSDT-1m-2022-10.zip",
+        "csv_name": "BTCUSDT-1m-2022-10.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2022-10.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2022-10.zip.CHECKSUM"
+      },
+      "diagnostic": {
+        "archive_authentication": {
+          "zip_sha256": "e6bba74c7ccb41dcd8a7ea1a65f40dc01de05e3128a265d77cd882898037780f",
+          "checksum_sha256": "57de42b90f0ef9920e2a33ef83a03dd0c988ed8416eb8bb45d5cb4fb3d2dbaae",
+          "csv_sha256": "76e61665e467b0a25c31fad05c9e80d8479c099b708cc01c4dd31c799b3d4c0d",
+          "csv_bytes": 4236558,
+          "csv_member": "BTCUSDT-1m-2022-10.csv"
+        },
+        "observed_rows": 43200,
+        "expected_rows": 44640,
+        "missing_minute_count": 1440,
+        "first_missing_utc_ms": [
+          1664668800000,
+          1664668860000,
+          1664668920000,
+          1664668980000,
+          1664669040000,
+          1664669100000,
+          1664669160000,
+          1664669220000,
+          1664669280000,
+          1664669340000,
+          1664669400000,
+          1664669460000
+        ],
+        "duplicates": 0,
+        "out_of_scope_minute_count": 0
+      },
+      "failure": "duplicate/gap/out-of-order/wrong minute close at row 1442: expected_open=1664668800000; observed_open=1664755200000; observed_close=1664755259999; delta_ms=86400000",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "mark-BTCUSDT-1m-2022-10.zip": {
+          "bytes": 1055224,
+          "sha256": "e6bba74c7ccb41dcd8a7ea1a65f40dc01de05e3128a265d77cd882898037780f"
+        },
+        "mark-BTCUSDT-1m-2022-10.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\nHTTP/2 200 \ncontent-type: binary/octet-stream\ncontent-length: 1055224\naccept-ranges: bytes\ndate: Sun, 11 Oct 2026 10:55:14 GMT\nserver: AmazonS3\nlast-modified: Thu, 17 Nov 2022 19:32:47 GMT\netag: \"8535e8594868b657e40f6a76d706192a\"\nx-cache: Miss from cloudfront\nvia: 1.1 c9249f7f94011ec15757db9d9378506c.cloudfront.net (CloudFront)\nx-amz-cf-pop: HKG54-P2\nx-amz-cf-id: 1N7_rFzQ4wUMXkVc1upvmlwSsteRn0Vd4OSwNuxYgxoEiWl6d9VUUQ==\n\n",
+          "sha256": "0fdae1509ffbeb172f0fe03ae927d2923c705c817ea06bfe002a58313effbad1"
+        },
+        "mark-BTCUSDT-1m-2022-10.zip.CHECKSUM": {
+          "bytes": 89,
+          "sha256": "57de42b90f0ef9920e2a33ef83a03dd0c988ed8416eb8bb45d5cb4fb3d2dbaae"
+        },
+        "mark-BTCUSDT-1m-2022-10.zip.CHECKSUM.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\nHTTP/2 200 \ncontent-type: binary/octet-stream\ncontent-length: 89\nserver: AmazonS3\ndate: Sun, 11 Oct 2026 10:55:17 GMT\nlast-modified: Thu, 17 Nov 2022 19:32:47 GMT\netag: \"12814d78939ad75db7d63788afb58890\"\naccept-ranges: bytes\nx-cache: Miss from cloudfront\nvia: 1.1 c3ab5627cd4b01a7ddf334ec111ce3ba.cloudfront.net (CloudFront)\nx-amz-cf-pop: HKG54-P2\nx-amz-cf-id: ORIE-HgjNv34_tnUzsctz-zdnuN3FexxbY_IFvKaJhsh_owK6Xlxcw==\n\n",
+          "sha256": "e0ebb2f04d20162feb9a6398c076f7b27e1ab65f6e4b6ce912f268a8a67a3333"
+        }
+      }
+    },
+    {
+      "year": 2023,
+      "month": 2,
+      "kind": "mark",
+      "plan": {
+        "kind": "mark",
+        "year": 2023,
+        "month": 2,
+        "zip_name": "BTCUSDT-1m-2023-02.zip",
+        "csv_name": "BTCUSDT-1m-2023-02.csv",
+        "zip_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2023-02.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2023-02.zip.CHECKSUM"
+      },
+      "diagnostic": {
+        "archive_authentication": {
+          "zip_sha256": "f84b1b0c1524f381fadaaee37b7be4912cb21fe947106cf01d6a9f0248e38d78",
+          "checksum_sha256": "b4967bd75c29dc991ab0678239112d7922745bd5304e0b697bcf019303444ade",
+          "csv_sha256": "0ff0b27c1d339b787eedb952fd42ee05bcae2ea188e38b79b463d177601b99d7",
+          "csv_bytes": 3829245,
+          "csv_member": "BTCUSDT-1m-2023-02.csv"
+        },
+        "observed_rows": 38880,
+        "expected_rows": 40320,
+        "missing_minute_count": 1440,
+        "first_missing_utc_ms": [
+          1677196800000,
+          1677196860000,
+          1677196920000,
+          1677196980000,
+          1677197040000,
+          1677197100000,
+          1677197160000,
+          1677197220000,
+          1677197280000,
+          1677197340000,
+          1677197400000,
+          1677197460000
+        ],
+        "duplicates": 0,
+        "out_of_scope_minute_count": 0
+      },
+      "failure": "duplicate/gap/out-of-order/wrong minute close at row 33122: expected_open=1677196800000; observed_open=1677283200000; observed_close=1677283259999; delta_ms=86400000",
+      "exception": "ValueError",
+      "task_owned_source_files": {
+        "mark-BTCUSDT-1m-2023-02.zip": {
+          "bytes": 996170,
+          "sha256": "f84b1b0c1524f381fadaaee37b7be4912cb21fe947106cf01d6a9f0248e38d78"
+        },
+        "mark-BTCUSDT-1m-2023-02.zip.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\nHTTP/2 200 \ncontent-type: binary/octet-stream\ncontent-length: 996170\nserver: AmazonS3\ndate: Sun, 11 Oct 2026 10:56:15 GMT\nlast-modified: Wed, 14 Jun 2023 18:38:37 GMT\netag: \"c12b5191eb7382fea7c8c599221eba0c\"\nx-amz-server-side-encryption: AES256\naccept-ranges: bytes\nx-cache: Miss from cloudfront\nvia: 1.1 422244782115063795f0953e126851ce.cloudfront.net (CloudFront)\nx-amz-cf-pop: HKG54-P2\nx-amz-cf-id: 5uoTyJW0QE9dIQ40GUFDUaKhXJC272B7xkFYpyoSbHdMz1ipeZL0cg==\n\n",
+          "sha256": "5ce721d57f5ca55ee75d55063633d3924c3bdfd8c9e9caa2e5bd33af602d90a8"
+        },
+        "mark-BTCUSDT-1m-2023-02.zip.CHECKSUM": {
+          "bytes": 89,
+          "sha256": "b4967bd75c29dc991ab0678239112d7922745bd5304e0b697bcf019303444ade"
+        },
+        "mark-BTCUSDT-1m-2023-02.zip.CHECKSUM.headers": {
+          "text": "HTTP/1.1 200 Connection established\n\nHTTP/2 200 \ncontent-type: binary/octet-stream\ncontent-length: 89\nserver: AmazonS3\ndate: Sun, 11 Oct 2026 10:56:17 GMT\nlast-modified: Wed, 14 Jun 2023 18:38:37 GMT\netag: \"dcd9126b09a5a9e76ac614839b508b78\"\nx-amz-server-side-encryption: AES256\naccept-ranges: bytes\nx-cache: Miss from cloudfront\nvia: 1.1 ae5469138301e8d865a948ccb42090f4.cloudfront.net (CloudFront)\nx-amz-cf-pop: HKG54-P2\nx-amz-cf-id: OXYAkv4Xruy40aHppH-EZ2D-FV2MOBT0TDP3S4QMCuSm-G6NHhUHtA==\n\n",
+          "sha256": "b137c3dd92db1391812d41c657c1a6d0325b445360d7c279898a8db40b7b0775"
+        }
+      }
+    }
+  ],
+  "economic_results": null,
+  "observed_funding_adjusted_profit": null,
+  "Mark_MTM": null,
+  "baseline_reference_R2_only": {
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H": {
+      "BASE": 37.62049607367666,
+      "STRESS": 11.503604910334033
+    },
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H": {
+      "BASE": 46.04776806292657,
+      "STRESS": 19.132158228736902
+    }
+  },
+  "actual_body_access_after_freeze": true,
+  "identity": {
+    "original_code_sha": "a37721eaa1f3cd176146df6bdb63fbd17746189e",
+    "exact_start_sha": "d1f9f4316a2485f5d09ee1c910d7797ecfc6be7e",
+    "corrected_code_sha": null,
+    "signal_function_ast_sha256": "2c0e03fd3525ea1e578f0e50a17691ec780969fb47a902e182649fffee42b92f",
+    "candidate_branch_ast_sha256": {
+      "W1_C01_MULTISCALE_TREND_ADOPTION_08H": "7e3ae2b6ab9459c9ae8201a3c523a335b8ad12c29d8042148a335c5b9f6a9843",
+      "W1_C02_PERSISTENT_TAKER_PRESSURE_08H": "1324ab9933bfd7946f7a86d6bff9f219630e7f847e0ac26ca887d6f39b384d78",
+      "W1_C03_BREAKOUT_RETEST_WITH_FLOW_04H": "b47abdf783b725ef977d93ee550eec867b520d15dea6e1a04d92bca7c580e55c",
+      "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H": "639ab2fb4cb1b3299feda9ef5146603303eb7145a8c102929ae8a063978e358c",
+      "W1_C05_CROSS_SESSION_CONTINUATION_08H": "b241d29419924fb7934aecd54d9727babf7374ecf4f9b4b04b84da7620ff7881",
+      "W2_C01_VOLUME_WEIGHTED_MOMENTUM_SURGE_08H": "d773a6645b1e196d768683e88f2337a3a8aeb5450e96e930ccdeec9810ee461b",
+      "W2_C02_MULTI_TIMEFRAME_CHOP_EXIT_TREND_12H": "8bc627240d92b1f3f5876ea19d9c5e2228dfd9efef0fd1b2f94dd9b3fc036282",
+      "W2_C03_AGGRESSIVE_FLOW_CUMULATIVE_DELTA_DIVERGENCE_08H": "8f9a115ddd1b3780634ed361f3a4563b8043e618c60b4777bef21dbffe1b0785",
+      "W2_C04_DONCHIAN_MIDLINE_PULLBACK_CONTINUATION_08H": "46f39d9c2cce701fcbdf330ea0b7175fabc5ef99c89901e14fb0d5167a12c446",
+      "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H": "a03ad33a80c365bd51e67394bce84ce67d883ad15dc0c5a913522b584528a2b2",
+      "W2_C06_EXTREME_FLOW_EXHAUSTION_REVERSAL_TO_TREND_04H": "92ba690f6936200c85a8bed0722d6917cd1ce03a7e6be216924c73f2d140eb1e",
+      "W3_C01_EMA_CROSS_MULTI_HORIZON_TREND_FILTER_08H": "2b5d94aaa054e648fa7b873906f97f5ed8402c4139deb1ee5c6619bc26bb83a8",
+      "W3_C02_KAUFMAN_EFFICIENCY_RATIO_EXPANSION_08H": "10f33e5471690417610f9606daeb04de30d8fe6df8c7d92ac80ddead5e949453",
+      "W3_C03_BOLLINGER_BAND_WIDTH_SQUEEZE_EXPLOSION_12H": "07d7561b17b9c116b97ca65595ad622c567f2bfaab8b65a084212c5b84d42b35",
+      "W3_C04_ASYMMETRIC_LONG_BIASED_TREND_FLOW_12H": "b77a5c28849c11815cfb01ec385a6b5508916b1d3af8a3b36f4736e11c71f058",
+      "W3_C05_ASYMMETRIC_SHORT_BIASED_FLOW_COLLAPSE_08H": "85eaa8e5d00fa595e08f63e5a5d49cc2d8f7a229690a105634b4370a439bf482",
+      "W3_C06_TIME_WEIGHTED_SESSION_PULLBACK_08H": "aa596382c6245e4f48d1ce5dd574a7ce1434a9a9b53421966328469db14d5b66",
+      "W4_C01_DUAL_TIMEFRAME_VOLATILITY_EXPANSION_08H": "2e4632951beee38e69678ae1251255a27accddf9c415ab4a6d35bbce02dfd0a6",
+      "W4_C02_VWAP_MEAN_DRIFT_ACCELERATION_08H": "b9a30e2359552de953bfbafe3cbedddfb44d0a7410f433eed9160554912a5eb4",
+      "W4_C03_TREND_MOMENTUM_CONVERGENCE_DIVERGENCE_12H": "e037b17679f90502e2786492225de4d4dca6e3ecf337ee578ba773727cce9860",
+      "W4_C04_DONCHIAN_CHANNEL_VOLATILITY_BREAKOUT_08H": "1cacdc30f91c048bf51a2bec08689235789b768a66aa9cf7ba06184dd92bcdec",
+      "W4_C05_CUMULATIVE_FLOW_PERCENTILE_SURGE_08H": "82ceb10a465d641d5712051695d7eda241dd40bd53067025cec729affd123af2",
+      "W4_C06_ASYMMETRIC_MOMENTUM_EXHAUSTION_CONTINUATION_24H": "ec418d263d4adbdcca1dae616b29e0d68a3e7ffa290c22110fd62010db6dae9f"
+    },
+    "unchanged_registries": [
+      {
+        "wave": 1,
+        "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_FROZEN_REGISTRY.json",
+        "sha256": "d05f2361c59bf3d0c0f2b75d2ea91293e4e3f95a5720f8c0feb587b86ede3249"
+      },
+      {
+        "wave": 2,
+        "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_FROZEN_REGISTRY.json",
+        "sha256": "7d0fcc73ce81180ac5c90de5dc4ac7528dc94ff26f3a5735e86b946f9e1d9423"
+      },
+      {
+        "wave": 3,
+        "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_FROZEN_REGISTRY.json",
+        "sha256": "d42458d2c454dc2658eb52f459aafa39dcab87cdfc95a2b58756321d51092490"
+      },
+      {
+        "wave": 4,
+        "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_FROZEN_REGISTRY.json",
+        "sha256": "bc625fb62537b01958618ab55e308d01144c67dfa1e2d2d6e99b59b19687d668"
+      }
+    ],
+    "excluded": {
+      "id": "W1_C06_PERSISTENT_TREND_24H",
+      "status": "METHOD_INVALID_EXCLUDED_FROM_PROMOTION",
+      "numeric_rerun": false
+    },
+    "entry_clock": "event_time=t_round-60000;decision_at=t_round;entry_at=t_round+60000",
+    "time_cap": "first minute-open at/after entry+horizon, capped at target, original priority",
+    "controller_dispatch_sha": "bfe9f5df1bf55e7738cfbff58ce32e674edab683",
+    "prompt_sha": "681087557fb774a110500282fcd5e20fa17bc949",
+    "scientific_grade": "EX_POST_CODE_AS_EXECUTED_DEV_ONLY_NOT_REGISTERED_TEXT_METHOD",
+    "controller_scientific_grade": "EX_POST_CODE_AS_EXECUTED_REANALYSIS_EXPOSED_DEV_ONLY__NOT_PREREG_CONFIRMED"
+  },
+  "no_strategy_replay_rerun": true
+}

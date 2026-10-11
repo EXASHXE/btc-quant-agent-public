@@ -1,0 +1,32 @@
+{
+  "task_id": "V06_G2_BTC_TWO_12H_FIXED_LEADS_ACTUAL_FUNDING_MARK_ECONOMICS_R3",
+  "terminal": "MARK_FUNDING_SOURCE_OR_CAUSALITY_BLOCKED",
+  "scientific_grade": "COST_PROXY_LAST_TRADE_PLUS_OBSERVED_FUNDING_AND_MARK_DEV_ONLY",
+  "frozen_code_sha": "e1218baa51fa503525aed1ecf687016821f6dfd5",
+  "freeze_pushed_remote_verified_before_new_values": "e1218baa51fa503525aed1ecf687016821f6dfd5",
+  "source_plan_months": "2021-01..2023-12 ONLY",
+  "attempted_month_triplets": 108,
+  "actual_source_passes": 104,
+  "source_authenticated_but_incomplete_mark_months": 4,
+  "actual_replay_configs": 0,
+  "new_strategies_or_retuning": 0,
+  "actual_trading_orders_or_credentials": false,
+  "protected2024_2026_stat_list_header_or_body": false,
+  "owner_Quant_agent_data_stat_realpath_or_body": false,
+  "other_worktrees_or_caches_access": false,
+  "raw_prices_or_full_cash_equity_or_API_payloads_in_git": false,
+  "actual_funding_API_requests": 0,
+  "official_archive_route_used": true,
+  "TLS_one_bounded_batch_retry_sources": 8,
+  "TLS_checksum_only_final_retry_files": 2,
+  "not_interpolated_not_zero_filled": true,
+  "old_R2_code_evidence_immutable_paths": 43,
+  "remaining_proxies": [
+    "fees/spread/slippage/queue",
+    "settlementMarkapproximationwhenarchivehasnoeventMark",
+    "historicalpublicationknownat",
+    "registeredstrategyidentity",
+    "laterholdout"
+  ],
+  "rights": "BinanceVisionCCBYNCSA4.0 noncommercialnonproduction research only;noAlphaortradingauthority"
+}
