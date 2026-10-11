@@ -1,4 +1,5 @@
 """Audit reconciliation and discrepancy matrix for Goal B R1 vs R2."""
+
 from __future__ import annotations
 
 from typing import Any

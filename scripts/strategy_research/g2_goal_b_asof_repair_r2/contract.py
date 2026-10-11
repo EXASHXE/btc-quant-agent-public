@@ -1,4 +1,5 @@
 """Frozen contract, digests, definitions, and revocation attestations for Goal B R2."""
+
 from __future__ import annotations
 
 import hashlib
@@ -74,10 +75,10 @@ EXPECTED_LEDGER_DIGESTS: dict[str, dict[str, Any]] = {
 
 # Strict Timing Constants
 SIGNAL_DECISION_LAG_MS = 60_000  # Exactly 1m before entry execution
-TREND_BARS_COUNT = 240           # 240 consecutive 1m bars = strictly pre-entry 4h window
-ATR_PERIOD = 14                  # Wilder ATR period on 1-hour bars
-ATR_LOOKBACK_HOURS = 2160        # 90 days * 24 hours = 2,160 completed hourly bars
-MIN_EVENTS_PER_STRATUM = 10      # Power gate minimum count per cell
+TREND_BARS_COUNT = 240  # 240 consecutive 1m bars = strictly pre-entry 4h window
+ATR_PERIOD = 14  # Wilder ATR period on 1-hour bars
+ATR_LOOKBACK_HOURS = 2160  # 90 days * 24 hours = 2,160 completed hourly bars
+MIN_EVENTS_PER_STRATUM = 10  # Power gate minimum count per cell
 
 # Formal Revocation Statements
 FORMAL_REVOCATIONS: dict[str, str] = {

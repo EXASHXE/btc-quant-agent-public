@@ -3,6 +3,7 @@
 Proves that any post-decision data mutation (bars, prices, funding rates)
 leaves as-of-entry feature extractors 100% byte-for-byte unchanged.
 """
+
 from __future__ import annotations
 
 import copy
@@ -63,11 +64,13 @@ def mutate_future_funding_settlements(
         if int(s["calc_time"]) >= signal_decision_at_ms:
             s["last_funding_rate"] = extreme_rate
     # Also inject a rogue future settlement
-    mutated.append({
-        "calc_time": signal_decision_at_ms + 1000,
-        "funding_interval_hours": 8,
-        "last_funding_rate": -extreme_rate,
-    })
+    mutated.append(
+        {
+            "calc_time": signal_decision_at_ms + 1000,
+            "funding_interval_hours": 8,
+            "last_funding_rate": -extreme_rate,
+        }
+    )
     return mutated
 
 

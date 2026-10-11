@@ -1,0 +1,13 @@
+{
+  "task_id": "g2_goal_b_asof_repair_r2",
+  "terminal_state": "B_R2_ASOF_LABELS_CAUSALLY_RECONSTRUCTED_DEVELOPMENT_ONLY",
+  "controller_dispatch_sha": "1172d3a91324c1a7379bc9e5c24ef601076547c2",
+  "parent_commit_sha": "397a62c1a0fbd6ad14a569a5be0058b1f684f08e",
+  "elapsed_seconds": 29.05,
+  "w1_events_count": 34,
+  "w2_events_count": 55,
+  "reconciled_defects_count": 5,
+  "asof_causal_status": "PROVEN_STRICTLY_PRE_ENTRY",
+  "post_selection_bootstrap_intervals_span_zero": true,
+  "zero_new_strategy_search_attested": true
+}

@@ -1,0 +1,38 @@
+{
+  "task_id": "g2_goal_b_asof_repair_r2",
+  "timestamp_utc": "2026-10-11T19:52:14Z",
+  "files": {
+    "B_R2_ASOF_EVENT_ATTRIBUTION.json": {
+      "sha256": "17f5af147cdcce5adbc16382f55d164437dd7182bfae43c8de122790a4d887d0",
+      "bytes": 366372
+    },
+    "B_R2_RECONCILIATION_MATRIX.json": {
+      "sha256": "fe080b2bb03311ffe77bd75994e3db56450bd941a53a028d4a4da0115d6d648e",
+      "bytes": 5649
+    },
+    "B_R2_CORRECTED_REGIME_STRATIFICATION.json": {
+      "sha256": "82567039524c68b351d361d0ba8b926179877e37379f4df94bd79dd4ac6f1b85",
+      "bytes": 34720
+    },
+    "B_R2_TIME_CAP_PATHWAY_DECOMPOSITION.json": {
+      "sha256": "f0e0bbc96f0cb0f903cd6ac413267559365940f5023b754da2d9e8c4e3c25542",
+      "bytes": 386300
+    },
+    "B_R2_DECIMAL_BOUNDARY_AUDIT.json": {
+      "sha256": "bf619a5d38fda41f97e070fae700ce977877f782741f94fcae1181ad197f377b",
+      "bytes": 29763
+    },
+    "B_R2_SCIENCE_EXECUTION_RECEIPT.json": {
+      "sha256": "b732c622b6b6c36a4d6e4fcdf96bddd27933b6cc938d75eefa3304c719135381",
+      "bytes": 529
+    },
+    "B_R2_FROZEN_CONTRACT.json": {
+      "sha256": "fb9de0f8aee6663a71a2e1ab59880df107aeee00bf0a0229d17a6c25340633c2",
+      "bytes": 4135
+    },
+    "B_R2_FIRST_FREEZE_VERIFICATION.json": {
+      "sha256": "28602ec38a419374e597b4b9d921a2403316a8143d462ebb71fd5263eae53cfa",
+      "bytes": 2071
+    }
+  }
+}

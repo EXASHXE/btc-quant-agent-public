@@ -5,15 +5,19 @@ Enforces zero lookahead:
 2. PRE_ENTRY_ATR_REGIME: Strictly prior-only 90d (2,160h) completed 1h Wilder ATR14 / Close median.
 3. PRE_ENTRY_FUNDING_STATE: Latest official funding rate settled strictly before signal decision.
 """
+
 from __future__ import annotations
 
 import csv
 import io
 import zipfile
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import numpy as np
+
+MIN_EVENTS_PER_STRATUM = 10
 
 # Column indices for 1m LAST bars:
 # 0: open_time (ms), 1: open, 2: high, 3: low, 4: close, 5: volume, 6: close_time (ms)
@@ -301,10 +305,7 @@ def extract_pre_entry_funding_state(
     effective_cutoff = cutoff_ms - lag_ms
 
     # Filter settlements strictly before effective cutoff
-    prior = [
-        s for s in funding_settlements
-        if int(s["calc_time"]) < effective_cutoff
-    ]
+    prior = [s for s in funding_settlements if int(s["calc_time"]) < effective_cutoff]
 
     if not prior:
         return {
@@ -351,21 +352,21 @@ def load_monthly_1m_bars(cache_dir: Path, year_month: str) -> np.ndarray:
                 for row in reader:
                     if not row or row[0].startswith("#") or not row[0].isdigit():
                         continue
-                    rows.append([
-                        float(row[0]),  # open_time
-                        float(row[1]),  # open
-                        float(row[2]),  # high
-                        float(row[3]),  # low
-                        float(row[4]),  # close
-                        float(row[5]),  # volume
-                        float(row[6]),  # close_time
-                    ])
+                    rows.append(
+                        [
+                            float(row[0]),  # open_time
+                            float(row[1]),  # open
+                            float(row[2]),  # high
+                            float(row[3]),  # low
+                            float(row[4]),  # close
+                            float(row[5]),  # volume
+                            float(row[6]),  # close_time
+                        ]
+                    )
     return np.array(rows, dtype=float)
 
 
-def load_monthly_funding_settlements(
-    cache_dir: Path, year_month: str
-) -> list[dict[str, Any]]:
+def load_monthly_funding_settlements(cache_dir: Path, year_month: str) -> list[dict[str, Any]]:
     """Load public official funding settlements from monthly zip archive."""
     zip_path = cache_dir / f"funding-BTCUSDT-fundingRate-{year_month}.zip"
     if not zip_path.is_file():
@@ -380,9 +381,78 @@ def load_monthly_funding_settlements(
                 for row in reader:
                     if len(row) < 3 or not row[0].isdigit():
                         continue
-                    settlements.append({
-                        "calc_time": int(row[0]),
-                        "funding_interval_hours": int(row[1]),
-                        "last_funding_rate": float(row[2]),
-                    })
+                    settlements.append(
+                        {
+                            "calc_time": int(row[0]),
+                            "funding_interval_hours": int(row[1]),
+                            "last_funding_rate": float(row[2]),
+                        }
+                    )
     return settlements
+
+
+def extract_year(entry_at_ms: int) -> str:
+    """Extract calendar year string from timestamp in ms."""
+    dt = datetime.fromtimestamp(entry_at_ms / 1000, UTC)
+    return str(dt.year)
+
+
+def extract_side(side: int) -> str:
+    """Extract human-readable side string from side integer."""
+    if side == 1:
+        return "LONG"
+    if side == -1:
+        return "SHORT"
+    raise ValueError(f"Invalid side integer: {side}")
+
+
+def calculate_effective_utc_weeks(timestamps_ms: list[int]) -> int:
+    """Calculate number of distinct UTC calendar weeks spanned by events."""
+    if not timestamps_ms:
+        return 0
+    weeks = {datetime.fromtimestamp(ts / 1000, UTC).isocalendar()[:2] for ts in timestamps_ms}
+    return len(weeks)
+
+
+def stratify_cohorts(
+    events: list[dict[str, Any]],
+    regime_key: str,
+    min_events: int = MIN_EVENTS_PER_STRATUM,
+) -> dict[str, dict[str, Any]]:
+    """Group events by a single predeclared regime dimension and check sample power.
+
+    events: list of dicts with 'labels' dict containing regime_key, and 'delta_net_bps'.
+    """
+    groups: dict[str, list[dict[str, Any]]] = {}
+    for ev in events:
+        label = ev.get("labels", {}).get(regime_key, "UNKNOWN")
+        groups.setdefault(label, []).append(ev)
+
+    out: dict[str, dict[str, Any]] = {}
+    for label, cohort in sorted(groups.items()):
+        n = len(cohort)
+        is_underpowered = n < min_events
+        timestamps = [ev["entry_at"] for ev in cohort if "entry_at" in ev]
+        effective_weeks = calculate_effective_utc_weeks(timestamps)
+
+        deltas_net = [ev["delta_net_bps"] for ev in cohort if "delta_net_bps" in ev]
+        mean_delta = float(np.mean(deltas_net)) if deltas_net else 0.0
+        median_delta = float(np.median(deltas_net)) if deltas_net else 0.0
+        std_delta = float(np.std(deltas_net, ddof=1)) if len(deltas_net) > 1 else 0.0
+
+        out[label] = {
+            "regime": regime_key,
+            "label": label,
+            "event_count": n,
+            "underpowered": is_underpowered,
+            "power_status": "UNDERPOWERED" if is_underpowered else "SUFFICIENT_SUPPORT",
+            "effective_utc_weeks": effective_weeks,
+            "mean_delta_net_bps": mean_delta,
+            "median_delta_net_bps": median_delta,
+            "std_delta_net_bps": std_delta,
+            "favorable_count": sum(d > 0 for d in deltas_net),
+            "adverse_count": sum(d < 0 for d in deltas_net),
+            "flat_count": sum(d == 0 for d in deltas_net),
+        }
+
+    return out

@@ -9,6 +9,7 @@ Covers >=40 test cases including:
 - Power gate thresholds (N < 10)
 - Manual 12-event Decimal / stdlib audit fixture
 """
+
 from __future__ import annotations
 
 import sys
@@ -75,6 +76,7 @@ def make_synthetic_1m_bars(
 # ---------------------------------------------------------
 # 1. 4h Trend Alignment Tests (Tests 1 - 12)
 # ---------------------------------------------------------
+
 
 def test_trend_exact_240_bars_aligned_long() -> None:
     t_start = 1620000000000
@@ -201,6 +203,7 @@ def test_trend_signal_vs_entry_cutoff() -> None:
 # 2. Resampling & Wilder ATR(14) Tests (Tests 13 - 19)
 # ---------------------------------------------------------
 
+
 def test_resample_1m_to_1h_exact_60_bars() -> None:
     t_start = 1609459200000  # 2021-01-01 00:00:00 UTC
     bars_1m = make_synthetic_1m_bars(t_start, 60, base_price=29000.0, price_drift=1.0)
@@ -243,11 +246,16 @@ def test_wilder_atr14_exact_formula_first_14_bars() -> None:
     t_start = 1609459200000
     for i in range(20):
         # Open=100, High=110, Low=90, Close=105 (TR = 20 for all)
-        hourly.append([
-            float(t_start + i * HOUR_MS),
-            100.0, 110.0, 90.0, 105.0,
-            float(t_start + (i + 1) * HOUR_MS - 1)
-        ])
+        hourly.append(
+            [
+                float(t_start + i * HOUR_MS),
+                100.0,
+                110.0,
+                90.0,
+                105.0,
+                float(t_start + (i + 1) * HOUR_MS - 1),
+            ]
+        )
     hourly_np = np.array(hourly)
     atr = compute_wilder_atr14(hourly_np)
     # Indices 0 to 12 must be NaN
@@ -260,11 +268,16 @@ def test_wilder_atr14_subsequent_smoothing() -> None:
     hourly = []
     t_start = 1609459200000
     for i in range(20):
-        hourly.append([
-            float(t_start + i * HOUR_MS),
-            100.0, 110.0, 90.0, 105.0,
-            float(t_start + (i + 1) * HOUR_MS - 1)
-        ])
+        hourly.append(
+            [
+                float(t_start + i * HOUR_MS),
+                100.0,
+                110.0,
+                90.0,
+                105.0,
+                float(t_start + (i + 1) * HOUR_MS - 1),
+            ]
+        )
     # At bar 14, make TR = 34 (High=120, Low=86)
     hourly[14][2] = 120.0
     hourly[14][3] = 86.0
@@ -278,11 +291,16 @@ def test_wilder_atr14_fewer_than_14_bars() -> None:
     hourly = []
     t_start = 1609459200000
     for i in range(10):
-        hourly.append([
-            float(t_start + i * HOUR_MS),
-            100.0, 110.0, 90.0, 105.0,
-            float(t_start + (i + 1) * HOUR_MS - 1)
-        ])
+        hourly.append(
+            [
+                float(t_start + i * HOUR_MS),
+                100.0,
+                110.0,
+                90.0,
+                105.0,
+                float(t_start + (i + 1) * HOUR_MS - 1),
+            ]
+        )
     hourly_np = np.array(hourly)
     atr = compute_wilder_atr14(hourly_np)
     assert len(atr) == 10
@@ -292,6 +310,7 @@ def test_wilder_atr14_fewer_than_14_bars() -> None:
 # ---------------------------------------------------------
 # 3. Expanding 90d ATR Regime & Lookback Tests (Tests 20 - 25)
 # ---------------------------------------------------------
+
 
 def make_synthetic_hourly_bars(
     start_ts_ms: int,
@@ -381,6 +400,7 @@ def test_atr_regime_hour_close_pre_signal() -> None:
 # 4. As-of Official Funding Rate Tests (Tests 26 - 31)
 # ---------------------------------------------------------
 
+
 def test_funding_settled_before_signal_positive() -> None:
     settlements = [
         {"calc_time": 1619395200003, "funding_interval_hours": 8, "last_funding_rate": 0.0001},
@@ -454,6 +474,7 @@ def test_funding_lag_sensitivity_positive() -> None:
 # 5. Time-Travel Guard & Mutation Tests (Tests 32 - 35)
 # ---------------------------------------------------------
 
+
 def test_time_travel_mutation_guard_trend_invariance() -> None:
     t_start = 1620000000000
     bars = make_synthetic_1m_bars(t_start, 300, base_price=50000.0, price_drift=2.0)
@@ -504,18 +525,21 @@ def test_time_travel_full_guard_helper() -> None:
     # Use 2160 bars for ATR
     hourly_long = make_synthetic_hourly_bars(t_start, 2200)
     settlements = [
-        {"calc_time": t_start + 8 * HOUR_MS, "funding_interval_hours": 8, "last_funding_rate": 0.0002},
+        {
+            "calc_time": t_start + 8 * HOUR_MS,
+            "funding_interval_hours": 8,
+            "last_funding_rate": 0.0002,
+        },
     ]
     sig_at = t_start + 2165 * HOUR_MS
-    guard_res = verify_time_travel_invariance(
-        bars_1m, hourly_long, settlements, sig_at, side=1
-    )
+    guard_res = verify_time_travel_invariance(bars_1m, hourly_long, settlements, sig_at, side=1)
     assert guard_res["status"] == "PASS_TIME_TRAVEL_INVARIANT"
 
 
 # ---------------------------------------------------------
 # 6. Power Gate, Warmup, & Integrity Tests (Tests 36 - 41)
 # ---------------------------------------------------------
+
 
 def test_power_gate_underpowered_threshold() -> None:
     count = 9
@@ -571,20 +595,31 @@ def test_reconciliation_matrix_discrepancy_table() -> None:
 # 7. Decimal Stdlib Manual 12-Event Synthetic Audit (Test 42)
 # ---------------------------------------------------------
 
+
 def test_decimal_stdlib_manual_12_event_audit() -> None:
     """Rigorous manual audit verifying 12 synthetic events against high-precision Decimal."""
     events = [
         {"p_start": "50000.00", "p_end": "51000.00", "side": 1, "expected_regime": "TREND_ALIGNED"},
         {"p_start": "50000.00", "p_end": "49000.00", "side": 1, "expected_regime": "COUNTERTREND"},
         {"p_start": "50000.00", "p_end": "50000.00", "side": 1, "expected_regime": "NEUTRAL"},
-        {"p_start": "45000.00", "p_end": "44000.00", "side": -1, "expected_regime": "TREND_ALIGNED"},
+        {
+            "p_start": "45000.00",
+            "p_end": "44000.00",
+            "side": -1,
+            "expected_regime": "TREND_ALIGNED",
+        },
         {"p_start": "45000.00", "p_end": "46000.00", "side": -1, "expected_regime": "COUNTERTREND"},
         {"p_start": "45000.00", "p_end": "45000.00", "side": -1, "expected_regime": "NEUTRAL"},
         {"p_start": "30000.00", "p_end": "30000.001", "side": 1, "expected_regime": "NEUTRAL"},
         {"p_start": "30000.00", "p_end": "30000.001", "side": -1, "expected_regime": "NEUTRAL"},
         {"p_start": "60000.00", "p_end": "60300.00", "side": 1, "expected_regime": "TREND_ALIGNED"},
         {"p_start": "60000.00", "p_end": "59700.00", "side": 1, "expected_regime": "COUNTERTREND"},
-        {"p_start": "20000.00", "p_end": "19800.00", "side": -1, "expected_regime": "TREND_ALIGNED"},
+        {
+            "p_start": "20000.00",
+            "p_end": "19800.00",
+            "side": -1,
+            "expected_regime": "TREND_ALIGNED",
+        },
         {"p_start": "20000.00", "p_end": "20200.00", "side": -1, "expected_regime": "COUNTERTREND"},
     ]
 
