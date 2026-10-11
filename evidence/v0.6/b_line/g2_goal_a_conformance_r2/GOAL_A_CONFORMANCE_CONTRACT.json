@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_name": "GOAL_A_R2_CONFORMANCE_CONTRACT",
+  "version": "1.0.0",
+  "dispatch_authority": {
+    "controller_dispatch_sha": "1172d3a91324c1a7379bc9e5c24ef601076547c2",
+    "authority_document": "reviews/v0.6/b_line/V06_G2_GEMINI_ABC_GOAL_R2_CONTROLLER_EVIDENCE_REPAIR_AUTHORITY.md",
+    "start_sha": "efa0b302233800f6474b3dda5775be56a77d0860",
+    "frozen_r1_sha": "83c0ef60d9eacfd2440fa223c57f042cfff4912f",
+    "final_r1_sha": "efa0b302233800f6474b3dda5775be56a77d0860",
+    "branch": "feature/v06-bline-gemini-goal-a-conformance-r2",
+    "prefix": "g2_goal_a_conformance_r2"
+  },
+  "scope": {
+    "scientific_question": "Does streaming monthly window replay in final commit efa0b302 strictly equal concatenated multi-year replay in frozen commit 83c0ef60 across all 8 candidates and 35 folds?",
+    "reconciliation_task": "Reconcile human report discrepancies (569/549 and 4/7) against committed machine JSON outputs and audit paired controls and 2023 zero-trade exposure."
+  },
+  "candidate_registry": [
+    {
+      "id": "C01_MACRO_PULLBACK_RECLAIM_12H",
+      "family": "MACRO_PULLBACK_RECLAIM",
+      "horizon_hours": 12,
+      "target_R": 2.0,
+      "warmup_hours_min": 60,
+      "causal_delays_minutes": 2
+    },
+    {
+      "id": "C01_MACRO_PULLBACK_RECLAIM_18H",
+      "family": "MACRO_PULLBACK_RECLAIM",
+      "horizon_hours": 18,
+      "target_R": 2.0,
+      "warmup_hours_min": 60,
+      "causal_delays_minutes": 2
+    },
+    {
+      "id": "C02_FAILED_BREAKOUT_EXHAUSTION_12H",
+      "family": "FAILED_BREAKOUT_EXHAUSTION",
+      "horizon_hours": 12,
+      "target_R": 2.0,
+      "warmup_hours_min": 24,
+      "causal_delays_minutes": 2
+    },
+    {
+      "id": "C02_FAILED_BREAKOUT_EXHAUSTION_18H",
+      "family": "FAILED_BREAKOUT_EXHAUSTION",
+      "horizon_hours": 18,
+      "target_R": 2.0,
+      "warmup_hours_min": 24,
+      "causal_delays_minutes": 2
+    },
+    {
+      "id": "C03_VOLATILITY_SHOCK_EXHAUSTION_12H",
+      "family": "VOLATILITY_SHOCK_EXHAUSTION",
+      "horizon_hours": 12,
+      "target_R": 2.0,
+      "warmup_hours_min": 24,
+      "causal_delays_minutes": 2
+    },
+    {
+      "id": "C03_VOLATILITY_SHOCK_EXHAUSTION_18H",
+      "family": "VOLATILITY_SHOCK_EXHAUSTION",
+      "horizon_hours": 18,
+      "target_R": 2.0,
+      "warmup_hours_min": 24,
+      "causal_delays_minutes": 2
+    },
+    {
+      "id": "C04_INTRADAY_RANGE_REVERSION_12H",
+      "family": "INTRADAY_RANGE_REVERSION",
+      "horizon_hours": 12,
+      "target_R": 2.0,
+      "warmup_hours_min": 168,
+      "causal_delays_minutes": 2
+    },
+    {
+      "id": "C04_INTRADAY_RANGE_REVERSION_18H",
+      "family": "INTRADAY_RANGE_REVERSION",
+      "horizon_hours": 18,
+      "target_R": 2.0,
+      "warmup_hours_min": 168,
+      "causal_delays_minutes": 2
+    }
+  ],
+  "cost_models": {
+    "BASE": {
+      "fee_bps": 6.0,
+      "spread_bps": 4.0,
+      "slip_bps": 3.0,
+      "nominal_roundtrip_bps": 22.0
+    },
+    "STRESS": {
+      "fee_bps": 12.0,
+      "spread_bps": 8.0,
+      "slip_bps": 6.0,
+      "nominal_roundtrip_bps": 44.0
+    }
+  },
+  "account_constraints": {
+    "starting_cash_usdt": 1000.0,
+    "max_exposure": "1x",
+    "reserve_margin_pct": 5.0,
+    "budget_formula": "0.95 * min(cash, 1000.0)",
+    "tick_size_usdt": 0.1,
+    "lot_step_btc": 0.001,
+    "min_notional_usdt": 5.0,
+    "order_ack_delay_ms": 60000,
+    "post_exit_cooldown_hours": 4
+  },
+  "temporal_folds": {
+    "warming_period": "2021-01 (744 hours, unscored)",
+    "scoring_folds_count": 35,
+    "start_fold": "2021-02",
+    "end_fold": "2023-12",
+    "fold_embargo_start_offset_ms": 0,
+    "fold_embargo_end_offset_ms": 86400000
+  },
+  "conformance_tolerances": {
+    "discrete_fields": {
+      "signal_counts": "EXACT_0_DIFF",
+      "trade_counts": "EXACT_0_DIFF",
+      "event_ids": "EXACT_0_DIFF",
+      "event_timestamps_ms": "EXACT_0_DIFF",
+      "entry_timestamps_ms": "EXACT_0_DIFF",
+      "exit_timestamps_ms": "EXACT_0_DIFF",
+      "exit_reasons": "EXACT_0_DIFF",
+      "trade_sides": "EXACT_0_DIFF",
+      "fates_counts": "EXACT_0_DIFF"
+    },
+    "continuous_floats": {
+      "effective_entry_price_max_abs_usdt": 1e-9,
+      "effective_exit_price_max_abs_usdt": 1e-9,
+      "quantity_max_abs_btc": 1e-9,
+      "gross_pnl_max_abs_usdt": 1e-9,
+      "fees_max_abs_usdt": 1e-9,
+      "funding_cash_max_abs_usdt": 1e-9,
+      "net_pnl_max_abs_usdt": 1e-9,
+      "ending_equity_max_abs_usdt": 1e-9,
+      "profit_factor_max_abs": 1e-9,
+      "return_bps_max_abs": 1e-6
+    }
+  },
+  "paired_control_contract": {
+    "required": true,
+    "side_inversion": "side_ctrl = -trade_side",
+    "quantity_conservation": "quantity_ctrl == trade_quantity",
+    "timing_identity": "entry_at_ctrl == entry_at_trade",
+    "execution_model": "identical adverse pricing applied to inverted side"
+  },
+  "failure_modes": [
+    "SIGNAL_DESYNCHRONIZATION",
+    "FILL_DESYNCHRONIZATION",
+    "FUNDING_DESYNCHRONIZATION",
+    "CASH_DESYNCHRONIZATION",
+    "PAIRED_CONTROL_ASYMMETRY",
+    "TOLERANCE_BREACH"
+  ],
+  "admissible_terminals": [
+    "A_R2_SEMANTIC_EQUIVALENCE_AND_REPORT_RECONCILED",
+    "A_R2_NON_EQUIVALENT_R1_FROZEN_METHOD_INVALID",
+    "A_R2_INCONCLUSIVE_OR_SOURCE_BLOCKED"
+  ]
+}
