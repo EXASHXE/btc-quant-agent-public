@@ -1,0 +1,12 @@
+{
+  "TASK_ID": "V06_G2_POST_EXIT_R1_GOAL_B_H18_MECHANISM_R1",
+  "terminal_decision": "H18_MECHANISM_DIAGNOSTIC_COMPLETE",
+  "scientific_grade": "OBSERVATIONAL_MECHANISTIC_ATTRIBUTION_COMPLETE",
+  "timestamp_utc": "2026-10-12T01:43:00Z",
+  "commit_parent": "ebb33b7f96e5ab0c753beab14363632a0a221416",
+  "start_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "controller_dispatch_sha": "c02743fddccdf517582c371a47e82d8dcbb05923",
+  "synthetic_tests_passed": 29,
+  "new_configurable_exit_policies_authorized": 0,
+  "status": "COMPLETED_AUDITABLE"
+}

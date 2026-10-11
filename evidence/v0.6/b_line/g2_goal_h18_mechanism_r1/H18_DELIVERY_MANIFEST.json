@@ -1,0 +1,47 @@
+[
+  {
+    "path": "evidence/v0.6/b_line/g2_goal_h18_mechanism_r1/FIRST_FREEZE_REMOTE_VERIFICATION.json",
+    "sha256": "39ca743427f7787d279d42939e52dcd0a508a7c1bac90933f67c7290b0adce66",
+    "bytes": 708
+  },
+  {
+    "path": "evidence/v0.6/b_line/g2_goal_h18_mechanism_r1/G2_GOAL_H18_FROZEN_CONTRACT.json",
+    "sha256": "892c5cf3b19f9346c869b5a91b75b1e0fb795398be11ac7dbc2b7e8ad6d6fe2b",
+    "bytes": 5358
+  },
+  {
+    "path": "evidence/v0.6/b_line/g2_goal_h18_mechanism_r1/H18_ACCOUNT_OPPORTUNITY_COST_AUDIT.json",
+    "sha256": "e5a6860b494bddef7fdcf6e7e112e92014a11667a2ea84bd7898041d09ef03a9",
+    "bytes": 9364
+  },
+  {
+    "path": "evidence/v0.6/b_line/g2_goal_h18_mechanism_r1/H18_DECIMAL_BOUNDARY_AUDIT.json",
+    "sha256": "2faa452a97f4317966cc2c758117ebc3afe4eb57b60d29c7bf3030b5e4cf6fca",
+    "bytes": 29782
+  },
+  {
+    "path": "evidence/v0.6/b_line/g2_goal_h18_mechanism_r1/H18_DELIVERY_MANIFEST.json",
+    "sha256": "86d1cd23a8ec0f9417a40012ad6dd91c34311cb0045c74b139c8456c4446ee6b",
+    "bytes": 1661
+  },
+  {
+    "path": "evidence/v0.6/b_line/g2_goal_h18_mechanism_r1/H18_MECHANISM_DIAGNOSTIC_RESULTS.json",
+    "sha256": "0ecbafa0d194e0a30d609dff17bfc60c35cb7c21ef317efa040c2b31a30dee65",
+    "bytes": 458852
+  },
+  {
+    "path": "evidence/v0.6/b_line/g2_goal_h18_mechanism_r1/H18_REGIME_STRATIFIED_ANALYSIS.json",
+    "sha256": "6a9c4d1bd2a787d4d880885703096a6c61920eab0f5def7bedaf9cb31323ab42",
+    "bytes": 38643
+  },
+  {
+    "path": "evidence/v0.6/b_line/g2_goal_h18_mechanism_r1/H18_SCIENCE_EXECUTION_RECEIPT.json",
+    "sha256": "4576d7626ed3d61f00794a2688a4132498f027e74acb4982220c431707f5bdab",
+    "bytes": 550
+  },
+  {
+    "path": "evidence/v0.6/b_line/g2_goal_h18_mechanism_r1/H18_TIME_CAP_INCREMENTAL_ATTRIBUTION.json",
+    "sha256": "dda1b54fa1a3c1d3f6b49500b063fe6b0b4ee6de23ffa885b6172e6efcd33de7",
+    "bytes": 377697
+  }
+]

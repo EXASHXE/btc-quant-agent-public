@@ -1,0 +1,205 @@
+{
+  "TASK_ID": "V06_G2_POST_EXIT_R1_GOAL_B_H18_MECHANISM_R1",
+  "analysis_2_opportunity": {
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H": {
+      "STRESS": {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost_model": "STRESS",
+        "event_set_equivalence": {
+          "e0_count": 34,
+          "h1_count": 34,
+          "h2_count": 34,
+          "h1_matches_e0_exactly": true,
+          "h2_matches_e0_exactly": true,
+          "interpretation": "Trade sets across E0, H1, and H2 are identical because candidate signal bursts arrive strictly within 0-7h of entry, followed by multi-day quiet periods. Zero new signals arrived in the (12h, 24h) extended holding windows."
+        },
+        "signal_collisions": {
+          "h1_total_skipped": 42,
+          "h2_total_skipped": 42,
+          "h1_cooldown_blocked": 30,
+          "h2_cooldown_blocked": 30,
+          "blocked_in_12_to_18h_window": 0,
+          "blocked_in_18_to_24h_window": 0,
+          "intra_trade_early_burst_collisions": 30
+        },
+        "capital_occupancy": {
+          "e0_occupied_minutes": 18456,
+          "h1_occupied_minutes": 24100,
+          "h2_occupied_minutes": 28308,
+          "h1_occupancy_increase_minutes": 5644,
+          "h1_occupancy_increase_pct": 30.580840918942346,
+          "h2_occupancy_increase_minutes": 9852,
+          "h2_occupancy_increase_pct": 53.381014304291284,
+          "e0_occupied_days": 12.816666666666666,
+          "h1_occupied_days": 16.73611111111111,
+          "h2_occupied_days": 19.658333333333335,
+          "e0_return_per_occupied_day_pct": 0.2538000817748389,
+          "h1_return_per_occupied_day_pct": 0.8906488276784533,
+          "h2_return_per_occupied_day_pct": 0.6857126595084955
+        },
+        "mark_drawdown_safety": {
+          "e0_max_mtm_drawdown_pct": 10.06414874257869,
+          "h1_max_mtm_drawdown_pct": 9.282331212014594,
+          "h2_max_mtm_drawdown_pct": 8.88142810292062,
+          "e0_cash_return_pct": 3.252871048080852,
+          "h1_cash_return_pct": 14.905997741007448,
+          "h2_cash_return_pct": 13.479968031504509
+        },
+        "hypothetical_skipped_signal_sensitivity": {
+          "skipped_signal_count": 30,
+          "estimated_notional_blocked_usdt": 27000.0,
+          "diagnostic_note": "Hypothetical skipped signal PnL is an unobservable counterfactual sensitivity bound, NOT a realizable performance claim."
+        }
+      },
+      "BASE": {
+        "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "cost_model": "BASE",
+        "event_set_equivalence": {
+          "e0_count": 34,
+          "h1_count": 34,
+          "h2_count": 34,
+          "h1_matches_e0_exactly": true,
+          "h2_matches_e0_exactly": true,
+          "interpretation": "Trade sets across E0, H1, and H2 are identical because candidate signal bursts arrive strictly within 0-7h of entry, followed by multi-day quiet periods. Zero new signals arrived in the (12h, 24h) extended holding windows."
+        },
+        "signal_collisions": {
+          "h1_total_skipped": 42,
+          "h2_total_skipped": 42,
+          "h1_cooldown_blocked": 30,
+          "h2_cooldown_blocked": 30,
+          "blocked_in_12_to_18h_window": 0,
+          "blocked_in_18_to_24h_window": 0,
+          "intra_trade_early_burst_collisions": 30
+        },
+        "capital_occupancy": {
+          "e0_occupied_minutes": 17875,
+          "h1_occupied_minutes": 23382,
+          "h2_occupied_minutes": 27589,
+          "h1_occupancy_increase_minutes": 5507,
+          "h1_occupancy_increase_pct": 30.80839160839161,
+          "h2_occupancy_increase_minutes": 9714,
+          "h2_occupancy_increase_pct": 54.344055944055945,
+          "e0_occupied_days": 12.413194444444445,
+          "h1_occupied_days": 16.2375,
+          "h2_occupied_days": 19.159027777777776,
+          "e0_return_per_occupied_day_pct": 0.9423682818840363,
+          "h1_return_per_occupied_day_pct": 1.3396853104843804,
+          "h2_return_per_occupied_day_pct": 1.0589958378274527
+        },
+        "mark_drawdown_safety": {
+          "e0_max_mtm_drawdown_pct": 7.729910774650467,
+          "h1_max_mtm_drawdown_pct": 8.688623821680794,
+          "h2_max_mtm_drawdown_pct": 8.288080483287487,
+          "e0_cash_return_pct": 11.697800721303576,
+          "h1_cash_return_pct": 21.75314022899013,
+          "h2_cash_return_pct": 20.289330673487214
+        },
+        "hypothetical_skipped_signal_sensitivity": {
+          "skipped_signal_count": 30,
+          "estimated_notional_blocked_usdt": 27000.0,
+          "diagnostic_note": "Hypothetical skipped signal PnL is an unobservable counterfactual sensitivity bound, NOT a realizable performance claim."
+        }
+      }
+    },
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H": {
+      "STRESS": {
+        "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+        "cost_model": "STRESS",
+        "event_set_equivalence": {
+          "e0_count": 55,
+          "h1_count": 55,
+          "h2_count": 55,
+          "h1_matches_e0_exactly": true,
+          "h2_matches_e0_exactly": true,
+          "interpretation": "Trade sets across E0, H1, and H2 are identical because candidate signal bursts arrive strictly within 0-7h of entry, followed by multi-day quiet periods. Zero new signals arrived in the (12h, 24h) extended holding windows."
+        },
+        "signal_collisions": {
+          "h1_total_skipped": 46,
+          "h2_total_skipped": 46,
+          "h1_cooldown_blocked": 28,
+          "h2_cooldown_blocked": 28,
+          "blocked_in_12_to_18h_window": 0,
+          "blocked_in_18_to_24h_window": 0,
+          "intra_trade_early_burst_collisions": 28
+        },
+        "capital_occupancy": {
+          "e0_occupied_minutes": 32607,
+          "h1_occupied_minutes": 44056,
+          "h2_occupied_minutes": 52898,
+          "h1_occupancy_increase_minutes": 11449,
+          "h1_occupancy_increase_pct": 35.11209249547643,
+          "h2_occupancy_increase_minutes": 20291,
+          "h2_occupancy_increase_pct": 62.2289692397338,
+          "e0_occupied_days": 22.64375,
+          "h1_occupied_days": 30.594444444444445,
+          "h2_occupied_days": 36.734722222222224,
+          "e0_return_per_occupied_day_pct": 0.4276296966142012,
+          "h1_return_per_occupied_day_pct": 0.6839634107768751,
+          "h2_return_per_occupied_day_pct": 0.4505770704571187
+        },
+        "mark_drawdown_safety": {
+          "e0_max_mtm_drawdown_pct": 9.233807545831962,
+          "h1_max_mtm_drawdown_pct": 6.909060546122964,
+          "h2_max_mtm_drawdown_pct": 7.9881636759439765,
+          "e0_cash_return_pct": 9.683139942707818,
+          "h1_cash_return_pct": 20.92548057304584,
+          "h2_cash_return_pct": 16.551823522944908
+        },
+        "hypothetical_skipped_signal_sensitivity": {
+          "skipped_signal_count": 28,
+          "estimated_notional_blocked_usdt": 25200.0,
+          "diagnostic_note": "Hypothetical skipped signal PnL is an unobservable counterfactual sensitivity bound, NOT a realizable performance claim."
+        }
+      },
+      "BASE": {
+        "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+        "cost_model": "BASE",
+        "event_set_equivalence": {
+          "e0_count": 55,
+          "h1_count": 55,
+          "h2_count": 55,
+          "h1_matches_e0_exactly": true,
+          "h2_matches_e0_exactly": true,
+          "interpretation": "Trade sets across E0, H1, and H2 are identical because candidate signal bursts arrive strictly within 0-7h of entry, followed by multi-day quiet periods. Zero new signals arrived in the (12h, 24h) extended holding windows."
+        },
+        "signal_collisions": {
+          "h1_total_skipped": 46,
+          "h2_total_skipped": 46,
+          "h1_cooldown_blocked": 28,
+          "h2_cooldown_blocked": 28,
+          "blocked_in_12_to_18h_window": 0,
+          "blocked_in_18_to_24h_window": 0,
+          "intra_trade_early_burst_collisions": 28
+        },
+        "capital_occupancy": {
+          "e0_occupied_minutes": 31855,
+          "h1_occupied_minutes": 42539,
+          "h2_occupied_minutes": 50295,
+          "h1_occupancy_increase_minutes": 10684,
+          "h1_occupancy_increase_pct": 33.53947574948988,
+          "h2_occupancy_increase_minutes": 18440,
+          "h2_occupancy_increase_pct": 57.887301836446404,
+          "e0_occupied_days": 22.12152777777778,
+          "h1_occupied_days": 29.540972222222223,
+          "h2_occupied_days": 34.927083333333336,
+          "e0_return_per_occupied_day_pct": 1.0526183863095722,
+          "h1_return_per_occupied_day_pct": 1.2477084110310648,
+          "h2_return_per_occupied_day_pct": 0.9061270317397437
+        },
+        "mark_drawdown_safety": {
+          "e0_max_mtm_drawdown_pct": 6.156951922765148,
+          "h1_max_mtm_drawdown_pct": 6.714693932362666,
+          "h2_max_mtm_drawdown_pct": 6.68236922260661,
+          "e0_cash_return_pct": 23.28552687214682,
+          "h1_cash_return_pct": 36.858519511701715,
+          "h2_cash_return_pct": 31.64837434816001
+        },
+        "hypothetical_skipped_signal_sensitivity": {
+          "skipped_signal_count": 28,
+          "estimated_notional_blocked_usdt": 25200.0,
+          "diagnostic_note": "Hypothetical skipped signal PnL is an unobservable counterfactual sensitivity bound, NOT a realizable performance claim."
+        }
+      }
+    }
+  }
+}
