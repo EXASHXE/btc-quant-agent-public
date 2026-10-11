@@ -1,0 +1,35 @@
+{
+  "scientific_grade": "EX_POST_CODE_AS_EXECUTED_DEV_ONLY_NOT_REGISTERED_TEXT_METHOD",
+  "selected_real_fold_reruns": [
+    {
+      "candidate": "W1_C01_MULTISCALE_TREND_ADOPTION_08H",
+      "cost": "STRESS",
+      "year": 2021,
+      "month": 2,
+      "trade_count": 7,
+      "trades_sha256": "8b6681629eaf50752234fd05c2b272d9e9d3f444d1844ceed1b34310c888e640",
+      "minute_curve_sha256": "d8f91e38631c8944f017341160e7a27a424c611fab8103abebd21a8f265182cc",
+      "exact_match": true
+    },
+    {
+      "candidate": "W3_C01_EMA_CROSS_MULTI_HORIZON_TREND_FILTER_08H",
+      "cost": "STRESS",
+      "year": 2021,
+      "month": 3,
+      "trade_count": 3,
+      "trades_sha256": "5a7f1470e629792a783e119ef5cdbe1aa25b6170e11cdb9470eb3d5567961c07",
+      "minute_curve_sha256": "430b845220185f58475756d158f50ae71f7fb7dfe1bdd86852a55401fe0a2d09",
+      "exact_match": true
+    },
+    {
+      "candidate": "W4_C06_ASYMMETRIC_MOMENTUM_EXHAUSTION_CONTINUATION_24H",
+      "cost": "STRESS",
+      "year": 2021,
+      "month": 2,
+      "trade_count": 13,
+      "trades_sha256": "b0aa731aeace5546674066f6b77ed1f6f254e60aa6975d5b330202ff70a0a3cf",
+      "minute_curve_sha256": "698fcaf7ddfcce83e7274353f67edf791344fb40351e4c2db2e250dd423e4561",
+      "exact_match": true
+    }
+  ]
+}

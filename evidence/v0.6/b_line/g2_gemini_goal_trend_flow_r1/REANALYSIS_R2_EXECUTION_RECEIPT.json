@@ -1,0 +1,244 @@
+{
+  "task_id": "V06_G2_GEMINI_A_CODE_AS_EXECUTED_23_TRIAL_ACTUAL_MARKET_REPLAY_R2",
+  "scientific_grade": "EX_POST_CODE_AS_EXECUTED_DEV_ONLY_NOT_REGISTERED_TEXT_METHOD",
+  "controller_scientific_grade": "EX_POST_CODE_AS_EXECUTED_REANALYSIS_EXPOSED_DEV_ONLY__NOT_PREREG_CONFIRMED",
+  "terminal": "ACTUAL_23_EXECUTABLE_DEV_REANALYSIS_POSITIVE_LEAD_UNVALIDATED",
+  "requested_root_model": "Codex GPT-6 Sol High",
+  "observable_root_model": "NOT_EXPOSED",
+  "observable_root_effort": "NOT_EXPOSED",
+  "prompt_sha": "681087557fb774a110500282fcd5e20fa17bc949",
+  "controller_dispatch_sha": "bfe9f5df1bf55e7738cfbff58ce32e674edab683",
+  "exact_start_sha": "d1f9f4316a2485f5d09ee1c910d7797ecfc6be7e",
+  "original_strategy_code_sha": "a37721eaa1f3cd176146df6bdb63fbd17746189e",
+  "frozen_code_sha": "99c909f9a2dd52cf5a6ba89938851ddb9397d3dd",
+  "frozen_code_direct_parent": "d1f9f4316a2485f5d09ee1c910d7797ecfc6be7e",
+  "branch": "feature/v06-bline-gemini-a-code-identity-exploratory-replay-r2",
+  "worktree": "/root/workspace/project/quant-v0.6/gemini-a-code-identity-replay-r2",
+  "created_at_utc": "2026-10-11T09:59:30.581857+00:00",
+  "started_at_utc": "2026-10-11T09:51:03.179072+00:00",
+  "finished_at_utc": "2026-10-11T09:54:28.415306+00:00",
+  "archive_months": 36,
+  "minute_rows": 1576800,
+  "score_months": 35,
+  "scoring_24h_purge": true,
+  "unchanged_original_signal_function_ast_sha256": "2c0e03fd3525ea1e578f0e50a17691ec780969fb47a902e182649fffee42b92f",
+  "fixed_candidate_count": 23,
+  "invalid_excluded_candidate": {
+    "id": "W1_C06_PERSISTENT_TREND_24H",
+    "status": "METHOD_INVALID_EXCLUDED_FROM_PROMOTION",
+    "numeric_rerun": false
+  },
+  "cost_scenarios": 46,
+  "candidate_cost_month_accounts": 1610,
+  "base_stress_trade_observations_dependent": 14358,
+  "positive_exploratory_ids": [
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+    "W3_C05_ASYMMETRIC_SHORT_BIASED_FLOW_COLLAPSE_08H"
+  ],
+  "descriptive_gate_passes": [],
+  "automatic_promotions": [],
+  "source": {
+    "fresh_official_checksum_http200": 36,
+    "full_archive_csv_checks": 36,
+    "actual_raw_archive_downloads": 0,
+    "existing_A_owned_cache_archives_verified": 36,
+    "old_npy_cache_used": false,
+    "source_sha256": "48076612590a6ec77af75f204f48c49b7f4bcf4571159b354334f3ef0e87c163",
+    "rights_primary_doc": "https://raw.githubusercontent.com/binance/binance-public-data/master/TERMS_AND_CONDITIONS.md",
+    "rights_version": "1.0 updated2026-08-26;CC BY-NC-SA4.0;noncommercial nonproduction research",
+    "known_at": "UNPROVEN",
+    "mark": "NOT_OBSERVED",
+    "funding": "NOT_OBSERVED",
+    "fees_filters": "PROXY_NOT_HISTORICALLY_AUTHENTICATED"
+  },
+  "checks": {
+    "focused_pytest_passed": 82,
+    "focused_pytest_failed": 0,
+    "ruff": "PASS",
+    "compileall": "PASS",
+    "json_validity": "PASS",
+    "diff_check": "PASS",
+    "real_decimal_first_hit_and_cash_audits": 6,
+    "real_decimal_exit_types": [
+      "STOP",
+      "TIME_CAP",
+      "TARGET"
+    ],
+    "real_decimal_sides": [
+      1,
+      -1
+    ],
+    "deterministic_real_fold_replays": 3,
+    "all_three_exact_match": true,
+    "source_and_account_hard_blockers": [],
+    "funded_book_month_year_continuity": "PASS",
+    "outside_git_full_ledger_hashes_rechecked": "PASS",
+    "configured_mypy_local": "not rerun; configured target src/btc_quant_agent unchanged; no script typing/wholeCI repair loop",
+    "independent_read_only_review": "No consequential blocker; aggregatecounts/cashlabels/sourcecoverage verified"
+  },
+  "engineering_code_sha256": {
+    "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_EXECUTABLE_PROTOCOL.json": "d5a930bd98983df9813bcddd7899baa90ecb4bebee8e06f82324f1b2fcf200a9",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_audit.py": "471ced282d410f3735d04ceb5f67aa24e245bf43948b00f3c268e2d5ba846939",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_controls.py": "1a890a530b7f5ab888cc0244dfa6036b83949e1e420a1663bb9880c771a2d45f",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_report.py": "3f479e4a206e49ea4b66657f39f7fc554e07ad59b696f3c23c6e4eac495c53e6",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_run.py": "c7f391f1a931e714967c9d602c771ae7d9085fd9c2e273cbc7cb2c1c307b5b50",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_sources.py": "99afb24d98e93a5aad8a728db9ee55cd5372c17ae4d2cec65b32022b2f3dfc7f",
+    "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py": "ca4822b742bb11b0e8a9712af7a15ea258d2478d88cb44c8b3ae1a8f6b71cf16",
+    "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_r2_controls.py": "97d76bd4e2a62a7eb9ebe0bf0c05c13cdda09d9c1580617843e3db13c49eb359",
+    "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_r2_run.py": "f4ee5b3f993f665052dfe05ff7c97fa6e0e3e4cff35ab5ac38a2f193e67c2fa8",
+    "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_r2_sources.py": "d7e56a4f37e1cc6b4e81aa6265cbd6346e425f0009465792d87b16dbf52d39f0"
+  },
+  "aggregate_artifacts_sha256": {
+    "REANALYSIS_R2_DETERMINISM.json": "7196026709b3d11da380e639eab2356df88f46ec24e006a9f351157bd483d260",
+    "REANALYSIS_R2_OLD_VS_CORRECTED.json": "38db740fedde56b2545686306f522c6d2b9ab42916c9bcb339b65a60e905682c",
+    "REANALYSIS_R2_SOURCE_RECEIPT.json": "7acb54f6e18242109c5992a6a23c61edc0c89ca1807fd03458ff64c81b994c4a",
+    "REANALYSIS_R2_DECIMAL_AUDITS.json": "509fabaab7c04dd4f988263b0a4525451976b05add30d96a12a6497f234806a3",
+    "REANALYSIS_R2_RESULTS.json": "855d95175afdc5f4cb1b9edcc525db76855a28db5cda72d81e989b382a0cdb51",
+    "REANALYSIS_R2_EXECUTABLE_PROTOCOL.json": "d5a930bd98983df9813bcddd7899baa90ecb4bebee8e06f82324f1b2fcf200a9"
+  },
+  "immutable_original_and_R1_files": [
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/FINAL_GOAL_RESEARCH_REPORT.md",
+      "sha256": "b934315e05c17f9cc114a74ec62e5b73e851ee8c82349f4a7d78df9deef0f370",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/REANALYSIS_R1_ENGINEERING_METHOD.md",
+      "sha256": "a19d09cb2cfc0d94abdeb903e7a912da02d6c413c6012a49c662e4af88ffb0f2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/REANALYSIS_R1_OUTCOME_REPORT.md",
+      "sha256": "1b130edfd2f17b32095ac57cff2cbc777808a6f69918b84e5a8d0ad301ba90f6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_01_DECISION.md",
+      "sha256": "38bb83b4b45e65d289c699259f3f675b2a879d3f354b6e5b5bcc380e31a091a6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_01_HYPOTHESIS_FREEZE.md",
+      "sha256": "2206d3296813e9a5d7b5fd25186e8a44454c359afd26aca6f5f73d2ec971de00",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_02_DECISION.md",
+      "sha256": "f9fa471395a0e97e6edd9d15241df73f403d1997bced154a979cf3ce0d3bb479",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_02_HYPOTHESIS_FREEZE.md",
+      "sha256": "63d4e44b7270818c6fced04f65562288d0a87c028f271494a6b2a006b79f62fb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_03_DECISION.md",
+      "sha256": "d2d40762587a1d72e2352ade9a8da9e3f455791a4e3fd7ae4d8ae57637071246",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_03_HYPOTHESIS_FREEZE.md",
+      "sha256": "76d6531a853a3860de33267118deba8fce07a9f71a3fd83c1bdbfb403007b484",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_04_DECISION.md",
+      "sha256": "af137c5c8f37c9eca58f26ac6ba7fb7f8dc51ff17018d99e5a551541375affcc",
+      "unchanged": true
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/gemini_goal_trend_flow_r1/WAVE_04_HYPOTHESIS_FREEZE.md",
+      "sha256": "44fa1184f07f4ee7c0ed095dfa621a64a071deedb602e0b9ea867490065af2c5",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/CUMULATIVE_TRIAL_BUDGET_LEDGER.json",
+      "sha256": "efba0b75623fd1f6827e6670999486ac192a3c49d5f1bad54e09cb74cbd9bb7c",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R1_ENGINEERING_METHOD.json",
+      "sha256": "ec9746c62ac7422f730d86c0ac3d7c53736f792240018b70beb4e761811795e8",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R1_EXECUTION_RECEIPT.json",
+      "sha256": "7dea8bbde6102d187f06064aea7b4920da59432a9a115f32a00c518e26e005ba",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R1_FIXED_24_COMPARISON.json",
+      "sha256": "b628de2ccaa612809d83491dbe6d41974d9f1639166057d567b8d46219bf83ad",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_FROZEN_REGISTRY.json",
+      "sha256": "d05f2361c59bf3d0c0f2b75d2ea91293e4e3f95a5720f8c0feb587b86ede3249",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_RESULT.json",
+      "sha256": "899d389cf8342f9ba4bfa0939fe7aa92c2a848c6307f878b100ba5eee6bb5365",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_FROZEN_REGISTRY.json",
+      "sha256": "7d0fcc73ce81180ac5c90de5dc4ac7528dc94ff26f3a5735e86b946f9e1d9423",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_RESULT.json",
+      "sha256": "2607fa9d415b6c22c54fa91c98b0a884e0efee848e2e02d317e02ca3bf908e4e",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_FROZEN_REGISTRY.json",
+      "sha256": "d42458d2c454dc2658eb52f459aafa39dcab87cdfc95a2b58756321d51092490",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_RESULT.json",
+      "sha256": "deb984e642364bab3519445aae5d1da539ad64843e05c79b7d12cc3f26544747",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_FROZEN_REGISTRY.json",
+      "sha256": "bc625fb62537b01958618ab55e308d01144c67dfa1e2d2d6e99b59b19687d668",
+      "unchanged": true
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_RESULT.json",
+      "sha256": "c33540b5cf93a603e44e322cd96fb73f3e2e054e946e82a31b41792241b2ad1d",
+      "unchanged": true
+    }
+  ],
+  "scope": {
+    "real_owner_Quant_agent_data_stat_or_body": false,
+    "Quant_agent_sanitized_access": false,
+    "2024_2025_2026_price_or_outcome_access": false,
+    "other_agents_cache_access": false,
+    "exchange_private_api_or_account_access": false,
+    "real_orders": false,
+    "raw_market_or_full_trade_equity_ledger_in_git": false,
+    "strategy_parameter_retuning": false,
+    "extra_strategy_trials": 0,
+    "complete_full_replay_runs": 1,
+    "selected_deterministic_rechecks": 3
+  },
+  "authority": {
+    "OOS": false,
+    "Alpha": false,
+    "holdout_read": false,
+    "P3_P4": false,
+    "TESTNET_LIVE": false
+  },
+  "git_final_verification": "Second resultcommit must directly parent frozen_code_sha; exact finalremoteSHA verified afternonforcepush and reportedoutside selfreferential receipt",
+  "ci": "query exact final SHA afterpush; no success inferred fromlocalchecks",
+  "actual_price_report_sha256": "c0010b50774e68a9e5155afa0c9f5682bb63b7e3eba6ae8d1c4a211792a72c95",
+  "trade_observations_by_cost": {
+    "BASE": 7367,
+    "STRESS": 6991
+  }
+}
