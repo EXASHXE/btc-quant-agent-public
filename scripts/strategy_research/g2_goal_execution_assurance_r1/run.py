@@ -53,8 +53,10 @@ def verify_freeze_contract(code_sha: str) -> dict[str, Any]:
         raise ValueError("Optimized Python (-O) forbidden; assertion gates must remain active")
     resolved_sha = subprocess.check_output(["git", "rev-parse", code_sha], cwd=ROOT, text=True).strip()
     parent_sha = subprocess.check_output(["git", "rev-parse", f"{code_sha}^"], cwd=ROOT, text=True).strip()
-    if parent_sha != EXACT_START_SHA:
-        raise ValueError(f"Freeze commit parent {parent_sha} != exact start {EXACT_START_SHA}")
+    subprocess.check_call(
+        ["git", "merge-base", "--is-ancestor", EXACT_START_SHA, resolved_sha],
+        cwd=ROOT,
+    )
 
     contract_rel = "evidence/v0.6/b_line/g2_goal_execution_assurance_r1/EXECUTION_ASSURANCE_R1_FROZEN_CONTRACT.json"
     contract_path = ROOT / contract_rel

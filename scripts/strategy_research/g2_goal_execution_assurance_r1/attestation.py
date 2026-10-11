@@ -181,8 +181,9 @@ def verify_public_source_caches() -> dict[str, Any]:
     for ref in monthly_sources:
         kind = ref["kind"]
         by_kind_counts[kind] += 1
-        zip_path = R3_CACHE / f"{kind}-{ref['zip_name']}"
-        chk_path = R3_CACHE / f"{kind}-{ref['zip_name']}.CHECKSUM"
+        zip_name = Path(ref["source_url"]).name
+        zip_path = R3_CACHE / f"{kind}-{zip_name}"
+        chk_path = R3_CACHE / f"{kind}-{zip_name}.CHECKSUM"
         if zip_path.is_symlink() or chk_path.is_symlink() or not zip_path.is_file() or not chk_path.is_file():
             raise ValueError(f"Missing or symlinked monthly cache file: {zip_path}")
         z_sha = hashlib.sha256(zip_path.read_bytes()).hexdigest()

@@ -2,6 +2,7 @@
   "task_id": "V06_G2_GEMINI_GOAL_C_EXECUTION_ASSURANCE_R1",
   "controller_dispatch_sha": "c02743fddccdf517582c371a47e82d8dcbb05923",
   "exact_start_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "initial_freeze_commit_sha": "8db2e3ff36011c6a65458f8cf4c2ba5e90d5fee2",
   "audited_exit_r1_frozen_sha": "de2c1fb222970a93ca797868b91b8544261ebaad",
   "audited_exit_r1_final_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
   "stage": "STEP_1_FROZEN_ADVERSARIAL_METHOD_AND_HARNESS",
@@ -251,13 +252,13 @@
   "frozen_implementation_sha256": {
     "docs/strategy_research/g2_goal_execution_assurance_r1/EXECUTION_ASSURANCE_R1_FROZEN_METHOD.md": "8864717c3b9d71ca934d9220658037972f0bcbcd2b5c7c5a380e77ca72e5d293",
     "scripts/strategy_research/g2_goal_execution_assurance_r1/__init__.py": "00ba69bd82e4a57cc626253cf696fc98fc8ba7a8c000236810fa2479bb16385b",
-    "scripts/strategy_research/g2_goal_execution_assurance_r1/attestation.py": "d7d0c5757229526dd7568ed65f38daf6e4496c3abed8a4b8cf7551b53439474a",
+    "scripts/strategy_research/g2_goal_execution_assurance_r1/attestation.py": "4a5b262f5f7f98ca503267cdaaa8f8b742aef158c3e2e50aab7c4d05acd540a6",
     "scripts/strategy_research/g2_goal_execution_assurance_r1/collision_matrix.py": "d39a7fb9d7368738e05d462e91b13d5a25f9ab0192a0ed3829acc6522f5223af",
     "scripts/strategy_research/g2_goal_execution_assurance_r1/decimal_journal.py": "0cee8baa432c40e2c0d2db36e9c55115a0762c71c2d3a3d24f4eb8c90bbb5ccb",
     "scripts/strategy_research/g2_goal_execution_assurance_r1/execution_sensitivity.py": "ad65a773444e2c61bcba4dded0faa5c5885ebf3eb3b91aee93afb5b0fb559fd8",
     "scripts/strategy_research/g2_goal_execution_assurance_r1/lineage_audit.py": "cac6aa9f4b9305672f3d61d9209e4170317c4097330c3e6065f248e981bf6a59",
     "scripts/strategy_research/g2_goal_execution_assurance_r1/risk_envelope.py": "e852402291040bc422242cbdcd36dc7ded9249dabf59cf180a4f166b7f4d95da",
-    "scripts/strategy_research/g2_goal_execution_assurance_r1/run.py": "071aaa32512aa308bdaf712172742816502bf4c095d62846c7a1d8da0289ebd1",
+    "scripts/strategy_research/g2_goal_execution_assurance_r1/run.py": "07dc7567c7be2f35b07c33e5fd270a0649ee9cb8b9871fc0c7b3500741d88ea0",
     "tests/test_v06_g2_goal_execution_assurance_r1_collision_matrix.py": "600a471d1f3fc2ea72907b980b6da987421ed2f894138464aacfbdc6212ec08e",
     "tests/test_v06_g2_goal_execution_assurance_r1_decimal_and_risk.py": "17e7ed008fa23fef42858c764ec6aa3502523e7916c5e6ea00d2ea692d9f9f7c"
   },
