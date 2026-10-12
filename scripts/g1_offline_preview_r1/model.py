@@ -69,8 +69,15 @@ def initial_state(trusted_approvals: list[dict[str, Any]]) -> dict[str, Any]:
     if not isinstance(trusted_approvals, list):
         raise SafetyViolation("APPROVAL_FIXTURE_INVALID")
     token_keys = {
-        "token_id", "signal_id", "proposal_hash", "proposal_version", "quantity",
-        "issued_at", "expires_at", "approved", "issuer",
+        "token_id",
+        "signal_id",
+        "proposal_hash",
+        "proposal_version",
+        "quantity",
+        "issued_at",
+        "expires_at",
+        "approved",
+        "issuer",
     }
     tokens: dict[str, dict[str, Any]] = {}
     for raw in trusted_approvals:
@@ -104,6 +111,11 @@ def initial_state(trusted_approvals: list[dict[str, Any]]) -> dict[str, Any]:
         "trusted_approvals": tokens,
         "used_tokens": [],
         "used_settlements": [],
+        "used_settlement_clocks": [],
+        "used_fill_ids": [],
+        "required_exit": None,
+        "used_signal_ids": [],
+        "entry_acknowledged": False,
         "used_ack_ids": [],
         "delivered_outbox_ids": [],
         "used_event_ids": [],

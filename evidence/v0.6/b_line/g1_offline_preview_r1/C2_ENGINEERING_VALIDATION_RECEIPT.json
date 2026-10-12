@@ -1,0 +1,52 @@
+{
+  "stage": "C2_INDEPENDENT_ENGINEERING_REPAIR_AND_TESTS",
+  "task_id": "V06_G1_CODEX_GPT61_SOL_OFFLINE_PREVIEW_R1",
+  "controller_sha": "99df4ed8e820984d69d7b895be8808b892ed7f5f",
+  "start_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "parent_sha": "cf76ef99b47dc91b7f062877679172bacf1d6c9f",
+  "source_manifest": {
+    "scripts/g1_offline_preview_r1/__main__.py": "2df73d59f8ac7fda619c27ed113f13bb8441e61b3b027a310c9bd1f4f9a23f86",
+    "scripts/g1_offline_preview_r1/analysis_schema.json": "dea9da8a0f03740894f117a7da56cd7c99476aa3058bdf2a665107019a98e1cb",
+    "scripts/g1_offline_preview_r1/fixtures/long_24h.json": "ae6c70f7c26b752df1cfc2cc803d6a941a62e1699749365f4902d335cb93fe4f",
+    "scripts/g1_offline_preview_r1/fixtures/short_24h.json": "d6bf849411f82db75f433f91985b7c8698fbbd1834685fb706453de3cad1dc11",
+    "scripts/g1_offline_preview_r1/fixtures.py": "9999418e5cb1f9fd98d1f4cae5c1d460a9593b28c9f7f338a3043374fa4ea8b0",
+    "scripts/g1_offline_preview_r1/model.py": "086d6ec8747f82d59b6f8f42bfefd2d9c61e5f962707b4f9119f784741dd206e",
+    "scripts/g1_offline_preview_r1/reducer.py": "e5857b4afdd815eef19dec9f8a23129fee50eba19e7a1f3c2285c1483c5a4275",
+    "scripts/g1_offline_preview_r1/storage.py": "9e4ac21c501e48734a750021f8ea2f51f4f06ecc0ee2e798647718b4c453f101",
+    "tests/test_v06_g1_offline_preview_r1_core.py": "d5679c583d1122f2ce877f7686e477acc869637e7ee21643fbee1f5058e52da3",
+    "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py": "022ba64e10488632830bf05bd35ec7a3198dba995374dcaf9400a5a06591cde8",
+    "tests/test_v06_g1_offline_preview_r1_exit_safety.py": "bd1f6bd21a3225543e18af564bbef9c0294ef748dec705e44621c794c6898756",
+    "tests/test_v06_g1_offline_preview_r1_process_recovery.py": "d6c99ea559f9c4a8c384568af52ed6aa556ecca896d9add58ca9aa5c07f04249",
+    "tests/test_v06_g1_offline_preview_r1_wal.py": "41d53a583502b4d28da92dfa9f8c9e2dde73522509009739418d9dfff42c8585"
+  },
+  "source_manifest_sha256": "e369285adce532bd5b21dcda313be7f518f8bf367718b493b8ce78eea4325009",
+  "synthetic_only": true,
+  "market_source_bodies_read": 0,
+  "network_adapter": "ABSENT",
+  "actual_network_syscall_audit": "NOT_PERFORMED_NO_TRACER_INSTALLED",
+  "scoped_nonprocess_pytest": {
+    "passed": 108,
+    "failed": 0,
+    "command": "python3.12 -m pytest -q tests/test_v06_g1_offline_preview_r1_{core,wal,exit_safety,decimal_and_ports}.py",
+    "receipt_text": "........................................................................ [ 66%]\n....................................                                     [100%]\n108 passed in 38.17s\n"
+  },
+  "process_kill_tests": {
+    "first_round_passed": 32,
+    "checkpoint_hash_extension_smoke_passed": 2,
+    "combined_final_suite": "PENDING_FINAL_C3_EVIDENCE"
+  },
+  "ruff": "PASS",
+  "compile": "PASS",
+  "independent_review": "NO_REMAINING_PROVEN_BLOCKER_IN_REVIEWED_PATHS",
+  "repairs": [
+    "required completed-bar exit before clock advancement",
+    "explicit TP2; arbitrary CLOSE rejected",
+    "settlement-clock and persistent fill-ID dedupe",
+    "residual exits before prior ACK; per-fill independent settlement",
+    "BE actual tick economics",
+    "late operational receipt never advances market clock",
+    "terminal immutable checkpoint; linked traces",
+    "synthetic NO_ACTION cannot request or obtain approval"
+  ],
+  "terminal_authority": "NO_PRODUCTION_TESTNET_LIVE_OR_ALPHA_GRANT"
+}
