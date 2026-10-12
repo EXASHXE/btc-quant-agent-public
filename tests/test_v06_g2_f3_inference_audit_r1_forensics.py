@@ -148,16 +148,19 @@ def test_timestamp_boundary_exact_start() -> None:
 
 
 def test_timestamp_boundary_pre_eval_excluded() -> None:
-    """Trade timestamp before eval_start falls outside positive block range."""
-    b_idx = int((EVAL_START - 60_000 - EVAL_START) // (14 * 86_400_000))
-    assert b_idx < 0
+    """Trade timestamp before eval_start falls outside positive block range and is excluded from active blocks."""
+    t_pre = _build_synthetic_trade(0)
+    t_pre["entry_at"] = EVAL_START - 60_000
+    res = audit_event_and_block_support([t_pre], EVAL_START, EVAL_END, block_days=14)
+    assert res["n_active_blocks"] == 0
 
 
 def test_timestamp_boundary_post_eval_censor() -> None:
-    """Trade timestamp after eval_end is flagged as out-of-evaluation."""
-    b_idx = int((EVAL_END + 1000 - EVAL_START) // (14 * 86_400_000))
-    n_blocks = math.ceil((EVAL_END - EVAL_START) / (14 * 86_400_000))
-    assert b_idx >= n_blocks
+    """Trade timestamp after eval_end is flagged as out-of-evaluation and excluded from active blocks."""
+    t_post = _build_synthetic_trade(0)
+    t_post["entry_at"] = EVAL_END + 60_000
+    res = audit_event_and_block_support([t_post], EVAL_START, EVAL_END, block_days=14)
+    assert res["n_active_blocks"] == 0
 
 
 def test_timestamp_boundary_minute_alignment() -> None:
@@ -175,9 +178,10 @@ def test_timestamp_boundary_minute_alignment() -> None:
 def test_source_admission_hash_frozen_contract() -> None:
     """FROZEN_CONTRACT.json matches known SHA256."""
     p = REPO_ROOT / "evidence/v0.6/b_line/g2_flow_funding_entries_r1/FROZEN_CONTRACT.json"
-    if p.exists():
-        sha = compute_file_sha256(p)
-        assert len(sha) == 64
+    assert p.is_file(), f"FROZEN_CONTRACT.json missing at {p}"
+    sha = compute_file_sha256(p)
+    assert sha == "99b0319ec6eb8390ff292919f292da614ecdd573008530362d1c27828709d26d"
+
 
 
 def test_source_admission_hash_tamper_detection(tmp_path: Path) -> None:
@@ -398,6 +402,14 @@ def test_bounded_studentizer_exact_match_7d() -> None:
     assert abs(t_val - 1201357.7970858698) < 1e-6
 
 
+def test_bounded_studentizer_exact_match_14d() -> None:
+    """F1 14-day mean of -182.6063851570522 / 76 yields exact t ~ 2,402,715.59."""
+    mean_14d = -182.6063851570522 / 76
+    t_val = compute_degenerate_t_value(mean_14d, floor=1e-6)
+    assert abs(t_val - 2402715.5941717396) < 1e-6
+
+
+
 def test_bounded_studentizer_floor_scaling() -> None:
     """Changing floor from 1e-6 to 1e-3 divides degenerate t by 1000."""
     t1 = compute_degenerate_t_value(2.0, floor=1e-6)
@@ -501,16 +513,43 @@ def test_source_row_reversal_win_rate() -> None:
     assert e1["win_rate_pct"] == e2["win_rate_pct"]
 
 
+def _compute_max_drawdown(cash_curve: list[float]) -> tuple[float, float]:
+    peak = cash_curve[0]
+    max_dd_usdt = 0.0
+    max_dd_pct = 0.0
+    for c in cash_curve:
+        peak = max(peak, c)
+        dd_u = peak - c
+        dd_p = (dd_u / peak * 100.0) if peak > 0 else 0.0
+        max_dd_usdt = max(max_dd_usdt, dd_u)
+        max_dd_pct = max(max_dd_pct, dd_p)
+    return max_dd_usdt, max_dd_pct
+
+
 def test_source_row_reversal_path_dependent_drawdown() -> None:
-    """Max drawdown is path-dependent and differs under time reversal."""
-    trades = [
+    """Max percentage drawdown is path-dependent and differs under time reversal."""
+    trades_forward = [
         _build_synthetic_trade(0, net_usdt=50.0),
         _build_synthetic_trade(1, net_usdt=-40.0),
         _build_synthetic_trade(2, net_usdt=10.0),
     ]
-    # In original order: 1000 -> 1050 -> 1010 -> 1020 (max dd = 40)
-    # In reversed order: 1000 -> 1010 -> 970 -> 1020 (max dd = 40 or different depending on cash base)
-    assert len(trades) == 3
+    # Forward: 1000 -> 1050 -> 1010 -> 1020 (peak=1050, dd=40, dd_pct=40/1050 ~ 3.8095%)
+    curve_fwd = [1000.0]
+    for t in trades_forward:
+        curve_fwd.append(curve_fwd[-1] + float(t["net_after_funding_usdt"]))
+    dd_u_fwd, dd_p_fwd = _compute_max_drawdown(curve_fwd)
+
+    # Reversed: 1000 -> 1010 -> 970 -> 1020 (peak=1010, dd=40, dd_pct=40/1010 ~ 3.9604%)
+    curve_rev = [1000.0]
+    for t in reversed(trades_forward):
+        curve_rev.append(curve_rev[-1] + float(t["net_after_funding_usdt"]))
+    dd_u_rev, dd_p_rev = _compute_max_drawdown(curve_rev)
+
+    assert abs(dd_u_fwd - dd_u_rev) < 1e-6  # USDT drawdown happens to be 40.0 in both
+    assert abs(dd_p_fwd - dd_p_rev) > 0.1   # Percentage drawdown is path-dependent (3.81% vs 3.96%)
+    assert abs(dd_p_fwd - (40.0 / 1050.0 * 100.0)) < 1e-6
+    assert abs(dd_p_rev - (40.0 / 1010.0 * 100.0)) < 1e-6
+
 
 
 def test_source_row_reversal_chronological_sort() -> None:
@@ -553,6 +592,36 @@ def test_normalization_win_rate_percentage() -> None:
     """Win rate scales between 0% and 100%."""
     res = compute_exact_binomial_sign_test(12, 6)
     assert res["win_rate_pct"] == 50.0
+
+
+def test_exact_binomial_sign_test_bounds_and_symmetry() -> None:
+    """Exact binomial sign test satisfies proper boundary coverage and symmetry."""
+    # k=0 out of 12: lower bound must be 0.0
+    r0 = compute_exact_binomial_sign_test(12, 0)
+    assert r0["clopper_pearson_95_ci"][0] == 0.0
+    assert r0["score_95_ci"][0] == 0.0
+    assert r0["k_losses"] == 12
+
+    # k=12 out of 12: upper bound must be 1.0
+    r12 = compute_exact_binomial_sign_test(12, 12)
+    assert r12["clopper_pearson_95_ci"][1] == 1.0
+    assert r12["score_95_ci"][1] == 1.0
+    assert r12["k_losses"] == 0
+
+    # k=6 out of 12: symmetric around 0.5
+    r6 = compute_exact_binomial_sign_test(12, 6)
+    cp_mid = (r6["clopper_pearson_95_ci"][0] + r6["clopper_pearson_95_ci"][1]) / 2.0
+    score_mid = (r6["score_95_ci"][0] + r6["score_95_ci"][1]) / 2.0
+    assert abs(cp_mid - 0.5) < 1e-6
+    assert abs(score_mid - 0.5) < 1e-6
+
+    # n=0 empty edge case consistency
+    r_empty = compute_exact_binomial_sign_test(0, 0)
+    assert r_empty["k_losses"] == 0
+    assert "clopper_pearson_95_ci" in r_empty
+    assert "score_95_ci" in r_empty
+    assert r_empty["statistically_significant_at_05"] is False
+
 
 
 # ==============================================================================

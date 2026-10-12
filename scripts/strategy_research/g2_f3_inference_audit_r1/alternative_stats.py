@@ -52,10 +52,12 @@ def compute_exact_binomial_sign_test(
         return {
             "n": 0,
             "k_wins": 0,
+            "k_losses": 0,
             "win_rate_pct": 0.0,
             "p_value_two_sided": 1.0,
             "clopper_pearson_95_ci": [0.0, 1.0],
-            "statistically_significant": False,
+            "score_95_ci": [0.0, 1.0],
+            "statistically_significant_at_05": False,
         }
 
     # Binomial probabilities
@@ -64,18 +66,44 @@ def compute_exact_binomial_sign_test(
     # Two-sided p-value: sum probabilities <= obs_prob
     p_value = min(1.0, sum(p for p in probs if p <= obs_prob + 1e-12))
 
-    # Clopper-Pearson exact 95% confidence interval for binomial proportion
-    # Using scipy-free Beta quantile approximation or closed-form for small n
+    # Clopper-Pearson exact 95% confidence interval for binomial proportion (alpha = 0.05)
+    alpha = 0.05
+    if k_wins == 0:
+        cp_lower = 0.0
+    else:
+        # Solve P(X >= k | p) = alpha / 2 via bisection
+        low, high = 0.0, 1.0
+        for _ in range(50):
+            mid = (low + high) / 2.0
+            p_tail = sum(math.comb(n, j) * (mid**j) * ((1.0 - mid) ** (n - j)) for j in range(k_wins, n + 1))
+            if p_tail > alpha / 2.0:
+                high = mid
+            else:
+                low = mid
+        cp_lower = (low + high) / 2.0
 
-    # Exact Clopper-Pearson using Beta inverse if available, or closed-form for small n
-    # Approximate Clopper-Pearson using Wilson score interval with continuity correction as accurate fallback
+    if k_wins == n:
+        cp_upper = 1.0
+    else:
+        # Solve P(X <= k | p) = alpha / 2 via bisection
+        low, high = 0.0, 1.0
+        for _ in range(50):
+            mid = (low + high) / 2.0
+            p_tail = sum(math.comb(n, j) * (mid**j) * ((1.0 - mid) ** (n - j)) for j in range(k_wins + 1))
+            if p_tail < alpha / 2.0:
+                high = mid
+            else:
+                low = mid
+        cp_upper = (low + high) / 2.0
+
+    # Standard Wilson score interval (symmetric, properly bounded in [0, 1])
     z = 1.959963984540054
     z2 = z * z
-    denom = 2 * (n + z2)
-    center = (2 * k_wins + z2) / denom
-    half = (z * math.sqrt(z2 - 1.0 / n + 4 * k_wins * (1.0 - k_wins / n) + (4 * k_wins - 2 * n) / n) + 1) / denom if n > 1 else 0.5
-    ci_lower = max(0.0, center - half)
-    ci_upper = min(1.0, center + half)
+    denom = n + z2
+    center = (k_wins + z2 / 2.0) / denom
+    half = (z * math.sqrt(k_wins * (1.0 - k_wins / n) + z2 / 4.0)) / denom
+    score_lower = max(0.0, center - half)
+    score_upper = min(1.0, center + half)
 
     win_rate = (k_wins / n) * 100.0
 
@@ -85,7 +113,8 @@ def compute_exact_binomial_sign_test(
         "k_losses": n - k_wins,
         "win_rate_pct": win_rate,
         "p_value_two_sided": float(p_value),
-        "score_95_ci": [float(ci_lower), float(ci_upper)],
+        "clopper_pearson_95_ci": [float(cp_lower), float(cp_upper)],
+        "score_95_ci": [float(score_lower), float(score_upper)],
         "statistically_significant_at_05": p_value < 0.05,
     }
 

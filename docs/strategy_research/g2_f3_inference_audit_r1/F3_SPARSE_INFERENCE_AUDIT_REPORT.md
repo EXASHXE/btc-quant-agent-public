@@ -150,8 +150,8 @@ Under the pre-registered audit rule ($n < 30$), the auditor formally issues a **
 
 ### 6.2 Exact Binomial Sign Test
 Evaluating directional entry predictive ability against null hypothesis $H_0: p = 0.5$:
-- **12H**: 6 wins / 6 losses (50.0% win rate). Two-sided exact binomial $p = 1.0000$.
-- **18H**: 7 wins / 5 losses (58.3% win rate). Two-sided exact binomial $p = 0.7744$.
+- **12H**: 6 wins / 6 losses (50.0% win rate). Two-sided exact binomial $p = 1.0000$. Clopper-Pearson exact 95% CI: $[21.1\%, 78.9\%]$ (Wilson score $[25.4\%, 74.6\%]$).
+- **18H**: 7 wins / 5 losses (58.3% win rate). Two-sided exact binomial $p = 0.7744$. Clopper-Pearson exact 95% CI: $[27.7\%, 84.8\%]$ (Wilson score $[32.0\%, 80.7\%]$).
 - Directional predictive win rate is statistically indistinguishable from a fair coin toss.
 
 ### 6.3 Adverse-Event Sensitivity Analysis
@@ -183,6 +183,6 @@ For any future research trial seeking to test fair-value basis dislocation or re
 
 - **Stage 1 Freeze Commit**: `6d20579486cc62daf5420e61ced2f8dc4732a414` (Pushed and verified via `git ls-remote`).
 - **Parent Commit**: `f25954b45577cebb7624fae86cd91df9071a87ab`.
-- **Unit Test Coverage**: 56 deterministic synthetic forensic tests passed locally in 0.20s (`tests/test_v06_g2_f3_inference_audit_r1_forensics.py`).
-- **Original Test Regression**: 50 original tests passed in 0.50s (`tests/test_v06_g2_flow_funding_entries_r1_*.py`). Total active suite: 106 tests, 100% passing.
+- **Unit Test Coverage**: 58 deterministic synthetic forensic tests passed locally in 0.28s (`tests/test_v06_g2_f3_inference_audit_r1_forensics.py`).
+- **Original Test Regression**: 50 original tests passed in 0.50s (`tests/test_v06_g2_flow_funding_entries_r1_*.py`). Total active suite: 108 tests, 100% passing.
 - **CI Disclosure**: In accordance with task protocol, the initial freeze push CI status may be superseded or cancelled by this final evidence commit push. Local test execution is 100% verified.

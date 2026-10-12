@@ -173,3 +173,10 @@ def run_full_forensic_audit(
             json.dump(audit_report, f, indent=2)
 
     return audit_report
+
+
+if __name__ == "__main__":
+    target_out = Path("evidence/v0.6/b_line/g2_f3_inference_audit_r1")
+    res = run_full_forensic_audit(output_dir=target_out)
+    print(f"Audit completed: verdict={res['terminal_verdict']}, output={target_out / 'F3_SPARSE_INFERENCE_AUDIT_EVIDENCE.json'}")
+
