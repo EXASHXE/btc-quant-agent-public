@@ -1,0 +1,87 @@
+{
+  "receipt_version": "test-and-ci-exact-sha-receipt-v1",
+  "task_id": "V06_GEMINI_GOAL_ABC_R2_CLASH_ROUTED_PUBLIC_SOURCE_PIT_BRIDGE",
+  "timestamp_utc": "2026-10-12T11:53:15Z",
+  "environment": {
+    "os": "Linux 6.6.87.2-microsoft-standard-WSL2",
+    "python": "3.12.3",
+    "pytest": "9.0.3",
+    "websockets": "16.0",
+    "python_socks": "3.1.1"
+  },
+  "branch_shas": {
+    "bridge_r2": {
+      "branch": "feature/v06-bline-gemini-abc-clash-routed-feed-bridge-r2",
+      "commit_sha": "2d8cd7cbe116e155ad16b2f3b438362bd69e5b15",
+      "worktree_path": "/root/workspace/project/quant-v0.6/gemini-abc-clash-bridge-r2"
+    },
+    "branch_b_forward_shadow": {
+      "branch": "feature/v06-bline-gemini-forward-shadow-research-r1",
+      "commit_sha": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "worktree_path": "/root/workspace/project/quant-v0.6/gemini-forward-shadow-research-r1"
+    },
+    "branch_c_offline_ports": {
+      "branch": "feature/v06-bline-gemini-g1g3-offline-ports-r1",
+      "commit_sha": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+      "worktree_path": "/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1"
+    }
+  },
+  "test_suites": {
+    "r2_new_independent_unit_tests": {
+      "total": 145,
+      "passed": 145,
+      "failed": 0,
+      "categories": {
+        "cat1_binance_2026_routes": {
+          "file": "tests/test_v06_market_event_bridge_r2_binance_2026_routes.py",
+          "count": 20,
+          "status": "PASSED"
+        },
+        "cat2_clash_proxy_network": {
+          "file": "tests/test_v06_market_event_bridge_r2_clash_proxy_network.py",
+          "count": 25,
+          "status": "PASSED"
+        },
+        "cat3_pit_clock_mark_last": {
+          "file": "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py",
+          "count": 25,
+          "status": "PASSED"
+        },
+        "cat4_depth_ladder_l2": {
+          "file": "tests/test_v06_market_event_bridge_r2_depth_ladder_l2.py",
+          "count": 25,
+          "status": "PASSED"
+        },
+        "cat5_settled_funding_ledger": {
+          "file": "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+          "count": 20,
+          "status": "PASSED"
+        },
+        "cat6_c_composite_g1": {
+          "file": "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+          "count": 15,
+          "status": "PASSED"
+        },
+        "cat7_stress_and_security": {
+          "file": "tests/test_v06_market_event_bridge_r2_stress_and_security.py",
+          "count": 15,
+          "status": "PASSED"
+        }
+      }
+    },
+    "forward_public_feed_tests": {
+      "total": 148,
+      "passed": 148,
+      "failed": 0,
+      "pattern": "tests/test_v06_forward_public_feed_r1_*.py",
+      "status": "PASSED"
+    }
+  },
+  "overall_summary": {
+    "total_tests_run": 293,
+    "total_passed": 293,
+    "total_failed": 0,
+    "total_skipped": 0,
+    "exit_code": 0
+  }
+}

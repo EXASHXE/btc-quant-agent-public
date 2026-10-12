@@ -137,7 +137,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -167,7 +167,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -197,7 +197,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -227,7 +227,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -257,7 +257,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -287,7 +287,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -317,7 +317,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -347,7 +347,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -377,7 +377,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -407,7 +407,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -437,7 +437,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -467,7 +467,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -497,7 +497,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -527,7 +527,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -557,7 +557,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -587,7 +587,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -617,7 +617,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -647,7 +647,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
@@ -677,7 +677,7 @@
           "asks": [],
           "observed_depth_levels": 0,
           "stale_age_ms": 0,
-          "quality": "DEGRADED",
+          "quality": "INVALID",
           "reason_codes": [
             "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
             "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"

@@ -1,0 +1,182 @@
+{
+  "manifest_version": "final-delivery-manifest-v1",
+  "goal_id": "V06_GEMINI_GOAL_ABC_R2_CLASH_ROUTED_PUBLIC_SOURCE_PIT_BRIDGE",
+  "timestamp_utc": "2026-10-12T11:53:45Z",
+  "author": "Antigravity Agent (Gemini abc-clash-bridge-r2)",
+  "terminal_status": "SUCCESS_ABC_R2_CLASH_ROUTED_BRIDGE_DELIVERED",
+  "target_branch": "feature/v06-bline-gemini-abc-clash-routed-feed-bridge-r2",
+  "summary": {
+    "binance_2026_migration": "COMPLETED (diff depth on /public/stream, market data on /market/stream, unrouted /stream fail-closed)",
+    "wsl2_clash_proxy_routing": "COMPLETED (explicit unified REST/WS proxy routing, 4-layer diagnostic, desensitization, auto-gateway)",
+    "cross_branch_adjudication": "COMPLETED (4 incompatibilities resolved with zero cash drift and monotonic PIT causality)",
+    "unit_test_count": 145,
+    "forward_feed_test_count": 148,
+    "total_tests_verified": 293,
+    "test_suite_status": "ALL_PASSED_100_PERCENT",
+    "git_commit_count": 5
+  },
+  "delivered_components": {
+    "core_proxy_and_connector": [
+      {
+        "path": "scripts/market_data/forward_public_feed_r1/proxy_route.py",
+        "sha256": "eeea0e1306dccd3b29b5ab1e2ca721b6be0ebad5f519038be444a67d0902bbfa",
+        "size_bytes": 17803
+      },
+      {
+        "path": "scripts/market_data/forward_public_feed_r1/connector.py",
+        "sha256": "584978dea98417c6fdafc166aa8ca60862b530743ae0e2f5e658d8060540cc5b",
+        "size_bytes": 18599
+      },
+      {
+        "path": "scripts/market_data/forward_public_feed_r1/cli.py",
+        "sha256": "9c51a85c90705b30d729fb9905377ebfc8ac72c77f33ca74c6778abc3f49202e",
+        "size_bytes": 12703
+      }
+    ],
+    "bridge_engine_and_adapters": [
+      {
+        "path": "scripts/integration/market_event_bridge_r2/__init__.py",
+        "sha256": "71bfac7f9e325ca65684f984f39523977eaa6bbe91d61e280d91e807869855c1",
+        "size_bytes": 283
+      },
+      {
+        "path": "scripts/integration/market_event_bridge_r2/__main__.py",
+        "sha256": "9c90f7fc3dbaace68477956158a4967d69bd04705562cf61f61353d667dda42f",
+        "size_bytes": 188
+      },
+      {
+        "path": "scripts/integration/market_event_bridge_r2/mark_aggregator.py",
+        "sha256": "3ffc42ce632ee991880966108e0b22d5bdba348011b1fdb623aff62c0ec1fc2e",
+        "size_bytes": 7474
+      },
+      {
+        "path": "scripts/integration/market_event_bridge_r2/book_ladder.py",
+        "sha256": "f0fc17ba28fbb92a18233775d80a70692983f61d3a7f5e593c32a15a8ae6fc71",
+        "size_bytes": 6986
+      },
+      {
+        "path": "scripts/integration/market_event_bridge_r2/funding_adapter.py",
+        "sha256": "feafa6c1c044025483fc251327107132d9c4a300ebd58ec3595e5d42ef40cd64",
+        "size_bytes": 6349
+      },
+      {
+        "path": "scripts/integration/market_event_bridge_r2/c_composite_bar.py",
+        "sha256": "49b21e5cbb02863c743d169fc05400c6bf5ee1eac4b8aa017281d3a9cd63a63c",
+        "size_bytes": 3711
+      },
+      {
+        "path": "scripts/integration/market_event_bridge_r2/fixtures.py",
+        "sha256": "d0acd0262e4e1acfce70289acacb02b262d17a24350214d73aa6912f60238f89",
+        "size_bytes": 7443
+      },
+      {
+        "path": "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+        "sha256": "4211de633e9eeaaf78ee3b2bd9529f76b9585a6518f908796647d84a8b01954f",
+        "size_bytes": 16442
+      },
+      {
+        "path": "scripts/integration/market_event_bridge_r2/cli.py",
+        "sha256": "5ce54996004bf252ef2bd28b064ae8094c876881ffcb0fadcd697510c07aca11",
+        "size_bytes": 10621
+      }
+    ],
+    "unit_test_suite": [
+      {
+        "path": "tests/test_v06_market_event_bridge_r2_binance_2026_routes.py",
+        "sha256": "97ac7d03ee5020d713441bef45753b3e2db55b6ac198d249fc579116f8dd976b",
+        "size_bytes": 6554,
+        "test_count": 20
+      },
+      {
+        "path": "tests/test_v06_market_event_bridge_r2_clash_proxy_network.py",
+        "sha256": "37b6668af14b151e2a29c4e0c7dfa4b350aa86688d7f0212eb48b17e0fc69cea",
+        "size_bytes": 10874,
+        "test_count": 25
+      },
+      {
+        "path": "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py",
+        "sha256": "82f27bcd9cbde046cdb5877f00c62aa9cda18dfdd4c31f242429085d1877e80d",
+        "size_bytes": 13661,
+        "test_count": 25
+      },
+      {
+        "path": "tests/test_v06_market_event_bridge_r2_depth_ladder_l2.py",
+        "sha256": "2b72c29d0eaae43ef1303047aaf8c6a13fc4ac1c51fa96e5e14c2160f9930c64",
+        "size_bytes": 14258,
+        "test_count": 25
+      },
+      {
+        "path": "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+        "sha256": "4f43c494da2616e120fa15aab19e17a55ac2946b9228d24ffe92ee1d39f182c7",
+        "size_bytes": 16773,
+        "test_count": 20
+      },
+      {
+        "path": "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+        "sha256": "d13260099ee8ae5129c5df6be3792df52017c98e11574c3f6c3ba68bfae91d67",
+        "size_bytes": 15702,
+        "test_count": 15
+      },
+      {
+        "path": "tests/test_v06_market_event_bridge_r2_stress_and_security.py",
+        "sha256": "71de5504744827a1952b0c60a43a589650a7d503f2d5edec701efbb92ae9f81e",
+        "size_bytes": 11081,
+        "test_count": 15
+      }
+    ],
+    "documentation": [
+      {
+        "path": "docs/integration/market_event_bridge_r2/BINANCE_2026_WEBSOCKET_MIGRATION.md",
+        "sha256": "9129444536fb0a6cb78977571a297a3b9cd4e785c7f97a5e2deef316f7a36cf7",
+        "size_bytes": 5169
+      },
+      {
+        "path": "docs/integration/market_event_bridge_r2/ARCHITECTURE_AND_CAUSAL_CONTRACT.md",
+        "sha256": "42f2c6170ba08e44a5779d2ad68b59128ac68a875316081266afa6eda47393df",
+        "size_bytes": 6869
+      },
+      {
+        "path": "docs/integration/market_event_bridge_r2/WINDOWS_WSL2_CLASH_CONNECTIVITY_RUNBOOK.md",
+        "sha256": "cbbea9a9a5a8dc78352f52045562ffe49023cf8071b041c83e1a811c7932f0ab",
+        "size_bytes": 9797
+      },
+      {
+        "path": "docs/integration/market_event_bridge_r2/CROSS_BRANCH_CONTRACT_ADJUDICATION_REPORT.md",
+        "sha256": "869c5cb38eb158a1c7894eb14c3b67aa6783253fd50ef8f1ac9fa46d44ce2d6e",
+        "size_bytes": 7106
+      }
+    ],
+    "evidence": [
+      {
+        "path": "evidence/v0.6/b_line/market_event_bridge_r2/INCOMPATIBILITY_BEFORE.json",
+        "sha256": "095d1c5318664316137f9dcce81f40765e8ee6aa9ffd49bcc4fbcc2235b99ea0",
+        "size_bytes": 6319
+      },
+      {
+        "path": "evidence/v0.6/b_line/market_event_bridge_r2/BRIDGE_AFTER_SYNTHETIC_WITNESSES.json",
+        "sha256": "85c48a432616ff7cd82eb307c673ca96565a581f09add82cf3bb90156c68540c",
+        "size_bytes": 20415
+      },
+      {
+        "path": "evidence/v0.6/b_line/market_event_bridge_r2/PIT_CLOCK_AND_SOURCE_HASH_AUDIT.json",
+        "sha256": "e2cc2ee0cb41f271bea369cf5dd6fab7d35ba1863386b9107f310c088e1baa82",
+        "size_bytes": 6384
+      },
+      {
+        "path": "evidence/v0.6/b_line/market_event_bridge_r2/SETTLED_FUNDING_DECIMAL_LEDGER.json",
+        "sha256": "71ccc3fbdd8d1697f96c8010f88cfb6043a61c3b7a026c603dba50048c5e41d7",
+        "size_bytes": 770
+      },
+      {
+        "path": "evidence/v0.6/b_line/market_event_bridge_r2/NETWORK_ROUTE_DIAGNOSTIC.json",
+        "sha256": "f9bad490370c1bb6ca0661e71b7011ae5464f8f7ff8d2ba638d89353f93dd6e6",
+        "size_bytes": 1147
+      },
+      {
+        "path": "evidence/v0.6/b_line/market_event_bridge_r2/TEST_AND_CI_EXACT_SHA_RECEIPT.json",
+        "sha256": "30f9939763aa168957b56b55a285f0e777daa83b34b6cdb9ea6c42381e83b138",
+        "size_bytes": 2924
+      }
+    ]
+  }
+}
