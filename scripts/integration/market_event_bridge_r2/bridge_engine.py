@@ -161,12 +161,16 @@ class MarketEventBridgeR2:
         # 3. Mark Price Tick
         elif event_type == "markPriceUpdate":
             self.stats.mark_ticks_ingested += 1
-            mark_p = frame.get("p", "0.0")
+            mark_p = frame.get("p")
+            if mark_p is None:
+                return result
             try:
                 self.last_mark_tick_price = float(mark_p)
             except (ValueError, TypeError):
                 pass
             prov_e = frame.get("E", observed_wall_utc_ms)
+            quality = str(frame.get("quality", "VERIFIED"))
+            reasons = tuple(frame.get("reason_codes", ["OK"]))
             try:
                 dec_p = Decimal(str(mark_p))
                 if dec_p > Decimal(0):
@@ -178,8 +182,8 @@ class MarketEventBridgeR2:
                         source_sha=payload_sha,
                         route_epoch=self.route_epoch,
                         connection_epoch=self.connection_epoch,
-                        quality="VERIFIED",
-                        reason_codes=("OK",),
+                        quality=quality,
+                        reason_codes=reasons,
                     )
             except (ValueError, TypeError, decimal.InvalidOperation):
                 self.last_mark_witness = None
@@ -317,8 +321,8 @@ class MarketEventBridgeR2:
                             source_sha="derived_mark_bar_witness",
                             route_epoch=self.route_epoch,
                             connection_epoch=self.connection_epoch,
-                            quality="VERIFIED",
-                            reason_codes=("OK",),
+                            quality=self.last_derived_mark_bar.quality,
+                            reason_codes=tuple(self.last_derived_mark_bar.reason_codes),
                         )
                 except (ValueError, TypeError, decimal.InvalidOperation):
                     witness = None

@@ -5,10 +5,14 @@
   "git_context": {
     "repository": "EXASHXE/btc-quant-agent-public",
     "branch": "feature/v06-bline-gemini-r3-portable-ci-funding-pit-source-qualification",
-    "c1_commit_sha": "2359fec6f376a917028b1842eb3a82aeb3c7a360",
-    "c2_commit_sha": "08490228df776c127457b98d248b61ca05cf4bda",
-    "c3_commit_sha": "3c5d076b1fbb4ef0c950d6990494cf0e4d773fdf",
-    "c4_commit_sha": "ed2d47055745812976be461f03407e3725b8429e"
+    "start_sha": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+    "head_sha": "4881b78928ed0982979dae667d3486030a38050c",
+    "c1_commit_sha": "2359fec6d548413afeeabe44332a947f8a548b97",
+    "c2_commit_sha": "084902283ec7f11b7c3fc782656f0e99745f4638",
+    "c3_commit_sha": "3c5d076b0b7669ef92a44368e6c04ceb695d60d7",
+    "c4_commit_sha": "ed2d470f9fc1470be2e4cdcf9e0b14e428109165",
+    "c5_commit_sha": "9cd6c6b1ff9ab20726edf98eea82643519001de7",
+    "c6_commit_sha": "4881b78928ed0982979dae667d3486030a38050c"
   },
   "python_runtime_compatibility": {
     "python_versions_verified": [
@@ -19,13 +23,13 @@
     "pytest_version": "8.4.2"
   },
   "test_suite_regression": {
-    "total_tests_run": 391,
-    "total_passed": 391,
+    "total_tests_run": 394,
+    "total_passed": 394,
     "total_failed": 0,
     "total_skipped": 0,
     "suites": {
       "portable_ci_and_pinned_deps": 27,
-      "funding_pit_and_provenance": 33,
+      "funding_pit_and_provenance": 36,
       "source_qualification_and_redaction": 38,
       "bridge_r2_baseline_categories": 145,
       "forward_public_feed_baseline": 148

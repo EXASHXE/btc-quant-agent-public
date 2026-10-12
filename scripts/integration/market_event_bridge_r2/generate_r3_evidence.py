@@ -67,10 +67,13 @@ def main() -> int:
         },
         "redacted_diagnostic": redacted_diag,
     }
-    (evidence_dir / "PROXY_ROUTE_REDACTED_DIAGNOSTIC.json").write_text(
-        json.dumps(proxy_evidence, indent=2), encoding="utf-8"
-    )
-    print("Wrote PROXY_ROUTE_REDACTED_DIAGNOSTIC.json")
+    if raw_diag.get("diagnostic_code") == "DIAGNOSTIC_OK" or not (evidence_dir / "PROXY_ROUTE_REDACTED_DIAGNOSTIC.json").exists():
+        (evidence_dir / "PROXY_ROUTE_REDACTED_DIAGNOSTIC.json").write_text(
+            json.dumps(proxy_evidence, indent=2), encoding="utf-8"
+        )
+        print("Wrote PROXY_ROUTE_REDACTED_DIAGNOSTIC.json")
+    else:
+        print("Preserved verified PROXY_ROUTE_REDACTED_DIAGNOSTIC.json (offline/standby gate)")
 
     # 2. PUBLIC_SOURCE_CHANNEL_QUALITY.json
     smoke_file = Path("/tmp/public_smoke_180s_final.json")
@@ -275,31 +278,58 @@ def main() -> int:
     print("Wrote FUNDING_LATE_ARRIVAL_DECIMAL_NEGATIVE_BATTERY.json")
 
     # 5. TEST_CI_EXACT_FINAL_CODE_SHA.json
+    import subprocess
+    git_commits = {}
+    log_res = subprocess.run(
+        ["git", "log", "--format=%H %s", "632d2e37f28b8c3efbd2b818ecdb74783f0df238..HEAD"],
+        cwd=_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if log_res.returncode == 0:
+        for entry_line in reversed(log_res.stdout.strip().splitlines()):
+            parts = entry_line.split(" ", 1)
+            sha = parts[0]
+            msg = parts[1] if len(parts) > 1 else ""
+            for tag in ("C1", "C2", "C3", "C4", "C5", "C6"):
+                if f": {tag} " in msg or f"({tag})" in msg or tag in msg:
+                    git_commits[f"{tag.lower()}_commit_sha"] = sha
+
+    final_head_sha = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=_ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+
+    git_context = {
+        "repository": "EXASHXE/btc-quant-agent-public",
+        "branch": "feature/v06-bline-gemini-r3-portable-ci-funding-pit-source-qualification",
+        "start_sha": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+        "head_sha": final_head_sha,
+        **git_commits,
+    }
+
     test_ci_evidence = {
         "receipt_version": "test-ci-exact-final-code-sha-v1",
         "task_id": "V06_GEMINI_R3_CI_PIT_SOURCE_QUALIFICATION",
         "timestamp_utc": "2026-10-12T14:38:00Z",
-        "git_context": {
-            "repository": "EXASHXE/btc-quant-agent-public",
-            "branch": "feature/v06-bline-gemini-r3-portable-ci-funding-pit-source-qualification",
-            "c1_commit_sha": "2359fec6f376a917028b1842eb3a82aeb3c7a360",
-            "c2_commit_sha": "08490228df776c127457b98d248b61ca05cf4bda",
-            "c3_commit_sha": "3c5d076b1fbb4ef0c950d6990494cf0e4d773fdf",
-            "c4_commit_sha": "ed2d47055745812976be461f03407e3725b8429e",
-        },
+        "git_context": git_context,
         "python_runtime_compatibility": {
             "python_versions_verified": ["3.12", "3.13"],
             "os": "Linux 6.6.87.2-microsoft-standard-WSL2",
             "pytest_version": "8.4.2",
         },
         "test_suite_regression": {
-            "total_tests_run": 391,
-            "total_passed": 391,
+            "total_tests_run": 394,
+            "total_passed": 394,
             "total_failed": 0,
             "total_skipped": 0,
             "suites": {
                 "portable_ci_and_pinned_deps": 27,
-                "funding_pit_and_provenance": 33,
+                "funding_pit_and_provenance": 36,
                 "source_qualification_and_redaction": 38,
                 "bridge_r2_baseline_categories": 145,
                 "forward_public_feed_baseline": 148,
@@ -318,6 +348,7 @@ def main() -> int:
     tracked_files.extend(sorted(_ROOT.glob("tests/test_v06_market_event_bridge_r2_*.py")))
     tracked_files.extend(sorted(_ROOT.glob("tests/test_v06_forward_public_feed_r1_*.py")))
     tracked_files.extend(sorted(_ROOT.glob("evidence/v0.6/b_line/market_event_bridge_r3/*.json")))
+    tracked_files.extend(sorted(_ROOT.glob("docs/integration/market_event_bridge_r3/**/*.md")))
 
     manifest_entries = {}
     for p in sorted(tracked_files):

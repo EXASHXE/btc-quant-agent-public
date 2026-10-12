@@ -591,3 +591,62 @@ def test_settled_funding_entry_canonical_sha_idempotence() -> None:
     d2 = entry.to_dict()
     assert d1["canonical_sha256"] == d2["canonical_sha256"]
     assert len(d1["canonical_sha256"]) == 64
+
+
+def test_future_mark_price_witness_rejected_fail_closed() -> None:
+    w_future = _make_sample_witness(wall_ms=1728720005000)
+    valid, why = w_future.is_valid_for_settlement(reference_time_ms=1728720001000)
+    assert valid is False
+    assert why == "MARK_FUTURE_AVAILABLE"
+
+
+def test_missing_json_fields_fail_closed_never_default_to_zero() -> None:
+    ledger = SettledFundingLedger("BTCUSDT")
+    witness = _make_sample_witness(wall_ms=1728720000000)
+
+    assert ledger.ingest_settled_funding({}, witness, 1728720000100) is None
+    assert ledger.ingest_settled_funding({"fundingTime": 1728720000000}, witness, 1728720000100) is None
+    assert ledger.ingest_settled_funding({"fundingRate": "0.0001"}, witness, 1728720000100) is None
+    assert ledger.ingest_settled_funding({"fundingTime": None, "fundingRate": "0.0001"}, witness, 1728720000100) is None
+    assert ledger.ingest_settled_funding({"fundingTime": 1728720000000, "fundingRate": None}, witness, 1728720000100) is None
+    assert ledger.ingest_settled_funding({"fundingTime": 0, "fundingRate": "0.0001"}, witness, 1728720000100) is None
+    assert ledger.ingest_settled_funding({"fundingTime": 1728720000000, "fundingRate": ""}, witness, 1728720000100) is None
+
+    assert ledger.rejected_count == 7
+
+
+def test_degraded_derived_mark_bar_fallback_fails_closed() -> None:
+    bridge = MarketEventBridgeR2(symbol="BTCUSDT")
+    from scripts.integration.market_event_bridge_r2.mark_aggregator import DerivedMark1MBar
+    degraded_bar = DerivedMark1MBar(
+        symbol="BTCUSDT",
+        bar_open_ms=1728720000000,
+        bar_close_ms=1728720060000,
+        closed=True,
+        open=64000.0,
+        high=64050.0,
+        low=63950.0,
+        close=64010.0,
+        sample_count=5,
+        derived_available_at_ms=1728720060000,
+        feature_known_at_ms=1728720060000,
+        quality="DEGRADED",
+        reason_codes=("SOURCE_DROPPED",),
+        parent_event_sha256=(),
+        raw_source_manifest_sha256="msha",
+    )
+    bridge.last_derived_mark_bar = degraded_bar
+
+    funding_frame = {
+        "symbol": "BTCUSDT",
+        "fundingRate": "0.00010000",
+        "fundingTime": 1728720000000,
+    }
+    res = bridge.ingest_frame(
+        funding_frame,
+        observed_wall_utc_ms=1728720060100,
+        observed_monotonic_ns=1000,
+    )
+    assert "settled_funding" not in res
+    assert bridge.stats.settled_fundings_adapted == 0
+

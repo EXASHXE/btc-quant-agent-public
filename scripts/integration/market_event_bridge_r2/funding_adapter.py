@@ -43,6 +43,8 @@ class MarkPriceWitness:
     ) -> tuple[bool, str]:
         if self.price <= Decimal(0):
             return False, "MARK_PRICE_NON_POSITIVE"
+        if reference_time_ms < self.available_at_ms or reference_time_ms < self.observed_wall_utc_ms:
+            return False, "MARK_FUTURE_AVAILABLE"
         if self.quality != "VERIFIED":
             return False, f"MARK_QUALITY_NOT_VERIFIED_{self.quality}"
         if "CLOCK_UNCERTAIN" in self.reason_codes:
@@ -194,11 +196,25 @@ class SettledFundingLedger:
 
         raw_record: {'symbol': 'BTCUSDT', 'fundingRate': '0.00010000', 'fundingTime': 1728720000000}
         """
-        funding_time = int(raw_record.get("fundingTime", 0))
-        rate_str = str(raw_record.get("fundingRate", "0.0"))
+        if "fundingTime" not in raw_record or "fundingRate" not in raw_record:
+            self.rejected_count += 1
+            return None
+        raw_ft = raw_record["fundingTime"]
+        raw_fr = raw_record["fundingRate"]
+        if raw_ft is None or raw_fr is None:
+            self.rejected_count += 1
+            return None
         try:
+            funding_time = int(raw_ft)
+            if funding_time <= 0:
+                self.rejected_count += 1
+                return None
+            rate_str = str(raw_fr).strip()
+            if not rate_str:
+                self.rejected_count += 1
+                return None
             funding_rate = Decimal(rate_str)
-        except (ValueError, decimal.InvalidOperation):
+        except (ValueError, TypeError, decimal.InvalidOperation):
             self.rejected_count += 1
             return None
 

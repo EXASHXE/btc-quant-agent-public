@@ -2,22 +2,38 @@
   "manifest_version": "final-source-manifest-v1",
   "task_id": "V06_GEMINI_R3_CI_PIT_SOURCE_QUALIFICATION",
   "timestamp_utc": "2026-10-12T14:38:30Z",
-  "total_files": 51,
+  "total_files": 55,
   "files": {
+    "docs/integration/market_event_bridge_r3/CI_PINNED_SHA_PORTABILITY_REPAIR.md": {
+      "sha256": "6c0f9ed03a0fc7e5e066e238d57c7fdc9cb08866eba8441bb69914b6e4c4a773",
+      "size_bytes": 5488
+    },
+    "docs/integration/market_event_bridge_r3/FINAL_L2_REQUEST_REPORT.md": {
+      "sha256": "e455ae07b87d95f5298dc184dabdfc2b42471f10e93342658ee65beebd119616",
+      "size_bytes": 5117
+    },
+    "docs/integration/market_event_bridge_r3/FUNDING_ASOF_AND_MARK_PROVENANCE_REPAIR.md": {
+      "sha256": "56c90086878f6d356321d649b948a3c84f7ba3d40419b12df8d444e9bccb8007",
+      "size_bytes": 4906
+    },
+    "docs/integration/market_event_bridge_r3/PUBLIC_SOURCE_QUALIFICATION_CRITERIA.md": {
+      "sha256": "20d2f1c10c2f9fdb88b3dcc3df555dd2459e6e7163296752bc6537bc5b40ac82",
+      "size_bytes": 5000
+    },
     "evidence/v0.6/b_line/market_event_bridge_r3/EXACT_DEPENDENCY_SHA_AND_CONSUMER_WITNESSES.json": {
       "sha256": "8d92c42a45befb8e04e34b24d34d68639a70ac665bc0f02a802ab5daf44f9e15",
       "size_bytes": 2156
     },
     "evidence/v0.6/b_line/market_event_bridge_r3/FINAL_SOURCE_MANIFEST.json": {
-      "sha256": "7992e96e7137c5621f1bb97b89a4601cba2fa49722da32e2b1b96b58ee8f677d",
-      "size_bytes": 9447
+      "sha256": "49b82c19c6507d2a783ab695a4a8159f17f6580c85762b1e1e4210c303144022",
+      "size_bytes": 10450
     },
     "evidence/v0.6/b_line/market_event_bridge_r3/FUNDING_LATE_ARRIVAL_DECIMAL_NEGATIVE_BATTERY.json": {
       "sha256": "17cccf8684ccf29d5ed291da62017da1d614fd17364e8c95f14f4cd7b8668b27",
       "size_bytes": 1429
     },
     "evidence/v0.6/b_line/market_event_bridge_r3/PROXY_ROUTE_REDACTED_DIAGNOSTIC.json": {
-      "sha256": "4f5f361ca13b6e7506b9894320ab8330ee1b7ca3fba89642c75fe78e009e14f5",
+      "sha256": "79ce7e397026a812fe62fb50a04fcda00848fbdaf099785b45c0050debdd3523",
       "size_bytes": 1075
     },
     "evidence/v0.6/b_line/market_event_bridge_r3/PUBLIC_SOURCE_CHANNEL_QUALITY.json": {
@@ -29,8 +45,8 @@
       "size_bytes": 4905
     },
     "evidence/v0.6/b_line/market_event_bridge_r3/TEST_CI_EXACT_FINAL_CODE_SHA.json": {
-      "sha256": "8a0080418d0144a8125ea87b1271b487ef2b0abcf93c095519d971f375f9724b",
-      "size_bytes": 1146
+      "sha256": "76716c1248f4f2d2fe11a50763f793fc6b70cd757033a23efdd16723a3ae96b7",
+      "size_bytes": 1397
     },
     "scripts/integration/market_event_bridge_r2/__init__.py": {
       "sha256": "71bfac7f9e325ca65684f984f39523977eaa6bbe91d61e280d91e807869855c1",
@@ -45,8 +61,8 @@
       "size_bytes": 8457
     },
     "scripts/integration/market_event_bridge_r2/bridge_engine.py": {
-      "sha256": "8a8419d9f179feaa624a1b0f43f593dd246adb2fd06657671ded6e26ded19fb9",
-      "size_bytes": 19028
+      "sha256": "3670068451fd87fe4fd25f51620a5f98bfd749c8408830ed17a06205e1dc56b6",
+      "size_bytes": 19265
     },
     "scripts/integration/market_event_bridge_r2/c_composite_bar.py": {
       "sha256": "49b21e5cbb02863c743d169fc05400c6bf5ee1eac4b8aa017281d3a9cd63a63c",
@@ -61,12 +77,12 @@
       "size_bytes": 7629
     },
     "scripts/integration/market_event_bridge_r2/funding_adapter.py": {
-      "sha256": "ae6b633f7c0cd8708eae9a1643120ee2834dac1fd18191dbd634a1cfd28c66f3",
-      "size_bytes": 12517
+      "sha256": "12cb0edfe73926f0f27b6f13c1a2d092e0215d3ad4b508ca8d05f0ccad65d631",
+      "size_bytes": 13173
     },
     "scripts/integration/market_event_bridge_r2/generate_r3_evidence.py": {
-      "sha256": "75420848da4dbea54a872c4bc8d9e1263bc9cc2cbee443225c83dcb7a98b772d",
-      "size_bytes": 13807
+      "sha256": "0e8fce3a56f7b7e3c63e36afa5a90d49f8ff1d43b0639f697bf82dca8295c4ff",
+      "size_bytes": 14883
     },
     "scripts/integration/market_event_bridge_r2/mark_aggregator.py": {
       "sha256": "0fb3676e85ffea93b66e3ee38fe50ba041b8538f321a002c3fffd88f4f08092b",
@@ -189,8 +205,8 @@
       "size_bytes": 14176
     },
     "tests/test_v06_market_event_bridge_r2_funding_pit_provenance.py": {
-      "sha256": "52aea299ea6bbc641dbf7ee61cc4d437b3c9831094fd60675e878fb6e5e2c0dc",
-      "size_bytes": 21600
+      "sha256": "8b0bfe6a5e304ca3431673d70d69901dc5a6771f592659d56a2b49c444d68fc1",
+      "size_bytes": 24006
     },
     "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py": {
       "sha256": "979fc83d1e5315f5e8c1c4ce6e773f52dd71c223c82799b9564fcdc7d20fa36f",

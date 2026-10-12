@@ -19,7 +19,7 @@ All work was committed to branch `feature/v06-bline-gemini-r3-portable-ci-fundin
 | **C3** | `3c5d076` | `fix` | Resolve Funding PIT arrival backdating, add MarkPriceWitness, and enforce decimal conservation (33 tests) |
 | **C4** | `ed2d470` | `feat` | Implement multi-channel public source qualification and strict proxy redaction (38 tests) |
 | **C5** | `9cd6c6b` | `test` | Bounded public telemetry (180s live run), redacted diagnostic, and 6 immutable evidence receipts |
-| **C6** | Pending | `docs` | Deliver complete documentation, repair runbooks, criteria, and final adjudication report |
+| **C6** | `4881b78` | `docs` | Deliver complete documentation, repair runbooks, criteria, and final adjudication report |
 
 ---
 
@@ -29,7 +29,7 @@ All work was committed to branch `feature/v06-bline-gemini-r3-portable-ci-fundin
 |---|---|---|---|
 | **V1** | Hardcoded `/root/...` paths caused `PermissionError` [Errno 13] on unprivileged runner | [`PortablePinnedSourceHarness`](file:///root/workspace/project/quant-v0.6/gemini-r3-portable-ci-pit-source/scripts/integration/market_event_bridge_r2/portable_ci_refs.py) extracts exact Git archives to `/tmp/...` scratch with manifest checksums | Verified under `nobody` user; 27 unit tests pass |
 | **V2** | Missing `PYTHONPATH=.` failed pytest collection with `ModuleNotFoundError` | All tests inject `_ROOT_DIR` via `Path(__file__).resolve().parent.parent` | Passes `pytest` invocation directly without env flags |
-| **V3** | C Funding PIT envelope backdated arrival time to `entry.funding_time_ms` | Arrival clock strictly preserved at `observed_wall_utc_ms`; C late arrival contract rejection caught fail-closed as `C_CONSUMER_CONTRACT_BLOCKED` | 33 tests in `test_v06_market_event_bridge_r2_funding_pit_provenance.py` |
+| **V3** | C Funding PIT envelope backdated arrival time to `entry.funding_time_ms` | Arrival clock strictly preserved at `observed_wall_utc_ms`; C late arrival contract rejection caught fail-closed as `C_CONSUMER_CONTRACT_BLOCKED` | 36 tests in `test_v06_market_event_bridge_r2_funding_pit_provenance.py` |
 | **V4** | Raw float mark price accepted without timestamp age or provenance | Required certified [`MarkPriceWitness`](file:///root/workspace/project/quant-v0.6/gemini-r3-portable-ci-pit-source/scripts/integration/market_event_bridge_r2/funding_adapter.py) with freshness $\le 60\text{s}$, quality `VERIFIED`, and matching route epoch | Missing/stale witness fails closed with `None` cash flow |
 | **V5** | Connector smoke false-positive: `events_received > 0` on REST only qualified smoke | Strict multi-channel criteria: duration $\ge 120\text{s}$, mark span $\ge 120\text{s}$, closed klines $\ge 2$, aggTrade $> 0$, raw depth $> 0$, zero WSS errors | 38 tests in `test_v06_forward_public_feed_r1_source_qualification.py` |
 | **V6** | `NETWORK_ROUTE_DIAGNOSTIC.json` leaked host IP, port, gateway `192.168.31.1`, NO_PROXY | [`build_redacted_route_diagnostic`](file:///root/workspace/project/quant-v0.6/gemini-r3-portable-ci-pit-source/scripts/market_data/forward_public_feed_r1/proxy_route.py) outputs only categorical flags, truncated SHA-256 hash, and sanitized layers | [`PROXY_ROUTE_REDACTED_DIAGNOSTIC.json`](file:///root/workspace/project/quant-v0.6/gemini-r3-portable-ci-pit-source/evidence/v0.6/b_line/market_event_bridge_r3/PROXY_ROUTE_REDACTED_DIAGNOSTIC.json) |
@@ -38,10 +38,10 @@ All work was committed to branch `feature/v06-bline-gemini-r3-portable-ci-fundin
 
 ## 4. Verification & Test Suite Summary
 
-Total Test Suite Count: **391 tests passed (100%), 0 failed, 0 skipped**.
+Total Test Suite Count: **394 tests passed (100%), 0 failed, 0 skipped**.
 
 - **Portable CI & Pinned Dependencies**: 27 passed
-- **Funding PIT & Mark Provenance**: 33 passed
+- **Funding PIT & Mark Provenance**: 36 passed
 - **Multi-Channel Source Qualification & Redaction**: 38 passed
 - **Bridge R2 Baseline Regression Suites**: 145 passed
 - **Forward Public Feed Baseline Suites**: 148 passed
