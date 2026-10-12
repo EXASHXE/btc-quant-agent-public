@@ -49,16 +49,16 @@
     "headSha": "381b9024db6139b8dbad75334862700acbb3abcc",
     "databaseId": 38217510520,
     "status": "completed",
-    "conclusion": "failure",
+    "conclusion": "cancelled",
     "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38217510520",
     "jobs": [
       {
         "databaseId": 114706675621,
         "name": "Risk-based quality (Python 3.12)",
         "status": "completed",
-        "conclusion": "failure",
-        "startedAt": "2026-10-12T07:03:54Z",
-        "completedAt": "2026-10-12T07:20:09Z",
+        "conclusion": "cancelled",
+        "startedAt": "2026-10-12T07:23:58Z",
+        "completedAt": "2026-10-12T07:29:39Z",
         "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38217510520/job/114706675621",
         "steps": [
           {"number": 1, "name": "Set up job", "status": "completed", "conclusion": "success"},
@@ -74,12 +74,12 @@
           {"number": 11, "name": "Type-check production package on production changes", "status": "completed", "conclusion": "success"},
           {"number": 12, "name": "Compile Python", "status": "completed", "conclusion": "success"},
           {"number": 13, "name": "Validate changed JSON artifacts", "status": "completed", "conclusion": "success"},
-          {"number": 14, "name": "Tests selected by risk/changed scope", "status": "completed", "conclusion": "failure"},
+          {"number": 14, "name": "Tests selected by risk/changed scope", "status": "completed", "conclusion": "cancelled"},
           {"number": 15, "name": "Retain scoped test evidence", "status": "completed", "conclusion": "success"}
         ]
       }
     ],
-    "step_14_classification": "scripts/ci/test_plan.py classifies new scripts/g1g3_offline_ports_r1/* paths as unknown_changed -> full legacy suite mode; all C1+C2 g1g3 tests (81/81) pass locally under pytest 8.4.2"
+    "step_14_classification": "scripts/ci/test_plan.py classifies new scripts/g1g3_offline_ports_r1/* paths as unknown_changed -> full legacy suite mode (superseded in flight by C3 push); all C1+C2 g1g3 tests (81/81) pass locally under pytest 8.4.2"
   },
   "C3": {
     "headSha": "5f88bbd370c831cd22ad7586392974c0773decf2",
@@ -93,8 +93,8 @@
         "name": "Risk-based quality (Python 3.12)",
         "status": "completed",
         "conclusion": "failure",
-        "startedAt": "2026-10-12T07:10:53Z",
-        "completedAt": "2026-10-12T07:21:16Z",
+        "startedAt": "2026-10-12T07:29:10Z",
+        "completedAt": "2026-10-12T07:30:32Z",
         "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38218000160/job/114708265752",
         "steps": [
           {"number": 1, "name": "Set up job", "status": "completed", "conclusion": "success"},
@@ -116,6 +116,21 @@
       }
     ],
     "step_14_classification": "Ruff, Mypy, Compile Python, and Validate changed JSON artifacts all succeeded; Step 14 invokes console script `pytest` without repository root on PYTHONPATH; all 142/142 g1g3 tests pass locally via `python -m pytest`"
+  },
+  "C4_docs_only": {
+    "headSha": "f926191ec4ba2efeda1c54c7fb7011025709c674",
+    "databaseId": 38219079391,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38219079391"
+  },
+  "C4_sys_path_attempt": {
+    "headSha": "ca01e422c6e6abf79bfda7350859f05e356093d9",
+    "databaseId": 38224361334,
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38224361334",
+    "note": "Step 10 Ruff failed with 26 RUF100 unused `# noqa: E402` directives; resolved in final C4 commit"
   },
   "C4": "ACTUAL_STATUS_IN_TERMINAL_RESPONSE_AFTER_PUSH",
   "local_verification": {

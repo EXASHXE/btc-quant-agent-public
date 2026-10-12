@@ -61,24 +61,24 @@
       "sha256": "80d895fb7ad56594e219b6416f76f52549611bd47ba6485128d1ba4e78a1ffcf"
     },
     "tests/test_v06_g1g3_offline_ports_r1_bounded_llm.py": {
-      "bytes": 7956,
-      "sha256": "dec066cb1821af6bf0df02eb7403495d73fd2ee601713d88b8c00b4ee7fab717"
+      "bytes": 7900,
+      "sha256": "99ffb98b4a647b34fdc386987c4510fb477d2570d65c2009d2a3053be722727f"
     },
     "tests/test_v06_g1g3_offline_ports_r1_core_integration.py": {
-      "bytes": 18373,
-      "sha256": "c73a81954d025c96f1eb6f01e3de8e3c5b551bfca053192d9017f421ba0091ee"
+      "bytes": 18317,
+      "sha256": "d297dcd641682e3e92f7a5db3df76a49b0931b44f2cb90ca1f8cd7dace1befbb"
     },
     "tests/test_v06_g1g3_offline_ports_r1_feishu_outbox.py": {
-      "bytes": 14221,
-      "sha256": "ea128eb4a81c828a2597fe539ac847f753aa6dcbbc6fe1f34faaf52ab733cb82"
+      "bytes": 14123,
+      "sha256": "58cdecb7ace0c15163b9e6f0fca6952b9d565894171946f1f2b3e7af4125e120"
     },
     "tests/test_v06_g1g3_offline_ports_r1_operator_auth.py": {
-      "bytes": 23150,
-      "sha256": "3067de5f0ad7892c81ed8aa82a95941d92c8104c5fd0d75c56a4d3ff3d4d1417"
+      "bytes": 23080,
+      "sha256": "ef8c84687076ff774a7b526991ac09e79c8832f249461da9cedc650fe424c0e5"
     },
     "tests/test_v06_g1g3_offline_ports_r1_recovery_and_guards.py": {
-      "bytes": 12967,
-      "sha256": "24bbe23bfb182a3cd384b508c0146c4e95a39f603480b670da6da510f6a4c12a"
+      "bytes": 12910,
+      "sha256": "76e9de75f438c733f14c1e0dc406b8fdde445cf15487147955506002c3665b60"
     }
   },
   "schema_version": 1,

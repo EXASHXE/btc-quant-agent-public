@@ -13,25 +13,26 @@ from pathlib import Path
 
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.g1_offline_preview_r1.model import SafetyViolation  # noqa: E402
-from scripts.g1g3_offline_ports_r1.__main__ import VALID_CRASH_BOUNDARIES  # noqa: E402
-from scripts.g1g3_offline_ports_r1.__main__ import main as cli_main  # noqa: E402
-from scripts.g1g3_offline_ports_r1.durable_supervisor import (  # noqa: E402
+from scripts.g1_offline_preview_r1.model import SafetyViolation
+from scripts.g1g3_offline_ports_r1.__main__ import VALID_CRASH_BOUNDARIES
+from scripts.g1g3_offline_ports_r1.__main__ import main as cli_main
+from scripts.g1g3_offline_ports_r1.durable_supervisor import (
     DurableSidecarSupervisor,
 )
-from scripts.g1g3_offline_ports_r1.loopback_servers import (  # noqa: E402
+from scripts.g1g3_offline_ports_r1.loopback_servers import (
     FakeLoopbackLLMServer,
 )
-from scripts.g1g3_offline_ports_r1.no_order_port import (  # noqa: E402
+from scripts.g1g3_offline_ports_r1.no_order_port import (
     OWN_SCRATCH,
     LoopbackSocketGuard,
     NoOrderPort,
     guard_lexical_path,
     verify_static_ast_and_core_immutability,
 )
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 @pytest.mark.parametrize("crash_boundary", list(VALID_CRASH_BOUNDARIES))

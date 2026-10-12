@@ -9,10 +9,10 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.g1_offline_preview_r1.model import SafetyViolation  # noqa: E402
-from scripts.g1g3_offline_ports_r1.bounded_llm_port import BoundedLLMPort  # noqa: E402
-from scripts.g1g3_offline_ports_r1.loopback_servers import FakeLoopbackLLMServer  # noqa: E402
-from scripts.g1g3_offline_ports_r1.no_order_port import (  # noqa: E402
+from scripts.g1_offline_preview_r1.model import SafetyViolation
+from scripts.g1g3_offline_ports_r1.bounded_llm_port import BoundedLLMPort
+from scripts.g1g3_offline_ports_r1.loopback_servers import FakeLoopbackLLMServer
+from scripts.g1g3_offline_ports_r1.no_order_port import (
     LoopbackSocketGuard,
     NoOrderPort,
 )

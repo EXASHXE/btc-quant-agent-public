@@ -11,14 +11,14 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.g1_offline_preview_r1.fixtures import bar as g1_bar  # noqa: E402
-from scripts.g1_offline_preview_r1.model import (  # noqa: E402
+from scripts.g1_offline_preview_r1.fixtures import bar as g1_bar
+from scripts.g1_offline_preview_r1.model import (
     SafetyViolation,
     digest,
     initial_state,
 )
-from scripts.g1_offline_preview_r1.reducer import transition  # noqa: E402
-from scripts.g1g3_offline_ports_r1.authenticated_human_port import (  # noqa: E402
+from scripts.g1_offline_preview_r1.reducer import transition
+from scripts.g1g3_offline_ports_r1.authenticated_human_port import (
     APPROVAL_CLASS,
     DEFAULT_ROUTE_ID,
     DEFAULT_WORKTREE_ID,
@@ -27,7 +27,7 @@ from scripts.g1g3_offline_ports_r1.authenticated_human_port import (  # noqa: E4
     compute_operator_context_hash,
     sign_synthetic_operator_decision,
 )
-from scripts.g1g3_offline_ports_r1.crypto_ed25519 import (  # noqa: E402
+from scripts.g1g3_offline_ports_r1.crypto_ed25519 import (
     SYNTHETIC_TEST_OPERATOR_SEEDS,
 )
 

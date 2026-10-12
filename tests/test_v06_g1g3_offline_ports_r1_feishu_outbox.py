@@ -10,20 +10,20 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.g1_offline_preview_r1.model import SafetyViolation, digest  # noqa: E402
-from scripts.g1_offline_preview_r1.reducer import transition  # noqa: E402
-from scripts.g1g3_offline_ports_r1.crypto_ed25519 import (  # noqa: E402
+from scripts.g1_offline_preview_r1.model import SafetyViolation, digest
+from scripts.g1_offline_preview_r1.reducer import transition
+from scripts.g1g3_offline_ports_r1.crypto_ed25519 import (
     SYNTHETIC_TEST_OPERATOR_SEEDS,
 )
-from scripts.g1g3_offline_ports_r1.feishu_outbox_port import FeishuOutboxPort  # noqa: E402
-from scripts.g1g3_offline_ports_r1.loopback_servers import (  # noqa: E402
+from scripts.g1g3_offline_ports_r1.feishu_outbox_port import FeishuOutboxPort
+from scripts.g1g3_offline_ports_r1.loopback_servers import (
     FakeLoopbackFeishuServer,
 )
-from scripts.g1g3_offline_ports_r1.no_order_port import (  # noqa: E402
+from scripts.g1g3_offline_ports_r1.no_order_port import (
     LoopbackSocketGuard,
     NoOrderPort,
 )
-from tests.test_v06_g1_offline_preview_r1_core import (  # noqa: E402
+from tests.test_v06_g1_offline_preview_r1_core import (
     analyzed,
     ev,
     next_bar,

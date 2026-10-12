@@ -11,16 +11,16 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.g1_offline_preview_r1.model import (  # noqa: E402
+from scripts.g1_offline_preview_r1.model import (
     SafetyViolation,
     digest,
     initial_state,
 )
-from scripts.g1_offline_preview_r1.reducer import transition  # noqa: E402
-from scripts.g1g3_offline_ports_r1.durable_supervisor import (  # noqa: E402
+from scripts.g1_offline_preview_r1.reducer import transition
+from scripts.g1g3_offline_ports_r1.durable_supervisor import (
     DurableSidecarSupervisor,
 )
-from scripts.g1g3_offline_ports_r1.market_pit_port import (  # noqa: E402
+from scripts.g1g3_offline_ports_r1.market_pit_port import (
     MarketPitPort,
     make_synthetic_bar_envelope,
     make_synthetic_market_event_v1_from_g1_funding,
