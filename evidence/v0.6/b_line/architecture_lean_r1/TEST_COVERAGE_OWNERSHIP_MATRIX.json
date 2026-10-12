@@ -1,0 +1,2036 @@
+{
+  "total_test_files": 205,
+  "total_collected_test_instances": 3385,
+  "total_parameterized_decorations": 187,
+  "tests_by_category": {
+    "UNKNOWN_NEEDS_REVIEW": 1444,
+    "SCIENCE_AUTHORITY_IMMUTABLE": 1547,
+    "SAME_METHOD_DIFFERENT_INVARIANT": 394
+  },
+  "known_slow_tests_top_10": [
+    {
+      "test_id": "tests/test_v051_h40_m3a_production_discovery_producer.py",
+      "elapsed_s": 59.62,
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE",
+      "role": "H40 runtime scaling & parameter grid validation"
+    },
+    {
+      "test_id": "tests/test_v051_h40_p3b_production_verifier_behavior_seal.py",
+      "elapsed_s": 50.61,
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE",
+      "role": "H40 producer/verifier behavior roundtrip seal"
+    },
+    {
+      "test_id": "tests/test_v051_h40_f01r3r3_api_seal.py",
+      "elapsed_s": 38.2,
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE",
+      "role": "H40 API surface & state sealing"
+    },
+    {
+      "test_id": "tests/test_v041_p6_metrics_benchmarks_qualification.py",
+      "elapsed_s": 28.45,
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE",
+      "role": "P6 statistical metric benchmark evaluation"
+    },
+    {
+      "test_id": "tests/test_v042_b06_random_experiment_replay.py",
+      "elapsed_s": 24.12,
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE",
+      "role": "B06 random experiment Monte Carlo replay"
+    },
+    {
+      "test_id": "tests/test_v040_research_kernel_economic_validation.py",
+      "elapsed_s": 22.8,
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE",
+      "role": "Research kernel economic validation"
+    },
+    {
+      "test_id": "tests/test_v041_c2_intrabar_exit_slippage_bounds.py",
+      "elapsed_s": 19.5,
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE",
+      "role": "Intrabar slippage boundary proof"
+    },
+    {
+      "test_id": "tests/test_v06_market_event_bridge_r2_clash_proxy_network.py",
+      "elapsed_s": 4.15,
+      "category": "ACTUALLY_REDUNDANT_CANDIDATE",
+      "role": "Proxy TCP probe closed socket timeout (2.0s per probe)"
+    },
+    {
+      "test_id": "tests/test_v06_forward_public_feed_r1_proxy_route.py",
+      "elapsed_s": 2.25,
+      "category": "ACTUALLY_REDUNDANT_CANDIDATE",
+      "role": "Proxy route TCP probe closed socket timeout (2.0s per probe)"
+    },
+    {
+      "test_id": "tests/test_v06_market_event_bridge_r2_portable_ci.py",
+      "elapsed_s": 3.8,
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT",
+      "role": "Portable CI harness un-cached git cat-file calls"
+    }
+  ],
+  "test_files_matrix": [
+    {
+      "path": "tests/test_market_watch.py",
+      "test_functions_count": 137,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v051_h40_f01_lifecycle_authority.py",
+      "test_functions_count": 101,
+      "parameterized_decorations": 9,
+      "fixtures_used": [
+        "bad",
+        "child_name",
+        "field",
+        "forged",
+        "mode",
+        "monkeypatch",
+        "mutation",
+        "tamper_target",
+        "target",
+        "tmp_path",
+        "value"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_p1_scaffold.py",
+      "test_functions_count": 81,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_p3b_production_discovery_verifier.py",
+      "test_functions_count": 81,
+      "parameterized_decorations": 11,
+      "fixtures_used": [
+        "accept",
+        "action",
+        "alteration",
+        "base",
+        "close",
+        "expected",
+        "extra",
+        "failed_metric",
+        "field",
+        "foreign_metric",
+        "monkeypatch",
+        "p_up",
+        "policy_name",
+        "replacement",
+        "score",
+        "tmp_path",
+        "value",
+        "wrong_metric"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v0325_one_shot_unblind_preregistration.py",
+      "test_functions_count": 59,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "h39_outcome_access_spy",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_repair_b_provenance_pit.py",
+      "test_functions_count": 59,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "forbidden_field",
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v041_p0_p1_cash_ledger.py",
+      "test_functions_count": 54,
+      "parameterized_decorations": 10,
+      "fixtures_used": [
+        "bad",
+        "cashflow",
+        "closing",
+        "end",
+        "initial",
+        "kind",
+        "kwargs",
+        "mark",
+        "nonempty",
+        "opening",
+        "pnl",
+        "side",
+        "t"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "test_functions_count": 50,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_execution_protection_r5.py",
+      "test_functions_count": 49,
+      "parameterized_decorations": 10,
+      "fixtures_used": [
+        "body",
+        "change",
+        "expected",
+        "field",
+        "interruption",
+        "monkeypatch",
+        "omit_status",
+        "structured",
+        "terminal",
+        "tmp_path",
+        "uncertainty",
+        "value"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v051_h40_repair_a_lifecycle_authority.py",
+      "test_functions_count": 49,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_live_v1_rc1_llm_approval_integration.py",
+      "test_functions_count": 44,
+      "parameterized_decorations": 3,
+      "fixtures_used": [
+        "change",
+        "conflict_type",
+        "expected_reason",
+        "injected_field",
+        "secondary_override",
+        "tmp_path",
+        "trigger"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_execution_protection_r6.py",
+      "test_functions_count": 41,
+      "parameterized_decorations": 3,
+      "fixtures_used": [
+        "corrupt_change",
+        "invalid_val",
+        "payload",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v041_p6_metrics_benchmarks_qualification.py",
+      "test_functions_count": 39,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "action_close",
+        "action_open",
+        "entry",
+        "exit_price",
+        "expected",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_source_qualification.py",
+      "test_functions_count": 38,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_g2_exit_horizon_r1_book.py",
+      "test_functions_count": 38,
+      "parameterized_decorations": 5,
+      "fixtures_used": [
+        "hours",
+        "mode",
+        "positive_cash",
+        "quantity",
+        "rate",
+        "scheme",
+        "side"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_execution_environment_authority.py",
+      "test_functions_count": 36,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_position_outbox_r6.py",
+      "test_functions_count": 36,
+      "parameterized_decorations": 5,
+      "fixtures_used": [
+        "field",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_market_event_bridge_r2_funding_pit_provenance.py",
+      "test_functions_count": 36,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_live_v1_execution_protection_r4.py",
+      "test_functions_count": 34,
+      "parameterized_decorations": 4,
+      "fixtures_used": [
+        "changes",
+        "failure",
+        "interruption",
+        "raw",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_position_supervisor.py",
+      "test_functions_count": 34,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "change",
+        "tmp_path",
+        "trigger"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v043_c_lite_formal_consumers.py",
+      "test_functions_count": 34,
+      "parameterized_decorations": 9,
+      "fixtures_used": [
+        "attack",
+        "available",
+        "capsys",
+        "closed",
+        "command",
+        "field",
+        "label",
+        "monkeypatch",
+        "name",
+        "nonzero",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_live_v1_rc1_wp_d_release_engineering.py",
+      "test_functions_count": 33,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "caplog",
+        "capsys",
+        "env_updates",
+        "expected_match",
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v0326_h39_blocker_repairs.py",
+      "test_functions_count": 33,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "book_delta",
+        "case",
+        "expected",
+        "monkeypatch",
+        "tmp_path",
+        "trade_delta"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_tactical_feature_evidence_v2.py",
+      "test_functions_count": 31,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_position_outbox_r7.py",
+      "test_functions_count": 30,
+      "parameterized_decorations": 6,
+      "fixtures_used": [
+        "field",
+        "monkeypatch",
+        "round_number",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v041_c2_intrabar_exit_slippage_bounds.py",
+      "test_functions_count": 30,
+      "parameterized_decorations": 11,
+      "fixtures_used": [
+        "close_action",
+        "direction",
+        "exit_bar",
+        "expected_price",
+        "fees",
+        "field",
+        "gap_open",
+        "setup_bar",
+        "side",
+        "trigger_bar",
+        "value"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v050_r05c_funding_evidence_authority.py",
+      "test_functions_count": 29,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_f01r3r1_durable_authority.py",
+      "test_functions_count": 29,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_live_v1_decision_approval.py",
+      "test_functions_count": 28,
+      "parameterized_decorations": 2,
+      "fixtures_used": [
+        "final_state",
+        "interrupted_state",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v042_b12_bounded_rest_requester.py",
+      "test_functions_count": 28,
+      "parameterized_decorations": 5,
+      "fixtures_used": [
+        "body",
+        "delay",
+        "error",
+        "expected",
+        "header",
+        "monkeypatch",
+        "values"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_reviewer_fixes.py",
+      "test_functions_count": 28,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v051_h40_p2r1_contract_materialization.py",
+      "test_functions_count": 27,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_market_event_bridge_r2_portable_ci.py",
+      "test_functions_count": 27,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "clean_scratch_dir",
+        "harness"
+      ],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_microstructure_status_incremental_performance.py",
+      "test_functions_count": 26,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v0323_blind_validation.py",
+      "test_functions_count": 26,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "h39_outcome_access_spy",
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v050_r02_orchestration_guards.py",
+      "test_functions_count": 26,
+      "parameterized_decorations": 3,
+      "fixtures_used": [
+        "args",
+        "capsys",
+        "command",
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_m3a_production_discovery_producer.py",
+      "test_functions_count": 26,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "authority",
+        "kind",
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_contracts.py",
+      "test_functions_count": 26,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_g2_btc_empirical_fast_replay.py",
+      "test_functions_count": 26,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/h41/test_authority_and_signals.py",
+      "test_functions_count": 25,
+      "parameterized_decorations": 4,
+      "fixtures_used": [
+        "confirm_slot",
+        "slot"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_hermetic_runtime_guard.py",
+      "test_functions_count": 25,
+      "parameterized_decorations": 3,
+      "fixtures_used": [
+        "base_url",
+        "h39_outcome_access_spy",
+        "hermetic_guard",
+        "query",
+        "relative_root",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_market_event_bridge_r2_clash_proxy_network.py",
+      "test_functions_count": 25,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch"
+      ],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_market_event_bridge_r2_depth_ladder_l2.py",
+      "test_functions_count": 25,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py",
+      "test_functions_count": 25,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_live_v1_position_outbox_r8.py",
+      "test_functions_count": 24,
+      "parameterized_decorations": 7,
+      "fixtures_used": [
+        "change",
+        "monkeypatch",
+        "operation",
+        "receipt",
+        "replacement",
+        "state",
+        "tmp_path",
+        "verb"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_tactical_shadow_evaluation_v2.py",
+      "test_functions_count": 24,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_tactical_policy_b0.py",
+      "test_functions_count": 23,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_g2_btc_two_lead_funding_mark_r3_economics.py",
+      "test_functions_count": 23,
+      "parameterized_decorations": 3,
+      "fixtures_used": [
+        "events",
+        "expected",
+        "mutation",
+        "rate",
+        "side"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_position_authority_r4.py",
+      "test_functions_count": 22,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "new_quantity",
+        "old_quantity",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v041_p5_protocol_evidence_persistence.py",
+      "test_functions_count": 22,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "change",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v050_r05b_material_input_selector_authority.py",
+      "test_functions_count": 22,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "field",
+        "match",
+        "registry_ids",
+        "tmp_path",
+        "value"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_p2_search_space.py",
+      "test_functions_count": 22,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_live_v1_runtime_recovery_r3.py",
+      "test_functions_count": 21,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v042_b04r_replay_bundle_acceptance_repair.py",
+      "test_functions_count": 21,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "meta_field",
+        "tampered_value",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_mechanism.py",
+      "test_functions_count": 20,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v042_b04_verified_replay_input_bundle.py",
+      "test_functions_count": 20,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_g2_btc_two_lead_mark_gap_r31_gaps.py",
+      "test_functions_count": 20,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_market_event_bridge_r2_binance_2026_routes.py",
+      "test_functions_count": 20,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+      "test_functions_count": 20,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_live_v1_execution_recovery_r3.py",
+      "test_functions_count": 19,
+      "parameterized_decorations": 4,
+      "fixtures_used": [
+        "component",
+        "filled",
+        "missing",
+        "terminal",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v041_p2_p3_causal_execution.py",
+      "test_functions_count": 19,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b01_limit_causality.py",
+      "test_functions_count": 19,
+      "parameterized_decorations": 4,
+      "fixtures_used": [
+        "high",
+        "latent_path",
+        "limit_price",
+        "low",
+        "monkeypatch",
+        "side",
+        "touch_kind"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v050_r05a_ag03_producer_contract_immutability.py",
+      "test_functions_count": 19,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "conflict_kwargs",
+        "registered_contract_ids"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_live_v1_execution_authorization_r2.py",
+      "test_functions_count": 18,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "monkeypatch",
+        "target",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_execution_backend.py",
+      "test_functions_count": 18,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v0311_runtime_registry.py",
+      "test_functions_count": 18,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "setup",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v0316_reliability.py",
+      "test_functions_count": 18,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "error",
+        "expected",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v041_acceptance_repair_causal_risk.py",
+      "test_functions_count": 18,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b11_sqlite_compatibility.py",
+      "test_functions_count": 18,
+      "parameterized_decorations": 4,
+      "fixtures_used": [
+        "attack",
+        "column",
+        "marker",
+        "table",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_book.py",
+      "test_functions_count": 18,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_live_v1_runtime_authority_r5.py",
+      "test_functions_count": 17,
+      "parameterized_decorations": 2,
+      "fixtures_used": [
+        "change"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v041_p4_risk_policy.py",
+      "test_functions_count": 17,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_p3b_production_verifier_behavior_seal.py",
+      "test_functions_count": 17,
+      "parameterized_decorations": 2,
+      "fixtures_used": [
+        "field",
+        "method",
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_g2_btc_two_lead_funding_mark_r3_sources.py",
+      "test_functions_count": 17,
+      "parameterized_decorations": 2,
+      "fixtures_used": [
+        "change",
+        "january_klines",
+        "match",
+        "rows"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_r2_controls.py",
+      "test_functions_count": 17,
+      "parameterized_decorations": 4,
+      "fixtures_used": [
+        "cost",
+        "expected",
+        "rate",
+        "side"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v0322_microstructure_research.py",
+      "test_functions_count": 16,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v0324_blind_accumulation_operations.py",
+      "test_functions_count": 16,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v040_research_kernel_economic_validation.py",
+      "test_functions_count": 16,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b02_causal_liquidity.py",
+      "test_functions_count": 16,
+      "parameterized_decorations": 4,
+      "fixtures_used": [
+        "liquidity",
+        "side"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b08_clock_config.py",
+      "test_functions_count": 16,
+      "parameterized_decorations": 4,
+      "fixtures_used": [
+        "monkeypatch",
+        "skew",
+        "tmp_path",
+        "wall_times"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_f01r3r2_commit_authority.py",
+      "test_functions_count": 16,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/h41/test_source_and_outcomes.py",
+      "test_functions_count": 15,
+      "parameterized_decorations": 2,
+      "fixtures_used": [
+        "field",
+        "replacement",
+        "times",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_a04_semantic_goldens.py",
+      "test_functions_count": 15,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "case_id",
+        "closing",
+        "opening"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b03_formal_pit_boundary.py",
+      "test_functions_count": 15,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "field",
+        "monkeypatch",
+        "value"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_r2_sources.py",
+      "test_functions_count": 15,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "monkeypatch",
+        "month",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_replay.py",
+      "test_functions_count": 15,
+      "parameterized_decorations": 4,
+      "fixtures_used": [
+        "cost",
+        "expected",
+        "side"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+      "test_functions_count": 15,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_market_event_bridge_r2_stress_and_security.py",
+      "test_functions_count": 15,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "capsys",
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_live_v1_decision_backends.py",
+      "test_functions_count": 14,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "change"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v051_h40_p3_controller_authority_publication.py",
+      "test_functions_count": 14,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_proxy_route.py",
+      "test_functions_count": 14,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch"
+      ],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_g2_btc_empirical_fast_signals.py",
+      "test_functions_count": 14,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "monkeypatch",
+        "mutation"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_forward_derivatives.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_decision_risk.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 2,
+      "fixtures_used": [
+        "case_args",
+        "ceiling",
+        "drawdown",
+        "loss",
+        "reason"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v0313_forward_reliability.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b04r2_authority_acceptance_repair.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b05_candidate_execution_replay.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "attack",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b07_cash_reconstruction.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "attack",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v050_r01_surface_reduction.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 2,
+      "fixtures_used": [
+        "capsys",
+        "command",
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_f01r3r4_lineage_durability.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_implementation_authority_publication.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_connector.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_g2_btc_empirical_fast_metrics_source.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "error",
+        "name",
+        "row",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_g2_btc_two_lead_mark_gap_r31_partial.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_gemini_goal_trend_flow_r1_economics.py",
+      "test_functions_count": 13,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_ci_test_plan.py",
+      "test_functions_count": 12,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_engine_correctness.py",
+      "test_functions_count": 12,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_execution_validator.py",
+      "test_functions_count": 12,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_runtime_r2.py",
+      "test_functions_count": 12,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_microstructure_stats_cache.py",
+      "test_functions_count": 12,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v0317_opportunity_successor.py",
+      "test_functions_count": 12,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b04r5_candidate_identity_relabel_fail_closed.py",
+      "test_functions_count": 12,
+      "parameterized_decorations": 2,
+      "fixtures_used": [
+        "field",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_adversarial.py",
+      "test_functions_count": 12,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_live_v1_execution_protection_r3.py",
+      "test_functions_count": 11,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "field",
+        "tmp_path",
+        "value"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_position_outbox_r5.py",
+      "test_functions_count": 11,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "field",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_time.py",
+      "test_functions_count": 11,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_live_v1_execution_compilation_r2.py",
+      "test_functions_count": 10,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "field",
+        "tmp_path",
+        "value"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_execution_intent.py",
+      "test_functions_count": 10,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_execution_placement_r3.py",
+      "test_functions_count": 10,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "changes",
+        "reason",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_risk.py",
+      "test_functions_count": 10,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_strategies.py",
+      "test_functions_count": 10,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "_mock",
+        "pivots"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v0314_evidence_epoch.py",
+      "test_functions_count": 10,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b06_random_experiment_replay.py",
+      "test_functions_count": 10,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "count",
+        "tmp_path",
+        "trials"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b09_durable_publication.py",
+      "test_functions_count": 10,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "monkeypatch",
+        "stage",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v050_r05a_ag04_health_read_only_inspection.py",
+      "test_functions_count": 10,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_g3_runner_integrity.py",
+      "test_functions_count": 10,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/h41/test_provenance_repair.py",
+      "test_functions_count": 9,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_funnel.py",
+      "test_functions_count": 9,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "_funnel_pivots",
+        "_strategy_pivots"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_account_stream_r2.py",
+      "test_functions_count": 9,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_runtime_authority_r6.py",
+      "test_functions_count": 9,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "env",
+        "ns",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v0315_microstructure.py",
+      "test_functions_count": 9,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b04r4_random_benchmark_authority_boundary.py",
+      "test_functions_count": 9,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v050_r01_retained_owner_guards.py",
+      "test_functions_count": 9,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_p3b_production_verifier_identity_seal.py",
+      "test_functions_count": 9,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_contract.py",
+      "test_functions_count": 9,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_decision_models.py",
+      "test_functions_count": 8,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "field",
+        "monkeypatch"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_rc1_operational_readiness.py",
+      "test_functions_count": 8,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v0320_reliability.py",
+      "test_functions_count": 8,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_b10_writer_finalization.py",
+      "test_functions_count": 8,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_f01r3r3_api_seal.py",
+      "test_functions_count": 8,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v051_h40_m3a_r1_runtime_scaling.py",
+      "test_functions_count": 8,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_g2_btc_two_lead_funding_mark_r3_contract.py",
+      "test_functions_count": 8,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_backtest.py",
+      "test_functions_count": 7,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_derivatives.py",
+      "test_functions_count": 7,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_account_watch.py",
+      "test_functions_count": 7,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_decision_e2e.py",
+      "test_functions_count": 7,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "state",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v042_b04r3_protocol_producer_contract_fail_closed.py",
+      "test_functions_count": 7,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v042_bar_pit_formal_promotion.py",
+      "test_functions_count": 7,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_durability.py",
+      "test_functions_count": 7,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_e2e_scenarios.py",
+      "test_functions_count": 7,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_health.py",
+      "test_functions_count": 7,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_g3_operational_readiness.py",
+      "test_functions_count": 7,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_research.py",
+      "test_functions_count": 6,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v0321_resilience.py",
+      "test_functions_count": 6,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v050_r03b_legacy_benchmark_guards.py",
+      "test_functions_count": 6,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_g2_exit_horizon_r1_account.py",
+      "test_functions_count": 6,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_g2_exit_horizon_r1_statistics.py",
+      "test_functions_count": 6,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/h41/test_inference_and_ranking.py",
+      "test_functions_count": 5,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_binance_archive.py",
+      "test_functions_count": 5,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_event_backtest.py",
+      "test_functions_count": 5,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_execution.py",
+      "test_functions_count": 5,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_regime.py",
+      "test_functions_count": 5,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_forward_public_feed_r1_replay.py",
+      "test_functions_count": 5,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "SAME_METHOD_DIFFERENT_INVARIANT"
+    },
+    {
+      "path": "tests/test_v06_g2_btc_two_lead_mark_gap_r31_monthly.py",
+      "test_functions_count": 5,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_metrics.py",
+      "test_functions_count": 5,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_r2_run.py",
+      "test_functions_count": 5,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_api.py",
+      "test_functions_count": 4,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_binance_spot_archive.py",
+      "test_functions_count": 4,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_research_protocol.py",
+      "test_functions_count": 4,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_storage.py",
+      "test_functions_count": 4,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_engineering_preview_r1.py",
+      "test_functions_count": 4,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_g2_exit_horizon_r1_audit.py",
+      "test_functions_count": 4,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_execution_guard.py",
+      "test_functions_count": 3,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_day2_e2e.py",
+      "test_functions_count": 3,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_decision_case.py",
+      "test_functions_count": 3,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_execution_identity_r3.py",
+      "test_functions_count": 3,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_position_lease_r2.py",
+      "test_functions_count": 3,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_multifactor.py",
+      "test_functions_count": 3,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v042_ba_information_set_integration.py",
+      "test_functions_count": 3,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v050_r04_kernel_convergence.py",
+      "test_functions_count": 3,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "capsys",
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_binance_signed.py",
+      "test_functions_count": 2,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "_time",
+        "urlopen"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_data_manifest.py",
+      "test_functions_count": 2,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_features.py",
+      "test_functions_count": 2,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_approval_environment_r4.py",
+      "test_functions_count": 2,
+      "parameterized_decorations": 1,
+      "fixtures_used": [
+        "endpoint",
+        "environment",
+        "namespace",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_decision_api.py",
+      "test_functions_count": 2,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "monkeypatch",
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_execution_storage.py",
+      "test_functions_count": 2,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_live_v1_position_kill.py",
+      "test_functions_count": 2,
+      "parameterized_decorations": 0,
+      "fixtures_used": [
+        "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_quality.py",
+      "test_functions_count": 2,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_structure.py",
+      "test_functions_count": 2,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_config.py",
+      "test_functions_count": 1,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_csvio.py",
+      "test_functions_count": 1,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_engine.py",
+      "test_functions_count": 1,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_explain.py",
+      "test_functions_count": 1,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_notify.py",
+      "test_functions_count": 1,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_service_correctness.py",
+      "test_functions_count": 1,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_shadow.py",
+      "test_functions_count": 1,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/conftest.py",
+      "test_functions_count": 0,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/h40_runtime_reference.py",
+      "test_functions_count": 0,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/h40_runtime_scaling_benchmark.py",
+      "test_functions_count": 0,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/h41/__init__.py",
+      "test_functions_count": 0,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/h41/r2_reference.py",
+      "test_functions_count": 0,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/helpers.py",
+      "test_functions_count": 0,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/helpers_v042_economic_replay.py",
+      "test_functions_count": 0,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/helpers_v042_semantic_goldens.py",
+      "test_functions_count": 0,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/probe_v043_c_lite_differential.py",
+      "test_functions_count": 0,
+      "parameterized_decorations": 0,
+      "fixtures_used": [],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    }
+  ]
+}

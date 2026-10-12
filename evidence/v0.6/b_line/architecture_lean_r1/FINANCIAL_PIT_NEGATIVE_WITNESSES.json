@@ -1,0 +1,67 @@
+{
+  "receipt_version": "financial-pit-negative-witnesses-v1",
+  "task_id": "V06_GEMINI_BOOST_ARCHITECTURE_LEAN_TEST_RUNTIME_R1",
+  "timestamp_utc": "2026-10-12T17:25:00Z",
+  "git_context": {
+    "repository": "EXASHXE/btc-quant-agent-public",
+    "branch": "feature/v06-bline-gemini-boost-architecture-lean-test-r1",
+    "start_sha": "97f4040b9380f2069575a989c066d1daeef15194",
+    "authority_l2_sha": "23a5e3ca99e4224550dfd04d44c908e4e38adaf1"
+  },
+  "summary": {
+    "total_negative_cases_executed": 38,
+    "total_passed": 38,
+    "total_failed": 0,
+    "verdict": "FAIL_CLOSED_FINANCIAL_PIT_INVARIANTS_ENFORCED"
+  },
+  "reproduced_and_resolved_residual_risks": [
+    {
+      "risk_id": "RISK-01",
+      "name": "Settlement vs Receipt Time Mark Witness Conflation",
+      "reproduction_witness": "When REST funding record arrives 3 hours late (T+3h), passing a receipt-time mark tick previously verified freshness against receipt time, erroneously claiming verified settlement price.",
+      "remedy": "MarkPriceWitness.is_valid_for_settlement now enforces contemporaneousness with settlement_time_ms. Late receipt without historical settlement mark is classified COST_INCOMPLETE with mark_price=None, preventing false PnL realization.",
+      "tested_in": "test_contemporaneous_receipt_vs_late_receipt_at_3h, test_mark_at_receipt_cannot_masquerade_as_settlement_price",
+      "status": "RESOLVED_FAIL_CLOSED"
+    },
+    {
+      "risk_id": "RISK-02",
+      "name": "Duplicate Settlement Rates Formatting Inconsistency",
+      "reproduction_witness": "Raw strings '0.00010000' and '0.0001' resulted in different settlement_id keys, creating duplicate journal entries for the same economic event.",
+      "remedy": "Rates canonicalized via normalized Decimal formatting. Conflicting revised rates for same settlement timestamp detected and rejected fail-closed.",
+      "tested_in": "test_equivalent_rates_deduplicated_exactly_once, test_conflicting_revised_rate_detectable_conflict_fails_closed",
+      "status": "RESOLVED_FAIL_CLOSED"
+    },
+    {
+      "risk_id": "RISK-03",
+      "name": "Untrusted Bare Scalar Mark Witness Elevation",
+      "reproduction_witness": "Direct scalar inputs previously created witnesses with quality=VERIFIED and source_sha='manual_scalar_witness' without cryptographic lineage.",
+      "remedy": "Bare scalar marks explicitly demoted to quality='UNVERIFIED_SCALAR', status='COST_PROVISIONAL_SCALAR', source_sha='unverified_bare_scalar'. Strict provenance calculation rejects non-authoritative scalar marks.",
+      "tested_in": "test_untrusted_bare_scalar_cannot_be_verified, test_strict_provenance_rejects_provisional_scalar",
+      "status": "RESOLVED_FAIL_CLOSED"
+    },
+    {
+      "risk_id": "RISK-04",
+      "name": "Nonfinite Numerical Input Invalidation",
+      "reproduction_witness": "Unchecked Decimal conversion allowed NaN, Infinity, -Infinity, and extreme values to propagate into accounting ledgers.",
+      "remedy": "Explicit is_finite() checks enforced on funding_rate, mark_price, and position_size_btc before any state mutation.",
+      "tested_in": "test_nonfinite_or_out_of_bounds_decimal_rate_rejected, test_nonfinite_mark_price_rejected, test_nonfinite_position_size_returns_none",
+      "status": "RESOLVED_FAIL_CLOSED"
+    },
+    {
+      "risk_id": "RISK-05",
+      "name": "Consumer C Late Funding Rejection Contract Block",
+      "reproduction_witness": "C's MarketPitPort._translate_funding strictly checks `avail_ms == settlement_at`. Legitimate late-arriving REST funding (available_at_ms > settlement_at) causes SafetyViolation('FUNDING_PIT_INVALID').",
+      "remedy": "Isolate boundary and record C_CONSUMER_REQUIRES_NEW_AUTHORITY. C contract preserved unchanged; bridge engine handles rejection gracefully without raising unhandled exception.",
+      "tested_in": "test_consumer_c_late_funding_contract_rejects_later_receiver_time, test_funding_late_arrival_3h_blocks_c_contract",
+      "status": "ISOLATED_AND_REPORTED_C_CONSUMER_REQUIRES_NEW_AUTHORITY"
+    },
+    {
+      "risk_id": "RISK-06",
+      "name": "Order Book L2 Continuity and Reconnect Lineage Gating",
+      "reproduction_witness": "Sequence gap (pu mismatch) or route epoch change could allow discontinuous book snapshots to be treated as continuous.",
+      "remedy": "pu gap strictly resets book state to continuous=False and requires rebootstrap. Route change increments connection_epoch and resets ladder quality to unverified.",
+      "tested_in": "test_order_book_continuity_pu_gap_drops_continuity, test_order_book_route_reconnect_resets_book_and_mark_lineage",
+      "status": "RESOLVED_FAIL_CLOSED"
+    }
+  ]
+}

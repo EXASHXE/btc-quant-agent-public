@@ -40,8 +40,9 @@ class MarkPriceWitness:
         current_route_epoch: str = "route-epoch-0",
         current_connection_epoch: int = 1,
         max_staleness_ms: int = 60_000,
+        settlement_time_ms: int | None = None,
     ) -> tuple[bool, str]:
-        if self.price <= Decimal(0):
+        if not self.price.is_finite() or self.price <= Decimal(0):
             return False, "MARK_PRICE_NON_POSITIVE"
         if reference_time_ms < self.available_at_ms or reference_time_ms < self.observed_wall_utc_ms:
             return False, "MARK_FUTURE_AVAILABLE"
@@ -53,6 +54,10 @@ class MarkPriceWitness:
             return False, "MARK_ROUTE_EPOCH_MISMATCH"
         if self.connection_epoch != current_connection_epoch:
             return False, "MARK_CONNECTION_EPOCH_MISMATCH"
+        if settlement_time_ms is not None:
+            age_from_settlement = abs(self.provider_event_ms - settlement_time_ms)
+            if age_from_settlement > max_staleness_ms:
+                return False, f"MARK_NOT_CONTEMPORANEOUS_WITH_SETTLEMENT_{age_from_settlement}MS"
         age = self.measured_age_ms(reference_time_ms)
         if age > max_staleness_ms:
             return False, f"MARK_STALE_AGE_{age}MS"
@@ -100,7 +105,11 @@ class SettledFundingEntry:
     source_available_at_ms: int = 0
     clock_uncertainty_ms: int = 0
 
-    def calculate_cash_flow(self, position_size_btc: Decimal) -> Decimal | None:
+    def calculate_cash_flow(
+        self,
+        position_size_btc: Decimal,
+        strict_provenance: bool = False,
+    ) -> Decimal | None:
         """Calculate signed cash flow for position size in BTC.
 
         Long (>0) pays positive rate; short (<0) receives positive rate.
@@ -108,9 +117,15 @@ class SettledFundingEntry:
         Returns None if cash realization is not COST_COMPLETE or mark_price is None.
         Conservation: zero position size always yields Decimal('0.00000000').
         """
+        if not position_size_btc.is_finite():
+            return None
         if position_size_btc == Decimal(0):
             return Decimal("0.00000000")
-        if self.cash_realization_status != "COST_COMPLETE" or self.mark_price is None:
+        if self.mark_price is None:
+            return None
+        if strict_provenance and self.cash_realization_status != "COST_COMPLETE":
+            return None
+        if self.cash_realization_status not in ("COST_COMPLETE", "COST_PROVISIONAL_SCALAR"):
             return None
         cf = -1 * position_size_btc * self.funding_rate * self.mark_price
         return cf.quantize(Decimal("0.00000001"), rounding=ROUND_HALF_EVEN)
@@ -179,6 +194,7 @@ class SettledFundingLedger:
     def __init__(self, symbol: str = "BTCUSDT") -> None:
         self.symbol = symbol
         self.journal: dict[str, SettledFundingEntry] = {}
+        self.journal_by_event: dict[tuple[str, int], SettledFundingEntry] = {}
         self.duplicate_count: int = 0
         self.rejected_count: int = 0
 
@@ -214,6 +230,9 @@ class SettledFundingLedger:
                 self.rejected_count += 1
                 return None
             funding_rate = Decimal(rate_str)
+            if not funding_rate.is_finite() or abs(funding_rate) > Decimal("1.0"):
+                self.rejected_count += 1
+                return None
         except (ValueError, TypeError, decimal.InvalidOperation):
             self.rejected_count += 1
             return None
@@ -225,10 +244,27 @@ class SettledFundingLedger:
             self.rejected_count += 1
             return None
 
-        settlement_id = f"{sym}:{funding_time}:{rate_str}"
+        # Canonicalize rate representation to normalize numeric equivalents (e.g. 0.0001 vs 0.00010000)
+        canonical_rate_str = f"{funding_rate.normalize():f}"
+        settlement_id = f"{sym}:{funding_time}:{canonical_rate_str}"
+
+        # Exact deduplication and conflicting rate detection
+        event_key = (sym, funding_time)
+        if event_key in self.journal_by_event:
+            existing = self.journal_by_event[event_key]
+            if existing.funding_rate == funding_rate:
+                self.duplicate_count += 1
+                return existing
+            # Same symbol + funding_time with conflicting revised rate => detectable conflict, reject
+            self.rejected_count += 1
+            return None
         if settlement_id in self.journal:
-            self.duplicate_count += 1
-            return self.journal[settlement_id]
+            existing = self.journal[settlement_id]
+            if existing.funding_rate == funding_rate:
+                self.duplicate_count += 1
+                return existing
+            self.rejected_count += 1
+            return None
 
         # Check Mark price validity & witness
         if contemporaneous_mark_price is None:
@@ -237,43 +273,67 @@ class SettledFundingLedger:
 
         witness: MarkPriceWitness | None = None
         mark_dec: Decimal | None = None
+        time_delta_to_settlement = abs(observed_wall_utc_ms - funding_time)
+        is_contemporaneous_receipt = time_delta_to_settlement <= max_mark_staleness_ms
 
         if isinstance(contemporaneous_mark_price, MarkPriceWitness):
             witness = contemporaneous_mark_price
-            valid, _why = witness.is_valid_for_settlement(
+            valid, why = witness.is_valid_for_settlement(
                 reference_time_ms=observed_wall_utc_ms,
+                settlement_time_ms=funding_time,
                 current_route_epoch=current_route_epoch,
                 current_connection_epoch=current_connection_epoch,
                 max_staleness_ms=max_mark_staleness_ms,
             )
-            if not valid:
+            if valid:
+                mark_dec = witness.price
+                status = "COST_COMPLETE"
+                reasons = ["OK"]
+                quality = "VERIFIED"
+            elif why.startswith(("MARK_NOT_CONTEMPORANEOUS_WITH_SETTLEMENT", "MARK_STALE_AGE")):
+                # Late arrival: preserve funding rate, classify cash basis INCOMPLETE, no settlement mark
+                mark_dec = None
+                status = "COST_INCOMPLETE"
+                quality = "DEGRADED"
+                reasons = [why]
+            else:
                 self.rejected_count += 1
                 return None
-            mark_dec = witness.price
         else:
             try:
                 candidate = Decimal(str(contemporaneous_mark_price))
-                if candidate <= Decimal(0):
+                if not candidate.is_finite() or candidate <= Decimal(0):
                     self.rejected_count += 1
                     return None
-                mark_dec = candidate
+
+                # Check if receipt is contemporaneous with settlement
+                if is_contemporaneous_receipt:
+                    mark_dec = candidate
+                    status = "COST_PROVISIONAL_SCALAR"
+                    quality = "UNVERIFIED_SCALAR"
+                    reasons = ["PROVISIONAL_BARE_SCALAR"]
+                else:
+                    # Late receipt without historical settlement witness: official settlement mark is missing!
+                    # Do not masquerade receipt price as settlement price!
+                    mark_dec = None
+                    status = "COST_INCOMPLETE"
+                    quality = "DEGRADED"
+                    reasons = ["LATE_RECEIPT_MARK_NOT_AT_SETTLEMENT"]
+
                 witness = MarkPriceWitness(
                     price=candidate,
                     observed_wall_utc_ms=observed_wall_utc_ms,
                     available_at_ms=observed_wall_utc_ms,
                     provider_event_ms=observed_wall_utc_ms,
-                    source_sha="manual_scalar_witness",
+                    source_sha="unverified_bare_scalar",
                     route_epoch=current_route_epoch,
                     connection_epoch=current_connection_epoch,
-                    quality="VERIFIED",
-                    reason_codes=("OK",),
+                    quality="UNVERIFIED_SCALAR",
+                    reason_codes=("MANUAL_UNVERIFIED_SCALAR",),
                 )
-            except (ValueError, decimal.InvalidOperation):
+            except (ValueError, TypeError, decimal.InvalidOperation):
                 self.rejected_count += 1
                 return None
-
-        status = "COST_COMPLETE"
-        reasons: list[str] = ["OK"]
 
         entry = SettledFundingEntry(
             symbol=sym,
@@ -288,7 +348,7 @@ class SettledFundingLedger:
             source_observed_wall_utc_ms=observed_wall_utc_ms,
             source_available_at_ms=observed_wall_utc_ms,
             producer_manifest_sha256=raw_manifest_sha256,
-            quality="VERIFIED" if status == "COST_COMPLETE" else "DEGRADED",
+            quality=quality,
             reason_codes=tuple(reasons),
             mark_witness=witness,
             cash_realization_status=status,
@@ -297,6 +357,7 @@ class SettledFundingLedger:
         )
 
         self.journal[settlement_id] = entry
+        self.journal_by_event[event_key] = entry
         return entry
 
     def generate_decimal_ledger_report(self) -> dict[str, Any]:

@@ -1,0 +1,654 @@
+{
+  "repository_files_count": 436,
+  "package_loc_summary": {
+    "evidence": {
+      "total_lines": 78,
+      "code_lines": 76,
+      "comment_lines": 1,
+      "blank_lines": 1,
+      "file_count": 1
+    },
+    "scripts/ci": {
+      "total_lines": 404,
+      "code_lines": 325,
+      "comment_lines": 31,
+      "blank_lines": 48,
+      "file_count": 1
+    },
+    "scripts/integration": {
+      "total_lines": 2696,
+      "code_lines": 2320,
+      "comment_lines": 56,
+      "blank_lines": 320,
+      "file_count": 12
+    },
+    "scripts/market_data": {
+      "total_lines": 3748,
+      "code_lines": 3180,
+      "comment_lines": 79,
+      "blank_lines": 489,
+      "file_count": 11
+    },
+    "scripts/ops_g3": {
+      "total_lines": 873,
+      "code_lines": 747,
+      "comment_lines": 23,
+      "blank_lines": 103,
+      "file_count": 2
+    },
+    "scripts/strategy_research": {
+      "total_lines": 7824,
+      "code_lines": 6966,
+      "comment_lines": 97,
+      "blank_lines": 761,
+      "file_count": 35
+    },
+    "skill-template": {
+      "total_lines": 181,
+      "code_lines": 169,
+      "comment_lines": 1,
+      "blank_lines": 11,
+      "file_count": 1
+    },
+    "src/btc_quant_agent": {
+      "total_lines": 75534,
+      "code_lines": 67623,
+      "comment_lines": 1233,
+      "blank_lines": 6678,
+      "file_count": 161
+    },
+    "tests": {
+      "total_lines": 81830,
+      "code_lines": 67296,
+      "comment_lines": 2940,
+      "blank_lines": 11594,
+      "file_count": 205
+    },
+    "tools": {
+      "total_lines": 774,
+      "code_lines": 676,
+      "comment_lines": 7,
+      "blank_lines": 91,
+      "file_count": 7
+    }
+  },
+  "largest_modules": [
+    {
+      "path": "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 6049,
+      "total_lines": 6523,
+      "classes_count": 33,
+      "functions_count": 208
+    },
+    {
+      "path": "src/btc_quant_agent/microstructure_research.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 5670,
+      "total_lines": 6621,
+      "classes_count": 9,
+      "functions_count": 65
+    },
+    {
+      "path": "tests/test_market_watch.py",
+      "package": "tests",
+      "code_lines": 5027,
+      "total_lines": 5833,
+      "classes_count": 0,
+      "functions_count": 150
+    },
+    {
+      "path": "tests/test_v051_h40_f01_lifecycle_authority.py",
+      "package": "tests",
+      "code_lines": 2324,
+      "total_lines": 2671,
+      "classes_count": 3,
+      "functions_count": 107
+    },
+    {
+      "path": "tests/test_v051_h40_p1_scaffold.py",
+      "package": "tests",
+      "code_lines": 2317,
+      "total_lines": 2826,
+      "classes_count": 0,
+      "functions_count": 83
+    },
+    {
+      "path": "src/btc_quant_agent/market_watch/state.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 2162,
+      "total_lines": 2322,
+      "classes_count": 1,
+      "functions_count": 34
+    },
+    {
+      "path": "src/btc_quant_agent/h40/discovery_evidence.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 2125,
+      "total_lines": 2366,
+      "classes_count": 12,
+      "functions_count": 80
+    },
+    {
+      "path": "src/btc_quant_agent/economic/qualification.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1876,
+      "total_lines": 2033,
+      "classes_count": 16,
+      "functions_count": 75
+    },
+    {
+      "path": "src/btc_quant_agent/microstructure.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1828,
+      "total_lines": 1963,
+      "classes_count": 7,
+      "functions_count": 58
+    },
+    {
+      "path": "tests/test_v051_h40_repair_b_provenance_pit.py",
+      "package": "tests",
+      "code_lines": 1824,
+      "total_lines": 2286,
+      "classes_count": 0,
+      "functions_count": 62
+    },
+    {
+      "path": "tests/test_v041_p6_metrics_benchmarks_qualification.py",
+      "package": "tests",
+      "code_lines": 1760,
+      "total_lines": 1917,
+      "classes_count": 0,
+      "functions_count": 55
+    },
+    {
+      "path": "src/btc_quant_agent/market_watch/evidence.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1713,
+      "total_lines": 1896,
+      "classes_count": 22,
+      "functions_count": 31
+    },
+    {
+      "path": "src/btc_quant_agent/market_watch/shadow_evidence.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1683,
+      "total_lines": 2026,
+      "classes_count": 16,
+      "functions_count": 28
+    },
+    {
+      "path": "src/btc_quant_agent/economic/acceptance_verifier.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1577,
+      "total_lines": 1713,
+      "classes_count": 1,
+      "functions_count": 37
+    },
+    {
+      "path": "tests/test_tactical_shadow_evaluation_v2.py",
+      "package": "tests",
+      "code_lines": 1511,
+      "total_lines": 1823,
+      "classes_count": 0,
+      "functions_count": 28
+    },
+    {
+      "path": "tests/test_tactical_feature_evidence_v2.py",
+      "package": "tests",
+      "code_lines": 1490,
+      "total_lines": 1868,
+      "classes_count": 1,
+      "functions_count": 42
+    },
+    {
+      "path": "src/btc_quant_agent/market_watch/shadow.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1466,
+      "total_lines": 1642,
+      "classes_count": 1,
+      "functions_count": 15
+    },
+    {
+      "path": "tests/test_v0325_one_shot_unblind_preregistration.py",
+      "package": "tests",
+      "code_lines": 1457,
+      "total_lines": 1793,
+      "classes_count": 0,
+      "functions_count": 68
+    },
+    {
+      "path": "src/btc_quant_agent/api.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1308,
+      "total_lines": 1417,
+      "classes_count": 0,
+      "functions_count": 20
+    },
+    {
+      "path": "src/btc_quant_agent/h40/split_manifest.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1241,
+      "total_lines": 1378,
+      "classes_count": 4,
+      "functions_count": 26
+    },
+    {
+      "path": "src/btc_quant_agent/opportunity_forward.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1119,
+      "total_lines": 1176,
+      "classes_count": 6,
+      "functions_count": 34
+    },
+    {
+      "path": "tests/test_v051_h40_p3b_production_discovery_verifier.py",
+      "package": "tests",
+      "code_lines": 1089,
+      "total_lines": 1230,
+      "classes_count": 3,
+      "functions_count": 67
+    },
+    {
+      "path": "src/btc_quant_agent/h41/frozen_bindings.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1062,
+      "total_lines": 1063,
+      "classes_count": 0,
+      "functions_count": 0
+    },
+    {
+      "path": "src/btc_quant_agent/position_supervisor/supervisor.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1037,
+      "total_lines": 1145,
+      "classes_count": 2,
+      "functions_count": 21
+    },
+    {
+      "path": "src/btc_quant_agent/research_contract/registry.py",
+      "package": "src/btc_quant_agent",
+      "code_lines": 1023,
+      "total_lines": 1099,
+      "classes_count": 6,
+      "functions_count": 34
+    }
+  ],
+  "duplicate_ast_families_sample": {
+    "fn:member": [
+      "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_INDEPENDENT_REAL_DECIMAL_BOUNDARY_AUDIT_METHOD.py",
+      "scripts/strategy_research/g2_exit_horizon_r1/audit.py"
+    ],
+    "fn:parse_junit_xml": [
+      "scripts/ci/test_plan.py",
+      "scripts/ops_g3/run_operational_readiness.py"
+    ],
+    "fn:main": [
+      "scripts/ci/test_plan.py",
+      "scripts/integration/market_event_bridge_r2/cli.py",
+      "scripts/integration/market_event_bridge_r2/generate_r3_evidence.py",
+      "scripts/market_data/forward_public_feed_r1/cli.py",
+      "scripts/ops_g3/lint_container_spec.py",
+      "scripts/ops_g3/run_operational_readiness.py",
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/audit.py",
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/report.py",
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/run.py",
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/sources.py",
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/verify.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_run.py",
+      "skill-template/scripts/quant_tool.py",
+      "src/btc_quant_agent/api.py",
+      "src/btc_quant_agent/cli.py",
+      "tests/probe_v043_c_lite_differential.py",
+      "tools/catalog_surfaces.py",
+      "tools/run_formal_research.py",
+      "tools/run_h39_blind_operations.py",
+      "tools/run_h39_blind_validation.py",
+      "tools/run_h39_one_shot_unblind.py",
+      "tools/run_h39_research.py"
+    ],
+    "fn:to_dict": [
+      "scripts/integration/market_event_bridge_r2/book_ladder.py",
+      "scripts/integration/market_event_bridge_r2/funding_adapter.py",
+      "scripts/integration/market_event_bridge_r2/funding_adapter.py",
+      "scripts/integration/market_event_bridge_r2/mark_aggregator.py",
+      "scripts/integration/market_event_bridge_r2/source_qualification.py",
+      "scripts/integration/market_event_bridge_r2/source_qualification.py",
+      "scripts/market_data/forward_public_feed_r1/contracts.py",
+      "scripts/market_data/forward_public_feed_r1/contracts.py",
+      "scripts/market_data/forward_public_feed_r1/replay.py",
+      "src/btc_quant_agent/economic/funding_evidence.py",
+      "src/btc_quant_agent/economic/metrics.py",
+      "src/btc_quant_agent/economic/metrics.py",
+      "src/btc_quant_agent/economic/metrics.py",
+      "src/btc_quant_agent/economic/order.py",
+      "src/btc_quant_agent/economic/policy.py",
+      "src/btc_quant_agent/economic/qualification.py",
+      "src/btc_quant_agent/economic/qualification.py",
+      "src/btc_quant_agent/economic/qualification.py",
+      "src/btc_quant_agent/economic/qualification.py",
+      "src/btc_quant_agent/economic/qualification.py",
+      "src/btc_quant_agent/economic/qualification.py",
+      "src/btc_quant_agent/economic/qualification.py",
+      "src/btc_quant_agent/economic/qualification.py",
+      "src/btc_quant_agent/economic/qualification.py",
+      "src/btc_quant_agent/economic/qualification.py",
+      "src/btc_quant_agent/economic/qualification.py",
+      "src/btc_quant_agent/economic/replay_bundle.py",
+      "src/btc_quant_agent/economic/replay_bundle.py",
+      "src/btc_quant_agent/economic/replay_bundle.py",
+      "src/btc_quant_agent/economic/signal.py",
+      "src/btc_quant_agent/economic/signal_producer.py",
+      "src/btc_quant_agent/economic/trade_event.py",
+      "src/btc_quant_agent/h40/configuration_ledger.py",
+      "src/btc_quant_agent/h40/configuration_ledger.py",
+      "src/btc_quant_agent/h40/discovery_evidence.py",
+      "src/btc_quant_agent/h40/feature_contracts.py",
+      "src/btc_quant_agent/h40/feature_contracts.py",
+      "src/btc_quant_agent/h40/feature_contracts.py",
+      "src/btc_quant_agent/h40/feature_contracts.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/protocol.py",
+      "src/btc_quant_agent/h40/source_manifest.py",
+      "src/btc_quant_agent/h40/source_manifest.py",
+      "src/btc_quant_agent/h40/source_manifest.py",
+      "src/btc_quant_agent/h40/split_manifest.py",
+      "src/btc_quant_agent/h40/split_manifest.py",
+      "src/btc_quant_agent/h40/split_manifest.py",
+      "src/btc_quant_agent/market_watch/domain.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/market_watch/grid_shadow_evidence.py",
+      "src/btc_quant_agent/market_watch/shadow_evidence.py",
+      "src/btc_quant_agent/market_watch/shadow_evidence.py",
+      "src/btc_quant_agent/market_watch/shadow_evidence.py",
+      "src/btc_quant_agent/market_watch/shadow_evidence.py",
+      "src/btc_quant_agent/market_watch/shadow_evidence.py",
+      "src/btc_quant_agent/market_watch/shadow_evidence.py",
+      "src/btc_quant_agent/market_watch/shadow_evidence.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/registry.py"
+    ],
+    "fn:_sha256": [
+      "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+      "src/btc_quant_agent/data/binance_archive.py",
+      "src/btc_quant_agent/mechanism_research.py",
+      "tests/test_v050_r05a_ag04_health_read_only_inspection.py"
+    ],
+    "fn:build_parser": [
+      "scripts/integration/market_event_bridge_r2/cli.py",
+      "scripts/market_data/forward_public_feed_r1/cli.py",
+      "src/btc_quant_agent/cli.py"
+    ],
+    "fn:to_json": [
+      "scripts/integration/market_event_bridge_r2/source_qualification.py",
+      "src/btc_quant_agent/market_watch/domain.py",
+      "src/btc_quant_agent/research_contract/models.py"
+    ],
+    "fn:from_dict": [
+      "scripts/market_data/forward_public_feed_r1/contracts.py",
+      "scripts/market_data/forward_public_feed_r1/contracts.py",
+      "src/btc_quant_agent/domain.py",
+      "src/btc_quant_agent/economic/signal.py",
+      "src/btc_quant_agent/economic/signal_producer.py",
+      "src/btc_quant_agent/economic/trade_event.py",
+      "src/btc_quant_agent/execution/models.py",
+      "src/btc_quant_agent/execution/models.py",
+      "src/btc_quant_agent/execution/models.py",
+      "src/btc_quant_agent/h40/configuration_ledger.py",
+      "src/btc_quant_agent/h40/configuration_ledger.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/lifecycle_authority.py",
+      "src/btc_quant_agent/h40/protocol.py",
+      "src/btc_quant_agent/h40/source_manifest.py",
+      "src/btc_quant_agent/h40/source_manifest.py",
+      "src/btc_quant_agent/h40/split_manifest.py",
+      "src/btc_quant_agent/h40/split_manifest.py",
+      "src/btc_quant_agent/h40/split_manifest.py",
+      "src/btc_quant_agent/market_watch/domain.py",
+      "src/btc_quant_agent/market_watch/evidence.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_registry.py"
+    ],
+    "fn:canonical_json": [
+      "scripts/market_data/forward_public_feed_r1/contracts.py",
+      "src/btc_quant_agent/decision/models.py",
+      "src/btc_quant_agent/decision/models.py",
+      "src/btc_quant_agent/h40/configuration_ledger.py",
+      "src/btc_quant_agent/h40/protocol.py",
+      "src/btc_quant_agent/h40/source_manifest.py",
+      "src/btc_quant_agent/h40/split_manifest.py",
+      "src/btc_quant_agent/h41/authority.py",
+      "src/btc_quant_agent/research_contract/canonical.py"
+    ],
+    "fn:_open_new_segment": [
+      "scripts/market_data/forward_public_feed_r1/durability.py",
+      "scripts/market_data/forward_public_feed_r1/durability.py"
+    ],
+    "fn:_write_manifest": [
+      "scripts/market_data/forward_public_feed_r1/durability.py",
+      "scripts/market_data/forward_public_feed_r1/durability.py"
+    ],
+    "fn:close": [
+      "scripts/market_data/forward_public_feed_r1/durability.py",
+      "scripts/market_data/forward_public_feed_r1/durability.py",
+      "tests/test_microstructure_status_incremental_performance.py"
+    ],
+    "fn:reset": [
+      "scripts/market_data/forward_public_feed_r1/order_book.py",
+      "src/btc_quant_agent/microstructure.py"
+    ],
+    "fn:connect": [
+      "scripts/market_data/forward_public_feed_r1/proxy_route.py",
+      "tests/test_live_v1_account_stream_r2.py"
+    ],
+    "fn:validate": [
+      "scripts/market_data/forward_public_feed_r1/proxy_route.py",
+      "src/btc_quant_agent/execution/validator.py",
+      "src/btc_quant_agent/research_contract/models.py",
+      "src/btc_quant_agent/research_registry.py"
+    ],
+    "fn:d": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/audit.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/audit.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_audit.py"
+    ],
+    "fn:rounded": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/audit.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/audit.py"
+    ],
+    "fn:quantile": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/metrics.py",
+      "src/btc_quant_agent/economic/qualification.py"
+    ],
+    "fn:_tick": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py"
+    ],
+    "fn:_slippage": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py"
+    ],
+    "fn:_effective": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py"
+    ],
+    "fn:_fee": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py"
+    ],
+    "fn:_index": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py"
+    ],
+    "fn:_event_clock": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "scripts/strategy_research/g2_btc_two_lead_funding_mark_r3/economics.py"
+    ],
+    "fn:_proposed": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py"
+    ],
+    "fn:_trade": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "tests/test_v06_gemini_goal_trend_flow_r1_reanalysis_metrics.py"
+    ],
+    "fn:episode": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py"
+    ],
+    "fn:simulate": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "src/btc_quant_agent/economic/simulator.py"
+    ],
+    "fn:f": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/report.py",
+      "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/report.py",
+      "scripts/strategy_research/g2_exit_horizon_r1/report.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_report.py"
+    ],
+    "fn:dump": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/run.py",
+      "scripts/strategy_research/g2_btc_two_lead_funding_mark_r3/run.py",
+      "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/run.py",
+      "scripts/strategy_research/g2_exit_horizon_r1/run.py"
+    ]
+  },
+  "circular_imports_detected": [],
+  "simplification_opportunities_ranked": [
+    {
+      "id": "SIMP-01",
+      "name": "Canonical MarketEvent Envelope & Metadata Harmonization",
+      "source_modules": [
+        "scripts/market_data/forward_public_feed_r1/contracts.py",
+        "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+        "scripts/integration/market_event_bridge_r2/funding_adapter.py"
+      ],
+      "evidence": "MarketEvent dictionary schemas, hash calculation routines, and envelope validation are re-implemented with slight differences across 3 files.",
+      "semantic_risk": "LOW (Strict fail-closed equivalence, schema version sealed)",
+      "impact_lines_dedup": ">= 80 LOC",
+      "wall_time_impact": "Direct serialization speedup"
+    },
+    {
+      "id": "SIMP-02",
+      "name": "Unified Desensitized Proxy Route & Network Error Diagnostic",
+      "source_modules": [
+        "scripts/market_data/forward_public_feed_r1/proxy_route.py",
+        "scripts/market_data/forward_public_feed_r1/cli.py",
+        "scripts/integration/market_event_bridge_r2/cli.py"
+      ],
+      "evidence": "Proxy sanitization, WSL2 detection, and CLI route diagnostic commands are duplicated between feed and bridge packages.",
+      "semantic_risk": "LOW (Purely diagnostic and configuration formatting)",
+      "impact_lines_dedup": ">= 60 LOC",
+      "wall_time_impact": "Consolidated single route configuration"
+    },
+    {
+      "id": "SIMP-03",
+      "name": "Deterministic Synthetic Exchange Fixture Deduplication",
+      "source_modules": [
+        "scripts/market_data/forward_public_feed_r1/fixture.py",
+        "scripts/integration/market_event_bridge_r2/fixtures.py"
+      ],
+      "evidence": "Both files independently generate synthetic depth snapshots, 1m klines, mark ticks, and orderbook frames with slight variation in seed management.",
+      "semantic_risk": "LOW (Hermetic synthetic data generation, no strategy state)",
+      "impact_lines_dedup": ">= 90 LOC",
+      "wall_time_impact": "Shared deterministic fixtures across test suites"
+    },
+    {
+      "id": "SIMP-04",
+      "name": "Portable Pinned Source Git Command Memoization",
+      "source_modules": [
+        "scripts/integration/market_event_bridge_r2/portable_ci_refs.py"
+      ],
+      "evidence": "PortablePinnedSourceHarness executes git cat-file and git checkout repeatedly per test invocation across 27 tests in test_v06_market_event_bridge_r2_portable_ci.py.",
+      "semantic_risk": "LOW (Process-isolated immutable read-only cache keyed by exact 40-char SHA and manifest hash)",
+      "impact_lines_dedup": "Focused harness efficiency",
+      "wall_time_impact": "Reduces focused test suite wall time by 2-3 seconds"
+    },
+    {
+      "id": "SIMP-05",
+      "name": "Bounded TCP Probe Timeout for Negative Route Tests",
+      "source_modules": [
+        "scripts/market_data/forward_public_feed_r1/proxy_route.py",
+        "tests/test_v06_market_event_bridge_r2_clash_proxy_network.py",
+        "tests/test_v06_forward_public_feed_r1_proxy_route.py"
+      ],
+      "evidence": "Hardcoded 2.0s probe_tcp_socket timeout causes negative closed-port tests to block synchronously for 4.0+ seconds in aggregate.",
+      "semantic_risk": "LOW (Configurable or bounded probe timeout, preserves failure detection)",
+      "impact_lines_dedup": "Clean interface parameterization",
+      "wall_time_impact": "Eliminates ~3.5 seconds of artificial sleep/wait in focused test runs"
+    }
+  ]
+}
