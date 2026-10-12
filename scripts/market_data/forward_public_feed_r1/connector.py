@@ -26,6 +26,12 @@ from .contracts import (
     validate_provider_payload_shape,
 )
 from .order_book import OrderBookIntegrityEngine
+from .proxy_route import (
+    ProxyRouteConfig,
+    build_2026_market_stream_url,
+    build_2026_public_stream_url,
+    validate_2026_routed_url,
+)
 from .time_authority import TimeAuthority
 
 BINANCE_USDT_M_REST_BASE: str = "https://fapi.binance.com"
@@ -75,6 +81,7 @@ class BinancePublicFeedClient:
         network_mode: str = "disabled",
         time_authority: TimeAuthority | None = None,
         book_engine: OrderBookIntegrityEngine | None = None,
+        proxy_config: ProxyRouteConfig | None = None,
     ) -> None:
         if symbol != ALLOWED_SYMBOL:
             raise ContractValidationError(f"Symbol '{symbol}' invalid. Must be exact '{ALLOWED_SYMBOL}'")
@@ -84,8 +91,16 @@ class BinancePublicFeedClient:
         self.time_authority = time_authority or TimeAuthority()
         self.book_engine = book_engine or OrderBookIntegrityEngine(symbol=symbol)
 
+        if proxy_config is not None:
+            self.proxy_config = proxy_config
+            if proxy_config.mode in ("public-direct", "public-clash-explicit") and self.network_mode == "disabled":
+                self.network_mode = proxy_config.mode
+        else:
+            mode = "public-direct" if network_mode == "allow-public" else network_mode
+            self.proxy_config = ProxyRouteConfig(mode=mode)
+
     def _assert_network_permitted(self) -> None:
-        if self.network_mode != "allow-public":
+        if self.network_mode not in ("allow-public", "public-direct", "public-clash-explicit"):
             raise NetworkGateError(
                 f"Network access blocked. network_mode='{self.network_mode}' (must be 'allow-public')."
             )
@@ -102,8 +117,8 @@ class BinancePublicFeedClient:
             method="GET",
         )
 
-        # Ingress clock captured immediately before/after network receive
-        with urllib.request.urlopen(req, timeout=10.0) as resp:
+        opener = self.proxy_config.build_urllib_opener()
+        with opener.open(req, timeout=10.0) as resp:
             ingress = self.time_authority.capture_ingress()
             raw_bytes = resp.read()
 
@@ -122,7 +137,8 @@ class BinancePublicFeedClient:
             method="GET",
         )
 
-        with urllib.request.urlopen(req, timeout=10.0) as resp:
+        opener = self.proxy_config.build_urllib_opener()
+        with opener.open(req, timeout=10.0) as resp:
             ingress = self.time_authority.capture_ingress()
             raw_bytes = resp.read()
 
@@ -260,24 +276,31 @@ class BinancePublicFeedClient:
         on_event_callback: Any = None,
         raw_writer: Any = None,
         event_writer: Any = None,
+        custom_url: str | None = None,
     ) -> dict[str, Any]:
-        """Connect to official public combined streams for bounded duration."""
+        """Connect to official 2026 public depth and market streams for bounded duration."""
         self._assert_network_permitted()
 
-        streams = [
-            f"{self.symbol.lower()}@kline_1m",
-            f"{self.symbol.lower()}@markPrice@1s",
-            f"{self.symbol.lower()}@aggTrade",
-            f"{self.symbol.lower()}@depth@100ms",
-        ]
-        url = f"{BINANCE_USDT_M_WS_BASE}?streams={'/'.join(streams)}"
-        validate_public_url(url, method="GET")
+        public_url = build_2026_public_stream_url(self.symbol)
+        market_url = build_2026_market_stream_url(self.symbol)
 
-        stats = {
+        if custom_url is not None:
+            validate_public_url(custom_url, method="GET")
+            target_urls = [(custom_url, "custom")]
+        else:
+            validate_2026_routed_url(public_url, expected_route="public")
+            validate_2026_routed_url(market_url, expected_route="market")
+            target_urls = [(public_url, "public_depth"), (market_url, "market_events")]
+
+        stats: dict[str, Any] = {
             "status": "RUNNING",
             "events_received": 0,
+            "public_depth_events": 0,
+            "market_events": 0,
             "duration_seconds": duration_seconds,
             "rebootstrap_count": 0,
+            "public_epoch": f"pub-{self.time_authority.connection_epoch}",
+            "market_epoch": f"mkt-{self.time_authority.connection_epoch}",
             "error": None,
         }
 
@@ -299,6 +322,7 @@ class BinancePublicFeedClient:
             )
             if snap_event is not None:
                 stats["events_received"] += 1
+                stats["public_depth_events"] += 1
                 if event_writer is not None:
                     event_writer.append_event(snap_event)
                 if on_event_callback is not None:
@@ -328,21 +352,31 @@ class BinancePublicFeedClient:
                 )
                 if fund_event is not None:
                     stats["events_received"] += 1
+                    stats["market_events"] += 1
                     if event_writer is not None:
                         event_writer.append_event(fund_event)
         except (urllib.error.URLError, OSError, json.JSONDecodeError, KeyError, ValueError, ContractValidationError):
             pass
 
         stop_time = asyncio.get_event_loop().time() + duration_seconds
+        ws_proxy = self.proxy_config.get_websockets_proxy() if self.proxy_config else None
 
-        try:
-            async with websockets.connect(url, ping_interval=20, ping_timeout=10) as ws:
-                while asyncio.get_event_loop().time() < stop_time:
-                    try:
+        async def _consume_stream(stream_url: str, stream_tag: str) -> None:
+            try:
+                async with websockets.connect(
+                    stream_url,
+                    proxy=ws_proxy,
+                    ping_interval=20,
+                    ping_timeout=10,
+                ) as ws:
+                    while asyncio.get_event_loop().time() < stop_time:
                         timeout_left = max(0.1, stop_time - asyncio.get_event_loop().time())
-                        raw_msg = await asyncio.wait_for(ws.recv(), timeout=timeout_left)
-                        ingress = self.time_authority.capture_ingress()
+                        try:
+                            raw_msg = await asyncio.wait_for(ws.recv(), timeout=timeout_left)
+                        except TimeoutError:
+                            break
 
+                        ingress = self.time_authority.capture_ingress()
                         if raw_writer is not None:
                             _eh, raw_manifest_sha = raw_writer.append_raw_frame(
                                 raw_msg,
@@ -360,12 +394,15 @@ class BinancePublicFeedClient:
                         )
                         if event is not None:
                             stats["events_received"] += 1
+                            if stream_tag == "public_depth":
+                                stats["public_depth_events"] += 1
+                            else:
+                                stats["market_events"] += 1
                             if event_writer is not None:
                                 event_writer.append_event(event)
                             if on_event_callback is not None:
                                 on_event_callback(event)
 
-                        # Automatic rebootstrap if book encounters discontinuity / gap
                         if self.book_engine.needs_rebootstrap:
                             try:
                                 reb_snap, reb_wall, reb_mono = self.fetch_public_depth_snapshot()
@@ -385,13 +422,19 @@ class BinancePublicFeedClient:
                                 if reb_event is not None and event_writer is not None:
                                     event_writer.append_event(reb_event)
                                 stats["rebootstrap_count"] += 1
-                            except (urllib.error.URLError, OSError, ValueError, RuntimeError) as reb_exc:
+                            except Exception as reb_exc:  # noqa: BLE001
                                 stats["rebootstrap_error"] = str(reb_exc)
+            except (socket.gaierror, ssl.SSLError, ConnectionRefusedError, websockets.WebSocketException, OSError) as exc:
+                stats["error"] = f"WebSocket stream {stream_tag} error: {exc}"
 
-                    except TimeoutError:
-                        break
-            stats["status"] = "PUBLIC_SMOKE_VERIFIED"
-        except (socket.gaierror, ssl.SSLError, ConnectionRefusedError, websockets.WebSocketException) as exc:
+        try:
+            tasks = [_consume_stream(u, tag) for u, tag in target_urls]
+            await asyncio.gather(*tasks)
+            if stats["events_received"] > 0:
+                stats["status"] = "PUBLIC_SMOKE_VERIFIED"
+            else:
+                stats["status"] = "WS_CONNECTED_NO_EVENTS"
+        except (socket.gaierror, ssl.SSLError, ConnectionRefusedError, websockets.WebSocketException, OSError) as exc:
             stats["status"] = "NOT_TESTED_SOURCE_UNREACHABLE"
             stats["error"] = f"WebSocket connection failed: {exc}"
 

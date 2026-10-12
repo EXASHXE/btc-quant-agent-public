@@ -21,6 +21,7 @@ from .durability import RawSegmentWriter, SegmentWriter
 from .fixture import DeterministicExchangeFixture
 from .health import HealthSupervisor
 from .order_book import OrderBookIntegrityEngine
+from .proxy_route import ProxyRouteConfig
 from .replay import ReplayEngine
 from .time_authority import TimeAuthority
 
@@ -37,9 +38,26 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--network",
-        choices=["disabled", "allow-public"],
+        choices=["disabled", "allow-public", "public-direct", "public-clash-explicit"],
         default="disabled",
-        help="Network access gate (default: disabled). Live connection requires allow-public.",
+        help="Network access gate (default: disabled). Live connection requires opt-in mode.",
+    )
+    parser.add_argument(
+        "--proxy-kind",
+        choices=["http", "socks5h"],
+        default="http",
+        help="Proxy protocol kind (default: http).",
+    )
+    parser.add_argument(
+        "--proxy-host",
+        default=None,
+        help="Proxy hostname or IP for public-clash-explicit.",
+    )
+    parser.add_argument(
+        "--proxy-port",
+        type=int,
+        default=None,
+        help="Proxy port for public-clash-explicit.",
     )
     parser.add_argument(
         "--symbol",
@@ -259,16 +277,27 @@ def run_replay_mode(args: argparse.Namespace) -> int:
 
 def run_live_public_mode(args: argparse.Namespace) -> int:
     """Run bounded public-only live market stream recorder."""
-    if args.network != "allow-public":
+    if args.network == "disabled":
         print(
-            "ERROR: --mode live-public requires explicit opt-in flag '--network allow-public'.",
+            "ERROR: --mode live-public requires explicit opt-in flag '--network allow-public', 'public-direct', or 'public-clash-explicit'.",
             file=sys.stderr,
         )
         return 2
 
+    if args.network == "public-clash-explicit":
+        proxy_cfg = ProxyRouteConfig(
+            mode="public-clash-explicit",
+            kind=args.proxy_kind,
+            host=args.proxy_host,
+            port=args.proxy_port,
+        )
+    else:
+        proxy_cfg = ProxyRouteConfig(mode="public-direct")
+
     client = BinancePublicFeedClient(
         symbol=args.symbol,
-        network_mode="allow-public",
+        network_mode=args.network,
+        proxy_config=proxy_cfg,
     )
     out_dir = Path(args.output_dir)
     epoch = f"live-epoch-{args.symbol.lower()}"
