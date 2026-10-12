@@ -7,6 +7,8 @@ and source provenance tracking. Never promotes a single arbitrary tick to an off
 
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
@@ -34,6 +36,13 @@ class DerivedMark1MBar:
     parent_event_sha256: tuple[str, ...]
     raw_source_manifest_sha256: str
     symbol: str = "BTCUSDT"
+    derivation_version: str = "derived-mark-1m-v1"
+    producer_upstream_sha: str = "df00997f344eba82f7cca0d03ee1617948abee44"
+    route_epoch: str = "route-epoch-0"
+    connection_epoch: int = 1
+    source_observed_wall_utc_ms: int = 0
+    source_available_at_ms: int = 0
+    clock_uncertainty_ms: int = 0
 
     def to_b_kline_payload(self) -> dict[str, Any]:
         """Convert to Binance kline payload structure expected by B's parse_kline_payload."""
@@ -63,7 +72,11 @@ class DerivedMark1MBar:
         }
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        src_wall = self.source_observed_wall_utc_ms or self.derived_available_at_ms
+        src_avail = self.source_available_at_ms or self.derived_available_at_ms
+        base = {
+            "schema_version": self.derivation_version,
+            "derivation_version": self.derivation_version,
             "symbol": self.symbol,
             "bar_open_ms": self.bar_open_ms,
             "bar_close_ms": self.bar_close_ms,
@@ -73,13 +86,24 @@ class DerivedMark1MBar:
             "low": self.low,
             "close": self.close,
             "sample_count": self.sample_count,
+            "source_observed_wall_utc_ms": src_wall,
+            "source_available_at_ms": src_avail,
             "derived_available_at_ms": self.derived_available_at_ms,
             "feature_known_at_ms": self.feature_known_at_ms,
+            "clock_uncertainty_ms": self.clock_uncertainty_ms,
+            "route_epoch": self.route_epoch,
+            "connection_epoch": self.connection_epoch,
+            "producer_upstream_sha": self.producer_upstream_sha,
             "quality": self.quality,
             "reason_codes": list(self.reason_codes),
             "parent_event_sha256": list(self.parent_event_sha256),
             "raw_source_manifest_sha256": self.raw_source_manifest_sha256,
         }
+        canonical_sha = hashlib.sha256(
+            json.dumps(base, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        base["canonical_sha256"] = canonical_sha
+        return base
 
 
 @dataclass

@@ -6,22 +6,33 @@
   "rejected_count": 0,
   "journal_records": [
     {
+      "schema_version": "settled-funding-entry-v1",
+      "derivation_version": "settled-funding-entry-v1",
       "symbol": "BTCUSDT",
       "funding_time_ms": 1728720000000,
       "funding_rate": "0.00010000",
-      "mark_price": "64047.09",
+      "mark_price": "64001.16",
       "settlement_id": "BTCUSDT:1728720000000:0.00010000",
       "settled": true,
       "rate_type": "SETTLED_REALIZED",
-      "derived_available_at_ms": 1728720181100,
-      "feature_known_at_ms": 1728720181100,
-      "producer_manifest_sha256": "manifest-1811",
+      "source_observed_wall_utc_ms": 1728720000200,
+      "source_available_at_ms": 1728720000200,
+      "derived_available_at_ms": 1728720000200,
+      "feature_known_at_ms": 1728720000200,
+      "clock_uncertainty_ms": 0,
+      "route_epoch": "route-epoch-0",
+      "connection_epoch": 1,
+      "parent_event_sha256": [],
+      "raw_source_manifest_sha256": "db72fd25eb87fe8835a2f025a7d0ced5e192fb7fb868b0f3aadfff17a7d3ca13",
+      "producer_manifest_sha256": "db72fd25eb87fe8835a2f025a7d0ced5e192fb7fb868b0f3aadfff17a7d3ca13",
+      "producer_upstream_sha": "df00997f344eba82f7cca0d03ee1617948abee44",
       "quality": "VERIFIED",
       "reason_codes": [
         "OK"
       ],
-      "sample_long_1btc_cash_flow": "-6.40470900",
-      "sample_short_1btc_cash_flow": "6.40470900"
+      "canonical_sha256": "56c1ee956bbbc4d3917b035209bdff5599ebf859158c0a79ff2751072c169e14",
+      "sample_long_1btc_cash_flow": "-6.40011600",
+      "sample_short_1btc_cash_flow": "6.40011600"
     }
   ]
 }

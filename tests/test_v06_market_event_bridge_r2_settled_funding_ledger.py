@@ -9,16 +9,16 @@ Covers:
 - Compatibility with B's parse_funding_payload and C's MarketPitPort funding validation
 """
 
+import sys
 from decimal import Decimal
 from pathlib import Path
-import sys
+
 import pytest
 
 from scripts.integration.market_event_bridge_r2.funding_adapter import (
     SettledFundingEntry,
     SettledFundingLedger,
 )
-from scripts.integration.market_event_bridge_r2.bridge_engine import MarketEventBridgeR2
 
 # Ensure B and C worktrees are on sys.path if present
 B_DIR = Path("/root/workspace/project/quant-v0.6/gemini-forward-shadow-research-r1")
@@ -67,7 +67,7 @@ def test_settled_funding_entry_immutable():
         quality="VERIFIED",
         reason_codes=("OK",),
     )
-    with pytest.raises(Exception):
+    with pytest.raises(AttributeError):
         entry.symbol = "ETHUSDT"  # type: ignore
 
 
@@ -208,7 +208,7 @@ def test_cash_flow_large_position_precise():
     )
     cf = entry.calculate_cash_flow(Decimal("500.12345678"))
     assert isinstance(cf, Decimal)
-    assert cf < Decimal("0")
+    assert cf < Decimal(0)
 
 
 def test_to_b_funding_payload_format():

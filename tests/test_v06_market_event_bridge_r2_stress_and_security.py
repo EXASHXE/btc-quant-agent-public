@@ -13,27 +13,27 @@ Covers:
 - High-velocity burst throughput benchmarking (>1,000 frames/sec)
 """
 
-from decimal import Decimal
 import json
-from pathlib import Path
 import sys
 import time
+from pathlib import Path
+
 import pytest
 
-from scripts.integration.market_event_bridge_r2.fixtures import BridgeFixtureGenerator
 from scripts.integration.market_event_bridge_r2.bridge_engine import MarketEventBridgeR2
 from scripts.integration.market_event_bridge_r2.cli import main as bridge_cli_main
-from scripts.market_data.forward_public_feed_r1.proxy_route import (
-    ProxyRouteConfig,
-    validate_2026_routed_url,
-    detect_wsl2_networking,
-    sanitize_env_proxy_map,
-    NetworkRouteError,
-    NetworkErrorCode,
-)
+from scripts.integration.market_event_bridge_r2.fixtures import BridgeFixtureGenerator
 from scripts.market_data.forward_public_feed_r1.connector import (
     BinancePublicFeedClient,
     NetworkGateError,
+)
+from scripts.market_data.forward_public_feed_r1.proxy_route import (
+    NetworkErrorCode,
+    NetworkRouteError,
+    ProxyRouteConfig,
+    detect_wsl2_networking,
+    sanitize_env_proxy_map,
+    validate_2026_routed_url,
 )
 
 # Ensure B and C worktrees are on sys.path
@@ -119,7 +119,7 @@ def test_bridge_10m_scenario_stress():
 
 def test_bridge_15m_jitter_and_drops_scenario():
     generator = BridgeFixtureGenerator(seed=1002, symbol="BTCUSDT")
-    frames, metrics = generator.generate_scenario("jitter_and_drops_15m")
+    frames, _metrics = generator.generate_scenario("jitter_and_drops_15m")
     assert len(frames) > 700
 
     bridge = MarketEventBridgeR2(symbol="BTCUSDT")
@@ -135,7 +135,7 @@ def test_bridge_15m_jitter_and_drops_scenario():
 
 def test_bridge_30m_stress_scenario():
     generator = BridgeFixtureGenerator(seed=1003, symbol="BTCUSDT")
-    frames, metrics = generator.generate_scenario("high_frequency_stress_30m")
+    frames, _metrics = generator.generate_scenario("high_frequency_stress_30m")
     assert len(frames) > 1500
 
     bridge = MarketEventBridgeR2(symbol="BTCUSDT")

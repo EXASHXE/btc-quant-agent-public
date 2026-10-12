@@ -68,6 +68,7 @@ class MarketEventBridgeR2:
         # In-memory tracking
         self.stats = BridgeStats()
         self.last_derived_mark_bar: DerivedMark1MBar | None = None
+        self.last_mark_tick_price: float | None = None
         self.last_top10_snapshot: Top10BookSnapshot | None = None
         self.witness_records: list[dict[str, Any]] = []
 
@@ -157,6 +158,10 @@ class MarketEventBridgeR2:
         elif event_type == "markPriceUpdate":
             self.stats.mark_ticks_ingested += 1
             mark_p = frame.get("p", "0.0")
+            try:
+                self.last_mark_tick_price = float(mark_p)
+            except (ValueError, TypeError):
+                pass
             prov_e = frame.get("E", observed_wall_utc_ms)
             derived_bar = self.mark_aggregator.ingest_tick(
                 provider_event_ms=prov_e,
@@ -278,7 +283,7 @@ class MarketEventBridgeR2:
 
         # 6. Settled Funding Record
         elif "fundingRate" in frame and "fundingTime" in frame:
-            mark_p = self.last_derived_mark_bar.close if self.last_derived_mark_bar else 64000.0
+            mark_p = self.last_mark_tick_price or (self.last_derived_mark_bar.close if self.last_derived_mark_bar else None)
             entry = self.funding_ledger.ingest_settled_funding(
                 raw_record=frame,
                 contemporaneous_mark_price=mark_p,

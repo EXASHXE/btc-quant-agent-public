@@ -9,7 +9,7 @@ import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -23,7 +23,6 @@ from market_data.forward_public_feed_r1.proxy_route import (
     NetworkRouteError,
     ProxyRouteConfig,
     detect_wsl2_networking,
-    probe_tcp_socket,
     run_desensitized_network_diagnostic,
     sanitize_env_proxy_map,
 )

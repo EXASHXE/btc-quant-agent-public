@@ -6,6 +6,7 @@ supporting Linux / WSL2 Windows Host Clash and Mihomo local proxies.
 
 from __future__ import annotations
 
+import http.client
 import os
 import platform
 import re
@@ -18,6 +19,11 @@ import urllib.request
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
+
+try:
+    from python_socks.sync import Proxy as SyncSocksProxy
+except ImportError:
+    SyncSocksProxy = None
 
 from .contracts import (
     ALLOWED_REST_HOSTS,
@@ -35,6 +41,7 @@ BINANCE_LEGACY_UNROUTED_WS_BASE: str = "wss://fstream.binance.com/stream"
 
 
 class NetworkErrorCode(str, Enum):
+    DIAGNOSTIC_OK = "DIAGNOSTIC_OK"
     NETWORK_DISABLED = "NETWORK_DISABLED"
     PROXY_PORT_CLOSED = "PROXY_PORT_CLOSED"
     PROXY_AUTH_REQUIRED = "PROXY_AUTH_REQUIRED"
@@ -49,6 +56,47 @@ class NetworkErrorCode(str, Enum):
     CLOCK_UNCERTAIN = "CLOCK_UNCERTAIN"
     SOURCE_BLOCKED_BY_PROVIDER_POLICY = "SOURCE_BLOCKED_BY_PROVIDER_POLICY"
     SOURCE_UNAVAILABLE = "SOURCE_UNAVAILABLE"
+
+
+class SocksHTTPSConnection(http.client.HTTPSConnection):
+    """HTTPS connection tunneling through remote DNS resolved SOCKS5h proxy."""
+
+    def __init__(
+        self,
+        proxy_url: str,
+        host: str,
+        port: int | None = None,
+        timeout: float = 10.0,
+        context: ssl.SSLContext | None = None,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(host, port, timeout=timeout, context=context, **kwargs)
+        self.proxy_url = proxy_url
+
+    def connect(self) -> None:
+        if SyncSocksProxy is None:
+            raise RuntimeError("python-socks not installed; cannot route via socks5h.")
+        proxy = SyncSocksProxy.from_url(self.proxy_url)
+        dest_port = self.port or 443
+        sock = proxy.connect(dest_host=self.host, dest_port=dest_port, timeout=self.timeout)
+        if self._context:
+            self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
+        else:
+            self.sock = sock
+
+
+class SocksHTTPSHandler(urllib.request.HTTPSHandler):
+    """Urllib handler directing HTTPS traffic through explicit SOCKS5h proxy."""
+
+    def __init__(self, proxy_url: str, context: ssl.SSLContext | None = None) -> None:
+        super().__init__(context=context)
+        self.proxy_url = proxy_url
+
+    def https_open(self, req: urllib.request.Request) -> http.client.HTTPResponse:
+        return self.do_open(
+            lambda host, **kw: SocksHTTPSConnection(self.proxy_url, host, context=self._context, **kw),
+            req,
+        )
 
 
 class NetworkRouteError(RuntimeError):
@@ -130,6 +178,8 @@ class ProxyRouteConfig:
         if self.mode == "public-clash-explicit":
             proxy_url = self.to_proxy_url()
             assert proxy_url is not None
+            if self.kind == "socks5h":
+                return urllib.request.build_opener(SocksHTTPSHandler(proxy_url, context=ssl_ctx))
             proxy_handler = urllib.request.ProxyHandler({
                 "http": proxy_url,
                 "https": proxy_url,
@@ -340,18 +390,24 @@ def run_desensitized_network_diagnostic(config: ProxyRouteConfig) -> dict[str, A
 
     if config.mode == "disabled":
         terminal_code = NetworkErrorCode.NETWORK_DISABLED
-    elif config.mode == "public-clash-explicit":
-        assert config.host is not None and config.port is not None
-        # Layer 1: Local TCP Probe
-        tcp_ok = probe_tcp_socket(config.host, config.port, timeout=2.0)
-        if not tcp_ok:
-            layers["layer_1_local_tcp"] = {"status": "FAILED", "host": config.host, "port": config.port}
-            terminal_code = NetworkErrorCode.PROXY_PORT_CLOSED
-            error_detail = f"TCP connection to proxy port {config.port} on {config.host} failed."
-        else:
-            layers["layer_1_local_tcp"] = {"status": "SUCCESS", "host": config.host, "port": config.port}
+    elif config.mode in ("public-clash-explicit", "public-direct"):
+        proceed_to_rest = True
 
-            # Layer 2 & 3: REST TLS end-to-end check via proxy
+        if config.mode == "public-clash-explicit":
+            assert config.host is not None and config.port is not None
+            # Layer 1: Local TCP Probe
+            tcp_ok = probe_tcp_socket(config.host, config.port, timeout=2.0)
+            if not tcp_ok:
+                layers["layer_1_local_tcp"] = {"status": "FAILED", "host": config.host, "port": config.port}
+                terminal_code = NetworkErrorCode.PROXY_PORT_CLOSED
+                error_detail = f"TCP connection to proxy port {config.port} on {config.host} failed."
+                proceed_to_rest = False
+            else:
+                layers["layer_1_local_tcp"] = {"status": "SUCCESS", "host": config.host, "port": config.port}
+
+        if proceed_to_rest:
+            # Layer 2 & 3: REST TLS end-to-end check
+            rest_ok = False
             try:
                 opener = config.build_urllib_opener()
                 test_url = f"{BINANCE_2026_REST_BASE}/fapi/v1/depth?symbol=BTCUSDT&limit=5"
@@ -365,9 +421,11 @@ def run_desensitized_network_diagnostic(config: ProxyRouteConfig) -> dict[str, A
                     status_code = resp.status
                     body = resp.read()
                     if status_code == 200 and len(body) > 0:
-                        layers["layer_2_proxy_negotiation"] = {"status": "SUCCESS"}
+                        if config.mode == "public-clash-explicit":
+                            layers["layer_2_proxy_negotiation"] = {"status": "SUCCESS"}
                         layers["layer_3_tls_rest_verify"] = {"status": "SUCCESS", "status_code": 200, "bytes": len(body)}
-                        terminal_code = NetworkErrorCode.NETWORK_DISABLED  # Reset or pending WS
+                        terminal_code = NetworkErrorCode.DIAGNOSTIC_OK
+                        rest_ok = True
                     elif status_code in (403, 451):
                         layers["layer_3_tls_rest_verify"] = {"status": "BLOCKED", "status_code": status_code}
                         terminal_code = NetworkErrorCode.SOURCE_BLOCKED_BY_PROVIDER_POLICY
@@ -393,10 +451,54 @@ def run_desensitized_network_diagnostic(config: ProxyRouteConfig) -> dict[str, A
                     layers["layer_3_tls_rest_verify"] = {"status": "TLS_CERT_INVALID", "error": str(se)}
                     terminal_code = NetworkErrorCode.TLS_CERT_INVALID
                 error_detail = f"TLS handshake failed: {se}"
-            except (socket.gaierror, urllib.error.URLError) as ue:
-                layers["layer_2_proxy_negotiation"] = {"status": "CONNECT_FAILED", "error": str(ue)}
-                terminal_code = NetworkErrorCode.PROXY_CONNECT_FAILED
-                error_detail = f"Proxy negotiation failed: {ue}"
+            except (socket.gaierror, urllib.error.URLError, OSError, RuntimeError, ValueError) as ue:
+                err_str = str(ue)
+                if "407" in err_str or "auth" in err_str.lower():
+                    layers["layer_2_proxy_negotiation"] = {"status": "AUTH_REQUIRED", "error": err_str}
+                    terminal_code = NetworkErrorCode.PROXY_AUTH_REQUIRED
+                    error_detail = f"Proxy requires authentication: {ue}"
+                else:
+                    layers["layer_2_proxy_negotiation"] = {"status": "CONNECT_FAILED", "error": err_str}
+                    terminal_code = NetworkErrorCode.PROXY_CONNECT_FAILED
+                    error_detail = f"Proxy negotiation failed: {ue}"
+
+            # Layer 4: WS Upgrade and stream event check (only if REST succeeded)
+            if rest_ok:
+                try:
+                    import websockets.sync.client
+                    ws_url = build_2026_public_stream_url("BTCUSDT")
+                    validate_2026_routed_url(ws_url, expected_route="public")
+                    ws_proxy = config.get_websockets_proxy()
+                    with websockets.sync.client.connect(
+                        ws_url,
+                        proxy=ws_proxy,
+                        open_timeout=min(config.timeout_seconds, 5.0),
+                        close_timeout=1.0,
+                    ) as ws:
+                        raw_msg = ws.recv(timeout=min(config.timeout_seconds, 3.0))
+                        layers["layer_4_ws_connect_verify"] = {
+                            "status": "SUCCESS",
+                            "frame_bytes": len(raw_msg),
+                            "stream": "btcusdt@depth@100ms",
+                        }
+                        terminal_code = NetworkErrorCode.DIAGNOSTIC_OK
+                except TimeoutError:
+                    layers["layer_4_ws_connect_verify"] = {
+                        "status": "NO_EVENTS",
+                        "error": "Connected but timed out waiting for events.",
+                    }
+                    terminal_code = NetworkErrorCode.WS_CONNECTED_NO_EVENTS
+                    error_detail = "WebSocket connected but zero stream events received within timeout."
+                except Exception as wse:  # noqa: BLE001
+                    msg_str = str(wse)
+                    if any(kw in msg_str for kw in ("403", "451", "Policy")):
+                        layers["layer_4_ws_connect_verify"] = {"status": "BLOCKED", "error": msg_str}
+                        terminal_code = NetworkErrorCode.SOURCE_BLOCKED_BY_PROVIDER_POLICY
+                        error_detail = f"WebSocket stream blocked by policy: {wse}"
+                    else:
+                        layers["layer_4_ws_connect_verify"] = {"status": "UPGRADE_FAILED", "error": msg_str}
+                        terminal_code = NetworkErrorCode.WS_UPGRADE_FAILED
+                        error_detail = f"WebSocket handshake/upgrade failed: {wse}"
 
     return {
         "timestamp_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),

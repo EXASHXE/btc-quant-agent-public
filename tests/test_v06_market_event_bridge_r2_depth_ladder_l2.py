@@ -6,8 +6,6 @@ import sys
 from decimal import Decimal
 from pathlib import Path
 
-import pytest
-
 _SCRIPTS_DIR = str(Path(__file__).resolve().parent.parent / "scripts")
 if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
@@ -17,9 +15,9 @@ if _B_DIR not in sys.path and Path(_B_DIR).exists():
     sys.path.insert(0, _B_DIR)
 
 from market_data.forward_public_feed_r1.order_book import OrderBookIntegrityEngine
+
 from scripts.integration.market_event_bridge_r2.book_ladder import (
     OrderBookLadderAdapter,
-    Top10BookSnapshot,
 )
 
 

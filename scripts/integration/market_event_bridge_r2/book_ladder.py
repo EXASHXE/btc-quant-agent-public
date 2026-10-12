@@ -34,6 +34,16 @@ class Top10BookSnapshot:
     reason_codes: tuple[str, ...]
     top10_ladder_sha256: str
     route_epoch: str
+    derivation_version: str = "top10-book-snapshot-v1"
+    parent_event_sha256: tuple[str, ...] = ()
+    raw_source_manifest_sha256: str = ""
+    producer_upstream_sha: str = "df00997f344eba82f7cca0d03ee1617948abee44"
+    connection_epoch: int = 1
+    source_observed_wall_utc_ms: int = 0
+    source_available_at_ms: int = 0
+    derived_available_at_ms: int = 0
+    feature_known_at_ms: int = 0
+    clock_uncertainty_ms: int = 0
 
     def top_10_imbalance(self) -> float | None:
         """Calculate B's P2 signal notional imbalance: (bid_notional - ask_notional) / total."""
@@ -66,6 +76,8 @@ class Top10BookSnapshot:
 
     def to_dict(self) -> dict[str, Any]:
         return {
+            "schema_version": self.derivation_version,
+            "derivation_version": self.derivation_version,
             "snapshot_update_id": self.snapshot_update_id,
             "first_update_id": self.first_update_id,
             "final_update_id": self.final_update_id,
@@ -80,7 +92,17 @@ class Top10BookSnapshot:
             "quality": self.quality,
             "reason_codes": list(self.reason_codes),
             "top10_ladder_sha256": self.top10_ladder_sha256,
+            "canonical_sha256": self.top10_ladder_sha256,
             "route_epoch": self.route_epoch,
+            "connection_epoch": self.connection_epoch,
+            "parent_event_sha256": list(self.parent_event_sha256),
+            "raw_source_manifest_sha256": self.raw_source_manifest_sha256,
+            "producer_upstream_sha": self.producer_upstream_sha,
+            "source_observed_wall_utc_ms": self.source_observed_wall_utc_ms,
+            "source_available_at_ms": self.source_available_at_ms,
+            "derived_available_at_ms": self.derived_available_at_ms,
+            "feature_known_at_ms": self.feature_known_at_ms,
+            "clock_uncertainty_ms": self.clock_uncertainty_ms,
             "top10_imbalance": self.top_10_imbalance(),
         }
 
@@ -165,4 +187,8 @@ class OrderBookLadderAdapter:
             reason_codes=tuple(reasons),
             top10_ladder_sha256=ladder_sha,
             route_epoch=route_epoch,
+            source_observed_wall_utc_ms=engine.last_update_wall_ms or current_wall_ms,
+            source_available_at_ms=engine.last_update_wall_ms or current_wall_ms,
+            derived_available_at_ms=current_wall_ms,
+            feature_known_at_ms=current_wall_ms,
         )

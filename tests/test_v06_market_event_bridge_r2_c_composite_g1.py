@@ -8,11 +8,11 @@ Covers:
 - G1 state engine ingest, transition immutability, and deterministic WAL replay
 """
 
-from decimal import Decimal
 import hashlib
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
+
 import pytest
 
 from scripts.integration.market_event_bridge_r2.c_composite_bar import CCompositeBarBuilder
@@ -400,7 +400,7 @@ def test_g1_reducer_transitions_on_translated_bar():
 def test_g1_state_immutability_and_wal_replay():
     try:
         from scripts.g1_offline_preview_r1.model import initial_state
-        from scripts.g1_offline_preview_r1.reducer import transition, digest
+        from scripts.g1_offline_preview_r1.reducer import digest, transition
         from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
     except ImportError:
         pytest.skip("C worktree not available")

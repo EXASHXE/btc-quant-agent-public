@@ -1,9 +1,9 @@
 {
   "manifest_version": "final-delivery-manifest-v1",
   "goal_id": "V06_GEMINI_GOAL_ABC_R2_CLASH_ROUTED_PUBLIC_SOURCE_PIT_BRIDGE",
-  "timestamp_utc": "2026-10-12T11:53:45Z",
+  "timestamp_utc": "2026-10-12T12:55:56Z",
   "author": "Antigravity Agent (Gemini abc-clash-bridge-r2)",
-  "terminal_status": "SUCCESS_ABC_R2_CLASH_ROUTED_BRIDGE_DELIVERED",
+  "terminal_status": "R2_ABC_SYNTHETIC_BRIDGE_PASS__PUBLIC_SOURCE_VERIFIED",
   "target_branch": "feature/v06-bline-gemini-abc-clash-routed-feed-bridge-r2",
   "summary": {
     "binance_2026_migration": "COMPLETED (diff depth on /public/stream, market data on /market/stream, unrouted /stream fail-closed)",
@@ -13,14 +13,23 @@
     "forward_feed_test_count": 148,
     "total_tests_verified": 293,
     "test_suite_status": "ALL_PASSED_100_PERCENT",
-    "git_commit_count": 5
+    "git_commit_count": 6,
+    "public_source_smoke": {
+      "status": "PUBLIC_SMOKE_VERIFIED",
+      "proxy_route": "http://127.0.0.1:7897 (public-clash-explicit)",
+      "rest_status": 200,
+      "duration_seconds": 15,
+      "events_received": 261,
+      "public_depth_events": 140,
+      "market_events": 121
+    }
   },
   "delivered_components": {
     "core_proxy_and_connector": [
       {
         "path": "scripts/market_data/forward_public_feed_r1/proxy_route.py",
-        "sha256": "eeea0e1306dccd3b29b5ab1e2ca721b6be0ebad5f519038be444a67d0902bbfa",
-        "size_bytes": 17803
+        "sha256": "abbf57be5d68ef93a994202a7d238f37fbd9b8dd03f17aadbab242ca8d057300",
+        "size_bytes": 22594
       },
       {
         "path": "scripts/market_data/forward_public_feed_r1/connector.py",
@@ -46,18 +55,18 @@
       },
       {
         "path": "scripts/integration/market_event_bridge_r2/mark_aggregator.py",
-        "sha256": "3ffc42ce632ee991880966108e0b22d5bdba348011b1fdb623aff62c0ec1fc2e",
-        "size_bytes": 7474
+        "sha256": "0fb3676e85ffea93b66e3ee38fe50ba041b8538f321a002c3fffd88f4f08092b",
+        "size_bytes": 8631
       },
       {
         "path": "scripts/integration/market_event_bridge_r2/book_ladder.py",
-        "sha256": "f0fc17ba28fbb92a18233775d80a70692983f61d3a7f5e593c32a15a8ae6fc71",
-        "size_bytes": 6986
+        "sha256": "1f89e6f26ea3e7f7f92067e0d89e7f0de2e9a237f09060e55a9bdb2b66fd9cfb",
+        "size_bytes": 8457
       },
       {
         "path": "scripts/integration/market_event_bridge_r2/funding_adapter.py",
-        "sha256": "feafa6c1c044025483fc251327107132d9c4a300ebd58ec3595e5d42ef40cd64",
-        "size_bytes": 6349
+        "sha256": "cbd5abfa82f6d812e27c7864322c3f77fa4db900c529c2b822fe0a1c8d13c062",
+        "size_bytes": 7698
       },
       {
         "path": "scripts/integration/market_event_bridge_r2/c_composite_bar.py",
@@ -66,18 +75,18 @@
       },
       {
         "path": "scripts/integration/market_event_bridge_r2/fixtures.py",
-        "sha256": "d0acd0262e4e1acfce70289acacb02b262d17a24350214d73aa6912f60238f89",
-        "size_bytes": 7443
+        "sha256": "4197339422e1ecc50a5f94565c48cac2a49152b6a4c475eceb9c5b257dfaa092",
+        "size_bytes": 7629
       },
       {
         "path": "scripts/integration/market_event_bridge_r2/bridge_engine.py",
-        "sha256": "4211de633e9eeaaf78ee3b2bd9529f76b9585a6518f908796647d84a8b01954f",
-        "size_bytes": 16442
+        "sha256": "9b48d3e8564e2ce4053e57a88b85dc3df71ecec0e3df1ab5ea9a60ac47043838",
+        "size_bytes": 16665
       },
       {
         "path": "scripts/integration/market_event_bridge_r2/cli.py",
-        "sha256": "5ce54996004bf252ef2bd28b064ae8094c876881ffcb0fadcd697510c07aca11",
-        "size_bytes": 10621
+        "sha256": "19168e8f038d90bce8651d3aadb9b494004578c905fc53df43bf5af14b42df41",
+        "size_bytes": 11525
       }
     ],
     "unit_test_suite": [
@@ -89,38 +98,38 @@
       },
       {
         "path": "tests/test_v06_market_event_bridge_r2_clash_proxy_network.py",
-        "sha256": "37b6668af14b151e2a29c4e0c7dfa4b350aa86688d7f0212eb48b17e0fc69cea",
-        "size_bytes": 10874,
+        "sha256": "7864236f9d36520a8e9e500c8415f0a3a7fc72cab662541b60f1212722c4d7bf",
+        "size_bytes": 10841,
         "test_count": 25
       },
       {
         "path": "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py",
-        "sha256": "82f27bcd9cbde046cdb5877f00c62aa9cda18dfdd4c31f242429085d1877e80d",
-        "size_bytes": 13661,
+        "sha256": "0e7aa8bd9cec70599b0ffa221be3e2d6807189163b4adc21836dace2ded93fe2",
+        "size_bytes": 13609,
         "test_count": 25
       },
       {
         "path": "tests/test_v06_market_event_bridge_r2_depth_ladder_l2.py",
-        "sha256": "2b72c29d0eaae43ef1303047aaf8c6a13fc4ac1c51fa96e5e14c2160f9930c64",
-        "size_bytes": 14258,
+        "sha256": "b31c0e60bd534771f935449eb7bacf2d1f669cb73fd1332d24ac9c91b7a50827",
+        "size_bytes": 14221,
         "test_count": 25
       },
       {
         "path": "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
-        "sha256": "4f43c494da2616e120fa15aab19e17a55ac2946b9228d24ffe92ee1d39f182c7",
-        "size_bytes": 16773,
+        "sha256": "813c7fab53f9935c5d4b6267ab8abbc25616937201b0924f0be07ae29908bf6c",
+        "size_bytes": 16688,
         "test_count": 20
       },
       {
         "path": "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
-        "sha256": "d13260099ee8ae5129c5df6be3792df52017c98e11574c3f6c3ba68bfae91d67",
-        "size_bytes": 15702,
+        "sha256": "5d4ce1e7032fa7b1d1af4d2f4313b2dc507c06b5bac2479dfbdc04f9cbb44258",
+        "size_bytes": 15675,
         "test_count": 15
       },
       {
         "path": "tests/test_v06_market_event_bridge_r2_stress_and_security.py",
-        "sha256": "71de5504744827a1952b0c60a43a589650a7d503f2d5edec701efbb92ae9f81e",
-        "size_bytes": 11081,
+        "sha256": "eaa91726457c52c10a1bbc5dd812bfff9ae4a74fcc990907b58dd269db4f152a",
+        "size_bytes": 11056,
         "test_count": 15
       }
     ],
@@ -154,29 +163,37 @@
       },
       {
         "path": "evidence/v0.6/b_line/market_event_bridge_r2/BRIDGE_AFTER_SYNTHETIC_WITNESSES.json",
-        "sha256": "85c48a432616ff7cd82eb307c673ca96565a581f09add82cf3bb90156c68540c",
-        "size_bytes": 20415
+        "sha256": "a56ae2eab66646d50d2f8f4d017249a14d783eecf1cce216a477ebc922855c3b",
+        "size_bytes": 33244
       },
       {
         "path": "evidence/v0.6/b_line/market_event_bridge_r2/PIT_CLOCK_AND_SOURCE_HASH_AUDIT.json",
-        "sha256": "e2cc2ee0cb41f271bea369cf5dd6fab7d35ba1863386b9107f310c088e1baa82",
-        "size_bytes": 6384
+        "sha256": "73f73fe1f483a5600c3115019f8fe11189fd6bb7cfec34614fc5ada9f37500ef",
+        "size_bytes": 6376
       },
       {
         "path": "evidence/v0.6/b_line/market_event_bridge_r2/SETTLED_FUNDING_DECIMAL_LEDGER.json",
-        "sha256": "71ccc3fbdd8d1697f96c8010f88cfb6043a61c3b7a026c603dba50048c5e41d7",
-        "size_bytes": 770
+        "sha256": "e0c1749db559a105ccc6e751138bd95a72c5b0bef079a95375aed8e99acf2717",
+        "size_bytes": 1434
       },
       {
         "path": "evidence/v0.6/b_line/market_event_bridge_r2/NETWORK_ROUTE_DIAGNOSTIC.json",
-        "sha256": "f9bad490370c1bb6ca0661e71b7011ae5464f8f7ff8d2ba638d89353f93dd6e6",
-        "size_bytes": 1147
+        "sha256": "2a9e1a467d7e274caa8d1840fd223e05758fb9df87ce46d2459e43a8c50025cc",
+        "size_bytes": 1599
       },
       {
         "path": "evidence/v0.6/b_line/market_event_bridge_r2/TEST_AND_CI_EXACT_SHA_RECEIPT.json",
-        "sha256": "30f9939763aa168957b56b55a285f0e777daa83b34b6cdb9ea6c42381e83b138",
-        "size_bytes": 2924
+        "sha256": "71eb0a360a80afe8ad6f80054ca5110f2e77df5c053d76d6f9ef2f4046880860",
+        "size_bytes": 3514
       }
     ]
+  },
+  "controller_terminal_status": "R2_ABCCONTRACT_PUBLIC_SMOKE_VERIFIED",
+  "exact_start_sha": "df00997f344eba82f7cca0d03ee1617948abee44",
+  "controller_authority_sha": "acf59828f878f3b1cc56e257dd952a8cd2c9ea97",
+  "b_c_pinned_readonly_sha": {
+    "b_forward_shadow_r1": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+    "c_g1g3_offline_ports_r1": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+    "g1_core_r1": "861a9d148f72db00e6079e53af78220bdd7e84ce"
   }
 }

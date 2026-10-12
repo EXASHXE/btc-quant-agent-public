@@ -1,7 +1,7 @@
 {
   "receipt_version": "test-and-ci-exact-sha-receipt-v1",
   "task_id": "V06_GEMINI_GOAL_ABC_R2_CLASH_ROUTED_PUBLIC_SOURCE_PIT_BRIDGE",
-  "timestamp_utc": "2026-10-12T11:53:15Z",
+  "timestamp_utc": "2026-10-12T12:55:56Z",
   "environment": {
     "os": "Linux 6.6.87.2-microsoft-standard-WSL2",
     "python": "3.12.3",
@@ -13,7 +13,9 @@
     "bridge_r2": {
       "branch": "feature/v06-bline-gemini-abc-clash-routed-feed-bridge-r2",
       "commit_sha": "2d8cd7cbe116e155ad16b2f3b438362bd69e5b15",
-      "worktree_path": "/root/workspace/project/quant-v0.6/gemini-abc-clash-bridge-r2"
+      "worktree_path": "/root/workspace/project/quant-v0.6/gemini-abc-clash-bridge-r2",
+      "exact_start_sha": "df00997f344eba82f7cca0d03ee1617948abee44",
+      "parent_commit_sha": "b86843b699ce1fa6567891808239347bc5ab9938"
     },
     "branch_b_forward_shadow": {
       "branch": "feature/v06-bline-gemini-forward-shadow-research-r1",
@@ -24,7 +26,9 @@
       "branch": "feature/v06-bline-gemini-g1g3-offline-ports-r1",
       "commit_sha": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
       "worktree_path": "/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1"
-    }
+    },
+    "controller_authority_sha": "acf59828f878f3b1cc56e257dd952a8cd2c9ea97",
+    "g1_core_read_only_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce"
   },
   "test_suites": {
     "r2_new_independent_unit_tests": {
@@ -83,5 +87,15 @@
     "total_failed": 0,
     "total_skipped": 0,
     "exit_code": 0
+  },
+  "live_public_smoke_receipt": {
+    "status": "PUBLIC_SMOKE_VERIFIED",
+    "proxy_route": "http://127.0.0.1:7897",
+    "duration_seconds": 15,
+    "events_received": 261,
+    "public_depth_events": 140,
+    "market_events": 121,
+    "rebootstrap_count": 1,
+    "rest_depth_snapshot_status": 200
   }
 }

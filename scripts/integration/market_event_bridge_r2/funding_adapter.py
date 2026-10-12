@@ -7,6 +7,8 @@ and signed long/short cash flows. Prevents silent zero defaults and duplicate se
 
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass
 from decimal import ROUND_HALF_EVEN, Decimal
 from typing import Any
@@ -28,6 +30,14 @@ class SettledFundingEntry:
     producer_manifest_sha256: str
     quality: str
     reason_codes: tuple[str, ...]
+    derivation_version: str = "settled-funding-entry-v1"
+    parent_event_sha256: tuple[str, ...] = ()
+    producer_upstream_sha: str = "df00997f344eba82f7cca0d03ee1617948abee44"
+    route_epoch: str = "route-epoch-0"
+    connection_epoch: int = 1
+    source_observed_wall_utc_ms: int = 0
+    source_available_at_ms: int = 0
+    clock_uncertainty_ms: int = 0
 
     def calculate_cash_flow(self, position_size_btc: Decimal) -> Decimal:
         """Calculate signed cash flow for position size in BTC.
@@ -62,7 +72,11 @@ class SettledFundingEntry:
         }
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        src_wall = self.source_observed_wall_utc_ms or self.derived_available_at_ms
+        src_avail = self.source_available_at_ms or self.derived_available_at_ms
+        base = {
+            "schema_version": self.derivation_version,
+            "derivation_version": self.derivation_version,
             "symbol": self.symbol,
             "funding_time_ms": self.funding_time_ms,
             "funding_rate": str(self.funding_rate),
@@ -70,12 +84,25 @@ class SettledFundingEntry:
             "settlement_id": self.settlement_id,
             "settled": self.settled,
             "rate_type": self.rate_type,
+            "source_observed_wall_utc_ms": src_wall,
+            "source_available_at_ms": src_avail,
             "derived_available_at_ms": self.derived_available_at_ms,
             "feature_known_at_ms": self.feature_known_at_ms,
+            "clock_uncertainty_ms": self.clock_uncertainty_ms,
+            "route_epoch": self.route_epoch,
+            "connection_epoch": self.connection_epoch,
+            "parent_event_sha256": list(self.parent_event_sha256),
+            "raw_source_manifest_sha256": self.producer_manifest_sha256,
             "producer_manifest_sha256": self.producer_manifest_sha256,
+            "producer_upstream_sha": self.producer_upstream_sha,
             "quality": self.quality,
             "reason_codes": list(self.reason_codes),
         }
+        canonical_sha = hashlib.sha256(
+            json.dumps(base, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        base["canonical_sha256"] = canonical_sha
+        return base
 
 
 class SettledFundingLedger:

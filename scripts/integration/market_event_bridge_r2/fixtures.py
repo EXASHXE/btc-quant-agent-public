@@ -106,6 +106,16 @@ class BridgeFixtureGenerator:
                     frames.append(mark_frame)
                     mark_count += 1
 
+                    # Contemporaneous settled funding record at start of session (minute 0)
+                    if funding_count == 0:
+                        funding_frame = {
+                            "symbol": self.symbol,
+                            "fundingRate": "0.00010000",
+                            "fundingTime": base_time_ms,
+                        }
+                        frames.append(funding_frame)
+                        funding_count += 1
+
                 # 2. Agg trade
                 trade_p = round(base_price + self._rng.uniform(-1.5, 1.5), 2)
                 trade_qty = round(self._rng.uniform(0.01, 2.5), 4)
@@ -183,15 +193,6 @@ class BridgeFixtureGenerator:
             }
             frames.append(kline_frame)
             kline_count += 1
-
-        # Periodic settled funding record (e.g. at minute 0)
-        funding_frame = {
-            "symbol": self.symbol,
-            "fundingRate": "0.00010000",
-            "fundingTime": base_time_ms,
-        }
-        frames.append(funding_frame)
-        funding_count += 1
 
         metrics = ScenarioMetrics(
             scenario_name=scenario_name,

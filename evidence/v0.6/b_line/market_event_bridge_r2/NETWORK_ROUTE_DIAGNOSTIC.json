@@ -1,6 +1,6 @@
 {
-  "timestamp_utc": "2026-10-12T11:52:22Z",
-  "duration_ms": 1.61,
+  "timestamp_utc": "2026-10-12T12:53:39Z",
+  "duration_ms": 1881.31,
   "environment": {
     "os": "Linux",
     "release": "6.6.87.2-microsoft-standard-WSL2",
@@ -12,33 +12,39 @@
   "ambient_env_proxies": {
     "HTTP_PROXY": "http://127.0.0.1:7897",
     "HTTPS_PROXY": "http://127.0.0.1:7897",
-    "NO_PROXY": "localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8",
+    "NO_PROXY": "172.31.*,172.30.*,172.29.*,172.28.*,172.27.*,172.26.*,172.25.*,172.24.*,172.23.*,172.22.*,172.21.*,172.20.*,172.19.*,172.18.*,172.17.*,172.16.*,10.*,192.168.*,127.*,localhost,<local>",
     "http_proxy": "http://127.0.0.1:7897",
     "https_proxy": "http://127.0.0.1:7897",
-    "no_proxy": "localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8"
+    "no_proxy": "172.31.*,172.30.*,172.29.*,172.28.*,172.27.*,172.26.*,172.25.*,172.24.*,172.23.*,172.22.*,172.21.*,172.20.*,172.19.*,172.18.*,172.17.*,172.16.*,10.*,192.168.*,127.*,localhost,<local>"
   },
   "configured_route": {
-    "mode": "disabled",
+    "mode": "public-clash-explicit",
     "kind": "http",
-    "host": null,
-    "port": null,
+    "host": "127.0.0.1",
+    "port": 7897,
     "route_epoch": "route-epoch-0",
-    "has_proxy": false
+    "has_proxy": true
   },
   "layers": {
     "layer_1_local_tcp": {
-      "status": "SKIPPED"
+      "status": "SUCCESS",
+      "host": "127.0.0.1",
+      "port": 7897
     },
     "layer_2_proxy_negotiation": {
-      "status": "SKIPPED"
+      "status": "SUCCESS"
     },
     "layer_3_tls_rest_verify": {
-      "status": "SKIPPED"
+      "status": "SUCCESS",
+      "status_code": 200,
+      "bytes": 296
     },
     "layer_4_ws_connect_verify": {
-      "status": "SKIPPED"
+      "status": "SUCCESS",
+      "frame_bytes": 1799,
+      "stream": "btcusdt@depth@100ms"
     }
   },
-  "diagnostic_code": "NETWORK_DISABLED",
+  "diagnostic_code": "DIAGNOSTIC_OK",
   "error_detail": null
 }

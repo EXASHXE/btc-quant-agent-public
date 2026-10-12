@@ -93,7 +93,7 @@ def run_proxy_diagnostic(args: argparse.Namespace) -> int:
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(json_str, encoding="utf-8")
 
-    return 0 if result["diagnostic_code"] in ("NETWORK_DISABLED", "NETWORK_DISABLED") else 1
+    return 0 if result["diagnostic_code"] in ("NETWORK_DISABLED", "DIAGNOSTIC_OK") else 1
 
 
 def run_fixture(args: argparse.Namespace) -> int:
@@ -131,7 +131,28 @@ def run_bridge_check(args: argparse.Namespace) -> int:
     gen = BridgeFixtureGenerator(seed=20261012)
     frames, _metrics = gen.generate_scenario("happy_path_10m")
 
-    bridge = MarketEventBridgeR2(symbol="BTCUSDT")
+    # Connect to C's MarketPitPort for full causal offline verification
+    c_port = None
+    manifest_sha = "db72fd25eb87fe8835a2f025a7d0ced5e192fb7fb868b0f3aadfff17a7d3ca13"
+    try:
+        c_dir = Path("/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1")
+        if c_dir.exists() and str(c_dir) not in sys.path:
+            sys.path.insert(0, str(c_dir))
+        from scripts.g1g3_offline_ports_r1.market_pit_port import (
+            PINNED_RAW_MANIFEST_SHA256,
+            MarketPitPort,
+        )
+
+        manifest_sha = PINNED_RAW_MANIFEST_SHA256
+        c_port = MarketPitPort(
+            expected_stream_id="SYNTHETIC_LOCAL_PIT_V1",
+            expected_manifest_sha256=PINNED_RAW_MANIFEST_SHA256,
+        )
+    except (ImportError, OSError, ValueError):
+        c_port = None
+
+    bridge = MarketEventBridgeR2(symbol="BTCUSDT", c_port=c_port)
+    bridge.c_bar_builder.manifest_sha256 = manifest_sha
     base_time = 1728720000000
 
     clock_audit_records = []
@@ -144,9 +165,9 @@ def run_bridge_check(args: argparse.Namespace) -> int:
             frame=frame,
             observed_wall_utc_ms=wall_ms,
             observed_monotonic_ns=mono_ns,
-            raw_manifest_sha256=f"manifest-{idx}",
+            raw_manifest_sha256=manifest_sha,
         )
-        if "top10_snapshot" in res or "derived_mark_bar" in res or "settled_funding" in res:
+        if "top10_snapshot" in res or "derived_mark_bar" in res or "settled_funding" in res or "c_envelope" in res:
             witnesses.append({
                 "frame_index": idx,
                 "event_type": frame.get("e", "snapshot/funding"),
@@ -199,6 +220,7 @@ def run_bridge_check(args: argparse.Namespace) -> int:
         "mark_bars_derived": bridge.stats.mark_bars_derived,
         "top10_snapshots": bridge.stats.top10_book_snapshots_emitted,
         "settled_fundings": bridge.stats.settled_fundings_adapted,
+        "c_composite_bars": bridge.stats.c_composite_bars_emitted,
         "evidence_written": str(evidence_dir),
     }
     print(json.dumps(summary, indent=2))
@@ -224,7 +246,7 @@ def run_public_source_smoke(args: argparse.Namespace) -> int:
 
     # Diagnostic pre-flight check
     diag = run_desensitized_network_diagnostic(cfg)
-    if diag["diagnostic_code"] not in ("NETWORK_DISABLED", "NETWORK_DISABLED") and diag["diagnostic_code"] != "NETWORK_DISABLED":
+    if diag["diagnostic_code"] not in ("NETWORK_DISABLED", "DIAGNOSTIC_OK"):
         report = {
             "status": "SOURCE_UNAVAILABLE",
             "diagnostic_code": diag["diagnostic_code"],

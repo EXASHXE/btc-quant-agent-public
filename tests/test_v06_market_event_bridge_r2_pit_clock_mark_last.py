@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import sys
-from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -18,8 +17,8 @@ if _C_DIR not in sys.path and Path(_C_DIR).exists():
 
 from scripts.g1_offline_preview_r1.model import SafetyViolation, digest
 from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
+
 from scripts.integration.market_event_bridge_r2.mark_aggregator import (
-    DerivedMark1MBar,
     MarkPriceAggregator,
 )
 
@@ -104,7 +103,7 @@ def test_mark_aggregator_early_end_unknown() -> None:
     agg = MarkPriceAggregator(min_samples=20)
     base_open = 1728720000000
     # Last tick at 45 seconds
-    for sec in range(0, 45):
+    for sec in range(45):
         t_ms = base_open + sec * 1000
         agg.ingest_tick(t_ms, 64000.0, t_ms + 10)
     bar = agg.flush_window()
