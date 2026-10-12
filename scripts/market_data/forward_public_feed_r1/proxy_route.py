@@ -226,7 +226,7 @@ def validate_2026_routed_url(url: str, expected_route: str = "any") -> None:
                     f"Expected route '{expected_route}', got '/public/stream'.",
                 )
             for s in stream_list:
-                if any(market_kw in s for market_kw in ("kline", "markprice", "aggtrade")):
+                if any(market_kw in s.lower() for market_kw in ("kline", "markprice", "aggtrade")):
                     raise NetworkRouteError(
                         NetworkErrorCode.BINANCE_ROUTING_INVALID,
                         f"Market stream '{s}' forbidden on '/public/stream'. Diff depth only.",
@@ -239,7 +239,7 @@ def validate_2026_routed_url(url: str, expected_route: str = "any") -> None:
                     f"Expected route '{expected_route}', got '/market/stream'.",
                 )
             for s in stream_list:
-                if "depth" in s:
+                if "depth" in s.lower():
                     raise NetworkRouteError(
                         NetworkErrorCode.BINANCE_ROUTING_INVALID,
                         f"Depth stream '{s}' forbidden on '/market/stream'. Use '/public/stream'.",

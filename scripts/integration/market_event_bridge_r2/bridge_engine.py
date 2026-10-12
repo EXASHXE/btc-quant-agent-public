@@ -71,6 +71,30 @@ class MarketEventBridgeR2:
         self.last_top10_snapshot: Top10BookSnapshot | None = None
         self.witness_records: list[dict[str, Any]] = []
 
+    def switch_route_node(self, new_route_epoch: str | None = None) -> None:
+        """Handle proxy failover / route node switch: reset book engine and advance epoch."""
+        if new_route_epoch is not None:
+            self.route_epoch = new_route_epoch
+        else:
+            epoch_num = int(self.route_epoch.split("-")[-1]) if "-" in self.route_epoch and self.route_epoch.split("-")[-1].isdigit() else 0
+            self.route_epoch = f"route-epoch-{epoch_num + 1}"
+        self.connection_epoch += 1
+        self.book_engine.reset(reason="ROUTE_NODE_SWITCH")
+
+    def process_fixture_sequence(
+        self,
+        frames: list[dict[str, Any]],
+        base_wall_utc_ms: int = 1728720000000,
+    ) -> dict[str, Any]:
+        """Process an ordered batch of exchange frames sequentially."""
+        processed = 0
+        for idx, frame in enumerate(frames):
+            wall_ms = base_wall_utc_ms + idx * 100
+            mono_ns = (idx + 1) * 1_000_000
+            self.ingest_frame(frame, observed_wall_utc_ms=wall_ms, observed_monotonic_ns=mono_ns)
+            processed += 1
+        return {"total_frames_processed": processed, "stats": self.stats}
+
     def ingest_frame(
         self,
         frame: dict[str, Any],
@@ -301,9 +325,9 @@ class MarketEventBridgeR2:
                         "channel": "funding_settled",
                         "provider_event_ms": entry.funding_time_ms,
                         "provider_transaction_ms": entry.funding_time_ms,
-                        "observed_wall_utc_ms": observed_wall_utc_ms,
+                        "observed_wall_utc_ms": entry.funding_time_ms,
                         "observed_monotonic_ns": observed_monotonic_ns,
-                        "available_at_ms": observed_wall_utc_ms,
+                        "available_at_ms": entry.funding_time_ms,
                         "source_stream_id": self.c_bar_builder.stream_id,
                         "connection_epoch": self.connection_epoch,
                         "source_sequence": None,

@@ -125,12 +125,14 @@ class OrderBookLadderAdapter:
 
         # Check level count
         if len(top_bids) < 10 or len(top_asks) < 10:
-            quality = "DEGRADED"
+            if quality != "INVALID":
+                quality = "DEGRADED"
             reasons.append(f"INCOMPLETE_L2_DEPTH: bids={len(top_bids)}, asks={len(top_asks)} < 10")
 
         # Check staleness (> 1000ms threshold for P2 prerequisite)
         if stale_age_ms > 1000:
-            quality = "DEGRADED"
+            if quality != "INVALID":
+                quality = "DEGRADED"
             reasons.append(f"DEPTH_STALE_OVER_1S: age={stale_age_ms}ms > 1000ms")
 
         if quality == "VERIFIED":
