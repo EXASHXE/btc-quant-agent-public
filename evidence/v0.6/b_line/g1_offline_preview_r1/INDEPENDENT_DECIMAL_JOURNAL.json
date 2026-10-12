@@ -1,0 +1,90 @@
+{
+  "oracle_source": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::reference_journal",
+  "runtime_execution_helpers_used": false,
+  "cases": [
+    {
+      "side": "LONG",
+      "effects": [
+        {
+          "kind": "ENTRY_FEE",
+          "at": 60004,
+          "cash_delta": "-0.1800900",
+          "cash_after": "999.8199100"
+        },
+        {
+          "kind": "FUNDING",
+          "at": 21660001,
+          "cash_delta": "-0.0151560",
+          "cash_after": "999.8047540"
+        },
+        {
+          "kind": "TP1_NET",
+          "at": 21719999,
+          "cash_delta": "1.25814560",
+          "cash_after": "1001.06289960"
+        },
+        {
+          "kind": "FUNDING",
+          "at": 28800000,
+          "cash_delta": "-0.0151035",
+          "cash_after": "1001.04779610"
+        },
+        {
+          "kind": "FUNDING",
+          "at": 36000000,
+          "cash_delta": "0.0302070",
+          "cash_after": "1001.07800310"
+        },
+        {
+          "kind": "STOP_NET",
+          "at": 43319999,
+          "cash_delta": "-0.73965500",
+          "cash_after": "1000.33834810"
+        }
+      ],
+      "pytest_result": "PASS"
+    },
+    {
+      "side": "SHORT",
+      "effects": [
+        {
+          "kind": "ENTRY_FEE",
+          "at": 60004,
+          "cash_delta": "-0.1799100",
+          "cash_after": "999.8200900"
+        },
+        {
+          "kind": "FUNDING",
+          "at": 21660001,
+          "cash_delta": "0.0148440",
+          "cash_after": "999.8349340"
+        },
+        {
+          "kind": "TP1_NET",
+          "at": 21719999,
+          "cash_delta": "1.26135530",
+          "cash_after": "1001.09628930"
+        },
+        {
+          "kind": "FUNDING",
+          "at": 28800000,
+          "cash_delta": "0.0148965",
+          "cash_after": "1001.11118580"
+        },
+        {
+          "kind": "FUNDING",
+          "at": 36000000,
+          "cash_delta": "-0.0297930",
+          "cash_after": "1001.08139280"
+        },
+        {
+          "kind": "STOP_NET",
+          "at": 43319999,
+          "cash_delta": "-0.74084530",
+          "cash_after": "1000.34054750"
+        }
+      ],
+      "pytest_result": "PASS"
+    }
+  ]
+}

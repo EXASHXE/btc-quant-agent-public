@@ -1,0 +1,386 @@
+{
+  "terminal": "G1_OFFLINE_PREVIEW_VERIFIED",
+  "task_id": "V06_G1_CODEX_GPT61_SOL_OFFLINE_PREVIEW_R1",
+  "requested_executor": "Codex GPT-6.1 Sol High",
+  "actual_root_model_effort": "NOT_EXPOSED",
+  "controller_sha": "99df4ed8e820984d69d7b895be8808b892ed7f5f",
+  "prompt_identity": "USER_INLINE_TASK_IN_THIS_SESSION",
+  "start_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "branch": "feature/v06-bline-codex-g1-offline-dryrun-preview-r1",
+  "commit_chain": [
+    {
+      "sha": "cf76ef99b47dc91b7f062877679172bacf1d6c9f",
+      "parent": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+      "nonforce_remote_exact_verified": true
+    },
+    {
+      "sha": "b792c613cac70324e66f6fb6958ce269f1a55dd1",
+      "parent": "cf76ef99b47dc91b7f062877679172bacf1d6c9f",
+      "nonforce_remote_exact_verified": true
+    },
+    {
+      "sha": "84c4764a2f1c46c81f43b144f5daf1f54cccc5d3",
+      "parent": "b792c613cac70324e66f6fb6958ce269f1a55dd1",
+      "nonforce_remote_exact_verified": true
+    }
+  ],
+  "final_evidence_commit_identity": "SELF_SHA_CANNOT_BE_EMBEDDED; terminal response provides remote exact SHA/parent; code remains implementation_commit",
+  "implementation_commit": "DELIVERY_COMMIT_SELF_SHA_IN_TERMINAL_RESPONSE",
+  "financial_transition_commit": "84c4764a2f1c46c81f43b144f5daf1f54cccc5d3",
+  "source_manifest_sha256": "2de618e4aebc43aacd3ef45071a1714099b47d59bc4e2d06973b0a74ce412460",
+  "pytest": {
+    "command": "PYTHONPATH=$PWD/src /tmp/btc-g1_offline_preview_r1/verification-py312-pytest842/bin/python -m pytest -q --tb=short tests/test_v06_g1_offline_preview_r1_*.py",
+    "passed": 145,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "receipt": "FINAL_PYTEST_JUNIT.xml",
+    "duration_seconds": 342.071
+  },
+  "validation_environment": {
+    "python": "3.12.3",
+    "pytest": "8.4.2",
+    "ruff": "0.16.9",
+    "venv": "/tmp/btc-g1_offline_preview_r1/verification-py312-pytest842"
+  },
+  "local_version_audit": {
+    "first_run_pytest": "9.0.3",
+    "first_run_passes": 140,
+    "repository_pin": "pytest>=8,<9",
+    "final_pin": "pytest==8.4.2",
+    "pinned_final_suite": "PASS",
+    "initial_tool_version_statement": "CORRECTED_IN_IMPLEMENTATION_RECEIPT"
+  },
+  "ruff": "PASS",
+  "compile": "PASS",
+  "JSON": "PASS",
+  "fixture_sha256": {
+    "synthetic-long-24h-STOP": "ae6c70f7c26b752df1cfc2cc803d6a941a62e1699749365f4902d335cb93fe4f",
+    "synthetic-short-24h-STOP": "d6bf849411f82db75f433f91985b7c8698fbbd1834685fb706453de3cad1dc11"
+  },
+  "process_recovery": {
+    "native_crash_restarts": 30,
+    "distinct_edges": 15,
+    "truncated_fail_closed": 2,
+    "state_wal_journal_terminal_checkpoint_identical": true
+  },
+  "independent_decimal_cases": 2,
+  "independent_decimal_cash_effects": 12,
+  "runtime_counters": {
+    "false_approvals_accepted": 0,
+    "actual_private_or_network_calls": 0,
+    "duplicate_cash_charges": 0,
+    "oversize_exposure": 0,
+    "phantom_spendable_ack": 0
+  },
+  "counter_evidence": "accepted-state invariants; AST forbidden-network surfaces; socket-connect trap; actual process-kill finance equality; not a native syscall interception audit",
+  "market_source_bodies_read": 0,
+  "private_account_access": 0,
+  "network_ports": "NONE_IN_RUNTIME",
+  "production_startup_registration": false,
+  "CI_C1": {
+    "sha": "cf76ef99b47dc91b7f062877679172bacf1d6c9f",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38195492298"
+  },
+  "CI_C2": {
+    "conclusion": "success",
+    "databaseId": 38197778075,
+    "headSha": "b792c613cac70324e66f6fb6958ce269f1a55dd1",
+    "jobs": [
+      {
+        "completedAt": "2026-10-12T03:16:15Z",
+        "conclusion": "success",
+        "databaseId": 114644219021,
+        "name": "Risk-based quality (Python 3.12)",
+        "startedAt": "2026-10-12T02:56:37Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Fetch v0.6 immutable base for merge-base resolution",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Ensure cache directory exists for docs-only/zero-pip FAST paths",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build fail-closed test plan",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Classify impact before heavy dependency installation",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Install tiny CI-planner dependencies",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Install production/research validation dependencies",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Ruff with bounded historical EXE001 debt",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Type-check production package on production changes",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Compile Python",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Validate changed JSON artifacts",
+            "number": 13,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Tests selected by risk/changed scope",
+            "number": 14,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Retain scoped test evidence",
+            "number": 15,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 29,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 30,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 31,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38197778075/job/114644219021"
+      },
+      {
+        "completedAt": "2026-10-12T02:56:35Z",
+        "conclusion": "skipped",
+        "databaseId": 114644220117,
+        "name": "Compatibility manual full suite",
+        "startedAt": "2026-10-12T02:56:35Z",
+        "status": "completed",
+        "steps": [],
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38197778075/job/114644220117"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38197778075"
+  },
+  "no_grant": [
+    "ALPHA",
+    "PRODUCTION_ACCEPTANCE",
+    "TESTNET",
+    "LIVE",
+    "REAL_MONEY",
+    "PROTECTED_DATA",
+    "FOLLOW_ON_TASK"
+  ],
+  "validation_recorded_at_utc": "2026-10-12T03:43:31.262759+00:00",
+  "CI_C3": {
+    "conclusion": "failure",
+    "databaseId": 38199249523,
+    "headSha": "84c4764a2f1c46c81f43b144f5daf1f54cccc5d3",
+    "jobs": [
+      {
+        "completedAt": "2026-10-12T03:34:28Z",
+        "conclusion": "failure",
+        "databaseId": 114648732367,
+        "name": "Risk-based quality (Python 3.12)",
+        "startedAt": "2026-10-12T03:18:45Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Fetch v0.6 immutable base for merge-base resolution",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Ensure cache directory exists for docs-only/zero-pip FAST paths",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build fail-closed test plan",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Classify impact before heavy dependency installation",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Install tiny CI-planner dependencies",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Install production/research validation dependencies",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Ruff with bounded historical EXE001 debt",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Type-check production package on production changes",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Compile Python",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Validate changed JSON artifacts",
+            "number": 13,
+            "status": "completed"
+          },
+          {
+            "conclusion": "failure",
+            "name": "Tests selected by risk/changed scope",
+            "number": 14,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Retain scoped test evidence",
+            "number": 15,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 29,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 30,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 31,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38199249523/job/114648732367"
+      },
+      {
+        "completedAt": "2026-10-12T03:18:43Z",
+        "conclusion": "skipped",
+        "databaseId": 114648733075,
+        "name": "Compatibility manual full suite",
+        "startedAt": "2026-10-12T03:18:43Z",
+        "status": "completed",
+        "steps": [],
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38199249523/job/114648733075"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38199249523"
+  },
+  "repository_CI_gate_C3": "FAIL",
+  "CI_failure_identifiers": {
+    "evidence": "failing pytest identifiers only; no traceback or outcome values",
+    "failed_nodes": [
+      "tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph"
+    ]
+  },
+  "CI_failure_scope": "unchanged oldH40 test outside task; no protected results inspected or repair attempted",
+  "final_commit_CI": "C4_IMPLEMENTATION_CI_STATUS_IN_TERMINAL_RESPONSE",
+  "source_manifest_receipt": "C4_FINAL_SOURCE_MANIFEST.json",
+  "source_parent_commit": "84c4764a2f1c46c81f43b144f5daf1f54cccc5d3",
+  "scope_manifest": "DELIVERY_PATH_SCOPE_MANIFEST.json",
+  "changed_path_count": 31
+}

@@ -1,345 +1,1022 @@
 {
-  "stage": "implementation",
+  "task_id": "V06_G1_CODEX_GPT61_SOL_OFFLINE_PREVIEW_R1",
+  "case_count": 145,
   "cases": [
     {
-      "F_ID": "F001",
+      "id": "F001",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_unrestricted_close_cannot_bypass_stop",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F002",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_same_settlement_clock_different_id_no_second_charge",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F003",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_stop_before_partial_ack_all_ack_orders_conserve[False]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F004",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_stop_before_partial_ack_all_ack_orders_conserve[True]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F005",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_fill_id_reuse_after_ack_rejected",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F006",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_net_BE_includes_execution_tick[LONG]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F007",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_net_BE_includes_execution_tick[SHORT]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F008",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_triggered_stop_cannot_be_omitted_before_next_bar[LONG]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F009",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_triggered_stop_cannot_be_omitted_before_next_bar[SHORT]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F010",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_triggered_tp_cannot_be_skipped_or_funded_first",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F011",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_mark_exposure_guard_rejects_unsafe_bar_without_state_change",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F012",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_late_receipt_cannot_lock_pending_stop_or_advance_market_clock",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F013",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_new_be_stop_cannot_retroactively_fill_update_source_bar[LONG]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F014",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_new_be_stop_cannot_retroactively_fill_update_source_bar[SHORT]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F015",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_exit_safety.py::test_stop_update_after_boundary_rejects_without_financial_effect",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F016",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_complete_24h_independent_decimal_journal[LONG]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F017",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_complete_24h_independent_decimal_journal[SHORT]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F018",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_all_event_time_caps_full_workflow[12-LONG]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F019",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_all_event_time_caps_full_workflow[12-SHORT]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F020",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_all_event_time_caps_full_workflow[18-LONG]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F021",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_all_event_time_caps_full_workflow[18-SHORT]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F022",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_all_event_time_caps_full_workflow[24-LONG]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F023",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_all_event_time_caps_full_workflow[24-SHORT]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F024",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_registered_tp2_capped_execution[LONG]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F025",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_registered_tp2_capped_execution[SHORT]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F026",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_malformed_llm_port_has_no_ledger_authority[{]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F027",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_malformed_llm_port_has_no_ledger_authority[[]]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F028",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_malformed_llm_port_has_no_ledger_authority[null]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F029",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_malformed_llm_port_has_no_ledger_authority[{\"x\":1,\"x\":2}]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F030",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_malformed_llm_port_has_no_ledger_authority[{\"as_of\":NaN}]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F031",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_malformed_llm_port_has_no_ledger_authority[{\"risk\":\"APPROVE\",\"place_order\":true}]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F032",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_explicit_human_token_drift_or_clock_never_places[mutation0-60002-APPROVAL_DRIFT]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F033",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_explicit_human_token_drift_or_clock_never_places[mutation1-60002-APPROVAL_DRIFT]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F034",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_explicit_human_token_drift_or_clock_never_places[mutation2-60002-APPROVAL_FIXTURE_INVALID]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F035",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_explicit_human_token_drift_or_clock_never_places[mutation3-60002-APPROVAL_DRIFT]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F036",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_explicit_human_token_drift_or_clock_never_places[mutation4-60002-APPROVAL_STALE_OR_REORDERED]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F037",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_explicit_human_token_drift_or_clock_never_places[mutation5-60002-APPROVAL_STALE_OR_REORDERED]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F038",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_explicit_human_token_drift_or_clock_never_places[mutation6-60002-APPROVAL_FIXTURE_INVALID]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F039",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_private_fixture_path_denied_before_filesystem",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F040",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_mock_redacts_credential_text_before_any_durable_storage",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F041",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_cli_argument_errors_never_echo_credentials_or_create_state[args0]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F042",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py::test_cli_argument_errors_never_echo_credentials_or_create_state[args1]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F043",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation0-SOURCE_UNAUTHORIZED]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F002",
+      "id": "F044",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation1-BAR_PIT_INVALID]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F003",
+      "id": "F045",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation2-BAR_PIT_INVALID]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F004",
+      "id": "F046",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation3-DECIMAL_BOUNDS]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F005",
+      "id": "F047",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation4-BAR_OHLC_INVALID]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F006",
+      "id": "F048",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation5-BAR_OHLC_INVALID]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F007",
+      "id": "F049",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation6-DECIMAL_BOUNDS]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F008",
+      "id": "F050",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation7-DECIMAL_BOUNDS]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F009",
+      "id": "F051",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation8-SCHEMA_FIELDS]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F010",
+      "id": "F052",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation0-PROPOSAL_SOURCE_DRIFT]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F011",
+      "id": "F053",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation1-PROPOSAL_SOURCE_DRIFT]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F012",
+      "id": "F054",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation2-PROPOSAL_PIT_OR_EXPIRY]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F013",
+      "id": "F055",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation3-PROPOSAL_PIT_OR_EXPIRY]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F014",
+      "id": "F056",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation4-QUANTITY_INVALID]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F015",
+      "id": "F057",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation5-QUANTITY_INVALID]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F016",
+      "id": "F058",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation6-LEVEL_ORDER_INVALID]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F017",
+      "id": "F059",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation7-LEVEL_ORDER_INVALID]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F018",
+      "id": "F060",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation8-HORIZON_INVALID]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F019",
+      "id": "F061",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation9-PROPOSAL_VERSION]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F020",
+      "id": "F062",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation10-EXIT_IDENTITY_INVALID]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F021",
+      "id": "F063",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation11-PROPOSAL_PIT_OR_EXPIRY]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F022",
+      "id": "F064",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation12-SCHEMA_FIELDS]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F023",
+      "id": "F065",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation0-ANALYSIS_STALE_OR_HALLUCINATED]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F024",
+      "id": "F066",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation1-ANALYSIS_STALE_OR_HALLUCINATED]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F025",
+      "id": "F067",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation2-ANALYSIS_AUTHORITY_OR_CLOCK]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F026",
+      "id": "F068",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation3-ANALYSIS_AUTHORITY_OR_CLOCK]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F027",
+      "id": "F069",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation4-SECRET_IN_EVENT]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F028",
+      "id": "F070",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation5-SCHEMA_FIELDS]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F029",
+      "id": "F071",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_manual_gate_and_entry_ack",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F030",
+      "id": "F072",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_signed_funding_and_replay_rejected",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F031",
+      "id": "F073",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_short_funding_sign_and_mark_not_last",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F032",
+      "id": "F074",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_partial_cash_waits_for_ack_and_uses_residual_for_funding",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F033",
+      "id": "F075",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_tp_touch_does_not_fill_and_stop_precedes_tp",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F034",
+      "id": "F076",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_stop_update_needs_later_bar_and_never_loosens",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F035",
+      "id": "F077",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_final_stop_ack_and_cooldown",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F036",
+      "id": "F078",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_reordered_and_duplicate_event_fail_without_mutation",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F037",
+      "id": "F079",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_outbox_receipt_cannot_change_cash",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F038",
+      "id": "F080",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_outbox_tracks_execution_without_bar_noise",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F039",
+      "id": "F081",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_analysis_bool_version_and_expiry_rejected",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F040",
+      "id": "F082",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_time_cap_uses_first_completed_bar_last_close_and_stop_priority",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F041",
+      "id": "F083",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_trusted_fixture_rejects_implicit_approval",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F042",
+      "id": "F084",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_no_action_never_requests_approval_or_places",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_core.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F085",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-proposal_pre]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F086",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-proposal_appended]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F087",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-analysis_fsynced]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F088",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-approval_snapshotted]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F089",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-place_pre]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F090",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-entry_appended]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F091",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-entry_ack_fsynced]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F092",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-funding_appended]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F093",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-tp1_snapshotted]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F094",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-partial_ack_fsynced]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F095",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-stop_update_appended]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F096",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-funding_snapshotted]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F097",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-stop_pre]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F098",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-final_ack_snapshotted]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F099",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[long_24h.json-outbox_delivered]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F100",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-proposal_pre]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F101",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-proposal_appended]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F102",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-analysis_fsynced]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F103",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-approval_snapshotted]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F104",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-place_pre]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F105",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-entry_appended]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F106",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-entry_ack_fsynced]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F107",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-funding_appended]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F108",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-tp1_snapshotted]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F109",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-partial_ack_fsynced]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F110",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-stop_update_appended]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F111",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-funding_snapshotted]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F112",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-stop_pre]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F113",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-final_ack_snapshotted]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F114",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_process_kill_then_restart_matches_reference[short_24h.json-outbox_delivered]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F115",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_truncated_wal_quarantines_and_fails_closed[long_24h.json]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F116",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_process_recovery.py::test_truncated_wal_quarantines_and_fails_closed[short_24h.json]",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F117",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_crash_boundaries_replay_once[before_append]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F043",
+      "id": "F118",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_crash_boundaries_replay_once[after_append]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F044",
+      "id": "F119",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_crash_boundaries_replay_once[after_fsync]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F045",
+      "id": "F120",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_crash_boundaries_replay_once[after_snapshot]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F046",
+      "id": "F121",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_duplicate_same_event_no_wal_cash_change",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F047",
+      "id": "F122",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_reused_id_changed_body_fails",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F048",
+      "id": "F123",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[truncated]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F049",
+      "id": "F124",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[malformed]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F050",
+      "id": "F125",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[hash]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F051",
+      "id": "F126",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[sequence]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F052",
+      "id": "F127",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[state]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F053",
+      "id": "F128",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[genesis]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F054",
+      "id": "F129",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[duplicatekey]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F055",
+      "id": "F130",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[nonfinite]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F056",
+      "id": "F131",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_checkpoint_mutation_rejected",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F057",
+      "id": "F132",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_checkpoint_ahead_of_wal_rejected",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F058",
+      "id": "F133",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_changed_initial_policy_fail_closed",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F059",
+      "id": "F134",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_single_writer_lock",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F060",
+      "id": "F135",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_symlink_output_refused_before_follow",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F061",
+      "id": "F136",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_invalid_event_not_durable_transaction",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F062",
+      "id": "F137",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_strict_json_rejects[{\"x\":1,\"x\":2}]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F063",
+      "id": "F138",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_strict_json_rejects[{\"a\":NaN}]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F064",
+      "id": "F139",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_strict_json_rejects[{\"a\":Infinity}]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F065",
+      "id": "F140",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_strict_json_rejects[{]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F066",
+      "id": "F141",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_strict_json_rejects[[1,]",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F067",
+      "id": "F142",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_import_surface_sealed",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     },
     {
-      "F_ID": "F068",
+      "id": "F143",
       "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_actual_network_monkeypatch_zero",
-      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F144",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_required_exit_cannot_be_skipped_durably",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
+    },
+    {
+      "id": "F145",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_trace_links_log_state_and_local_outbox",
+      "source_file": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "assertion_authority": "executable test body",
+      "status": "PASS"
     }
-  ]
+  ],
+  "validation_source": "FINAL_PYTEST_JUNIT.xml"
 }

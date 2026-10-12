@@ -179,3 +179,24 @@ def test_mock_redacts_credential_text_before_any_durable_storage():
         and "abcdef" not in result["summary"]
         and "hidden" not in result["summary"]
     )
+
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        ["--unknown=api_key=FAKE_PRIVATE_VALUE"],
+        ["--crash-edge", "password=FAKE_PRIVATE_VALUE"],
+    ],
+)
+def test_cli_argument_errors_never_echo_credentials_or_create_state(args, tmp_path, capsys):
+    from scripts.g1_offline_preview_r1.__main__ import main
+
+    target = tmp_path / "must-not-exist"
+    with pytest.raises(SystemExit) as exc:
+        main([*args, "--output", str(target)])
+    assert exc.value.code == 3
+    captured = capsys.readouterr()
+    assert "CLI_ARGUMENTS_INVALID" in captured.err
+    assert "FAKE_PRIVATE_VALUE" not in captured.err + captured.out
+    assert "api_key" not in captured.err + captured.out
+    assert not target.exists()

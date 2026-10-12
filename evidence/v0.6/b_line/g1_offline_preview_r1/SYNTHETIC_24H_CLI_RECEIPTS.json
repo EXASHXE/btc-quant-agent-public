@@ -1,0 +1,67 @@
+{
+  "source_kind": "INVENTED_SYNTHETIC_ONLY",
+  "receipts": [
+    {
+      "status": "G1_OFFLINE_PREVIEW_VERIFIED",
+      "safety_status": "DRY_RUN_NO_NETWORK_NO_ORDERING",
+      "health": "SINGLE_WRITER_WAL_VERIFIED",
+      "state_hash": "4cc9f7fb6912fa323d037a12dee64d413400b1ab18640f84d9125dd02063a21f",
+      "wal_chain": "69995097474559d6d2b27e5b6da27d35888e2baea39e602afd4b9af1b4afc0ff",
+      "logical_event_count": 1455,
+      "journal_hash": "9af1737882c8df4089018113bda26fac8e5de17531230eb07413a0a5f6441a46",
+      "journal_effects": 6,
+      "cash": "1000.33834810",
+      "available_cash": "1000.33834810",
+      "reserved_notional": "0.0000",
+      "phase": "CLOSED",
+      "pending_cash": {},
+      "required_exit": null,
+      "retry_classification": "IDENTICAL_EVENT_RETRANSMISSION_ONLY",
+      "counters": {
+        "false_approvals_accepted": 0,
+        "actual_private_or_network_calls": 0,
+        "duplicate_cash_charges": 0,
+        "oversize_exposure": 0,
+        "phantom_spendable_ack": 0
+      },
+      "readiness": "OFFLINE_ONLY",
+      "network_ports": "NONE",
+      "checkpoint_count": 27,
+      "fixture_sha256": "ae6c70f7c26b752df1cfc2cc803d6a941a62e1699749365f4902d335cb93fe4f",
+      "fixture_name": "synthetic-long-24h-STOP",
+      "LLM_port": "DETERMINISTIC_OFFLINE_JSON_MOCK",
+      "Feishu_port": "LOCAL_JSONL_OUTBOX_ONLY"
+    },
+    {
+      "status": "G1_OFFLINE_PREVIEW_VERIFIED",
+      "safety_status": "DRY_RUN_NO_NETWORK_NO_ORDERING",
+      "health": "SINGLE_WRITER_WAL_VERIFIED",
+      "state_hash": "cbf1b105d9a22a5dac204d35c47dcf3ba3b3bf1e3485f80b6726a6edf482de89",
+      "wal_chain": "892fc19569fceeb1c1437e6b1352c83c6ea6ced773cae5bcf6b0e6e163718a9e",
+      "logical_event_count": 1455,
+      "journal_hash": "e33b4bcb18bfe15607258c726526d35bbac717d8feb1fbe2da8e27808df94d3f",
+      "journal_effects": 6,
+      "cash": "1000.34054750",
+      "available_cash": "1000.34054750",
+      "reserved_notional": "0.0000",
+      "phase": "CLOSED",
+      "pending_cash": {},
+      "required_exit": null,
+      "retry_classification": "IDENTICAL_EVENT_RETRANSMISSION_ONLY",
+      "counters": {
+        "false_approvals_accepted": 0,
+        "actual_private_or_network_calls": 0,
+        "duplicate_cash_charges": 0,
+        "oversize_exposure": 0,
+        "phantom_spendable_ack": 0
+      },
+      "readiness": "OFFLINE_ONLY",
+      "network_ports": "NONE",
+      "checkpoint_count": 27,
+      "fixture_sha256": "d6bf849411f82db75f433f91985b7c8698fbbd1834685fb706453de3cad1dc11",
+      "fixture_name": "synthetic-short-24h-STOP",
+      "LLM_port": "DETERMINISTIC_OFFLINE_JSON_MOCK",
+      "Feishu_port": "LOCAL_JSONL_OUTBOX_ONLY"
+    }
+  ]
+}

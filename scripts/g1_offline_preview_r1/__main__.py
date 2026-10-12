@@ -14,6 +14,25 @@ from .storage import OWN_SCRATCH, Engine, guard_directory, strict_json
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
+class SafeArgumentParser(argparse.ArgumentParser):
+    """Rejected CLI text must never be echoed into operational output."""
+
+    def error(self, message):
+        self.exit(
+            3,
+            canonical(
+                {
+                    "status": "G1_OFFLINE_PREVIEW_FAIL_CLOSED",
+                    "code": "CLI_ARGUMENTS_INVALID",
+                    "health": "NOT_READY_FAIL_CLOSED",
+                    "retry_classification": "STOP_REQUIRES_OPERATOR",
+                    "safety_status": "DRY_RUN_NO_NETWORK_NO_ORDERING",
+                }
+            )
+            + "\n",
+        )
+
+
 class OfflineLLMAnalysisPort:
     """Deterministic JSON-only mock; reducer validates the full analysis schema."""
 
@@ -83,7 +102,7 @@ def load_fixture(name):
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(description=__doc__)
+    p = SafeArgumentParser(description=__doc__)
     p.add_argument("--fixture", default="long_24h.json")
     p.add_argument("--output", default=str(OWN_SCRATCH / "preview-long"))
     p.add_argument("--crash-event")
