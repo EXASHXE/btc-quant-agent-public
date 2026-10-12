@@ -1,0 +1,82 @@
+{
+  "exit_r1_ledgers_verified": 12,
+  "exit_r1_ledger_receipts": {
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_paired.jsonl": {
+      "sha256": "f8d10f8a8e7d16046c2d207bf12250d63f3cc1c1ec0b3d26a692c4317f8d2d8a",
+      "rows": 34,
+      "status": "EXACT_MATCH"
+    },
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E0_orders.jsonl": {
+      "sha256": "1c083656fb4bb66c206c4d879fbf09d9ce1cf240c58c73f67b91c07c5c15f943",
+      "rows": 34,
+      "status": "EXACT_MATCH"
+    },
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_H1_orders.jsonl": {
+      "sha256": "a7a1d8b01edad6f39bc156193a5040cf1949ee45c25be5e242892ab86e937444",
+      "rows": 34,
+      "status": "EXACT_MATCH"
+    },
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_paired.jsonl": {
+      "sha256": "acda3f0996931b551750e41eebc5a124127e1dac84821197264f76a3e63b00a5",
+      "rows": 34,
+      "status": "EXACT_MATCH"
+    },
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E0_orders.jsonl": {
+      "sha256": "7d383d0256f4afea8a9956ddfe5f45afd129e167a45327f579f72ef84a4ef496",
+      "rows": 34,
+      "status": "EXACT_MATCH"
+    },
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_H1_orders.jsonl": {
+      "sha256": "38437985dbb11ecfcd69e00fd305b09834725c3dcbffe23247be126f10729c6e",
+      "rows": 34,
+      "status": "EXACT_MATCH"
+    },
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_paired.jsonl": {
+      "sha256": "c27a8dabafd4b8e9949aa94fe76f524104481395294e812ca630a73c28db7847",
+      "rows": 55,
+      "status": "EXACT_MATCH"
+    },
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E0_orders.jsonl": {
+      "sha256": "be22694a2737cf80af50d62741091b47778b71139deb3da861799432a44df445",
+      "rows": 55,
+      "status": "EXACT_MATCH"
+    },
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_H1_orders.jsonl": {
+      "sha256": "1f034d1195955d64a5373d3456e7772809198216ceddf2e91bbd352807e6b02f",
+      "rows": 55,
+      "status": "EXACT_MATCH"
+    },
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_paired.jsonl": {
+      "sha256": "4e417da29f07c85884199647c284031ca4c84801b48b0170bfd8f9f5e06be4b2",
+      "rows": 55,
+      "status": "EXACT_MATCH"
+    },
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E0_orders.jsonl": {
+      "sha256": "9fb80199d02ba5e3460c1c3ac35cb38b70a77d200cb189e2500db011f10a735f",
+      "rows": 55,
+      "status": "EXACT_MATCH"
+    },
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_H1_orders.jsonl": {
+      "sha256": "28824ecf3df3c725030d38f8a495348baf74e468daf1cb443537b71ec312535d",
+      "rows": 55,
+      "status": "EXACT_MATCH"
+    }
+  },
+  "w1_original_events": 34,
+  "w2_original_events": 55,
+  "stress_e0_time_cap_counts": {
+    "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H": 20,
+    "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H": 36
+  },
+  "b_r2_revocations_verified": true,
+  "b_r2_revoked_keys": [
+    "NO_STRATEGY_SEARCH",
+    "R1_FUNDING_LEAKAGE",
+    "R1_SKIPPED_SIGNALS_MISSTATEMENT",
+    "R1_SLIPPAGE_VECTOR_DIFF",
+    "R1_TREND_LEAKAGE",
+    "R1_VOLATILITY_SUBSTITUTION",
+    "R1_W2_YEAR_MISSTATEMENT"
+  ],
+  "holding_time_12h_decision_not_entry_predictor": true
+}

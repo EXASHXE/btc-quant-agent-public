@@ -1,0 +1,122 @@
+[
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_paired.jsonl",
+    "sha256": "5e33a231c7b9813757e5886a95eb83847dfec256d611a85fd28b14eb998f6af7",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_paired.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E0_orders.jsonl",
+    "sha256": "e4c8219bfd1e8eecad4f988a2cf0ee769c2877c4534e1b64843ced8d10882aed",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E0_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_H1_orders.jsonl",
+    "sha256": "5074432c93eff562ae77d79845dd22e2f6b08966da8bec653389f171f2084e55",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_H1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_X1_NET_POSITIVE_AT_12H_orders.jsonl",
+    "sha256": "fd81e6dfecd658df45b326aa6802a312a88c749f2107f6416d4cb3daf9ed480a",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_X1_NET_POSITIVE_AT_12H_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl",
+    "sha256": "d4a241c4236df7205dae1722faaec4c4fbbc51a9535df3b0ca940ed6457164b6",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_paired.jsonl",
+    "sha256": "4e6054c03b32c2a2f86c670e67f583881537a831bcd0aee45757cb9f6a1e94a5",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_paired.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E0_orders.jsonl",
+    "sha256": "659b2bab03e86a0a259e84664e6a812566c881fa48c3c5ade0825258c929fe79",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E0_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_H1_orders.jsonl",
+    "sha256": "c5aaf31cb05a4d3fc58136e1eed8d0724f01dce1237eaa7feecd638ced1c547a",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_H1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_X1_NET_POSITIVE_AT_12H_orders.jsonl",
+    "sha256": "343e7cccd85d4a1f6da6bf6129c1c03eaa7ededcc5d76693c5a54e5d4882e4da",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_X1_NET_POSITIVE_AT_12H_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl",
+    "sha256": "9114189716d59228fe1d3cdc7419efe25d0e9730c59ea24bf37ca6330d03e7db",
+    "rows": 34,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_paired.jsonl",
+    "sha256": "933b073c1bb47c18baf360b6ea4db6ff68b5f318f26f287fd74e0ade310504cc",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_paired.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E0_orders.jsonl",
+    "sha256": "4347fe2759110313efae3130021647232a762530da8b18678eb85906b333f4d2",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E0_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_H1_orders.jsonl",
+    "sha256": "8fbae674c954258c465f0ca1362707a5d4b2468b43de62897a37fe91a732d039",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_H1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_X1_NET_POSITIVE_AT_12H_orders.jsonl",
+    "sha256": "c4a5b7148b080b5ac4f4ed13837e5cc566e2b4a5806b24e628508be6bc6c66f0",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_X1_NET_POSITIVE_AT_12H_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl",
+    "sha256": "c5629501e731a314c7fe48d6f43e34058538b8c2237c0b992729bbd89142027c",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_paired.jsonl",
+    "sha256": "2de6362a25073de9e1e7c5f41a41b38b21e3a6cdc3999e41f85cc6b3dca8c12d",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_paired.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E0_orders.jsonl",
+    "sha256": "7c246757213ada61a1ab62ac65551f4410319d266be1effc426aaca03a66fd2c",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E0_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_H1_orders.jsonl",
+    "sha256": "e3e7130211707ec6e72f27675921bd0d88d38aae1fefcc9d02b5aaa114aa51cf",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_H1_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_X1_NET_POSITIVE_AT_12H_orders.jsonl",
+    "sha256": "970b403bb6a81ab8be53c373f6428a365aa7f10dbcebacd2e122d90efea9a687",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_X1_NET_POSITIVE_AT_12H_orders.jsonl"
+  },
+  {
+    "path": "/tmp/btc-g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl",
+    "sha256": "fd2feb8a408012f7b25dc448daba2d76a23f2fa495ef3ca04eb9550525fd849b",
+    "rows": 55,
+    "committed_path": "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl"
+  }
+]

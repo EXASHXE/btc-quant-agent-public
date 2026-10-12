@@ -1,0 +1,240 @@
+{
+    "TASK_ID":  "V06_G2_GEMINI_B_CONDITIONAL_EXIT_R1",
+    "start_sha":  "d5e3a8407b1b84111dc7f4276865ffd68cb0a7d2",
+    "first_commit_sha":  "cb7445ef0cec515a6cf737b32d22d241788dc470",
+    "max_commits":  2,
+    "terminal":  "X1_X2_INSUFFICIENT_SUPPORT",
+    "files_excluding_this_manifest":  [
+                                          {
+                                              "path":  "docs/strategy_research/g2_conditional_exit_r1/G2_CONDITIONAL_EXIT_R1_EMPIRICAL_REPORT.md",
+                                              "sha256":  "56d3d7195ec2467dd8ebf854abee2522ba0a67e36da865f5ee4eeade6032ae7d",
+                                              "bytes":  30770
+                                          },
+                                          {
+                                              "path":  "docs/strategy_research/g2_conditional_exit_r1/G2_CONDITIONAL_EXIT_R1_FROZEN_METHOD_SPEC.md",
+                                              "sha256":  "4cf43eb384f8ca2f392ad6b888fdd32d283ec0bd58c1da970298a7bab9938671",
+                                              "bytes":  11999
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/BASELINE_E0_H1_IDENTITY_RECEIPT.json",
+                                              "sha256":  "45452e7736666d6c7ca2604bf026c76c15ad8ae2aab8844df3584b9bf2987c0a",
+                                              "bytes":  1288
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/COMMITTED_LEDGER_MANIFEST.json",
+                                              "sha256":  "05e7812dcb090297fef1cd4c2d669802fad10f2a80bc9eec2e630b0b76609ff5",
+                                              "bytes":  7267
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/DECIMAL_AUDIT_RECEIPT.json",
+                                              "sha256":  "e36f699184b3286d96c57df3700c6cc64613cc62558f52ed77d802e2aa20816f",
+                                              "bytes":  86076
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/FIRST_FREEZE_REMOTE_VERIFICATION.json",
+                                              "sha256":  "848d1c06542c4e4b186ad362d58fb99380aa4596001d8bf7f0d13384ee8afacc",
+                                              "bytes":  468
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/G2_CONDITIONAL_EXIT_R1_35_FOLD_AND_YEAR_LEDGERS.json",
+                                              "sha256":  "2552eeb5dab18581df364e26b457b4699145c8e782a8d3afad38b110dab77bee",
+                                              "bytes":  585674
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/G2_CONDITIONAL_EXIT_R1_DECISIONS_AT_12H.json",
+                                              "sha256":  "b7bffcdaaced106e63877203c49a0a1eca4ad6b3fe7b7faf869bc970387ea531",
+                                              "bytes":  721008
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/G2_CONDITIONAL_EXIT_R1_FROZEN_CONTRACT.json",
+                                              "sha256":  "48de03a02e73a32d8397f809979df899ed4f892004057919c2578bbac8d68c70",
+                                              "bytes":  22670
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/G2_CONDITIONAL_EXIT_R1_PAIRED_AND_BOOTSTRAP_SUMMARY.json",
+                                              "sha256":  "97936b92496225c1c7bfd20c8bdcbd0755a99978a5eb48c8afed6479143c034b",
+                                              "bytes":  59033
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/G2_CONDITIONAL_EXIT_R1_RESULTS.json",
+                                              "sha256":  "194a2fe9dc366c817e5079ec3f1817f830712149db954ecb6c72ee45aef624f4",
+                                              "bytes":  1652085
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/G2_CONDITIONAL_EXIT_R1_SCIENCE_EXECUTION_RECEIPT.json",
+                                              "sha256":  "2add9cd782cb243aa0a097470949f2f94e16e0adb545c2f038e09e8085ce21c1",
+                                              "bytes":  1410
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/PROVENANCE_AND_REVOCATION_RECEIPT.json",
+                                              "sha256":  "618d67acff3484b414c7546d2cf3df64eccbb4bb7b792b8bbbfe2ff53e1572a2",
+                                              "bytes":  3109
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/SOURCE_IDENTITY.json",
+                                              "sha256":  "a9fd6ef602dbbb5872af69fde97f80f0a11bed9e51dc5970b09fe7a35232bcdf",
+                                              "bytes":  1550875
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_E0_orders.jsonl",
+                                              "sha256":  "659b2bab03e86a0a259e84664e6a812566c881fa48c3c5ade0825258c929fe79",
+                                              "bytes":  99208
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_H1_orders.jsonl",
+                                              "sha256":  "c5aaf31cb05a4d3fc58136e1eed8d0724f01dce1237eaa7feecd638ced1c547a",
+                                              "bytes":  103404
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_paired.jsonl",
+                                              "sha256":  "4e6054c03b32c2a2f86c670e67f583881537a831bcd0aee45757cb9f6a1e94a5",
+                                              "bytes":  421701
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_X1_NET_POSITIVE_AT_12H_orders.jsonl",
+                                              "sha256":  "343e7cccd85d4a1f6da6bf6129c1c03eaa7ededcc5d76693c5a54e5d4882e4da",
+                                              "bytes":  123955
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl",
+                                              "sha256":  "9114189716d59228fe1d3cdc7419efe25d0e9730c59ea24bf37ca6330d03e7db",
+                                              "bytes":  117126
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_E0_orders.jsonl",
+                                              "sha256":  "e4c8219bfd1e8eecad4f988a2cf0ee769c2877c4534e1b64843ced8d10882aed",
+                                              "bytes":  99707
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_H1_orders.jsonl",
+                                              "sha256":  "5074432c93eff562ae77d79845dd22e2f6b08966da8bec653389f171f2084e55",
+                                              "bytes":  104331
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_paired.jsonl",
+                                              "sha256":  "5e33a231c7b9813757e5886a95eb83847dfec256d611a85fd28b14eb998f6af7",
+                                              "bytes":  426211
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_X1_NET_POSITIVE_AT_12H_orders.jsonl",
+                                              "sha256":  "fd81e6dfecd658df45b326aa6802a312a88c749f2107f6416d4cb3daf9ed480a",
+                                              "bytes":  125322
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl",
+                                              "sha256":  "d4a241c4236df7205dae1722faaec4c4fbbc51a9535df3b0ca940ed6457164b6",
+                                              "bytes":  118744
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_E0_orders.jsonl",
+                                              "sha256":  "7c246757213ada61a1ab62ac65551f4410319d266be1effc426aaca03a66fd2c",
+                                              "bytes":  162072
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_H1_orders.jsonl",
+                                              "sha256":  "e3e7130211707ec6e72f27675921bd0d88d38aae1fefcc9d02b5aaa114aa51cf",
+                                              "bytes":  171740
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_paired.jsonl",
+                                              "sha256":  "2de6362a25073de9e1e7c5f41a41b38b21e3a6cdc3999e41f85cc6b3dca8c12d",
+                                              "bytes":  698939
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_X1_NET_POSITIVE_AT_12H_orders.jsonl",
+                                              "sha256":  "970b403bb6a81ab8be53c373f6428a365aa7f10dbcebacd2e122d90efea9a687",
+                                              "bytes":  205785
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl",
+                                              "sha256":  "fd2feb8a408012f7b25dc448daba2d76a23f2fa495ef3ca04eb9550525fd849b",
+                                              "bytes":  194400
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_E0_orders.jsonl",
+                                              "sha256":  "4347fe2759110313efae3130021647232a762530da8b18678eb85906b333f4d2",
+                                              "bytes":  162283
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_H1_orders.jsonl",
+                                              "sha256":  "8fbae674c954258c465f0ca1362707a5d4b2468b43de62897a37fe91a732d039",
+                                              "bytes":  172490
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_paired.jsonl",
+                                              "sha256":  "933b073c1bb47c18baf360b6ea4db6ff68b5f318f26f287fd74e0ade310504cc",
+                                              "bytes":  704814
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_X1_NET_POSITIVE_AT_12H_orders.jsonl",
+                                              "sha256":  "c4a5b7148b080b5ac4f4ed13837e5cc566e2b4a5806b24e628508be6bc6c66f0",
+                                              "bytes":  208719
+                                          },
+                                          {
+                                              "path":  "evidence/v0.6/b_line/g2_conditional_exit_r1/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_X2_COMPLETED_4H_TREND_AT_12H_orders.jsonl",
+                                              "sha256":  "c5629501e731a314c7fe48d6f43e34058538b8c2237c0b992729bbd89142027c",
+                                              "bytes":  196017
+                                          },
+                                          {
+                                              "path":  "scripts/strategy_research/g2_conditional_exit_r1/__init__.py",
+                                              "sha256":  "a47c70c6e7af56b829b558d0480dd5b349c17187bcb2ea52bc7c54c752fdb77a",
+                                              "bytes":  76
+                                          },
+                                          {
+                                              "path":  "scripts/strategy_research/g2_conditional_exit_r1/account.py",
+                                              "sha256":  "29ac5f9459b5c9f5c49061e439e0cedef741c3b4d75f8afac8bac75f8065c0f1",
+                                              "bytes":  9728
+                                          },
+                                          {
+                                              "path":  "scripts/strategy_research/g2_conditional_exit_r1/audit.py",
+                                              "sha256":  "2992f183fb433c8c7e21f338106af8f7314e29822b53dd9365bd7ce70277dbd8",
+                                              "bytes":  20113
+                                          },
+                                          {
+                                              "path":  "scripts/strategy_research/g2_conditional_exit_r1/conditional_book.py",
+                                              "sha256":  "e3c58059c28f1ea60525f44cff5bfb3d4bb59b63850c79b63b28a37825602f89",
+                                              "bytes":  34416
+                                          },
+                                          {
+                                              "path":  "scripts/strategy_research/g2_conditional_exit_r1/contract.py",
+                                              "sha256":  "d937078dddeeafefc961b49ba970ed9666166654b7ea36dba340b9cfa44ee21c",
+                                              "bytes":  5131
+                                          },
+                                          {
+                                              "path":  "scripts/strategy_research/g2_conditional_exit_r1/report.py",
+                                              "sha256":  "948ae12b6067cf0b983c5640bcb8e45e122e1cc98f7cefb7f27e3fb1573be132",
+                                              "bytes":  25765
+                                          },
+                                          {
+                                              "path":  "scripts/strategy_research/g2_conditional_exit_r1/run.py",
+                                              "sha256":  "456c1f412cb1d49c0803435829416501ea483233ebd2ebaf0ed6c842685d20f2",
+                                              "bytes":  29266
+                                          },
+                                          {
+                                              "path":  "scripts/strategy_research/g2_conditional_exit_r1/sources.py",
+                                              "sha256":  "4056e2daf53ca78471b09a531cf0b8612fa6b6ee3c4e5923cfb52837683833bc",
+                                              "bytes":  9334
+                                          },
+                                          {
+                                              "path":  "scripts/strategy_research/g2_conditional_exit_r1/statistics.py",
+                                              "sha256":  "460bc2537a202175862552e58eb2980a09d7796220b533157d2a77f3bd7b6e3e",
+                                              "bytes":  20794
+                                          },
+                                          {
+                                              "path":  "tests/test_v06_g2_conditional_exit_r1_account.py",
+                                              "sha256":  "5078b33ae9a5025c0f8425b1e396e79808e5935f0e1bbb50323814bf628da149",
+                                              "bytes":  8300
+                                          },
+                                          {
+                                              "path":  "tests/test_v06_g2_conditional_exit_r1_book.py",
+                                              "sha256":  "bdf92a5f19c0bdc263560efafb57ad85cdeae0bef0132616b49fa0bd4416b1df",
+                                              "bytes":  28851
+                                          },
+                                          {
+                                              "path":  "tests/test_v06_g2_conditional_exit_r1_statistics_and_audit.py",
+                                              "sha256":  "dee7e07d081b95f86e258ce2e69a5e7745326d6586b2270bd9e276b601b0b2ce",
+                                              "bytes":  25108
+                                          }
+                                      ],
+    "self_digest":  "intentionally not recursive; final Git commit provides identity"
+}

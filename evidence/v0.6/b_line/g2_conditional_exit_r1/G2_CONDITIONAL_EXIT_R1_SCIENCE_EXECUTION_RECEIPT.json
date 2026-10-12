@@ -1,0 +1,29 @@
+{
+  "TASK_ID": "V06_G2_GEMINI_B_CONDITIONAL_EXIT_R1",
+  "CONTROLLER_DISPATCH_SHA": "99df4ed8e820984d69d7b895be8808b892ed7f5f",
+  "EXACT_START_SHA": "d5e3a8407b1b84111dc7f4276865ffd68cb0a7d2",
+  "first_frozen_commit_sha": "cb7445ef0cec515a6cf737b32d22d241788dc470",
+  "first_remote_exact_sha_verified_before_new_exit_outcomes": true,
+  "final_result_commit_parent": "cb7445ef0cec515a6cf737b32d22d241788dc470",
+  "branch": "feature/v06-bline-gemini-g2-conditional-exit-r1",
+  "namespace": "g2_conditional_exit_r1",
+  "READ_ONLY_ORIGINAL_EXIT_R1": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "READ_ONLY_MARGIN_R2": "c9846adacc1f2df85931ecf4649e02a3a61cf466",
+  "terminal": "X1_X2_INSUFFICIENT_SUPPORT",
+  "grade": "DEVELOPMENT_ONLY_PRECOMMITTED_12H_CONDITIONAL_EXIT_STUDY",
+  "published_at_UTC": "2026-10-12T02:35:42.308488+00:00",
+  "source_manifest_sha256": "1f06a24b892a24430f3d2f9e5f2c46e926ed24a437785614c400a1fa536b677c",
+  "last_rows": 1576800,
+  "mark_rows": 1576800,
+  "funding_events": 3285,
+  "selectable_new_configurations": 4,
+  "committed_jsonl_ledgers": 20,
+  "independent_decimal_witnesses_total": 88,
+  "report_to_machine_equality_verified": true,
+  "allowed_changed_prefixes": [
+    "scripts/strategy_research/g2_conditional_exit_r1/",
+    "tests/test_v06_g2_conditional_exit_r1_",
+    "docs/strategy_research/g2_conditional_exit_r1/",
+    "evidence/v0.6/b_line/g2_conditional_exit_r1/"
+  ]
+}

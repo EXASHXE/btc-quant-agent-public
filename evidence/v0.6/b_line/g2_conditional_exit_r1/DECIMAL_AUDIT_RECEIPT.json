@@ -1,0 +1,2428 @@
+{
+  "status": "PASS",
+  "method": "independent stdlib CSV/ZIP/Decimal; zero production execution helper calls",
+  "audited_new_trade_episodes_n": 48,
+  "audited_previous_exit_r1_witnesses_n": 40,
+  "total_decimal_witnesses_n": 88,
+  "per_cost_new_n": {
+    "STRESS": 24,
+    "BASE": 24
+  },
+  "per_scheme_new_n": {
+    "X1_NET_POSITIVE_AT_12H": 24,
+    "X2_COMPLETED_4H_TREND_AT_12H": 24
+  },
+  "official_funding_events_verified": 3285,
+  "new_trade_episodes": [
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.018000000000000002",
+      "independent_effective_entry": "51643.2",
+      "independent_fee_entry": "1.11549312000000012394368",
+      "independent_fee_exit": "1.16065872000000012896208",
+      "independent_gross_usdt": "39.53664000000000439296",
+      "independent_drag_usdt": "1.89864000000000021096",
+      "independent_funding_usdt": "-0.1914879682369980212764409152",
+      "independent_net_after_funding_usdt": "35.17036019176300590781779908",
+      "independent_net_after_funding_bps": "378.7266823725501065775719386",
+      "tiers": [
+        {
+          "quantity": "0.018000000000000002",
+          "raw_exit": "53788.01",
+          "independent_effective_exit": "53734.2",
+          "independent_fee_exit": "1.16065872000000012896208",
+          "exit_at": 1619466360000,
+          "exit_ack_at": 1619466420000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1619424000002,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619423999999,
+          "mark_close": "52815.88419012",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09506859154221601056317683802"
+        },
+        {
+          "settlement_at": 1619452800004,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619452799999,
+          "mark_close": "53566.32038599",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09641937669478201071326407720"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "35.86366244845778798485138316",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.018000000000000002",
+      "independent_effective_entry": "51617.4",
+      "independent_fee_entry": "0.55746792000000006194088",
+      "independent_fee_exit": "0.58061988000000006451332",
+      "independent_gross_usdt": "39.53664000000000439296",
+      "independent_drag_usdt": "0.95004000000000010556",
+      "independent_funding_usdt": "-0.1914879682369980212764409152",
+      "independent_net_after_funding_usdt": "37.25702423176300613966935908",
+      "independent_net_after_funding_bps": "401.1966071838514965537947798",
+      "tiers": [
+        {
+          "quantity": "0.018000000000000002",
+          "raw_exit": "53788.01",
+          "independent_effective_exit": "53761.1",
+          "independent_fee_exit": "0.58061988000000006451332",
+          "exit_at": 1619466360000,
+          "exit_ack_at": 1619466420000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1619424000002,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619423999999,
+          "mark_close": "52815.88419012",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09506859154221601056317683802"
+        },
+        {
+          "settlement_at": 1619452800004,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619452799999,
+          "mark_close": "53566.32038599",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09641937669478201071326407720"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "37.95068504845778821674278316",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.018000000000000002",
+      "independent_effective_entry": "51643.2",
+      "independent_fee_entry": "1.11549312000000012394368",
+      "independent_fee_exit": "1.16065872000000012896208",
+      "independent_gross_usdt": "39.53664000000000439296",
+      "independent_drag_usdt": "1.89864000000000021096",
+      "independent_funding_usdt": "-0.1914879682369980212764409152",
+      "independent_net_after_funding_usdt": "35.17036019176300590781779908",
+      "independent_net_after_funding_bps": "378.7266823725501065775719386",
+      "tiers": [
+        {
+          "quantity": "0.018000000000000002",
+          "raw_exit": "53788.01",
+          "independent_effective_exit": "53734.2",
+          "independent_fee_exit": "1.16065872000000012896208",
+          "exit_at": 1619466360000,
+          "exit_ack_at": 1619466420000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1619424000002,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619423999999,
+          "mark_close": "52815.88419012",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09506859154221601056317683802"
+        },
+        {
+          "settlement_at": 1619452800004,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619452799999,
+          "mark_close": "53566.32038599",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09641937669478201071326407720"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "5.78",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.018000000000000002",
+      "independent_effective_entry": "51617.4",
+      "independent_fee_entry": "0.55746792000000006194088",
+      "independent_fee_exit": "0.58061988000000006451332",
+      "independent_gross_usdt": "39.53664000000000439296",
+      "independent_drag_usdt": "0.95004000000000010556",
+      "independent_funding_usdt": "-0.1914879682369980212764409152",
+      "independent_net_after_funding_usdt": "37.25702423176300613966935908",
+      "independent_net_after_funding_bps": "401.1966071838514965537947798",
+      "tiers": [
+        {
+          "quantity": "0.018000000000000002",
+          "raw_exit": "53788.01",
+          "independent_effective_exit": "53761.1",
+          "independent_fee_exit": "0.58061988000000006451332",
+          "exit_at": 1619466360000,
+          "exit_ack_at": 1619466420000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1619424000002,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619423999999,
+          "mark_close": "52815.88419012",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09506859154221601056317683802"
+        },
+        {
+          "settlement_at": 1619452800004,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619452799999,
+          "mark_close": "53566.32038599",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09641937669478201071326407720"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "5.78",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1619401500000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.018000000000000002",
+      "independent_effective_entry": "51643.2",
+      "independent_fee_entry": "1.11549312000000012394368",
+      "independent_fee_exit": "1.16065872000000012896208",
+      "independent_gross_usdt": "39.53664000000000439296",
+      "independent_drag_usdt": "1.89864000000000021096",
+      "independent_funding_usdt": "-0.1914879682369980212764409152",
+      "independent_net_after_funding_usdt": "35.17036019176300590781779908",
+      "independent_net_after_funding_bps": "378.7266823725501065775719386",
+      "tiers": [
+        {
+          "quantity": "0.018000000000000002",
+          "raw_exit": "53788.01",
+          "independent_effective_exit": "53734.2",
+          "independent_fee_exit": "1.16065872000000012896208",
+          "exit_at": 1619466360000,
+          "exit_ack_at": 1619466420000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1619424000002,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619423999999,
+          "mark_close": "52815.88419012",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09506859154221601056317683802"
+        },
+        {
+          "settlement_at": 1619452800004,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619452799999,
+          "mark_close": "53566.32038599",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09641937669478201071326407720"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "35.86366244845778798485138316",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1619401500000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.018000000000000002",
+      "independent_effective_entry": "51617.4",
+      "independent_fee_entry": "0.55746792000000006194088",
+      "independent_fee_exit": "0.58061988000000006451332",
+      "independent_gross_usdt": "39.53664000000000439296",
+      "independent_drag_usdt": "0.95004000000000010556",
+      "independent_funding_usdt": "-0.1914879682369980212764409152",
+      "independent_net_after_funding_usdt": "37.25702423176300613966935908",
+      "independent_net_after_funding_bps": "401.1966071838514965537947798",
+      "tiers": [
+        {
+          "quantity": "0.018000000000000002",
+          "raw_exit": "53788.01",
+          "independent_effective_exit": "53761.1",
+          "independent_fee_exit": "0.58061988000000006451332",
+          "exit_at": 1619466360000,
+          "exit_ack_at": 1619466420000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1619424000002,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619423999999,
+          "mark_close": "52815.88419012",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09506859154221601056317683802"
+        },
+        {
+          "settlement_at": 1619452800004,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619452799999,
+          "mark_close": "53566.32038599",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09641937669478201071326407720"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "37.95068504845778821674278316",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1619401500000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.018000000000000002",
+      "independent_effective_entry": "51643.2",
+      "independent_fee_entry": "1.11549312000000012394368",
+      "independent_fee_exit": "1.16065872000000012896208",
+      "independent_gross_usdt": "39.53664000000000439296",
+      "independent_drag_usdt": "1.89864000000000021096",
+      "independent_funding_usdt": "-0.1914879682369980212764409152",
+      "independent_net_after_funding_usdt": "35.17036019176300590781779908",
+      "independent_net_after_funding_bps": "378.7266823725501065775719386",
+      "tiers": [
+        {
+          "quantity": "0.018000000000000002",
+          "raw_exit": "53788.01",
+          "independent_effective_exit": "53734.2",
+          "independent_fee_exit": "1.16065872000000012896208",
+          "exit_at": 1619466360000,
+          "exit_ack_at": 1619466420000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1619424000002,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619423999999,
+          "mark_close": "52815.88419012",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09506859154221601056317683802"
+        },
+        {
+          "settlement_at": 1619452800004,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619452799999,
+          "mark_close": "53566.32038599",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09641937669478201071326407720"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "5.78",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1619401500000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.018000000000000002",
+      "independent_effective_entry": "51617.4",
+      "independent_fee_entry": "0.55746792000000006194088",
+      "independent_fee_exit": "0.58061988000000006451332",
+      "independent_gross_usdt": "39.53664000000000439296",
+      "independent_drag_usdt": "0.95004000000000010556",
+      "independent_funding_usdt": "-0.1914879682369980212764409152",
+      "independent_net_after_funding_usdt": "37.25702423176300613966935908",
+      "independent_net_after_funding_bps": "401.1966071838514965537947798",
+      "tiers": [
+        {
+          "quantity": "0.018000000000000002",
+          "raw_exit": "53788.01",
+          "independent_effective_exit": "53761.1",
+          "independent_fee_exit": "0.58061988000000006451332",
+          "exit_at": 1619466360000,
+          "exit_ack_at": 1619466420000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1619424000002,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619423999999,
+          "mark_close": "52815.88419012",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09506859154221601056317683802"
+        },
+        {
+          "settlement_at": 1619452800004,
+          "remaining_quantity": "0.018000000000000002",
+          "rate": "0.00010000",
+          "mark_close_at": 1619452799999,
+          "mark_close": "53566.32038599",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.09641937669478201071326407720"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "5.78",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1627681500000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.022",
+      "independent_effective_entry": "41482.2",
+      "independent_fee_entry": "1.09513008",
+      "independent_fee_exit": "1.09792848",
+      "independent_gross_usdt": "4.16174",
+      "independent_drag_usdt": "1.82974",
+      "independent_funding_usdt": "-0.1842470195896000000",
+      "independent_net_after_funding_usdt": "-0.0453055795896000000",
+      "independent_net_after_funding_bps": "-0.4969374390213297452360866317",
+      "tiers": [
+        {
+          "quantity": "0.022",
+          "raw_exit": "41629.89",
+          "independent_effective_exit": "41588.2",
+          "independent_fee_exit": "1.09792848",
+          "exit_at": 1627724760000,
+          "exit_ack_at": 1627724820000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1627689600000,
+          "remaining_quantity": "0.022",
+          "rate": "0.00010000",
+          "mark_close_at": 1627689599999,
+          "mark_close": "42209.59000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0928610980000000000"
+        },
+        {
+          "settlement_at": 1627718400014,
+          "remaining_quantity": "0.022",
+          "rate": "0.00010000",
+          "mark_close_at": 1627718399999,
+          "mark_close": "41539.05526800",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0913859215896000000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "-0.19692341958960000",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1627865100000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.023",
+      "independent_effective_entry": "39597.5",
+      "independent_fee_entry": "1.092891",
+      "independent_fee_exit": "1.0951266",
+      "independent_gross_usdt": "-0.03772",
+      "independent_drag_usdt": "1.82528",
+      "independent_funding_usdt": "0.1835044190000000000",
+      "independent_net_after_funding_usdt": "-3.8675131810000000000",
+      "independent_net_after_funding_bps": "-42.42302724162237739655282899",
+      "tiers": [
+        {
+          "quantity": "0.023",
+          "raw_exit": "39638.78",
+          "independent_effective_exit": "39678.5",
+          "independent_fee_exit": "1.0951266",
+          "exit_at": 1627929960000,
+          "exit_ack_at": 1627930020000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1627891200014,
+          "remaining_quantity": "0.023",
+          "rate": "0.00010000",
+          "mark_close_at": 1627891199999,
+          "mark_close": "40106.52000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0922449960000000000"
+        },
+        {
+          "settlement_at": 1627920000021,
+          "remaining_quantity": "0.023",
+          "rate": "0.00010000",
+          "mark_close_at": 1627919999999,
+          "mark_close": "39678.01000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0912594230000000000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "4.6466415160000",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1627865100000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.023",
+      "independent_effective_entry": "39617.3",
+      "independent_fee_entry": "0.54671874",
+      "independent_fee_exit": "0.54728868",
+      "independent_gross_usdt": "-0.03772",
+      "independent_drag_usdt": "0.91218",
+      "independent_funding_usdt": "0.1835044190000000000",
+      "independent_net_after_funding_usdt": "-1.8604030010000000000",
+      "independent_net_after_funding_bps": "-20.40689287874957678581249808",
+      "tiers": [
+        {
+          "quantity": "0.023",
+          "raw_exit": "39638.78",
+          "independent_effective_exit": "39658.6",
+          "independent_fee_exit": "0.54728868",
+          "exit_at": 1627929960000,
+          "exit_ack_at": 1627930020000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1627891200014,
+          "remaining_quantity": "0.023",
+          "rate": "0.00010000",
+          "mark_close_at": 1627891199999,
+          "mark_close": "40106.52000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0922449960000000000"
+        },
+        {
+          "settlement_at": 1627920000021,
+          "remaining_quantity": "0.023",
+          "rate": "0.00010000",
+          "mark_close_at": 1627919999999,
+          "mark_close": "39678.01000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0912594230000000000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "6.6439918760000",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1627865100000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.023",
+      "independent_effective_entry": "39597.5",
+      "independent_fee_entry": "1.092891",
+      "independent_fee_exit": "1.0951266",
+      "independent_gross_usdt": "-0.03772",
+      "independent_drag_usdt": "1.82528",
+      "independent_funding_usdt": "0.1835044190000000000",
+      "independent_net_after_funding_usdt": "-3.8675131810000000000",
+      "independent_net_after_funding_bps": "-42.42302724162237739655282899",
+      "tiers": [
+        {
+          "quantity": "0.023",
+          "raw_exit": "39638.78",
+          "independent_effective_exit": "39678.5",
+          "independent_fee_exit": "1.0951266",
+          "exit_at": 1627929960000,
+          "exit_ack_at": 1627930020000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1627891200014,
+          "remaining_quantity": "0.023",
+          "rate": "0.00010000",
+          "mark_close_at": 1627891199999,
+          "mark_close": "40106.52000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0922449960000000000"
+        },
+        {
+          "settlement_at": 1627920000021,
+          "remaining_quantity": "0.023",
+          "rate": "0.00010000",
+          "mark_close_at": 1627919999999,
+          "mark_close": "39678.01000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0912594230000000000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "3.63",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1627865100000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.023",
+      "independent_effective_entry": "39617.3",
+      "independent_fee_entry": "0.54671874",
+      "independent_fee_exit": "0.54728868",
+      "independent_gross_usdt": "-0.03772",
+      "independent_drag_usdt": "0.91218",
+      "independent_funding_usdt": "0.1835044190000000000",
+      "independent_net_after_funding_usdt": "-1.8604030010000000000",
+      "independent_net_after_funding_bps": "-20.40689287874957678581249808",
+      "tiers": [
+        {
+          "quantity": "0.023",
+          "raw_exit": "39638.78",
+          "independent_effective_exit": "39658.6",
+          "independent_fee_exit": "0.54728868",
+          "exit_at": 1627929960000,
+          "exit_ack_at": 1627930020000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1627891200014,
+          "remaining_quantity": "0.023",
+          "rate": "0.00010000",
+          "mark_close_at": 1627891199999,
+          "mark_close": "40106.52000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0922449960000000000"
+        },
+        {
+          "settlement_at": 1627920000021,
+          "remaining_quantity": "0.023",
+          "rate": "0.00010000",
+          "mark_close_at": 1627919999999,
+          "mark_close": "39678.01000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0912594230000000000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "3.63",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1628186400000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.023",
+      "independent_effective_entry": "40591.1",
+      "independent_fee_entry": "0.56015718",
+      "independent_fee_exit": "0.55861986",
+      "independent_gross_usdt": "-1.62840",
+      "independent_drag_usdt": "0.93380",
+      "independent_funding_usdt": "-0.0940214431293300000",
+      "independent_net_after_funding_usdt": "-3.7749984831293300000",
+      "independent_net_after_funding_bps": "-40.45528517466375455653954161",
+      "tiers": [
+        {
+          "quantity": "0.023",
+          "raw_exit": "40500.01",
+          "independent_effective_exit": "40479.7",
+          "independent_fee_exit": "0.55861986",
+          "exit_at": 1628229660000,
+          "exit_ack_at": 1628229720000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1628208000000,
+          "remaining_quantity": "0.023",
+          "rate": "0.00010000",
+          "mark_close_at": 1628207999999,
+          "mark_close": "40878.88831710",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0940214431293300000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "-3.625588183129330000",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1628190900000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.022",
+      "independent_effective_entry": "41359.1",
+      "independent_fee_entry": "1.09188024",
+      "independent_fee_exit": "1.05674976",
+      "independent_gross_usdt": "-27.48262",
+      "independent_drag_usdt": "1.79278",
+      "independent_funding_usdt": "-0.0899335542976200000",
+      "independent_net_after_funding_usdt": "-31.5139635542976200000",
+      "independent_net_after_funding_bps": "-346.6922268518051944311531302",
+      "tiers": [
+        {
+          "quantity": "0.022",
+          "raw_exit": "40068.5",
+          "independent_effective_exit": "40028.4",
+          "independent_fee_exit": "1.05674976",
+          "exit_at": 1628211239999,
+          "exit_ack_at": 1628211300000,
+          "reason": "STOP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1628208000000,
+          "remaining_quantity": "0.022",
+          "rate": "0.00010000",
+          "mark_close_at": 1628207999999,
+          "mark_close": "40878.88831710",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0899335542976200000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1628190900000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.022",
+      "independent_effective_entry": "41338.4",
+      "independent_fee_entry": "0.54566688",
+      "independent_fee_exit": "0.52863888",
+      "independent_gross_usdt": "-27.48262",
+      "independent_drag_usdt": "0.89738",
+      "independent_funding_usdt": "-0.0899335542976200000",
+      "independent_net_after_funding_usdt": "-29.5442393142976200000",
+      "independent_net_after_funding_bps": "-325.0228458527130375812212245",
+      "tiers": [
+        {
+          "quantity": "0.022",
+          "raw_exit": "40068.5",
+          "independent_effective_exit": "40048.4",
+          "independent_fee_exit": "0.52863888",
+          "exit_at": 1628211239999,
+          "exit_ack_at": 1628211300000,
+          "reason": "STOP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1628208000000,
+          "remaining_quantity": "0.022",
+          "rate": "0.00010000",
+          "mark_close_at": 1628207999999,
+          "mark_close": "40878.88831710",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0899335542976200000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1628190900000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.022",
+      "independent_effective_entry": "41359.1",
+      "independent_fee_entry": "1.09188024",
+      "independent_fee_exit": "1.05674976",
+      "independent_gross_usdt": "-27.48262",
+      "independent_drag_usdt": "1.79278",
+      "independent_funding_usdt": "-0.0899335542976200000",
+      "independent_net_after_funding_usdt": "-31.5139635542976200000",
+      "independent_net_after_funding_bps": "-346.6922268518051944311531302",
+      "tiers": [
+        {
+          "quantity": "0.022",
+          "raw_exit": "40068.5",
+          "independent_effective_exit": "40028.4",
+          "independent_fee_exit": "1.05674976",
+          "exit_at": 1628211239999,
+          "exit_ack_at": 1628211300000,
+          "reason": "STOP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1628208000000,
+          "remaining_quantity": "0.022",
+          "rate": "0.00010000",
+          "mark_close_at": 1628207999999,
+          "mark_close": "40878.88831710",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0899335542976200000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1628190900000_1",
+      "year": 2021,
+      "side": 1,
+      "quantity": "0.022",
+      "independent_effective_entry": "41338.4",
+      "independent_fee_entry": "0.54566688",
+      "independent_fee_exit": "0.52863888",
+      "independent_gross_usdt": "-27.48262",
+      "independent_drag_usdt": "0.89738",
+      "independent_funding_usdt": "-0.0899335542976200000",
+      "independent_net_after_funding_usdt": "-29.5442393142976200000",
+      "independent_net_after_funding_bps": "-325.0228458527130375812212245",
+      "tiers": [
+        {
+          "quantity": "0.022",
+          "raw_exit": "40068.5",
+          "independent_effective_exit": "40048.4",
+          "independent_fee_exit": "0.52863888",
+          "exit_at": 1628211239999,
+          "exit_ack_at": 1628211300000,
+          "reason": "STOP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1628208000000,
+          "remaining_quantity": "0.022",
+          "rate": "0.00010000",
+          "mark_close_at": 1628207999999,
+          "mark_close": "40878.88831710",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0899335542976200000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1630210500000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.019",
+      "independent_effective_entry": "47970.6",
+      "independent_fee_entry": "1.09372968",
+      "independent_fee_exit": "1.10507724",
+      "independent_gross_usdt": "-7.62261",
+      "independent_drag_usdt": "1.83369",
+      "independent_funding_usdt": "0.1842860421949390000",
+      "independent_net_after_funding_usdt": "-11.4708208778050610000",
+      "independent_net_after_funding_bps": "-125.7276418987279322813397372",
+      "tiers": [
+        {
+          "quantity": "0.019",
+          "raw_exit": "48419.86",
+          "independent_effective_exit": "48468.3",
+          "independent_fee_exit": "1.10507724",
+          "exit_at": 1630253760000,
+          "exit_ack_at": 1630253820000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1630224000002,
+          "remaining_quantity": "0.019",
+          "rate": "0.00010000",
+          "mark_close_at": 1630223999999,
+          "mark_close": "48514",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.09217660000"
+        },
+        {
+          "settlement_at": 1630252800005,
+          "remaining_quantity": "0.019",
+          "rate": "0.00010000",
+          "mark_close_at": 1630252799999,
+          "mark_close": "48478.65378681",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0921094421949390000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "-11.4460912378050610000",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1630210500000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.019",
+      "independent_effective_entry": "47994.6",
+      "independent_fee_entry": "0.54713844",
+      "independent_fee_exit": "0.55226274",
+      "independent_gross_usdt": "-7.62261",
+      "independent_drag_usdt": "0.91789",
+      "independent_funding_usdt": "0.1842860421949390000",
+      "independent_net_after_funding_usdt": "-9.4556151378050610000",
+      "independent_net_after_funding_bps": "-103.6396790292856924192194411",
+      "tiers": [
+        {
+          "quantity": "0.019",
+          "raw_exit": "48419.86",
+          "independent_effective_exit": "48444.1",
+          "independent_fee_exit": "0.55226274",
+          "exit_at": 1630253760000,
+          "exit_ack_at": 1630253820000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1630224000002,
+          "remaining_quantity": "0.019",
+          "rate": "0.00010000",
+          "mark_close_at": 1630223999999,
+          "mark_close": "48514",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.09217660000"
+        },
+        {
+          "settlement_at": 1630252800005,
+          "remaining_quantity": "0.019",
+          "rate": "0.00010000",
+          "mark_close_at": 1630252799999,
+          "mark_close": "48478.65378681",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0921094421949390000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "-9.4309003178050610000",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1630210500000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.019",
+      "independent_effective_entry": "47970.6",
+      "independent_fee_entry": "1.09372968",
+      "independent_fee_exit": "1.10507724",
+      "independent_gross_usdt": "-7.62261",
+      "independent_drag_usdt": "1.83369",
+      "independent_funding_usdt": "0.1842860421949390000",
+      "independent_net_after_funding_usdt": "-11.4708208778050610000",
+      "independent_net_after_funding_bps": "-125.7276418987279322813397372",
+      "tiers": [
+        {
+          "quantity": "0.019",
+          "raw_exit": "48419.86",
+          "independent_effective_exit": "48468.3",
+          "independent_fee_exit": "1.10507724",
+          "exit_at": 1630253760000,
+          "exit_ack_at": 1630253820000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1630224000002,
+          "remaining_quantity": "0.019",
+          "rate": "0.00010000",
+          "mark_close_at": 1630223999999,
+          "mark_close": "48514",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.09217660000"
+        },
+        {
+          "settlement_at": 1630252800005,
+          "remaining_quantity": "0.019",
+          "rate": "0.00010000",
+          "mark_close_at": 1630252799999,
+          "mark_close": "48478.65378681",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0921094421949390000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "-103.99",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1630210500000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.019",
+      "independent_effective_entry": "47994.6",
+      "independent_fee_entry": "0.54713844",
+      "independent_fee_exit": "0.55226274",
+      "independent_gross_usdt": "-7.62261",
+      "independent_drag_usdt": "0.91789",
+      "independent_funding_usdt": "0.1842860421949390000",
+      "independent_net_after_funding_usdt": "-9.4556151378050610000",
+      "independent_net_after_funding_bps": "-103.6396790292856924192194411",
+      "tiers": [
+        {
+          "quantity": "0.019",
+          "raw_exit": "48419.86",
+          "independent_effective_exit": "48444.1",
+          "independent_fee_exit": "0.55226274",
+          "exit_at": 1630253760000,
+          "exit_ack_at": 1630253820000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1630224000002,
+          "remaining_quantity": "0.019",
+          "rate": "0.00010000",
+          "mark_close_at": 1630223999999,
+          "mark_close": "48514",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.09217660000"
+        },
+        {
+          "settlement_at": 1630252800005,
+          "remaining_quantity": "0.019",
+          "rate": "0.00010000",
+          "mark_close_at": 1630252799999,
+          "mark_close": "48478.65378681",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0921094421949390000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "-103.99",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1632482100000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.022",
+      "independent_effective_entry": "41165.7",
+      "independent_fee_entry": "1.08677448",
+      "independent_fee_exit": "1.12143768",
+      "independent_gross_usdt": "-27.043940000000088",
+      "independent_drag_usdt": "1.842059999999912",
+      "independent_funding_usdt": "0",
+      "independent_net_after_funding_usdt": "-31.094212160000000",
+      "independent_net_after_funding_bps": "-342.9940740550193863022554701",
+      "tiers": [
+        {
+          "quantity": "0.022",
+          "raw_exit": "42436.200000000004",
+          "independent_effective_exit": "42478.7",
+          "independent_fee_exit": "1.12143768",
+          "exit_at": 1632493799999,
+          "exit_ack_at": 1632493860000,
+          "reason": "STOP"
+        }
+      ],
+      "settlements": [],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1632482100000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.022",
+      "independent_effective_entry": "41186.3",
+      "independent_fee_entry": "0.54365916",
+      "independent_fee_exit": "0.560439",
+      "independent_gross_usdt": "-27.043940000000088",
+      "independent_drag_usdt": "0.922459999999912",
+      "independent_funding_usdt": "0",
+      "independent_net_after_funding_usdt": "-29.070498160000000",
+      "independent_net_after_funding_bps": "-320.6708871541752807112784185",
+      "tiers": [
+        {
+          "quantity": "0.022",
+          "raw_exit": "42436.200000000004",
+          "independent_effective_exit": "42457.5",
+          "independent_fee_exit": "0.560439",
+          "exit_at": 1632493799999,
+          "exit_ack_at": 1632493860000,
+          "reason": "STOP"
+        }
+      ],
+      "settlements": [],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1632482100000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.022",
+      "independent_effective_entry": "41165.7",
+      "independent_fee_entry": "1.08677448",
+      "independent_fee_exit": "1.12143768",
+      "independent_gross_usdt": "-27.043940000000088",
+      "independent_drag_usdt": "1.842059999999912",
+      "independent_funding_usdt": "0",
+      "independent_net_after_funding_usdt": "-31.094212160000000",
+      "independent_net_after_funding_bps": "-342.9940740550193863022554701",
+      "tiers": [
+        {
+          "quantity": "0.022",
+          "raw_exit": "42436.200000000004",
+          "independent_effective_exit": "42478.7",
+          "independent_fee_exit": "1.12143768",
+          "exit_at": 1632493799999,
+          "exit_ack_at": 1632493860000,
+          "reason": "STOP"
+        }
+      ],
+      "settlements": [],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1632482100000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.022",
+      "independent_effective_entry": "41186.3",
+      "independent_fee_entry": "0.54365916",
+      "independent_fee_exit": "0.560439",
+      "independent_gross_usdt": "-27.043940000000088",
+      "independent_drag_usdt": "0.922459999999912",
+      "independent_funding_usdt": "0",
+      "independent_net_after_funding_usdt": "-29.070498160000000",
+      "independent_net_after_funding_bps": "-320.6708871541752807112784185",
+      "tiers": [
+        {
+          "quantity": "0.022",
+          "raw_exit": "42436.200000000004",
+          "independent_effective_exit": "42457.5",
+          "independent_fee_exit": "0.560439",
+          "exit_at": 1632493799999,
+          "exit_ack_at": 1632493860000,
+          "reason": "STOP"
+        }
+      ],
+      "settlements": [],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1637028000000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.015",
+      "independent_effective_entry": "61948.9",
+      "independent_fee_entry": "1.1150802",
+      "independent_fee_exit": "1.0539216",
+      "independent_gross_usdt": "52.774049999999940",
+      "independent_drag_usdt": "1.808549999999940",
+      "independent_funding_usdt": "0.0912264349561050000",
+      "independent_net_after_funding_usdt": "48.8877246349561050000",
+      "independent_net_after_funding_bps": "525.5814644296657510759789760",
+      "tiers": [
+        {
+          "quantity": "0.015",
+          "raw_exit": "58492.700000000004",
+          "independent_effective_exit": "58551.2",
+          "independent_fee_exit": "1.0539216",
+          "exit_at": 1637057639999,
+          "exit_ack_at": 1637057700000,
+          "reason": "TARGET"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1637049600001,
+          "remaining_quantity": "0.015",
+          "rate": "0.00010000",
+          "mark_close_at": 1637049599999,
+          "mark_close": "60817.62330407",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0912264349561050000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1637028000000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.015",
+      "independent_effective_entry": "61979.9",
+      "independent_fee_entry": "0.5578191",
+      "independent_fee_exit": "0.5276754",
+      "independent_gross_usdt": "51.146549999999940",
+      "independent_drag_usdt": "0.907049999999940",
+      "independent_funding_usdt": "0.0912264349561050000",
+      "independent_net_after_funding_usdt": "49.2452319349561050000",
+      "independent_net_after_funding_bps": "529.4249488970108030885503001",
+      "tiers": [
+        {
+          "quantity": "0.015",
+          "raw_exit": "58601.200000000004",
+          "independent_effective_exit": "58630.6",
+          "independent_fee_exit": "0.5276754",
+          "exit_at": 1637057639999,
+          "exit_ack_at": 1637057700000,
+          "reason": "TARGET"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1637049600001,
+          "remaining_quantity": "0.015",
+          "rate": "0.00010000",
+          "mark_close_at": 1637049599999,
+          "mark_close": "60817.62330407",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0912264349561050000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1637028000000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.015",
+      "independent_effective_entry": "61948.9",
+      "independent_fee_entry": "1.1150802",
+      "independent_fee_exit": "1.0539216",
+      "independent_gross_usdt": "52.774049999999940",
+      "independent_drag_usdt": "1.808549999999940",
+      "independent_funding_usdt": "0.0912264349561050000",
+      "independent_net_after_funding_usdt": "48.8877246349561050000",
+      "independent_net_after_funding_bps": "525.5814644296657510759789760",
+      "tiers": [
+        {
+          "quantity": "0.015",
+          "raw_exit": "58492.700000000004",
+          "independent_effective_exit": "58551.2",
+          "independent_fee_exit": "1.0539216",
+          "exit_at": 1637057639999,
+          "exit_ack_at": 1637057700000,
+          "reason": "TARGET"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1637049600001,
+          "remaining_quantity": "0.015",
+          "rate": "0.00010000",
+          "mark_close_at": 1637049599999,
+          "mark_close": "60817.62330407",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0912264349561050000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1637028000000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.015",
+      "independent_effective_entry": "61979.9",
+      "independent_fee_entry": "0.5578191",
+      "independent_fee_exit": "0.5276754",
+      "independent_gross_usdt": "51.146549999999940",
+      "independent_drag_usdt": "0.907049999999940",
+      "independent_funding_usdt": "0.0912264349561050000",
+      "independent_net_after_funding_usdt": "49.2452319349561050000",
+      "independent_net_after_funding_bps": "529.4249488970108030885503001",
+      "tiers": [
+        {
+          "quantity": "0.015",
+          "raw_exit": "58601.200000000004",
+          "independent_effective_exit": "58630.6",
+          "independent_fee_exit": "0.5276754",
+          "exit_at": 1637057639999,
+          "exit_ack_at": 1637057700000,
+          "reason": "TARGET"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1637049600001,
+          "remaining_quantity": "0.015",
+          "rate": "0.00010000",
+          "mark_close_at": 1637049599999,
+          "mark_close": "60817.62330407",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0912264349561050000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1637930700000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.017",
+      "independent_effective_entry": "53967.9",
+      "independent_fee_entry": "1.10094516",
+      "independent_fee_exit": "1.10958864",
+      "independent_gross_usdt": "-5.35891",
+      "independent_drag_usdt": "1.84399",
+      "independent_funding_usdt": "0.1913390560951325896",
+      "independent_net_after_funding_usdt": "-9.2220947439048674104",
+      "independent_net_after_funding_bps": "-100.4176375191900838917478064",
+      "tiers": [
+        {
+          "quantity": "0.017",
+          "raw_exit": "54337.23",
+          "independent_effective_exit": "54391.6",
+          "independent_fee_exit": "1.10958864",
+          "exit_at": 1637973960000,
+          "exit_ack_at": 1637974020000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1637942400016,
+          "remaining_quantity": "0.017",
+          "rate": "0.00010000",
+          "mark_close_at": 1637942399999,
+          "mark_close": "54356.36242751",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0924058161267670000"
+        },
+        {
+          "settlement_at": 1637971200005,
+          "remaining_quantity": "0.017",
+          "rate": "0.00010824",
+          "mark_close_at": 1637971199999,
+          "mark_close": "53765.72755987",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0989332399683655896"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "-8.8204133039048674104",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1637930700000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.017",
+      "independent_effective_entry": "53994.9",
+      "independent_fee_entry": "0.55074798",
+      "independent_fee_exit": "0.55451688",
+      "independent_gross_usdt": "-5.35891",
+      "independent_drag_usdt": "0.92259",
+      "independent_funding_usdt": "0.1913390560951325896",
+      "independent_net_after_funding_usdt": "-7.1954258039048674104",
+      "independent_net_after_funding_bps": "-78.34962448746226929769353226",
+      "tiers": [
+        {
+          "quantity": "0.017",
+          "raw_exit": "54337.23",
+          "independent_effective_exit": "54364.4",
+          "independent_fee_exit": "0.55451688",
+          "exit_at": 1637973960000,
+          "exit_ack_at": 1637974020000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1637942400016,
+          "remaining_quantity": "0.017",
+          "rate": "0.00010000",
+          "mark_close_at": 1637942399999,
+          "mark_close": "54356.36242751",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0924058161267670000"
+        },
+        {
+          "settlement_at": 1637971200005,
+          "remaining_quantity": "0.017",
+          "rate": "0.00010824",
+          "mark_close_at": 1637971199999,
+          "mark_close": "53765.72755987",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0989332399683655896"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "-6.7956861039048674104",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1637930700000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.017",
+      "independent_effective_entry": "53967.9",
+      "independent_fee_entry": "1.10094516",
+      "independent_fee_exit": "1.11184692",
+      "independent_gross_usdt": "-7.2386",
+      "independent_drag_usdt": "1.8462",
+      "independent_funding_usdt": "0.1913390560951325896",
+      "independent_net_after_funding_usdt": "-11.1062530239048674104",
+      "independent_net_after_funding_bps": "-120.9338790504181021065491837",
+      "tiers": [
+        {
+          "quantity": "0.017",
+          "raw_exit": "54447.8",
+          "independent_effective_exit": "54502.3",
+          "independent_fee_exit": "1.11184692",
+          "exit_at": 1637995560000,
+          "exit_ack_at": 1637995620000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1637942400016,
+          "remaining_quantity": "0.017",
+          "rate": "0.00010000",
+          "mark_close_at": 1637942399999,
+          "mark_close": "54356.36242751",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0924058161267670000"
+        },
+        {
+          "settlement_at": 1637971200005,
+          "remaining_quantity": "0.017",
+          "rate": "0.00010824",
+          "mark_close_at": 1637971199999,
+          "mark_close": "53765.72755987",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0989332399683655896"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "785.37",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1637930700000_-1",
+      "year": 2021,
+      "side": -1,
+      "quantity": "0.017",
+      "independent_effective_entry": "53994.9",
+      "independent_fee_entry": "0.55074798",
+      "independent_fee_exit": "0.55564602",
+      "independent_gross_usdt": "-7.2386",
+      "independent_drag_usdt": "0.9248",
+      "independent_funding_usdt": "0.1913390560951325896",
+      "independent_net_after_funding_usdt": "-9.0784549439048674104",
+      "independent_net_after_funding_bps": "-98.85357102776066624708452112",
+      "tiers": [
+        {
+          "quantity": "0.017",
+          "raw_exit": "54447.8",
+          "independent_effective_exit": "54475.1",
+          "independent_fee_exit": "0.55564602",
+          "exit_at": 1637995560000,
+          "exit_ack_at": 1637995620000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1637942400016,
+          "remaining_quantity": "0.017",
+          "rate": "0.00010000",
+          "mark_close_at": 1637942399999,
+          "mark_close": "54356.36242751",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0924058161267670000"
+        },
+        {
+          "settlement_at": 1637971200005,
+          "remaining_quantity": "0.017",
+          "rate": "0.00010824",
+          "mark_close_at": 1637971199999,
+          "mark_close": "53765.72755987",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0989332399683655896"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "785.37",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1653882300000_1",
+      "year": 2022,
+      "side": 1,
+      "quantity": "0.03",
+      "independent_effective_entry": "30342.5",
+      "independent_fee_entry": "1.09233",
+      "independent_fee_exit": "1.1004984",
+      "independent_gross_usdt": "8.640",
+      "independent_drag_usdt": "1.833",
+      "independent_funding_usdt": "-0.091881600000000000",
+      "independent_net_after_funding_usdt": "4.522290000000000000",
+      "independent_net_after_funding_bps": "49.73030571949815420244720755",
+      "tiers": [
+        {
+          "quantity": "0.03",
+          "raw_exit": "30600.1",
+          "independent_effective_exit": "30569.4",
+          "independent_fee_exit": "1.1004984",
+          "exit_at": 1653925560000,
+          "exit_ack_at": 1653925620000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1653897600013,
+          "remaining_quantity": "0.03",
+          "rate": "0.00010000",
+          "mark_close_at": 1653897599999,
+          "mark_close": "30627.20000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.091881600000000000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "-200.1",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1653882300000_1",
+      "year": 2022,
+      "side": 1,
+      "quantity": "0.03",
+      "independent_effective_entry": "30327.3",
+      "independent_fee_entry": "0.5458914",
+      "independent_fee_exit": "0.5505246",
+      "independent_gross_usdt": "8.640",
+      "independent_drag_usdt": "0.918",
+      "independent_funding_usdt": "-0.091881600000000000",
+      "independent_net_after_funding_usdt": "6.533702400000000000",
+      "independent_net_after_funding_bps": "71.84922192787698641796510304",
+      "tiers": [
+        {
+          "quantity": "0.03",
+          "raw_exit": "30600.1",
+          "independent_effective_exit": "30584.7",
+          "independent_fee_exit": "0.5505246",
+          "exit_at": 1653925560000,
+          "exit_ack_at": 1653925620000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1653897600013,
+          "remaining_quantity": "0.03",
+          "rate": "0.00010000",
+          "mark_close_at": 1653897599999,
+          "mark_close": "30627.20000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.091881600000000000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "-200.1",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1653896700000_1",
+      "year": 2022,
+      "side": 1,
+      "quantity": "0.03",
+      "independent_effective_entry": "30644.7",
+      "independent_fee_entry": "1.1032092",
+      "independent_fee_exit": "1.1035548",
+      "independent_gross_usdt": "2.130",
+      "independent_drag_usdt": "1.842",
+      "independent_funding_usdt": "-0.183740829010950000",
+      "independent_net_after_funding_usdt": "-2.102504829010950000",
+      "independent_net_after_funding_bps": "-22.89262896072548507218919449",
+      "tiers": [
+        {
+          "quantity": "0.03",
+          "raw_exit": "30685.0",
+          "independent_effective_exit": "30654.3",
+          "independent_fee_exit": "1.1035548",
+          "exit_at": 1653939960000,
+          "exit_ack_at": 1653940020000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1653897600013,
+          "remaining_quantity": "0.03",
+          "rate": "0.00010000",
+          "mark_close_at": 1653897599999,
+          "mark_close": "30627.20000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.091881600000000000"
+        },
+        {
+          "settlement_at": 1653926400005,
+          "remaining_quantity": "0.03",
+          "rate": "0.00010000",
+          "mark_close_at": 1653926399999,
+          "mark_close": "30619.74300365",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.091859229010950000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "-2.054562429010950000",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1653896700000_1",
+      "year": 2022,
+      "side": 1,
+      "quantity": "0.03",
+      "independent_effective_entry": "30629.4",
+      "independent_fee_entry": "0.5513292",
+      "independent_fee_exit": "0.5520528",
+      "independent_gross_usdt": "2.130",
+      "independent_drag_usdt": "0.924",
+      "independent_funding_usdt": "-0.183740829010950000",
+      "independent_net_after_funding_usdt": "-0.081122829010950000",
+      "independent_net_after_funding_bps": "-0.8832868296743320049650486705",
+      "tiers": [
+        {
+          "quantity": "0.03",
+          "raw_exit": "30685.0",
+          "independent_effective_exit": "30669.6",
+          "independent_fee_exit": "0.5520528",
+          "exit_at": 1653939960000,
+          "exit_ack_at": 1653940020000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1653897600013,
+          "remaining_quantity": "0.03",
+          "rate": "0.00010000",
+          "mark_close_at": 1653897599999,
+          "mark_close": "30627.20000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.091881600000000000"
+        },
+        {
+          "settlement_at": 1653926400005,
+          "remaining_quantity": "0.03",
+          "rate": "0.00010000",
+          "mark_close_at": 1653926399999,
+          "mark_close": "30619.74300365",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.091859229010950000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "-0.033151629010950000",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1657222200000_1",
+      "year": 2022,
+      "side": 1,
+      "quantity": "0.043000000000000003",
+      "independent_effective_entry": "21491.8",
+      "independent_fee_entry": "0.55448844000000003868524",
+      "independent_fee_exit": "0.5819319000000000405999",
+      "independent_gross_usdt": "46.68940000000013225740000000",
+      "independent_drag_usdt": "0.9503000000001290663000000000",
+      "independent_funding_usdt": "-0.001970433130992708137472078906",
+      "independent_net_after_funding_usdt": "44.60070922686901040367738792",
+      "independent_net_after_funding_bps": "482.8573138930672892323448629",
+      "tiers": [
+        {
+          "quantity": "0.043000000000000003",
+          "raw_exit": "22566.800000000003",
+          "independent_effective_exit": "22555.5",
+          "independent_fee_exit": "0.5819319000000000405999",
+          "exit_at": 1657243739999,
+          "exit_ack_at": 1657243800000,
+          "reason": "TARGET"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1657238400008,
+          "remaining_quantity": "0.043000000000000003",
+          "rate": "0.00000212",
+          "mark_close_at": 1657238399999,
+          "mark_close": "21615.10674630",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.001970433130992708137472078906"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1657222200000_1",
+      "year": 2022,
+      "side": 1,
+      "quantity": "0.043000000000000003",
+      "independent_effective_entry": "21491.8",
+      "independent_fee_entry": "0.55448844000000003868524",
+      "independent_fee_exit": "0.5819319000000000405999",
+      "independent_gross_usdt": "46.68940000000013225740000000",
+      "independent_drag_usdt": "0.9503000000001290663000000000",
+      "independent_funding_usdt": "-0.001970433130992708137472078906",
+      "independent_net_after_funding_usdt": "44.60070922686901040367738792",
+      "independent_net_after_funding_bps": "482.8573138930672892323448629",
+      "tiers": [
+        {
+          "quantity": "0.043000000000000003",
+          "raw_exit": "22566.800000000003",
+          "independent_effective_exit": "22555.5",
+          "independent_fee_exit": "0.5819319000000000405999",
+          "exit_at": 1657243739999,
+          "exit_ack_at": 1657243800000,
+          "reason": "TARGET"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1657238400008,
+          "remaining_quantity": "0.043000000000000003",
+          "rate": "0.00000212",
+          "mark_close_at": 1657238399999,
+          "mark_close": "21615.10674630",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.001970433130992708137472078906"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1658953800000_1",
+      "year": 2022,
+      "side": 1,
+      "quantity": "0.04",
+      "independent_effective_entry": "22785.4",
+      "independent_fee_entry": "1.0936992",
+      "independent_fee_exit": "1.098696",
+      "independent_gross_usdt": "5.996",
+      "independent_drag_usdt": "1.832",
+      "independent_funding_usdt": "-0.176377302160000000",
+      "independent_net_after_funding_usdt": "1.795227497840000000",
+      "independent_net_after_funding_bps": "19.71685459745371794083276954",
+      "tiers": [
+        {
+          "quantity": "0.04",
+          "raw_exit": "22912.5",
+          "independent_effective_exit": "22889.5",
+          "independent_fee_exit": "1.098696",
+          "exit_at": 1658997060000,
+          "exit_ack_at": 1658997120000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1658966400009,
+          "remaining_quantity": "0.04",
+          "rate": "0.00009229",
+          "mark_close_at": 1658966399999,
+          "mark_close": "22942.60000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.084694902160000000"
+        },
+        {
+          "settlement_at": 1658995200008,
+          "remaining_quantity": "0.04",
+          "rate": "0.00010000",
+          "mark_close_at": 1658995199999,
+          "mark_close": "22920.60000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.091682400000000000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "-145.4",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1658953800000_1",
+      "year": 2022,
+      "side": 1,
+      "quantity": "0.041",
+      "independent_effective_entry": "22774.0",
+      "independent_fee_entry": "0.5602404",
+      "independent_fee_exit": "0.5633646",
+      "independent_gross_usdt": "6.1459",
+      "independent_drag_usdt": "0.9389",
+      "independent_funding_usdt": "-0.1807867347140000000",
+      "independent_net_after_funding_usdt": "3.9026082652860000000",
+      "independent_net_after_funding_bps": "41.81664987567325349476773304",
+      "tiers": [
+        {
+          "quantity": "0.041",
+          "raw_exit": "22912.5",
+          "independent_effective_exit": "22901.0",
+          "independent_fee_exit": "0.5633646",
+          "exit_at": 1658997060000,
+          "exit_ack_at": 1658997120000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1658966400009,
+          "remaining_quantity": "0.041",
+          "rate": "0.00009229",
+          "mark_close_at": 1658966399999,
+          "mark_close": "22942.60000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0868122747140000000"
+        },
+        {
+          "settlement_at": 1658995200008,
+          "remaining_quantity": "0.041",
+          "rate": "0.00010000",
+          "mark_close_at": 1658995199999,
+          "mark_close": "22920.60000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0939744600000000000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "-145.4",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1659949200000_1",
+      "year": 2022,
+      "side": 1,
+      "quantity": "0.038",
+      "independent_effective_entry": "24163.1",
+      "independent_fee_entry": "1.10183736",
+      "independent_fee_exit": "1.08580896",
+      "independent_gross_usdt": "-11.5292",
+      "independent_drag_usdt": "1.8278",
+      "independent_funding_usdt": "-0.0911634442921060000",
+      "independent_net_after_funding_usdt": "-15.6358097642921060000",
+      "independent_net_after_funding_bps": "-170.4587524732639018347977745",
+      "tiers": [
+        {
+          "quantity": "0.038",
+          "raw_exit": "23835.5",
+          "independent_effective_exit": "23811.6",
+          "independent_fee_exit": "1.08580896",
+          "exit_at": 1659986219999,
+          "exit_ack_at": 1659986280000,
+          "reason": "STOP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1659974400000,
+          "remaining_quantity": "0.038",
+          "rate": "0.00010000",
+          "mark_close_at": 1659974399999,
+          "mark_close": "23990.38007687",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0911634442921060000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1659949200000_1",
+      "year": 2022,
+      "side": 1,
+      "quantity": "0.038",
+      "independent_effective_entry": "24163.1",
+      "independent_fee_entry": "1.10183736",
+      "independent_fee_exit": "1.08580896",
+      "independent_gross_usdt": "-11.5292",
+      "independent_drag_usdt": "1.8278",
+      "independent_funding_usdt": "-0.0911634442921060000",
+      "independent_net_after_funding_usdt": "-15.6358097642921060000",
+      "independent_net_after_funding_bps": "-170.4587524732639018347977745",
+      "tiers": [
+        {
+          "quantity": "0.038",
+          "raw_exit": "23835.5",
+          "independent_effective_exit": "23811.6",
+          "independent_fee_exit": "1.08580896",
+          "exit_at": 1659986219999,
+          "exit_ack_at": 1659986280000,
+          "reason": "STOP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1659974400000,
+          "remaining_quantity": "0.038",
+          "rate": "0.00010000",
+          "mark_close_at": 1659974399999,
+          "mark_close": "23990.38007687",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0911634442921060000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": false
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1661531400000_-1",
+      "year": 2022,
+      "side": -1,
+      "quantity": "0.045",
+      "independent_effective_entry": "20552.4",
+      "independent_fee_entry": "1.1098296",
+      "independent_fee_exit": "1.0914318",
+      "independent_gross_usdt": "17.1675",
+      "independent_drag_usdt": "1.8360",
+      "independent_funding_usdt": "-0.0829003220885757780",
+      "independent_net_after_funding_usdt": "13.0473382779114242220",
+      "independent_net_after_funding_bps": "140.9327033588946053565352647",
+      "tiers": [
+        {
+          "quantity": "0.045",
+          "raw_exit": "20191.5",
+          "independent_effective_exit": "20211.7",
+          "independent_fee_exit": "1.0914318",
+          "exit_at": 1661596260000,
+          "exit_ack_at": 1661596320000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1661558400010,
+          "remaining_quantity": "0.045",
+          "rate": "-0.00002808",
+          "mark_close_at": 1661558399999,
+          "mark_close": "20235.63223313",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0255697448897830680"
+        },
+        {
+          "settlement_at": 1661587200007,
+          "remaining_quantity": "0.045",
+          "rate": "-0.00006290",
+          "mark_close_at": 1661587199999,
+          "mark_close": "20254.57594022",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0573305771987927100"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "13.8615760551102169320",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X1_NET_POSITIVE_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1661531400000_-1",
+      "year": 2022,
+      "side": -1,
+      "quantity": "0.045",
+      "independent_effective_entry": "20562.7",
+      "independent_fee_entry": "0.5551929",
+      "independent_fee_exit": "0.5454432",
+      "independent_gross_usdt": "17.1675",
+      "independent_drag_usdt": "0.9180",
+      "independent_funding_usdt": "-0.0829003220885757780",
+      "independent_net_after_funding_usdt": "15.0659635779114242220",
+      "independent_net_after_funding_bps": "162.7371752395148357556020026",
+      "tiers": [
+        {
+          "quantity": "0.045",
+          "raw_exit": "20191.5",
+          "independent_effective_exit": "20201.6",
+          "independent_fee_exit": "0.5454432",
+          "exit_at": 1661596260000,
+          "exit_ack_at": 1661596320000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1661558400010,
+          "remaining_quantity": "0.045",
+          "rate": "-0.00002808",
+          "mark_close_at": 1661558399999,
+          "mark_close": "20235.63223313",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0255697448897830680"
+        },
+        {
+          "settlement_at": 1661587200007,
+          "remaining_quantity": "0.045",
+          "rate": "-0.00006290",
+          "mark_close_at": 1661587199999,
+          "mark_close": "20254.57594022",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "-0.0573305771987927100"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X1_NET_POSITIVE_AT_12H",
+        "independent_estimated_net_usdt": "15.8797477551102169320",
+        "independent_extend_to_18h": true,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "STRESS",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1674058500000_-1",
+      "year": 2023,
+      "side": -1,
+      "quantity": "0.044",
+      "independent_effective_entry": "20848.4",
+      "independent_fee_entry": "1.10079552",
+      "independent_fee_exit": "1.09907424",
+      "independent_gross_usdt": "3.2692",
+      "independent_drag_usdt": "1.8348",
+      "independent_funding_usdt": "0.0909968400000000000",
+      "independent_net_after_funding_usdt": "-0.6744729200000000000",
+      "independent_net_after_funding_bps": "-7.345205636988303393022286325",
+      "tiers": [
+        {
+          "quantity": "0.044",
+          "raw_exit": "20795.0",
+          "independent_effective_exit": "20815.8",
+          "independent_fee_exit": "1.09907424",
+          "exit_at": 1674101760000,
+          "exit_ack_at": 1674101820000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1674086400000,
+          "remaining_quantity": "0.044",
+          "rate": "0.00010000",
+          "mark_close_at": 1674086399999,
+          "mark_close": "20681.10000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0909968400000000000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "-49.8",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "scheme": "X2_COMPLETED_4H_TREND_AT_12H",
+      "cost": "BASE",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1674058500000_-1",
+      "year": 2023,
+      "side": -1,
+      "quantity": "0.044",
+      "independent_effective_entry": "20858.8",
+      "independent_fee_entry": "0.55067232",
+      "independent_fee_exit": "0.54926256",
+      "independent_gross_usdt": "3.2692",
+      "independent_drag_usdt": "0.9196",
+      "independent_funding_usdt": "0.0909968400000000000",
+      "independent_net_after_funding_usdt": "1.3406619600000000000",
+      "independent_net_after_funding_bps": "14.60019741917553535576181281",
+      "tiers": [
+        {
+          "quantity": "0.044",
+          "raw_exit": "20795.0",
+          "independent_effective_exit": "20805.4",
+          "independent_fee_exit": "0.54926256",
+          "exit_at": 1674101760000,
+          "exit_ack_at": 1674101820000,
+          "reason": "TIME_CAP"
+        }
+      ],
+      "settlements": [
+        {
+          "settlement_at": 1674086400000,
+          "remaining_quantity": "0.044",
+          "rate": "0.00010000",
+          "mark_close_at": 1674086399999,
+          "mark_close": "20681.10000000",
+          "mark_origin": "MONTHLY_AUTHORITY",
+          "signed_cash_usdt": "0.0909968400000000000"
+        }
+      ],
+      "decision_12h_audit": {
+        "reached_12h": true,
+        "policy": "X2_COMPLETED_4H_TREND_AT_12H",
+        "independent_signed_price_diff": "-49.8",
+        "independent_extend_to_18h": false,
+        "status": "PASS"
+      },
+      "status": "PASS"
+    }
+  ],
+  "previous_exit_r1_witness_summary": {
+    "status": "PASS",
+    "witness_count": 40,
+    "candidates_covered": [
+      "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H"
+    ],
+    "costs_covered": [
+      "BASE",
+      "STRESS"
+    ],
+    "years_covered": [
+      2021
+    ]
+  }
+}

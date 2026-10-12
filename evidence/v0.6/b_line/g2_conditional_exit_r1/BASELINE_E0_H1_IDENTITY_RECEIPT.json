@@ -1,0 +1,42 @@
+{
+  "status": "ALL_EIGHT_BASELINE_CELLS_EXACT_MATCH",
+  "cells_verified": 4,
+  "receipts": [
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "cost": "STRESS",
+      "paired_events_verified": 34,
+      "E0_account_orders_verified": 34,
+      "H1_account_orders_verified": 34,
+      "H1_minus_E0_mean_net_bps": 37.345251625080365,
+      "status": "EXACT_MATCH"
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "cost": "BASE",
+      "paired_events_verified": 34,
+      "E0_account_orders_verified": 34,
+      "H1_account_orders_verified": 34,
+      "H1_minus_E0_mean_net_bps": 32.18686457190072,
+      "status": "EXACT_MATCH"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "cost": "STRESS",
+      "paired_events_verified": 55,
+      "E0_account_orders_verified": 55,
+      "H1_account_orders_verified": 55,
+      "H1_minus_E0_mean_net_bps": 22.434225789691734,
+      "status": "EXACT_MATCH"
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "cost": "BASE",
+      "paired_events_verified": 55,
+      "E0_account_orders_verified": 55,
+      "H1_account_orders_verified": 55,
+      "H1_minus_E0_mean_net_bps": 26.91862366052137,
+      "status": "EXACT_MATCH"
+    }
+  ]
+}

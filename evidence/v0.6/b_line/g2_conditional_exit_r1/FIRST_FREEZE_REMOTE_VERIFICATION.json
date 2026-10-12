@@ -1,0 +1,10 @@
+{
+    "TASK_ID":  "V06_G2_GEMINI_B_CONDITIONAL_EXIT_R1",
+    "branch":  "feature/v06-bline-gemini-g2-conditional-exit-r1",
+    "parent_SHA":  "d5e3a8407b1b84111dc7f4276865ffd68cb0a7d2",
+    "commit1_SHA":  "cb7445ef0cec515a6cf737b32d22d241788dc470",
+    "ls_remote_SHA":  "cb7445ef0cec515a6cf737b32d22d241788dc470",
+    "REMOTE_PUSH_VERIFIED":  true,
+    "verified_before_any_historical_replay":  true,
+    "verified_at_UTC":  "2026-10-12T02:30:16.2534681Z"
+}
