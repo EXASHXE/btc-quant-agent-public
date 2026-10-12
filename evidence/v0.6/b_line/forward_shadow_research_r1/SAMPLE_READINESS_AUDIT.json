@@ -1,0 +1,33 @@
+{
+  "ready_for_controller_evaluation": false,
+  "status": "EVIDENCE_IMMATURE",
+  "criteria": {
+    "p1_events": {
+      "required": 30,
+      "actual": 0,
+      "passed": false
+    },
+    "p2_events": {
+      "required": 30,
+      "actual": 0,
+      "passed": false
+    },
+    "distinct_utc_weeks": {
+      "required": 15,
+      "actual": 1,
+      "passed": false
+    },
+    "volatility_regimes": {
+      "required": 2,
+      "actual": 1,
+      "has_30d_forward_warmup": false,
+      "passed": false
+    },
+    "source_coverage_pct": {
+      "required": 95.0,
+      "actual": 100.0,
+      "passed": true
+    }
+  },
+  "prohibition_notice": "ZERO_HISTORICAL_OUTCOME_SEARCH: Evaluation restricted strictly to post-dispatch prospective arrivals. No 2021-23 search multiples, no 2024-26 historical backfills."
+}

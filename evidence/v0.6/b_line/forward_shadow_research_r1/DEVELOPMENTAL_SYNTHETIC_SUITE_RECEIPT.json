@@ -1,0 +1,209 @@
+{
+  "task_id": "V06_GEMINI_GOAL_B_FORWARD_SHADOW_SCIENCE_R1",
+  "controller_dispatch_sha": "e35724f1d1ee7458709e003dfc5673c826c68ffd",
+  "start_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "terminal_status": "FORWARD_SHADOW_ENGINE_PRE_REGISTERED_OFFLINE_VERIFIED",
+  "selectable_cells": [
+    "P1_BASIS_REVERSION_V2_SHADOW_6H",
+    "P1_BASIS_REVERSION_V2_SHADOW_12H",
+    "P1_BASIS_REVERSION_V2_SHADOW_18H",
+    "P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_6H",
+    "P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_12H",
+    "P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_18H"
+  ],
+  "total_events_generated": 270,
+  "cell_summaries": {
+    "P1_BASIS_REVERSION_V2_SHADOW_6H": {
+      "cell_id": "P1_BASIS_REVERSION_V2_SHADOW_6H",
+      "total_decision_evaluations": 5,
+      "signals_proposed_count": 0,
+      "positions_opened_count": 0,
+      "positions_closed_count": 0,
+      "positions_right_censored_count": 0,
+      "unfillable_proposals_count": 0,
+      "closed_positions_count": 0,
+      "account_initial_capital_usdt": 1000.0,
+      "account_final_cash_usdt": 1000.0,
+      "net_pnl_usdt": 0.0,
+      "mean_net_bps": 0.0,
+      "all_cost_complete": true,
+      "incomplete_economics_count": 0,
+      "closed_positions": []
+    },
+    "P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_6H": {
+      "cell_id": "P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_6H",
+      "total_decision_evaluations": 5,
+      "signals_proposed_count": 0,
+      "positions_opened_count": 0,
+      "positions_closed_count": 0,
+      "positions_right_censored_count": 0,
+      "unfillable_proposals_count": 0,
+      "closed_positions_count": 0,
+      "account_initial_capital_usdt": 1000.0,
+      "account_final_cash_usdt": 1000.0,
+      "net_pnl_usdt": 0.0,
+      "mean_net_bps": 0.0,
+      "all_cost_complete": true,
+      "incomplete_economics_count": 0,
+      "closed_positions": []
+    },
+    "P1_BASIS_REVERSION_V2_SHADOW_12H": {
+      "cell_id": "P1_BASIS_REVERSION_V2_SHADOW_12H",
+      "total_decision_evaluations": 5,
+      "signals_proposed_count": 0,
+      "positions_opened_count": 0,
+      "positions_closed_count": 0,
+      "positions_right_censored_count": 0,
+      "unfillable_proposals_count": 0,
+      "closed_positions_count": 0,
+      "account_initial_capital_usdt": 1000.0,
+      "account_final_cash_usdt": 1000.0,
+      "net_pnl_usdt": 0.0,
+      "mean_net_bps": 0.0,
+      "all_cost_complete": true,
+      "incomplete_economics_count": 0,
+      "closed_positions": []
+    },
+    "P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_12H": {
+      "cell_id": "P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_12H",
+      "total_decision_evaluations": 5,
+      "signals_proposed_count": 0,
+      "positions_opened_count": 0,
+      "positions_closed_count": 0,
+      "positions_right_censored_count": 0,
+      "unfillable_proposals_count": 0,
+      "closed_positions_count": 0,
+      "account_initial_capital_usdt": 1000.0,
+      "account_final_cash_usdt": 1000.0,
+      "net_pnl_usdt": 0.0,
+      "mean_net_bps": 0.0,
+      "all_cost_complete": true,
+      "incomplete_economics_count": 0,
+      "closed_positions": []
+    },
+    "P1_BASIS_REVERSION_V2_SHADOW_18H": {
+      "cell_id": "P1_BASIS_REVERSION_V2_SHADOW_18H",
+      "total_decision_evaluations": 5,
+      "signals_proposed_count": 0,
+      "positions_opened_count": 0,
+      "positions_closed_count": 0,
+      "positions_right_censored_count": 0,
+      "unfillable_proposals_count": 0,
+      "closed_positions_count": 0,
+      "account_initial_capital_usdt": 1000.0,
+      "account_final_cash_usdt": 1000.0,
+      "net_pnl_usdt": 0.0,
+      "mean_net_bps": 0.0,
+      "all_cost_complete": true,
+      "incomplete_economics_count": 0,
+      "closed_positions": []
+    },
+    "P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_18H": {
+      "cell_id": "P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_18H",
+      "total_decision_evaluations": 5,
+      "signals_proposed_count": 0,
+      "positions_opened_count": 0,
+      "positions_closed_count": 0,
+      "positions_right_censored_count": 0,
+      "unfillable_proposals_count": 0,
+      "closed_positions_count": 0,
+      "account_initial_capital_usdt": 1000.0,
+      "account_final_cash_usdt": 1000.0,
+      "net_pnl_usdt": 0.0,
+      "mean_net_bps": 0.0,
+      "all_cost_complete": true,
+      "incomplete_economics_count": 0,
+      "closed_positions": []
+    }
+  },
+  "bootstrap_results": {
+    "status": "EMPTY_SAMPLE",
+    "point_estimate_net_bps": null,
+    "active_blocks": 0,
+    "total_blocks_spanned": 0,
+    "trade_count": 0,
+    "is_degenerate": true,
+    "diagnostic": "EVIDENCE_IMMATURE"
+  },
+  "power_projections": [
+    {
+      "sample_size": 30,
+      "effect_size_bps": 5.0,
+      "projected_power": 0.204
+    },
+    {
+      "sample_size": 30,
+      "effect_size_bps": 10.0,
+      "projected_power": 0.612
+    },
+    {
+      "sample_size": 30,
+      "effect_size_bps": 15.0,
+      "projected_power": 0.906
+    },
+    {
+      "sample_size": 60,
+      "effect_size_bps": 5.0,
+      "projected_power": 0.35
+    },
+    {
+      "sample_size": 60,
+      "effect_size_bps": 10.0,
+      "projected_power": 0.882
+    },
+    {
+      "sample_size": 60,
+      "effect_size_bps": 15.0,
+      "projected_power": 0.998
+    },
+    {
+      "sample_size": 100,
+      "effect_size_bps": 5.0,
+      "projected_power": 0.51
+    },
+    {
+      "sample_size": 100,
+      "effect_size_bps": 10.0,
+      "projected_power": 0.974
+    },
+    {
+      "sample_size": 100,
+      "effect_size_bps": 15.0,
+      "projected_power": 1.0
+    }
+  ],
+  "sample_readiness_gate": {
+    "ready_for_controller_evaluation": false,
+    "status": "EVIDENCE_IMMATURE",
+    "criteria": {
+      "p1_events": {
+        "required": 30,
+        "actual": 0,
+        "passed": false
+      },
+      "p2_events": {
+        "required": 30,
+        "actual": 0,
+        "passed": false
+      },
+      "distinct_utc_weeks": {
+        "required": 15,
+        "actual": 1,
+        "passed": false
+      },
+      "volatility_regimes": {
+        "required": 2,
+        "actual": 1,
+        "has_30d_forward_warmup": false,
+        "passed": false
+      },
+      "source_coverage_pct": {
+        "required": 95.0,
+        "actual": 100.0,
+        "passed": true
+      }
+    },
+    "prohibition_notice": "ZERO_HISTORICAL_OUTCOME_SEARCH: Evaluation restricted strictly to post-dispatch prospective arrivals. No 2021-23 search multiples, no 2024-26 historical backfills."
+  },
+  "policy_fingerprint": "62c4e3cb982fa1b04ce00e578a83d86f073a2dd65bbe4fa17413c3b38fa6764a"
+}
