@@ -1,0 +1,179 @@
+{
+  "schema_version": "B_LINE_CI_FASTPATH_R1_BEFORE_AFTER_RISK_PLAN_V1",
+  "task_id": "V06_GEMINI_NORMAL_FAST_CI_RISKMAP_R1",
+  "mode": "NORMAL",
+  "branch": "feature/v06-bline-gemini-normal-ci-riskmap-fastpath-r1",
+  "exact_start_sha": "97f4040b9380f2069575a989c066d1daeef15194",
+  "code_commit_sha": "1e5eb35afef0c20ad0e45585c3648024919cda76",
+  "ownership_dependency_matrices": {
+    "FEED": {
+      "owner": "FEED",
+      "root_prefix": "scripts/market_data/forward_public_feed_r1/",
+      "known_modules": {
+        "scripts/market_data/forward_public_feed_r1/__init__.py": "package_init",
+        "scripts/market_data/forward_public_feed_r1/cli.py": "cli",
+        "scripts/market_data/forward_public_feed_r1/connector.py": "binance_2026_public_market_ws_routing",
+        "scripts/market_data/forward_public_feed_r1/contracts.py": "contracts",
+        "scripts/market_data/forward_public_feed_r1/durability.py": "durability",
+        "scripts/market_data/forward_public_feed_r1/fixture.py": "fixture",
+        "scripts/market_data/forward_public_feed_r1/health.py": "health",
+        "scripts/market_data/forward_public_feed_r1/order_book.py": "order_book",
+        "scripts/market_data/forward_public_feed_r1/proxy_route.py": "proxy_route",
+        "scripts/market_data/forward_public_feed_r1/replay.py": "replay",
+        "scripts/market_data/forward_public_feed_r1/time_authority.py": "time_authority"
+      },
+      "owned_test_glob": "tests/test_v06_forward_public_feed_r1_*.py",
+      "dependent_test_globs": [
+        "tests/test_v06_forward_public_feed_r1_*.py",
+        "tests/test_v06_market_event_bridge_r2_*.py"
+      ],
+      "expected_owned_tests": [
+        "tests/test_v06_forward_public_feed_r1_adversarial.py",
+        "tests/test_v06_forward_public_feed_r1_book.py",
+        "tests/test_v06_forward_public_feed_r1_connector.py",
+        "tests/test_v06_forward_public_feed_r1_contracts.py",
+        "tests/test_v06_forward_public_feed_r1_durability.py",
+        "tests/test_v06_forward_public_feed_r1_e2e_scenarios.py",
+        "tests/test_v06_forward_public_feed_r1_health.py",
+        "tests/test_v06_forward_public_feed_r1_proxy_route.py",
+        "tests/test_v06_forward_public_feed_r1_replay.py",
+        "tests/test_v06_forward_public_feed_r1_reviewer_fixes.py",
+        "tests/test_v06_forward_public_feed_r1_source_qualification.py",
+        "tests/test_v06_forward_public_feed_r1_time.py"
+      ],
+      "boundary_planner_test": "tests/test_ci_test_plan.py"
+    },
+    "BRIDGE": {
+      "owner": "BRIDGE",
+      "root_prefix": "scripts/integration/market_event_bridge_r2/",
+      "known_modules": {
+        "scripts/integration/market_event_bridge_r2/__init__.py": "package_init",
+        "scripts/integration/market_event_bridge_r2/__main__.py": "module_entrypoint",
+        "scripts/integration/market_event_bridge_r2/book_ladder.py": "book",
+        "scripts/integration/market_event_bridge_r2/bridge_engine.py": "bridge_engine",
+        "scripts/integration/market_event_bridge_r2/c_composite_bar.py": "c_composite_bar",
+        "scripts/integration/market_event_bridge_r2/cli.py": "cli",
+        "scripts/integration/market_event_bridge_r2/fixtures.py": "fixtures",
+        "scripts/integration/market_event_bridge_r2/funding_adapter.py": "funding",
+        "scripts/integration/market_event_bridge_r2/generate_r3_evidence.py": "generate_r3_evidence",
+        "scripts/integration/market_event_bridge_r2/mark_aggregator.py": "mark",
+        "scripts/integration/market_event_bridge_r2/portable_ci_refs.py": "portable_ci_refs",
+        "scripts/integration/market_event_bridge_r2/source_qualification.py": "source_qualification"
+      },
+      "owned_test_glob": "tests/test_v06_market_event_bridge_r2_*.py",
+      "dependent_test_globs": [
+        "tests/test_v06_market_event_bridge_r2_*.py",
+        "tests/test_v06_forward_public_feed_r1_*.py"
+      ],
+      "downstream_consumer_probe_tests": [
+        "tests/test_v06_market_event_bridge_r2_portable_ci.py",
+        "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+        "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+        "tests/test_v06_market_event_bridge_r2_funding_pit_provenance.py"
+      ],
+      "expected_owned_tests": [
+        "tests/test_v06_market_event_bridge_r2_binance_2026_routes.py",
+        "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+        "tests/test_v06_market_event_bridge_r2_clash_proxy_network.py",
+        "tests/test_v06_market_event_bridge_r2_depth_ladder_l2.py",
+        "tests/test_v06_market_event_bridge_r2_funding_pit_provenance.py",
+        "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py",
+        "tests/test_v06_market_event_bridge_r2_portable_ci.py",
+        "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+        "tests/test_v06_market_event_bridge_r2_stress_and_security.py"
+      ],
+      "boundary_planner_test": "tests/test_ci_test_plan.py"
+    }
+  },
+  "before_after_synthetic_plan_comparison": {
+    "scenario_1_bridge_engine_and_feed_cli": {
+      "synthetic_changed": [
+        "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+        "scripts/market_data/forward_public_feed_r1/cli.py"
+      ],
+      "before_at_97f4040b": {
+        "mode": "full",
+        "selected_test_file_count": 196,
+        "pytest_cases_executed": 3454,
+        "pytest_elapsed_seconds": 904.17,
+        "includes_h40_h41": true,
+        "reason": "unmapped executable path fell through to else: full = True at line 191-193"
+      },
+      "after_at_1e5eb35a": {
+        "schema_version": "B_LINE_CI_PLAN_V1",
+        "code_sha": "1e5eb35afef0c20ad0e45585c3648024919cda76",
+        "mode": "focused",
+        "selected_test_file_count": 21,
+        "pytest_cases_executed": 394,
+        "pytest_elapsed_seconds": 15.03,
+        "includes_feed_suite": true,
+        "includes_bridge_suite": true,
+        "includes_h40_h41": false,
+        "tests": [
+          "tests/test_v06_forward_public_feed_r1_adversarial.py",
+          "tests/test_v06_forward_public_feed_r1_book.py",
+          "tests/test_v06_forward_public_feed_r1_connector.py",
+          "tests/test_v06_forward_public_feed_r1_contracts.py",
+          "tests/test_v06_forward_public_feed_r1_durability.py",
+          "tests/test_v06_forward_public_feed_r1_e2e_scenarios.py",
+          "tests/test_v06_forward_public_feed_r1_health.py",
+          "tests/test_v06_forward_public_feed_r1_proxy_route.py",
+          "tests/test_v06_forward_public_feed_r1_replay.py",
+          "tests/test_v06_forward_public_feed_r1_reviewer_fixes.py",
+          "tests/test_v06_forward_public_feed_r1_source_qualification.py",
+          "tests/test_v06_forward_public_feed_r1_time.py",
+          "tests/test_v06_market_event_bridge_r2_binance_2026_routes.py",
+          "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+          "tests/test_v06_market_event_bridge_r2_clash_proxy_network.py",
+          "tests/test_v06_market_event_bridge_r2_depth_ladder_l2.py",
+          "tests/test_v06_market_event_bridge_r2_funding_pit_provenance.py",
+          "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py",
+          "tests/test_v06_market_event_bridge_r2_portable_ci.py",
+          "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+          "tests/test_v06_market_event_bridge_r2_stress_and_security.py"
+        ],
+        "reason": "risk-mapped"
+      }
+    },
+    "scenario_2_unknown_source_fail_closed": {
+      "synthetic_changed": [
+        "src/btc_quant_agent/engine.py"
+      ],
+      "before_at_97f4040b": {
+        "mode": "full",
+        "tests": []
+      },
+      "after_at_1e5eb35a": {
+        "mode": "full",
+        "tests": [],
+        "includes_h40_h41": true,
+        "reason": "risk-mapped"
+      }
+    },
+    "scenario_3_code_changed_plus_test_deleted_fail_closed": {
+      "synthetic_changed": [
+        "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+        "tests/test_v06_market_event_bridge_r2_deleted_test.py"
+      ],
+      "after_at_1e5eb35a": {
+        "mode": "full",
+        "tests": [],
+        "includes_h40_h41": true,
+        "reason": "risk-mapped"
+      }
+    },
+    "scenario_4_forced_profile_full_override": {
+      "synthetic_changed": [
+        "scripts/integration/market_event_bridge_r2/bridge_engine.py"
+      ],
+      "profile_requested": "full",
+      "classified_mode": "focused",
+      "effective_mode": "full",
+      "tests": [],
+      "includes_h40_h41": true,
+      "reason": "forced-profile-full"
+    }
+  },
+  "protected_path_reads": 0,
+  "private_network_calls": 0
+}

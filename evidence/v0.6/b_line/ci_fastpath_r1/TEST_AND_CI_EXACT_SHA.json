@@ -1,0 +1,91 @@
+{
+  "schema_version": "B_LINE_CI_FASTPATH_R1_TEST_AND_CI_RECEIPT_V1",
+  "task_id": "V06_GEMINI_NORMAL_FAST_CI_RISKMAP_R1",
+  "mode": "NORMAL",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "branch": "feature/v06-bline-gemini-normal-ci-riskmap-fastpath-r1",
+  "exact_start_sha": "97f4040b9380f2069575a989c066d1daeef15194",
+  "code_commit_sha": "1e5eb35afef0c20ad0e45585c3648024919cda76",
+  "baseline_full_ci_reference": {
+    "github_actions_run_id": 38270967488,
+    "github_actions_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38270967488",
+    "head_sha": "97f4040b9380f2069575a989c066d1daeef15194",
+    "profile_executed": "full",
+    "pytest_passed": 3454,
+    "pytest_failed": 0,
+    "pytest_skipped": 2,
+    "pytest_warnings": 9,
+    "pytest_elapsed_seconds": 904.17
+  },
+  "repository_test_inventory": {
+    "initial_top_level_test_files": 192,
+    "initial_h41_subdir_test_files": 4,
+    "initial_total_test_files": 196,
+    "final_total_test_files": 196,
+    "planner_test_file": "tests/test_ci_test_plan.py",
+    "initial_planner_pytest_cases": 12,
+    "added_planner_pytest_cases": 40,
+    "final_planner_pytest_cases": 52,
+    "feed_owned_test_files": 12,
+    "feed_owned_pytest_cases": 186,
+    "bridge_owned_test_files": 9,
+    "bridge_owned_pytest_cases": 208,
+    "coupled_feed_bridge_test_files": 21,
+    "coupled_feed_bridge_pytest_cases": 394
+  },
+  "local_verification_receipts": {
+    "ruff_touched_python": {
+      "command": "ruff check scripts/ci/test_plan.py tests/test_ci_test_plan.py",
+      "returncode": 0,
+      "status": "PASS"
+    },
+    "ruff_repo_wide_lint_baseline": {
+      "command": "python3 scripts/ci/test_plan.py lint",
+      "returncode": 0,
+      "exe001_observed": [],
+      "status": "PASS"
+    },
+    "compileall_check": {
+      "command": "python3 -m compileall -q src scripts tests",
+      "returncode": 0,
+      "status": "PASS"
+    },
+    "planner_unit_tests_noconftest": {
+      "command": "pytest -q tests/test_ci_test_plan.py --noconftest",
+      "tested_sha": "1e5eb35afef0c20ad0e45585c3648024919cda76",
+      "passed": 52,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 0.72
+    },
+    "planner_unit_tests_with_conftest": {
+      "command": "PYTHONPATH=src pytest -q tests/test_ci_test_plan.py",
+      "tested_sha": "1e5eb35afef0c20ad0e45585c3648024919cda76",
+      "passed": 52,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 2.04
+    },
+    "coupled_feed_bridge_focused_benchmark": {
+      "command": "PYTHONPATH=src pytest -q --durations=20 --junitxml=/tmp/btc-normal-ci-riskmap-r1/focused-feed-bridge-junit.xml tests/test_v06_forward_public_feed_r1_*.py tests/test_v06_market_event_bridge_r2_*.py",
+      "tested_sha": "97f4040b9380f2069575a989c066d1daeef15194",
+      "selected_test_files": 21,
+      "passed": 394,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 15.03,
+      "original_r3_executor_reference_seconds": 15.28,
+      "target_max_seconds": 60.0
+    }
+  },
+  "safety_and_governance_attestations": {
+    "unknown_path_fail_closed": true,
+    "deletion_rename_fail_closed": true,
+    "full_release_gate_retained": true,
+    "weekly_schedule_full_retained": true,
+    "workflow_yaml_modified": false,
+    "business_or_r3_source_modified": false,
+    "protected_path_reads": 0,
+    "private_network_calls": 0
+  }
+}
