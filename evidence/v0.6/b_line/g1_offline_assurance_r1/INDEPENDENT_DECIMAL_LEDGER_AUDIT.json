@@ -1,0 +1,649 @@
+{
+  "task_id": "V06_G1_GEMINI_OFFLINE_ASSURANCE_R1",
+  "exact_start_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+  "scenario_count": 10,
+  "total_verified_journal_effects": 60,
+  "synthetic_min_notional_proxy": "1 (synthetic contract constant; NOT Binance production USD-M minimum)",
+  "scenarios": [
+    {
+      "fixture_name": "synthetic-long-24h-STOP",
+      "side": "LONG",
+      "horizon_hours": 24,
+      "exit_kind": "STOP",
+      "oracle": {
+        "side": "LONG",
+        "horizon_hours": 24,
+        "exit_kind": "STOP",
+        "entry_fill_price": "30015.0",
+        "tp1_fill_price": "30284.8",
+        "be_stop_price": "30066.2",
+        "final_fill_price": "29885.0",
+        "final_cash": "1000.33834810",
+        "effects": [
+          {
+            "kind": "ENTRY_FEE",
+            "at": 60004,
+            "cash_delta": "-0.1800900",
+            "quantity": "0.01",
+            "cash_after": "999.8199100"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 21660001,
+            "cash_delta": "-0.0151560",
+            "quantity": "0.005",
+            "cash_after": "999.8047540"
+          },
+          {
+            "kind": "TP1_NET",
+            "at": 21719999,
+            "cash_delta": "1.25814560",
+            "quantity": "0",
+            "cash_after": "1001.06289960"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 28800000,
+            "cash_delta": "-0.0151035",
+            "quantity": "0.005",
+            "cash_after": "1001.04779610"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 36000000,
+            "cash_delta": "0.0302070",
+            "quantity": "0.005",
+            "cash_after": "1001.07800310"
+          },
+          {
+            "kind": "STOP_NET",
+            "at": 43319999,
+            "cash_delta": "-0.73965500",
+            "quantity": "0",
+            "cash_after": "1000.33834810"
+          }
+        ]
+      },
+      "actual_final_cash": "1000.33834810",
+      "actual_journal_hash": "9af1737882c8df4089018113bda26fac8e5de17531230eb07413a0a5f6441a46",
+      "actual_state_hash": "3a6a3d65e0a3f74010d7d79f617b72986bed8aa31a64891bbd859f98c348455c",
+      "exact_match": true
+    },
+    {
+      "fixture_name": "synthetic-long-24h-TP2",
+      "side": "LONG",
+      "horizon_hours": 24,
+      "exit_kind": "TP2",
+      "oracle": {
+        "side": "LONG",
+        "horizon_hours": 24,
+        "exit_kind": "TP2",
+        "entry_fill_price": "30015.0",
+        "tp1_fill_price": "30284.8",
+        "be_stop_price": "30066.2",
+        "final_fill_price": "30584.7",
+        "final_cash": "1003.83474900",
+        "effects": [
+          {
+            "kind": "ENTRY_FEE",
+            "at": 60004,
+            "cash_delta": "-0.1800900",
+            "quantity": "0.01",
+            "cash_after": "999.8199100"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 21660001,
+            "cash_delta": "-0.0151560",
+            "quantity": "0.005",
+            "cash_after": "999.8047540"
+          },
+          {
+            "kind": "TP1_NET",
+            "at": 21719999,
+            "cash_delta": "1.25814560",
+            "quantity": "0",
+            "cash_after": "1001.06289960"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 28800000,
+            "cash_delta": "-0.0151035",
+            "quantity": "0.005",
+            "cash_after": "1001.04779610"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 36000000,
+            "cash_delta": "0.0302070",
+            "quantity": "0.005",
+            "cash_after": "1001.07800310"
+          },
+          {
+            "kind": "TP2_NET",
+            "at": 43319999,
+            "cash_delta": "2.75674590",
+            "quantity": "0",
+            "cash_after": "1003.83474900"
+          }
+        ]
+      },
+      "actual_final_cash": "1003.83474900",
+      "actual_journal_hash": "83719e1d8edc7e466218dcecdb9abb773d4d75e2d379f1d8daf0adf2ffaf0311",
+      "actual_state_hash": "dde0a6ab77a46650a339db7c1e5cdf68799f119ddf34d9617a6907e7995642bf",
+      "exact_match": true
+    },
+    {
+      "fixture_name": "synthetic-long-12h-TIME_CAP",
+      "side": "LONG",
+      "horizon_hours": 12,
+      "exit_kind": "TIME_CAP",
+      "oracle": {
+        "side": "LONG",
+        "horizon_hours": 12,
+        "exit_kind": "TIME_CAP",
+        "entry_fill_price": "30015.0",
+        "tp1_fill_price": "30284.8",
+        "be_stop_price": "30066.2",
+        "final_fill_price": "30184.9",
+        "final_cash": "1001.83694840",
+        "effects": [
+          {
+            "kind": "ENTRY_FEE",
+            "at": 60004,
+            "cash_delta": "-0.1800900",
+            "quantity": "0.01",
+            "cash_after": "999.8199100"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 21660001,
+            "cash_delta": "-0.0151560",
+            "quantity": "0.005",
+            "cash_after": "999.8047540"
+          },
+          {
+            "kind": "TP1_NET",
+            "at": 21719999,
+            "cash_delta": "1.25814560",
+            "quantity": "0",
+            "cash_after": "1001.06289960"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 28800000,
+            "cash_delta": "-0.0151035",
+            "quantity": "0.005",
+            "cash_after": "1001.04779610"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 36000000,
+            "cash_delta": "0.0302070",
+            "quantity": "0.005",
+            "cash_after": "1001.07800310"
+          },
+          {
+            "kind": "TIME_CAP_NET",
+            "at": 43379999,
+            "cash_delta": "0.75894530",
+            "quantity": "0",
+            "cash_after": "1001.83694840"
+          }
+        ]
+      },
+      "actual_final_cash": "1001.83694840",
+      "actual_journal_hash": "b0f64cae83705f4c29d337dc841a39dd15e2cb56239de4859655d1caf1a23de1",
+      "actual_state_hash": "4d8454605e66b5ca0cc694e23af9903c6f8c81c0d41c7fd7bff70db5cb9dedf3",
+      "exact_match": true
+    },
+    {
+      "fixture_name": "synthetic-long-18h-TIME_CAP",
+      "side": "LONG",
+      "horizon_hours": 18,
+      "exit_kind": "TIME_CAP",
+      "oracle": {
+        "side": "LONG",
+        "horizon_hours": 18,
+        "exit_kind": "TIME_CAP",
+        "entry_fill_price": "30015.0",
+        "tp1_fill_price": "30284.8",
+        "be_stop_price": "30066.2",
+        "final_fill_price": "30184.9",
+        "final_cash": "1001.83694840",
+        "effects": [
+          {
+            "kind": "ENTRY_FEE",
+            "at": 60004,
+            "cash_delta": "-0.1800900",
+            "quantity": "0.01",
+            "cash_after": "999.8199100"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 21660001,
+            "cash_delta": "-0.0151560",
+            "quantity": "0.005",
+            "cash_after": "999.8047540"
+          },
+          {
+            "kind": "TP1_NET",
+            "at": 21719999,
+            "cash_delta": "1.25814560",
+            "quantity": "0",
+            "cash_after": "1001.06289960"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 28800000,
+            "cash_delta": "-0.0151035",
+            "quantity": "0.005",
+            "cash_after": "1001.04779610"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 36000000,
+            "cash_delta": "0.0302070",
+            "quantity": "0.005",
+            "cash_after": "1001.07800310"
+          },
+          {
+            "kind": "TIME_CAP_NET",
+            "at": 64979999,
+            "cash_delta": "0.75894530",
+            "quantity": "0",
+            "cash_after": "1001.83694840"
+          }
+        ]
+      },
+      "actual_final_cash": "1001.83694840",
+      "actual_journal_hash": "6fbd5998da989fc3358f092570d0da5b2a343fa8fbb745074da4be70e9108ed9",
+      "actual_state_hash": "185c61ec46ef09240ab289a1ca4630401652e86bf357d2717632f17f97366ed0",
+      "exact_match": true
+    },
+    {
+      "fixture_name": "synthetic-long-24h-TIME_CAP",
+      "side": "LONG",
+      "horizon_hours": 24,
+      "exit_kind": "TIME_CAP",
+      "oracle": {
+        "side": "LONG",
+        "horizon_hours": 24,
+        "exit_kind": "TIME_CAP",
+        "entry_fill_price": "30015.0",
+        "tp1_fill_price": "30284.8",
+        "be_stop_price": "30066.2",
+        "final_fill_price": "30184.9",
+        "final_cash": "1001.83694840",
+        "effects": [
+          {
+            "kind": "ENTRY_FEE",
+            "at": 60004,
+            "cash_delta": "-0.1800900",
+            "quantity": "0.01",
+            "cash_after": "999.8199100"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 21660001,
+            "cash_delta": "-0.0151560",
+            "quantity": "0.005",
+            "cash_after": "999.8047540"
+          },
+          {
+            "kind": "TP1_NET",
+            "at": 21719999,
+            "cash_delta": "1.25814560",
+            "quantity": "0",
+            "cash_after": "1001.06289960"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 28800000,
+            "cash_delta": "-0.0151035",
+            "quantity": "0.005",
+            "cash_after": "1001.04779610"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 36000000,
+            "cash_delta": "0.0302070",
+            "quantity": "0.005",
+            "cash_after": "1001.07800310"
+          },
+          {
+            "kind": "TIME_CAP_NET",
+            "at": 86579999,
+            "cash_delta": "0.75894530",
+            "quantity": "0",
+            "cash_after": "1001.83694840"
+          }
+        ]
+      },
+      "actual_final_cash": "1001.83694840",
+      "actual_journal_hash": "36b825710073f1904e0bf4b92535ca7ddcad26d99b737333b01bba2b66e35e5e",
+      "actual_state_hash": "343322905d1a95a252af96af7ae034f731985a9aa7cc355959ae4c18c961942b",
+      "exact_match": true
+    },
+    {
+      "fixture_name": "synthetic-short-24h-STOP",
+      "side": "SHORT",
+      "horizon_hours": 24,
+      "exit_kind": "STOP",
+      "oracle": {
+        "side": "SHORT",
+        "horizon_hours": 24,
+        "exit_kind": "STOP",
+        "entry_fill_price": "29985.0",
+        "tp1_fill_price": "29714.9",
+        "be_stop_price": "29934.0",
+        "final_fill_price": "30115.1",
+        "final_cash": "1000.34054750",
+        "effects": [
+          {
+            "kind": "ENTRY_FEE",
+            "at": 60004,
+            "cash_delta": "-0.1799100",
+            "quantity": "0.01",
+            "cash_after": "999.8200900"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 21660001,
+            "cash_delta": "0.0148440",
+            "quantity": "0.005",
+            "cash_after": "999.8349340"
+          },
+          {
+            "kind": "TP1_NET",
+            "at": 21719999,
+            "cash_delta": "1.26135530",
+            "quantity": "0",
+            "cash_after": "1001.09628930"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 28800000,
+            "cash_delta": "0.0148965",
+            "quantity": "0.005",
+            "cash_after": "1001.11118580"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 36000000,
+            "cash_delta": "-0.0297930",
+            "quantity": "0.005",
+            "cash_after": "1001.08139280"
+          },
+          {
+            "kind": "STOP_NET",
+            "at": 43319999,
+            "cash_delta": "-0.74084530",
+            "quantity": "0",
+            "cash_after": "1000.34054750"
+          }
+        ]
+      },
+      "actual_final_cash": "1000.34054750",
+      "actual_journal_hash": "e33b4bcb18bfe15607258c726526d35bbac717d8feb1fbe2da8e27808df94d3f",
+      "actual_state_hash": "9d386ba4969ed3c9eafdc5a2ce3682bb818bcde42662d35c6f3aed6582cf7b28",
+      "exact_match": true
+    },
+    {
+      "fixture_name": "synthetic-short-24h-TP2",
+      "side": "SHORT",
+      "horizon_hours": 24,
+      "exit_kind": "TP2",
+      "oracle": {
+        "side": "SHORT",
+        "horizon_hours": 24,
+        "exit_kind": "TP2",
+        "entry_fill_price": "29985.0",
+        "tp1_fill_price": "29714.9",
+        "be_stop_price": "29934.0",
+        "final_fill_price": "29414.7",
+        "final_cash": "1003.84464870",
+        "effects": [
+          {
+            "kind": "ENTRY_FEE",
+            "at": 60004,
+            "cash_delta": "-0.1799100",
+            "quantity": "0.01",
+            "cash_after": "999.8200900"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 21660001,
+            "cash_delta": "0.0148440",
+            "quantity": "0.005",
+            "cash_after": "999.8349340"
+          },
+          {
+            "kind": "TP1_NET",
+            "at": 21719999,
+            "cash_delta": "1.26135530",
+            "quantity": "0",
+            "cash_after": "1001.09628930"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 28800000,
+            "cash_delta": "0.0148965",
+            "quantity": "0.005",
+            "cash_after": "1001.11118580"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 36000000,
+            "cash_delta": "-0.0297930",
+            "quantity": "0.005",
+            "cash_after": "1001.08139280"
+          },
+          {
+            "kind": "TP2_NET",
+            "at": 43319999,
+            "cash_delta": "2.76325590",
+            "quantity": "0",
+            "cash_after": "1003.84464870"
+          }
+        ]
+      },
+      "actual_final_cash": "1003.84464870",
+      "actual_journal_hash": "2b31c4213656d5a1285f6dd0e616a8352e98b5726d6ac9881e24d8ace20693ba",
+      "actual_state_hash": "42631ebe0059e13f7198dc7a623d27249cc98951797a77d168124a7cdc19cc96",
+      "exact_match": true
+    },
+    {
+      "fixture_name": "synthetic-short-12h-TIME_CAP",
+      "side": "SHORT",
+      "horizon_hours": 12,
+      "exit_kind": "TIME_CAP",
+      "oracle": {
+        "side": "SHORT",
+        "horizon_hours": 12,
+        "exit_kind": "TIME_CAP",
+        "entry_fill_price": "29985.0",
+        "tp1_fill_price": "29714.9",
+        "be_stop_price": "29934.0",
+        "final_fill_price": "29814.9",
+        "final_cash": "1001.84244810",
+        "effects": [
+          {
+            "kind": "ENTRY_FEE",
+            "at": 60004,
+            "cash_delta": "-0.1799100",
+            "quantity": "0.01",
+            "cash_after": "999.8200900"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 21660001,
+            "cash_delta": "0.0148440",
+            "quantity": "0.005",
+            "cash_after": "999.8349340"
+          },
+          {
+            "kind": "TP1_NET",
+            "at": 21719999,
+            "cash_delta": "1.26135530",
+            "quantity": "0",
+            "cash_after": "1001.09628930"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 28800000,
+            "cash_delta": "0.0148965",
+            "quantity": "0.005",
+            "cash_after": "1001.11118580"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 36000000,
+            "cash_delta": "-0.0297930",
+            "quantity": "0.005",
+            "cash_after": "1001.08139280"
+          },
+          {
+            "kind": "TIME_CAP_NET",
+            "at": 43379999,
+            "cash_delta": "0.76105530",
+            "quantity": "0",
+            "cash_after": "1001.84244810"
+          }
+        ]
+      },
+      "actual_final_cash": "1001.84244810",
+      "actual_journal_hash": "d2aa603753fe516991028b4dbe922afb518cb3262fa1ca0a44a80f1e64d6a50d",
+      "actual_state_hash": "156843c4bc99056bab97ed1fb1a279a86b567722cda8e6e559f6996009184dcc",
+      "exact_match": true
+    },
+    {
+      "fixture_name": "synthetic-short-18h-TIME_CAP",
+      "side": "SHORT",
+      "horizon_hours": 18,
+      "exit_kind": "TIME_CAP",
+      "oracle": {
+        "side": "SHORT",
+        "horizon_hours": 18,
+        "exit_kind": "TIME_CAP",
+        "entry_fill_price": "29985.0",
+        "tp1_fill_price": "29714.9",
+        "be_stop_price": "29934.0",
+        "final_fill_price": "29814.9",
+        "final_cash": "1001.84244810",
+        "effects": [
+          {
+            "kind": "ENTRY_FEE",
+            "at": 60004,
+            "cash_delta": "-0.1799100",
+            "quantity": "0.01",
+            "cash_after": "999.8200900"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 21660001,
+            "cash_delta": "0.0148440",
+            "quantity": "0.005",
+            "cash_after": "999.8349340"
+          },
+          {
+            "kind": "TP1_NET",
+            "at": 21719999,
+            "cash_delta": "1.26135530",
+            "quantity": "0",
+            "cash_after": "1001.09628930"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 28800000,
+            "cash_delta": "0.0148965",
+            "quantity": "0.005",
+            "cash_after": "1001.11118580"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 36000000,
+            "cash_delta": "-0.0297930",
+            "quantity": "0.005",
+            "cash_after": "1001.08139280"
+          },
+          {
+            "kind": "TIME_CAP_NET",
+            "at": 64979999,
+            "cash_delta": "0.76105530",
+            "quantity": "0",
+            "cash_after": "1001.84244810"
+          }
+        ]
+      },
+      "actual_final_cash": "1001.84244810",
+      "actual_journal_hash": "b07a65147cbb39e363e6bad05733eb8e674fdbc0ddf70c3894367cdb3a7c1f13",
+      "actual_state_hash": "c6f255b1cfef199d009a087bbf1dbb9ff49e25bcdb209e6ecc8f7e6f11fa1f59",
+      "exact_match": true
+    },
+    {
+      "fixture_name": "synthetic-short-24h-TIME_CAP",
+      "side": "SHORT",
+      "horizon_hours": 24,
+      "exit_kind": "TIME_CAP",
+      "oracle": {
+        "side": "SHORT",
+        "horizon_hours": 24,
+        "exit_kind": "TIME_CAP",
+        "entry_fill_price": "29985.0",
+        "tp1_fill_price": "29714.9",
+        "be_stop_price": "29934.0",
+        "final_fill_price": "29814.9",
+        "final_cash": "1001.84244810",
+        "effects": [
+          {
+            "kind": "ENTRY_FEE",
+            "at": 60004,
+            "cash_delta": "-0.1799100",
+            "quantity": "0.01",
+            "cash_after": "999.8200900"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 21660001,
+            "cash_delta": "0.0148440",
+            "quantity": "0.005",
+            "cash_after": "999.8349340"
+          },
+          {
+            "kind": "TP1_NET",
+            "at": 21719999,
+            "cash_delta": "1.26135530",
+            "quantity": "0",
+            "cash_after": "1001.09628930"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 28800000,
+            "cash_delta": "0.0148965",
+            "quantity": "0.005",
+            "cash_after": "1001.11118580"
+          },
+          {
+            "kind": "FUNDING",
+            "at": 36000000,
+            "cash_delta": "-0.0297930",
+            "quantity": "0.005",
+            "cash_after": "1001.08139280"
+          },
+          {
+            "kind": "TIME_CAP_NET",
+            "at": 86579999,
+            "cash_delta": "0.76105530",
+            "quantity": "0",
+            "cash_after": "1001.84244810"
+          }
+        ]
+      },
+      "actual_final_cash": "1001.84244810",
+      "actual_journal_hash": "8917d2a86ed724dd10bfa07e04787a293252177c674ed01f9ebc300d82a71b3c",
+      "actual_state_hash": "70588f674e44108c5de1c81b7f5785e13184784867e673ddf4419defdeeea198",
+      "exact_match": true
+    }
+  ]
+}

@@ -1,0 +1,309 @@
+{
+  "task_id": "V06_G1_GEMINI_OFFLINE_ASSURANCE_R1",
+  "controller_dispatch_sha": "4a487fcef182edc6c68486ff53d4a64caa10debc",
+  "exact_start_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+  "parent_c3_sha": "84c4764a2f1c46c81f43b144f5daf1f54cccc5d3",
+  "own_namespace": "g1_offline_assurance_r1",
+  "all_c4_source_hashes_match": true,
+  "source_hash_verification": {
+    "scripts/g1_offline_preview_r1/__main__.py": {
+      "expected_sha256": "65dcb3d726ed5a8b828ed0288d10fa9f51340f4cf3a70cf44b4a2c62e21cd5fb",
+      "actual_sha256": "65dcb3d726ed5a8b828ed0288d10fa9f51340f4cf3a70cf44b4a2c62e21cd5fb",
+      "matches": true
+    },
+    "scripts/g1_offline_preview_r1/analysis_schema.json": {
+      "expected_sha256": "dea9da8a0f03740894f117a7da56cd7c99476aa3058bdf2a665107019a98e1cb",
+      "actual_sha256": "dea9da8a0f03740894f117a7da56cd7c99476aa3058bdf2a665107019a98e1cb",
+      "matches": true
+    },
+    "scripts/g1_offline_preview_r1/fixtures/long_24h.json": {
+      "expected_sha256": "ae6c70f7c26b752df1cfc2cc803d6a941a62e1699749365f4902d335cb93fe4f",
+      "actual_sha256": "ae6c70f7c26b752df1cfc2cc803d6a941a62e1699749365f4902d335cb93fe4f",
+      "matches": true
+    },
+    "scripts/g1_offline_preview_r1/fixtures/short_24h.json": {
+      "expected_sha256": "d6bf849411f82db75f433f91985b7c8698fbbd1834685fb706453de3cad1dc11",
+      "actual_sha256": "d6bf849411f82db75f433f91985b7c8698fbbd1834685fb706453de3cad1dc11",
+      "matches": true
+    },
+    "scripts/g1_offline_preview_r1/fixtures.py": {
+      "expected_sha256": "9999418e5cb1f9fd98d1f4cae5c1d460a9593b28c9f7f338a3043374fa4ea8b0",
+      "actual_sha256": "9999418e5cb1f9fd98d1f4cae5c1d460a9593b28c9f7f338a3043374fa4ea8b0",
+      "matches": true
+    },
+    "scripts/g1_offline_preview_r1/model.py": {
+      "expected_sha256": "086d6ec8747f82d59b6f8f42bfefd2d9c61e5f962707b4f9119f784741dd206e",
+      "actual_sha256": "086d6ec8747f82d59b6f8f42bfefd2d9c61e5f962707b4f9119f784741dd206e",
+      "matches": true
+    },
+    "scripts/g1_offline_preview_r1/reducer.py": {
+      "expected_sha256": "c0114c8cc0480b3c4c637217363833590fb231ad8529c93f85f574ce161ed89e",
+      "actual_sha256": "c0114c8cc0480b3c4c637217363833590fb231ad8529c93f85f574ce161ed89e",
+      "matches": true
+    },
+    "scripts/g1_offline_preview_r1/storage.py": {
+      "expected_sha256": "9e4ac21c501e48734a750021f8ea2f51f4f06ecc0ee2e798647718b4c453f101",
+      "actual_sha256": "9e4ac21c501e48734a750021f8ea2f51f4f06ecc0ee2e798647718b4c453f101",
+      "matches": true
+    },
+    "tests/test_v06_g1_offline_preview_r1_core.py": {
+      "expected_sha256": "d5679c583d1122f2ce877f7686e477acc869637e7ee21643fbee1f5058e52da3",
+      "actual_sha256": "d5679c583d1122f2ce877f7686e477acc869637e7ee21643fbee1f5058e52da3",
+      "matches": true
+    },
+    "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py": {
+      "expected_sha256": "7a0fef994f1548ebe0813836b41340519f49dcefbe46a5d5850b23392ee731e2",
+      "actual_sha256": "7a0fef994f1548ebe0813836b41340519f49dcefbe46a5d5850b23392ee731e2",
+      "matches": true
+    },
+    "tests/test_v06_g1_offline_preview_r1_exit_safety.py": {
+      "expected_sha256": "8efc412469fa5be183bca05dacd7ba255e7ad1f20f93e39706698e8bc4cd71f0",
+      "actual_sha256": "8efc412469fa5be183bca05dacd7ba255e7ad1f20f93e39706698e8bc4cd71f0",
+      "matches": true
+    },
+    "tests/test_v06_g1_offline_preview_r1_process_recovery.py": {
+      "expected_sha256": "d6c99ea559f9c4a8c384568af52ed6aa556ecca896d9add58ca9aa5c07f04249",
+      "actual_sha256": "d6c99ea559f9c4a8c384568af52ed6aa556ecca896d9add58ca9aa5c07f04249",
+      "matches": true
+    },
+    "tests/test_v06_g1_offline_preview_r1_wal.py": {
+      "expected_sha256": "41d53a583502b4d28da92dfa9f8c9e2dde73522509009739418d9dfff42c8585",
+      "actual_sha256": "41d53a583502b4d28da92dfa9f8c9e2dde73522509009739418d9dfff42c8585",
+      "matches": true
+    }
+  },
+  "ast_surface_audit": {
+    "verified_file_count": 5,
+    "violations": [],
+    "files": {
+      "scripts/g1_offline_preview_r1/__main__.py": {
+        "sha256": "65dcb3d726ed5a8b828ed0288d10fa9f51340f4cf3a70cf44b4a2c62e21cd5fb",
+        "imports": [
+          ".model",
+          ".storage",
+          "__future__",
+          "argparse",
+          "hashlib",
+          "json",
+          "os",
+          "pathlib"
+        ],
+        "defined_symbols": [
+          "OfflineLLMAnalysisPort",
+          "SafeArgumentParser",
+          "analyze",
+          "crash",
+          "error",
+          "load_fixture",
+          "main"
+        ],
+        "distinct_attr_calls": [
+          "_exit",
+          "add_argument",
+          "analyze",
+          "apply",
+          "checkpoint",
+          "decode",
+          "deliver",
+          "dumps",
+          "exit",
+          "hexdigest",
+          "is_symlink",
+          "parse_args",
+          "read_bytes",
+          "receipt",
+          "sha256",
+          "write_text"
+        ]
+      },
+      "scripts/g1_offline_preview_r1/fixtures.py": {
+        "sha256": "9999418e5cb1f9fd98d1f4cae5c1d460a9593b28c9f7f338a3043374fa4ea8b0",
+        "imports": [
+          ".model",
+          "__future__"
+        ],
+        "defined_symbols": [
+          "action",
+          "bar",
+          "make_fixture"
+        ],
+        "distinct_attr_calls": [
+          "append",
+          "extend",
+          "lower",
+          "sort"
+        ]
+      },
+      "scripts/g1_offline_preview_r1/model.py": {
+        "sha256": "086d6ec8747f82d59b6f8f42bfefd2d9c61e5f962707b4f9119f784741dd206e",
+        "imports": [
+          "__future__",
+          "decimal",
+          "hashlib",
+          "json",
+          "re",
+          "typing"
+        ],
+        "defined_symbols": [
+          "SafetyViolation",
+          "__init__",
+          "canonical",
+          "decimal",
+          "digest",
+          "exact",
+          "initial_state",
+          "redact_text",
+          "timestamp"
+        ],
+        "distinct_attr_calls": [
+          "__init__",
+          "dumps",
+          "encode",
+          "fullmatch",
+          "hexdigest",
+          "is_finite",
+          "sha256",
+          "sub"
+        ]
+      },
+      "scripts/g1_offline_preview_r1/reducer.py": {
+        "sha256": "c0114c8cc0480b3c4c637217363833590fb231ad8529c93f85f574ce161ed89e",
+        "imports": [
+          ".model",
+          "__future__",
+          "copy",
+          "decimal",
+          "typing"
+        ],
+        "defined_symbols": [
+          "_available",
+          "_bar",
+          "_check_portfolio",
+          "_d",
+          "_exit",
+          "_fill_price",
+          "_journal",
+          "_phase",
+          "_position_side",
+          "_required_exit",
+          "_text",
+          "mark_equity",
+          "transition"
+        ],
+        "distinct_attr_calls": [
+          "append",
+          "deepcopy",
+          "get",
+          "lower",
+          "pop",
+          "quantize",
+          "to_integral_value",
+          "update",
+          "values"
+        ]
+      },
+      "scripts/g1_offline_preview_r1/storage.py": {
+        "sha256": "9e4ac21c501e48734a750021f8ea2f51f4f06ecc0ee2e798647718b4c453f101",
+        "imports": [
+          ".model",
+          ".reducer",
+          "__future__",
+          "collections.abc",
+          "copy",
+          "fcntl",
+          "hashlib",
+          "json",
+          "os",
+          "pathlib",
+          "typing"
+        ],
+        "defined_symbols": [
+          "Engine",
+          "__enter__",
+          "__exit__",
+          "__init__",
+          "_directory_sync",
+          "_file",
+          "_recover",
+          "apply",
+          "bad",
+          "checkpoint",
+          "close",
+          "deliver",
+          "edge",
+          "guard_directory",
+          "pairs",
+          "quarantine",
+          "receipt",
+          "strict_json"
+        ],
+        "distinct_attr_calls": [
+          "_recover",
+          "checkpoint",
+          "chmod",
+          "close",
+          "decode",
+          "deepcopy",
+          "encode",
+          "endswith",
+          "exists",
+          "fileno",
+          "flock",
+          "flush",
+          "fsync",
+          "get",
+          "glob",
+          "hexdigest",
+          "is_absolute",
+          "is_symlink",
+          "items",
+          "link",
+          "loads",
+          "mkdir",
+          "open",
+          "quarantine",
+          "read",
+          "read_bytes",
+          "read_text",
+          "sha256",
+          "splitlines",
+          "stat",
+          "unlink",
+          "write",
+          "write_bytes",
+          "write_text"
+        ]
+      }
+    }
+  },
+  "c3_touched_symbols": {
+    "commit_sha": "84c4764a2f1c46c81f43b144f5daf1f54cccc5d3",
+    "executable_files": [
+      "scripts/g1_offline_preview_r1/reducer.py"
+    ],
+    "symbols": [
+      "transition"
+    ],
+    "invariants_added": [
+      "PROPOSE clears stop_update_source_hash",
+      "UPDATE_STOP enforces at <= bar['close_time'] + 1 (STOP_UPDATE_NOT_AT_COMPLETED_BOUNDARY) and records stop_update_source_hash = last_bar_hash",
+      "STOP rejects when stop_update_source_hash == last_bar_hash (STOP_UPDATE_NOT_YET_EFFECTIVE)"
+    ]
+  },
+  "c4_touched_symbols": {
+    "commit_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+    "executable_files": [
+      "scripts/g1_offline_preview_r1/__main__.py"
+    ],
+    "symbols": [
+      "SafeArgumentParser",
+      "SafeArgumentParser.error",
+      "main"
+    ],
+    "invariants_added": [
+      "SafeArgumentParser.error exits with code 3 and static canonical JSON CLI_ARGUMENTS_INVALID without echoing caller argument values"
+    ]
+  },
+  "pre_approval_journal_mutation_possible": false,
+  "outbound_network_calls_observed": 0
+}

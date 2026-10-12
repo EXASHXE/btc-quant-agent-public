@@ -1,0 +1,73 @@
+{
+  "task_id": "V06_G1_GEMINI_OFFLINE_ASSURANCE_R1",
+  "exact_start_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+  "freeze_commit_sha": "7a8b49adff94b5cc9fe2e3e2787acc3ffd7dda65",
+  "original_codex_suite": {
+    "total_cases": 145,
+    "non_process_cases_verified_locally": 113,
+    "non_process_passed": 113,
+    "non_process_failed": 0,
+    "process_recovery_cases_in_codex_evidence": 32
+  },
+  "independent_gemini_assurance_suite": {
+    "collected_cases": 149,
+    "passed_cases": 145,
+    "failed_cases": 4,
+    "negative_state_transition_witnesses": 65,
+    "material_safety_defects_in_codex_sidecar": 0,
+    "tester_calibration_mismatches": [
+      {
+        "test_node": "tests/test_v06_g1_offline_assurance_r1_approval_and_causality.py::test_initial_state_rejects_malformed_trusted_approval_fixtures[zero_quantity-override4]",
+        "classification": "TESTER_ERROR_CODE_REGEX_MISMATCH__NOT_ENGINE_DEFECT",
+        "explanation": "model.initial_state calls decimal(raw['quantity'], positive=True) which raises SafetyViolation('DECIMAL_BOUNDS') rather than 'APPROVAL_FIXTURE_INVALID'. The sidecar failed closed and rejected the zero-quantity token before state creation."
+      },
+      {
+        "test_node": "tests/test_v06_g1_offline_assurance_r1_ledger_and_recovery.py::test_lot_rounding_floors_tp1_half_and_preserves_residual[0.011-0.005-0.006]",
+        "classification": "TESTER_BAR_PRICE_CALIBRATION_MISMATCH__NOT_ENGINE_DEFECT",
+        "explanation": "Helper build_state_at_phase uses default last_close='100'. At TP1 bar (last_close='106'), tier=0.005 has notional 0.005 * 106 = 0.53 < MIN_NOTIONAL (1.0), so reducer.transition correctly raised SafetyViolation('PARTIAL_LOT_OR_MIN_NOTIONAL'). This accidentally served as a positive witness that TP1 enforces min-notional on the split tier."
+      },
+      {
+        "test_node": "tests/test_v06_g1_offline_assurance_r1_ledger_and_recovery.py::test_lot_rounding_floors_tp1_half_and_preserves_residual[0.003-0.001-0.002]",
+        "classification": "TESTER_BAR_PRICE_CALIBRATION_MISMATCH__NOT_ENGINE_DEFECT",
+        "explanation": "Helper build_state_at_phase uses default last_close='100'. At PLACE, qty=0.003 has notional 0.003 * 100 * 1.0005 = 0.30015 < MIN_NOTIONAL (1.0), so reducer.transition correctly raised SafetyViolation('ONE_X_OR_MIN_NOTIONAL')."
+      },
+      {
+        "test_node": "tests/test_v06_g1_offline_assurance_r1_ledger_and_recovery.py::test_min_notional_and_five_percent_reserve_fail_closed",
+        "classification": "TESTER_BAR_PRICE_CALIBRATION_MISMATCH__NOT_ENGINE_DEFECT",
+        "explanation": "In sub-case 2 of the test, build_state_at_phase('OPEN', quantity='0.001') used default last_close='100', so notional=0.10005 < MIN_NOTIONAL (1.0) failed closed at PLACE ('ONE_X_OR_MIN_NOTIONAL') before reaching OPEN/TP1. Because post-freeze test code edits are forbidden, this receipt is preserved unaltered."
+      }
+    ]
+  },
+  "characterized_test_gaps_in_original_145_suite": [
+    {
+      "gap_id": "GAP_01_WAL_EVENT_AND_STATE_IDENTITY_MASKED_BY_WAL_CHAIN",
+      "original_test": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state",
+      "finding": "Original test mutated record['state_hash'] without recomputing record['record_hash'] = digest(body). Because storage._recover() checks digest(body) != record['record_hash'] (WAL_CHAIN) at line 182 before checking event_hash (WAL_EVENT_IDENTITY, line 187) or state_hash (WAL_STATE_IDENTITY, line 190), the original suite never reached lines 187 or 190.",
+      "assurance_coverage": "Covered and verified PASS in test_wal_and_checkpoint_corruption_quarantine_and_fail_closed[event_hash_mismatch_recomputed_record], [duplicate_event_id_recomputed_chain], and [state_hash_mismatch_recomputed_record]."
+    },
+    {
+      "gap_id": "GAP_02_THIRD_NEGATIVE_FUNDING_SETTLEMENT_AND_NOVEL_CRASH_OFFSETS",
+      "original_test": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "finding": "Original 15 process-kill checkpoints only tested FUNDING occurrence 0 and occurrence 1 (both positive rate +0.0001), omitting FUNDING occurrence 2 (negative rate -0.0002 at t=36000000), and only tested single hook edges for APPROVE, PLACE, FILL_ENTRY, TP1, UPDATE_STOP, and STOP.",
+      "assurance_coverage": "Covered and verified PASS across 7 novel process-kill checkpoints including funding3_fsynced_novel (occurrence 2)."
+    },
+    {
+      "gap_id": "GAP_03_OS_PROCESS_CRASH_DURING_SIMULTANEOUS_DUAL_PENDING_EXIT_ACKS",
+      "original_test": "tests/test_v06_g1_offline_preview_r1_process_recovery.py",
+      "finding": "Standard long_24h.json and short_24h.json fixtures ACK TP1 before STOP occurs, so len(pending_cash) is never 2 during any OS process crash in the original 30 tests.",
+      "assurance_coverage": "Covered and verified PASS in test_native_process_kill_around_second_pending_exit_ack across all 4 hook edges (before_append, after_append, after_fsync, after_snapshot)."
+    },
+    {
+      "gap_id": "GAP_04_STOP_BEFORE_ENTRY_ACK_ARRIVAL_ORDER_PERMUTATIONS",
+      "original_test": "tests/test_v06_g1_offline_preview_r1_exit_safety.py",
+      "finding": "Original suite tested STOP before TP1 ACK, but did not test STOP occurring in WAIT_ENTRY_ACK (before entry fill is ACKed) followed by both [entry_ack, stop_ack] and [stop_ack, entry_ack] arrival orders.",
+      "assurance_coverage": "Covered and verified PASS in test_stop_before_entry_ack_all_ack_arrival_orders_conserve[True] and [False]."
+    },
+    {
+      "gap_id": "GAP_05_CHECKPOINT_IMMUTABLE_CONFLICT_AND_SCHEMA_ERRORS",
+      "original_test": "tests/test_v06_g1_offline_preview_r1_wal.py",
+      "finding": "Original suite did not exercise storage.Engine.checkpoint() CHECKPOINT_IMMUTABLE_CONFLICT (line 235) or CHECKPOINT_SCHEMA (line 207).",
+      "assurance_coverage": "Covered and verified PASS in test_checkpoint_immutable_conflict_and_missing_outbox_recovery and test_wal_and_checkpoint_corruption_quarantine_and_fail_closed[checkpoint_missing_schema_field]."
+    }
+  ]
+}

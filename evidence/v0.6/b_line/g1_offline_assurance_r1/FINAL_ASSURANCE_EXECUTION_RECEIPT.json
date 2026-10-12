@@ -1,0 +1,68 @@
+{
+  "task_id": "V06_G1_GEMINI_OFFLINE_ASSURANCE_R1",
+  "controller_dispatch_sha": "4a487fcef182edc6c68486ff53d4a64caa10debc",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "branch": "feature/v06-bline-gemini-g1-offline-assurance-r1",
+  "exact_start_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+  "c3_parent_sha": "84c4764a2f1c46c81f43b144f5daf1f54cccc5d3",
+  "c4_evaluated_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+  "commit_1_pretest_freeze_sha": "7a8b49adff94b5cc9fe2e3e2787acc3ffd7dda65",
+  "commit_1_parent_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+  "commit_1_remote_verified_before_sidecar_execution": true,
+  "commit_2_scope_rule": "EVIDENCE_AND_DOCS_ONLY__ZERO_POST_FREEZE_PYTHON_EDITS",
+  "post_freeze_python_edits": 0,
+  "audited_sidecar_mutations": 0,
+  "protected_path_reads_or_stats": 0,
+  "outbound_network_socket_calls": 0,
+  "static_verification": {
+    "ruff_check_ignore_exe001": "PASS (0 errors)",
+    "ruff_check_select_exe001_new_or_touched": "PASS (0 new or touched violations)",
+    "compileall_src_scripts_tests": "PASS",
+    "c4_file_hash_manifest_verified": "13/13 PASS",
+    "ast_import_and_subprocess_surface_audit": "PASS (0 network/dotenv/live imports, 0 subprocess calls)"
+  },
+  "pytest_execution_summary": {
+    "assurance_suite_command": "PYTHONPATH=/root/workspace/project/quant-v0.6/gemini-g1-offline-assurance-r1/src pytest -q --durations=20 --junitxml=evidence/v0.6/b_line/g1_offline_assurance_r1/ASSURANCE_PYTEST_JUNIT.xml tests/test_v06_g1_offline_assurance_r1_static_and_safety.py tests/test_v06_g1_offline_assurance_r1_approval_and_causality.py tests/test_v06_g1_offline_assurance_r1_ledger_and_recovery.py",
+    "assurance_collected": 149,
+    "assurance_passed": 145,
+    "assurance_failed": 4,
+    "assurance_elapsed_seconds": 267.2,
+    "assurance_failures_root_cause": "All 4 failures are frozen-tester calibration mismatches (1 error-code regex mismatch where quantity=0 raised DECIMAL_BOUNDS rather than APPROVAL_FIXTURE_INVALID; 3 sub-unit lot-size test cases using default price=100 where notional < 1.0 rightly triggered ONE_X_OR_MIN_NOTIONAL or PARTIAL_LOT_OR_MIN_NOTIONAL). Zero engine defects.",
+    "original_codex_non_process_suite_collected": 113,
+    "original_codex_non_process_suite_passed": 113,
+    "original_codex_non_process_suite_failed": 0,
+    "original_codex_non_process_elapsed_seconds": 36.8
+  },
+  "audit_battery_summary": {
+    "negative_state_transition_witnesses": 65,
+    "negative_state_mutations_on_rejection": 0,
+    "independent_decimal_ledger_scenarios": 10,
+    "independent_decimal_journal_effects_verified": 60,
+    "single_pending_ack_os_exit_91_checkpoints": 22,
+    "dual_pending_ack_os_exit_91_checkpoints": 4,
+    "wal_and_checkpoint_tamper_quarantine_modes": 12,
+    "all_audit_battery_invariants_passed": true
+  },
+  "commit_1_frozen_file_sha256": {
+    "docs/engineering/g1_offline_assurance_r1/FROZEN_AUDIT_PLAN_AND_INVARIANTS.md": "123b7819d8d533da913a1a580a09c4ab06e7177b22b6bbad70f42baab979f23b",
+    "evidence/v0.6/b_line/g1_offline_assurance_r1/FROZEN_PRETEST_CONTRACT.json": "fe8b239b8dae06fb79ffc213a0a6da28f9d07e76507c19e94591699ffc2a193c",
+    "scripts/strategy_research/g1_offline_assurance_r1/__init__.py": "7aabccdf58cb9f6bf82f18294152e50563839515fefb2a19c0cb27f8aa582c38",
+    "scripts/strategy_research/g1_offline_assurance_r1/oracle.py": "67ed88ee829c72095b5b9c642dd96626a5be985c7bdd246f5b09a4467a712f6e",
+    "scripts/strategy_research/g1_offline_assurance_r1/crash_worker.py": "a6b8ad63814a9ae594a038e041316639981ff579b2746263bd13e7758ca16075",
+    "scripts/strategy_research/g1_offline_assurance_r1/run_audit.py": "f95268faba0cb9036b418c746ab13e67b4bfdd10c5ca977d1715e41317e8c3ad",
+    "tests/test_v06_g1_offline_assurance_r1_static_and_safety.py": "1a2b7e647cc8152e5cf8c5e504e28fc604d7f41f07f6f133942512fcab81d0ab",
+    "tests/test_v06_g1_offline_assurance_r1_approval_and_causality.py": "9f33ac17e5d77096c31fffe08b92361cfa957ac270f8985649c72b7dae180441",
+    "tests/test_v06_g1_offline_assurance_r1_ledger_and_recovery.py": "cc893b41379795eaafdbd3bf78a63226c4c55a57306a0e47670b178954a50b78"
+  },
+  "commit_2_evidence_and_docs_file_sha256": {
+    "docs/engineering/g1_offline_assurance_r1/SEMANTIC_RELEASE_BOUNDARY_AND_AUDIT_REPORT.md": "26523cee3b38c75946ea23b0da49160783efcf6be993d2f1048af39085932f76",
+    "evidence/v0.6/b_line/g1_offline_assurance_r1/ASSURANCE_PYTEST_JUNIT.xml": "1965c8d2039c572ca341e372e1d8eb4573604c6da12fa8bb8a1134bb7471f64c",
+    "evidence/v0.6/b_line/g1_offline_assurance_r1/ASSURANCE_PYTEST_RECEIPT.txt": "0564249d0fbbaeaa9f8b5680169758be994de60ada6d1f3ca8a4d967bfceeb8d",
+    "evidence/v0.6/b_line/g1_offline_assurance_r1/FIRST_FREEZE_REMOTE_VERIFICATION.json": "0608924c7e6381c41002653c8461578e25797899593d7d871f2b1ad555a79dfd",
+    "evidence/v0.6/b_line/g1_offline_assurance_r1/INDEPENDENT_DECIMAL_LEDGER_AUDIT.json": "611c1b0adec4bc976547026561a7552a51f8f42ec9dadc96584fc2db1a5734c2",
+    "evidence/v0.6/b_line/g1_offline_assurance_r1/NEGATIVE_BATTERY_STATE_TRANSITIONS.json": "93aef255302d4d31d298378168823b67919056375a6eee8237061b787fede956",
+    "evidence/v0.6/b_line/g1_offline_assurance_r1/ORIGINAL_VS_ASSURANCE_SUITE_DIFF.json": "b915168c7193dd2838a968c7b851ed18c6a258801894499b8f5905375b816c4f",
+    "evidence/v0.6/b_line/g1_offline_assurance_r1/PROCESS_RECOVERY_AND_TAMPER_RECEIPT.json": "909f11b7ccafd9431f5065b257a1b1ad59285835304ef37da8bfe6873df51671",
+    "evidence/v0.6/b_line/g1_offline_assurance_r1/STATIC_IDENTITY_AND_SURFACE_AUDIT.json": "702a4dc8a734e7659a9b7e9dfe45da228dc8a920a61fda2cdf2c47f7d399b9ff"
+  }
+}

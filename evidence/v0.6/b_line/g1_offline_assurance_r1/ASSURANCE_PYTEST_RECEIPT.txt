@@ -1,0 +1,52 @@
+.....................F...............................................FF. [ 48%]
+.......F................................................................ [ 96%]
+.....                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_initial_state_rejects_malformed_trusted_approval_fixtures[zero_quantity-override4] _
+tests/test_v06_g1_offline_assurance_r1_approval_and_causality.py:126: in test_initial_state_rejects_malformed_trusted_approval_fixtures
+    initial_state([tok])
+scripts/g1_offline_preview_r1/model.py:91: in initial_state
+    decimal(raw["quantity"], positive=True)
+scripts/g1_offline_preview_r1/model.py:50: in decimal
+    raise SafetyViolation("DECIMAL_BOUNDS")
+E   scripts.g1_offline_preview_r1.model.SafetyViolation: DECIMAL_BOUNDS
+
+During handling of the above exception, another exception occurred:
+tests/test_v06_g1_offline_assurance_r1_approval_and_causality.py:125: in test_initial_state_rejects_malformed_trusted_approval_fixtures
+    with pytest.raises(SafetyViolation, match="APPROVAL_FIXTURE_INVALID"):
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'APPROVAL_FIXTURE_INVALID'
+E     Actual message: 'DECIMAL_BOUNDS'
+_ test_lot_rounding_floors_tp1_half_and_preserves_residual[0.011-0.005-0.006] __
+tests/test_v06_g1_offline_assurance_r1_ledger_and_recovery.py:93: in test_lot_rounding_floors_tp1_half_and_preserves_residual
+    s = transition(s, make_event("TP1", 179999, {"fill_id": f"tp1-{qty}"}))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/g1_offline_preview_r1/reducer.py:546: in transition
+    raise SafetyViolation("PARTIAL_LOT_OR_MIN_NOTIONAL")
+E   scripts.g1_offline_preview_r1.model.SafetyViolation: PARTIAL_LOT_OR_MIN_NOTIONAL
+_ test_lot_rounding_floors_tp1_half_and_preserves_residual[0.003-0.001-0.002] __
+tests/test_v06_g1_offline_assurance_r1_ledger_and_recovery.py:90: in test_lot_rounding_floors_tp1_half_and_preserves_residual
+    s, _, _, _ = build_state_at_phase("OPEN", side="LONG", quantity=qty)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/strategy_research/g1_offline_assurance_r1/oracle.py:530: in build_state_at_phase
+    s = transition(s, make_event("PLACE", 60003))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/g1_offline_preview_r1/reducer.py:426: in transition
+    raise SafetyViolation("ONE_X_OR_MIN_NOTIONAL")
+E   scripts.g1_offline_preview_r1.model.SafetyViolation: ONE_X_OR_MIN_NOTIONAL
+____________ test_min_notional_and_five_percent_reserve_fail_closed ____________
+tests/test_v06_g1_offline_assurance_r1_ledger_and_recovery.py:242: in test_min_notional_and_five_percent_reserve_fail_closed
+    s_one_lot, _, _, _ = build_state_at_phase("OPEN", side="LONG", quantity="0.001")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/strategy_research/g1_offline_assurance_r1/oracle.py:530: in build_state_at_phase
+    s = transition(s, make_event("PLACE", 60003))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts/g1_offline_preview_r1/reducer.py:426: in transition
+    raise SafetyViolation("ONE_X_OR_MIN_NOTIONAL")
+E   scripts.g1_offline_preview_r1.model.SafetyViolation: ONE_X_OR_MIN_NOTIONAL
+=========================== short test summary info ============================
+FAILED tests/test_v06_g1_offline_assurance_r1_approval_and_causality.py::test_initial_state_rejects_malformed_trusted_approval_fixtures[zero_quantity-override4]
+FAILED tests/test_v06_g1_offline_assurance_r1_ledger_and_recovery.py::test_lot_rounding_floors_tp1_half_and_preserves_residual[0.011-0.005-0.006]
+FAILED tests/test_v06_g1_offline_assurance_r1_ledger_and_recovery.py::test_lot_rounding_floors_tp1_half_and_preserves_residual[0.003-0.001-0.002]
+FAILED tests/test_v06_g1_offline_assurance_r1_ledger_and_recovery.py::test_min_notional_and_five_percent_reserve_fail_closed
+4 failed, 145 passed in 267.20s (0:04:27)

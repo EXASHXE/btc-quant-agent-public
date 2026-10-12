@@ -1,0 +1,14 @@
+{
+  "task_id": "V06_G1_GEMINI_OFFLINE_ASSURANCE_R1",
+  "controller_dispatch_sha": "4a487fcef182edc6c68486ff53d4a64caa10debc",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "branch": "feature/v06-bline-gemini-g1-offline-assurance-r1",
+  "exact_start_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+  "first_freeze_commit_sha": "7a8b49adff94b5cc9fe2e3e2787acc3ffd7dda65",
+  "first_freeze_parent_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+  "remote_ls_remote_ref": "refs/heads/feature/v06-bline-gemini-g1-offline-assurance-r1",
+  "remote_ls_remote_sha": "7a8b49adff94b5cc9fe2e3e2787acc3ffd7dda65",
+  "nonforce_push_verified": true,
+  "verified_before_sidecar_test_execution": true,
+  "post_freeze_code_edits": 0
+}

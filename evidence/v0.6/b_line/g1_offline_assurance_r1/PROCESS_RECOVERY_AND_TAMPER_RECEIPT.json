@@ -1,0 +1,76 @@
+{
+  "task_id": "V06_G1_GEMINI_OFFLINE_ASSURANCE_R1",
+  "exact_start_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+  "freeze_commit_sha": "7a8b49adff94b5cc9fe2e3e2787acc3ffd7dda65",
+  "own_scratch": "/tmp/btc-g1_offline_assurance_r1",
+  "reference_24h_long_expected": {
+    "status": "G1_OFFLINE_PREVIEW_VERIFIED",
+    "safety_status": "DRY_RUN_NO_NETWORK_NO_ORDERING",
+    "state_hash": "4cc9f7fb6912fa323d037a12dee64d413400b1ab18640f84d9125dd02063a21f",
+    "wal_chain": "69995097474559d6d2b27e5b6da27d35888e2baea39e602afd4b9af1b4afc0ff",
+    "logical_event_count": 1455,
+    "journal_hash": "9af1737882c8df4089018113bda26fac8e5de17531230eb07413a0a5f6441a46",
+    "journal_effects": 6,
+    "cash": "1000.33834810",
+    "available_cash": "1000.33834810",
+    "reserved_notional": "0.0000",
+    "phase": "CLOSED"
+  },
+  "native_process_kill_22_checkpoints": {
+    "total_checkpoints": 22,
+    "original_checkpoints": 15,
+    "novel_checkpoints": 7,
+    "passed": 22,
+    "failed": 0,
+    "cases": [
+      {"case": "proposal_pre", "kind": "PROPOSE", "occurrence": 0, "edge": "before_append", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "proposal_appended", "kind": "PROPOSE", "occurrence": 0, "edge": "after_append", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "analysis_fsynced", "kind": "ANALYZE", "occurrence": 0, "edge": "after_fsync", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "approval_snapshotted", "kind": "APPROVE", "occurrence": 0, "edge": "after_snapshot", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "place_pre", "kind": "PLACE", "occurrence": 0, "edge": "before_append", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "entry_appended", "kind": "FILL_ENTRY", "occurrence": 0, "edge": "after_append", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "entry_ack_fsynced", "kind": "ACK", "occurrence": 0, "edge": "after_fsync", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "funding_appended", "kind": "FUNDING", "occurrence": 0, "edge": "after_append", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "tp1_snapshotted", "kind": "TP1", "occurrence": 0, "edge": "after_snapshot", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "partial_ack_fsynced", "kind": "ACK", "occurrence": 1, "edge": "after_fsync", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "stop_update_appended", "kind": "UPDATE_STOP", "occurrence": 0, "edge": "after_append", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "funding_snapshotted", "kind": "FUNDING", "occurrence": 1, "edge": "after_snapshot", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "stop_pre", "kind": "STOP", "occurrence": 0, "edge": "before_append", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "final_ack_snapshotted", "kind": "ACK", "occurrence": 2, "edge": "after_snapshot", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "outbox_delivered", "kind": "OUTBOX", "occurrence": 0, "edge": "after_outbox_delivery", "is_novel": false, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "approve_pre_novel", "kind": "APPROVE", "occurrence": 0, "edge": "before_append", "is_novel": true, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "place_fsynced_novel", "kind": "PLACE", "occurrence": 0, "edge": "after_fsync", "is_novel": true, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "entry_snapshotted_novel", "kind": "FILL_ENTRY", "occurrence": 0, "edge": "after_snapshot", "is_novel": true, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "tp1_pre_novel", "kind": "TP1", "occurrence": 0, "edge": "before_append", "is_novel": true, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "stop_update_fsynced_novel", "kind": "UPDATE_STOP", "occurrence": 0, "edge": "after_fsync", "is_novel": true, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "funding3_fsynced_novel", "kind": "FUNDING", "occurrence": 2, "edge": "after_fsync", "is_novel": true, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true},
+      {"case": "stop_appended_novel", "kind": "STOP", "occurrence": 0, "edge": "after_append", "is_novel": true, "crash_exit": 91, "restart_exit": 0, "deterministic_match": true}
+    ]
+  },
+  "dual_pending_exit_ack_process_kills": {
+    "scenario": "TP1 and STOP both fill before either is ACKed (len(pending_cash)==2), then os._exit(91) on ACK-SECOND-PENDING",
+    "edges_tested": ["before_append", "after_append", "after_fsync", "after_snapshot"],
+    "passed": 4,
+    "failed": 0,
+    "post_restart_terminal_flat": true
+  },
+  "wal_and_checkpoint_corruption_quarantines": {
+    "total_modes": 12,
+    "passed": 12,
+    "failed": 0,
+    "modes": [
+      {"mode": "torn_trailing_bytes", "expected_code": "WAL_TRUNCATED", "quarantined": true, "unsafe_effects_replayed": false},
+      {"mode": "duplicate_wal_line", "expected_code": "WAL_CHAIN", "quarantined": true, "unsafe_effects_replayed": false},
+      {"mode": "checksum_mismatch", "expected_code": "WAL_CHAIN", "quarantined": true, "unsafe_effects_replayed": false},
+      {"mode": "event_hash_mismatch_recomputed_record", "expected_code": "WAL_EVENT_IDENTITY", "quarantined": true, "unsafe_effects_replayed": false},
+      {"mode": "duplicate_event_id_recomputed_chain", "expected_code": "WAL_EVENT_IDENTITY", "quarantined": true, "unsafe_effects_replayed": false},
+      {"mode": "state_hash_mismatch_recomputed_record", "expected_code": "WAL_STATE_IDENTITY", "quarantined": true, "unsafe_effects_replayed": false},
+      {"mode": "changed_genesis_fixture", "expected_code": "WAL_GENESIS_MISMATCH", "quarantined": true, "unsafe_effects_replayed": false},
+      {"mode": "unknown_wal_format_version", "expected_code": "WAL_GENESIS_MISMATCH", "quarantined": true, "unsafe_effects_replayed": false},
+      {"mode": "checkpoint_fork_mutated_state", "expected_code": "CHECKPOINT_IDENTITY", "quarantined": true, "unsafe_effects_replayed": false},
+      {"mode": "checkpoint_ahead_of_stale_wal", "expected_code": "CHECKPOINT_AHEAD_OF_WAL", "quarantined": true, "unsafe_effects_replayed": false},
+      {"mode": "checkpoint_unknown_format_version", "expected_code": "CHECKPOINT_AHEAD_OF_WAL", "quarantined": true, "unsafe_effects_replayed": false},
+      {"mode": "checkpoint_missing_schema_field", "expected_code": "CHECKPOINT_SCHEMA", "quarantined": true, "unsafe_effects_replayed": false}
+    ]
+  }
+}
