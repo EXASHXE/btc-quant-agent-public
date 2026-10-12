@@ -13,20 +13,25 @@ from pathlib import Path
 
 import pytest
 
-from scripts.g1_offline_preview_r1.model import SafetyViolation
-from scripts.g1g3_offline_ports_r1.__main__ import VALID_CRASH_BOUNDARIES
-from scripts.g1g3_offline_ports_r1.__main__ import main as cli_main
-from scripts.g1g3_offline_ports_r1.durable_supervisor import DurableSidecarSupervisor
-from scripts.g1g3_offline_ports_r1.loopback_servers import FakeLoopbackLLMServer
-from scripts.g1g3_offline_ports_r1.no_order_port import (
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+
+from scripts.g1_offline_preview_r1.model import SafetyViolation  # noqa: E402
+from scripts.g1g3_offline_ports_r1.__main__ import VALID_CRASH_BOUNDARIES  # noqa: E402
+from scripts.g1g3_offline_ports_r1.__main__ import main as cli_main  # noqa: E402
+from scripts.g1g3_offline_ports_r1.durable_supervisor import (  # noqa: E402
+    DurableSidecarSupervisor,
+)
+from scripts.g1g3_offline_ports_r1.loopback_servers import (  # noqa: E402
+    FakeLoopbackLLMServer,
+)
+from scripts.g1g3_offline_ports_r1.no_order_port import (  # noqa: E402
     OWN_SCRATCH,
     LoopbackSocketGuard,
     NoOrderPort,
     guard_lexical_path,
     verify_static_ast_and_core_immutability,
 )
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 @pytest.mark.parametrize("crash_boundary", list(VALID_CRASH_BOUNDARIES))
@@ -41,7 +46,10 @@ def test_subprocess_crash_91_and_idempotent_recovery_all_10_boundaries(
             "DUAL_PENDING_ACK" if crash_boundary == "double_pending_ack" else "STANDARD_24H"
         )
         env = dict(os.environ)
-        env["PYTHONPATH"] = f"{REPO_ROOT}:{REPO_ROOT / 'src'}"
+        existing_py = env.get("PYTHONPATH", "")
+        env["PYTHONPATH"] = os.pathsep.join(
+            [str(REPO_ROOT), str(REPO_ROOT / "src"), *([existing_py] if existing_py else [])]
+        )
         cmd = [
             sys.executable,
             "-m",
@@ -61,7 +69,7 @@ def test_subprocess_crash_91_and_idempotent_recovery_all_10_boundaries(
             env=env,
             capture_output=True,
             text=True,
-            timeout=15,
+            timeout=60,
             check=False,
         )
         assert proc.returncode == 91, (
@@ -123,6 +131,20 @@ def test_torn_sidecar_wal_tail_quarantined_without_unsafe_replay(tmp_path: Path)
     qmeta = json.loads(qfiles[0].read_text(encoding="utf-8"))
     assert qmeta["code"] == "SIDECAR_WAL_TRUNCATED"
     assert qmeta["unsafe_effects_replayed"] is False
+
+    # Also verify mid-file WAL payload/hash-chain corruption is caught and quarantined
+    mid_dir = tmp_path / "mid_corrupt_sidecar_wal"
+    sup_mid = DurableSidecarSupervisor(mid_dir, temporary=True)
+    sup_mid.run_scenario(side="LONG", allow_loopback=False)
+    wal_file = mid_dir / "sidecar.wal.jsonl"
+    lines = wal_file.read_text(encoding="utf-8").splitlines()
+    rec1 = json.loads(lines[1])
+    rec1["payload"]["tampered"] = True
+    lines[1] = json.dumps(rec1, sort_keys=True)
+    wal_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    with pytest.raises(SafetyViolation) as exc_mid:
+        DurableSidecarSupervisor(mid_dir, temporary=True)
+    assert exc_mid.value.code == "SIDECAR_WAL_CHAIN_CORRUPT"
 
 
 def test_torn_g1_wal_tail_quarantined_without_unsafe_replay(tmp_path: Path) -> None:

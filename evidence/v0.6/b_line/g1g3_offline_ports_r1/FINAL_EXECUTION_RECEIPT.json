@@ -1,5 +1,5 @@
 {
-  "terminal": "G1G3_OFFLINE_LOOPBACK_PORTS_VERIFIED",
+  "terminal": "G1G3_OFFLINE_PORTS_BOUNDED_VERIFIED",
   "task_id": "V06_GEMINI_GOAL_C_G1G3_OFFLINE_PORTS_R1",
   "controller_dispatch_sha": "e35724f1d1ee7458709e003dfc5673c826c68ffd",
   "start_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
@@ -27,9 +27,15 @@
       "parent": "381b9024db6139b8dbad75334862700acbb3abcc",
       "ci_run_id": 38218000160,
       "nonforce_remote_exact_verified": true
+    },
+    {
+      "commit": "C4_initial",
+      "sha": "f926191ec4ba2efeda1c54c7fb7011025709c674",
+      "parent": "5f88bbd370c831cd22ad7586392974c0773decf2",
+      "nonforce_remote_exact_verified": true
     }
   ],
-  "final_evidence_commit_identity": "SELF_SHA_CANNOT_BE_EMBEDDED; terminal response provides remote exact C4 SHA/parent and CI run ID",
+  "final_evidence_commit_identity": "SELF_SHA_CANNOT_BE_EMBEDDED; terminal response provides remote exact HEAD SHA/parent and CI run ID",
   "source_manifest_receipt": "C4_FINAL_SOURCE_MANIFEST.json",
   "e2e_loopback_reproduction_receipt": "E2E_LOOPBACK_REPRODUCTION_RECEIPT.json",
   "process_crash_recovery_receipt": "PROCESS_CRASH_RECOVERY_RECEIPT.json",
@@ -67,21 +73,29 @@
   "json_validation": "PASS",
   "financial_baseline_reproduction": {
     "LONG": {
-      "fixture_sha256": "ae6c70f7c26b752df1cfc2cc803d6a941a62e1699749365f4902d335cb93fe4f",
+      "sealed_fixture_sha256": "b895305433e07689ede8f15d36e716c74b9276e8d1282a5937a3bdb7ce42e39a",
+      "source_event_hash": "4d8aecdd1762fbdf50e9d6fb1ce9970826d94e9a869387ca5c3a1487538511c8",
+      "journal_hash": "9af1737882c8df4089018113bda26fac8e5de17531230eb07413a0a5f6441a46",
       "final_spendable_cash": "1000.33834810",
       "total_fees": "0.09565440",
       "total_funding": "-0.00499750",
       "realized_pnl": "0.43900000",
-      "terminal_state_digest": "7997f1d95da51c78113199e772da8a77e12d31b8e801d63fbcd1695e74f632e0",
+      "terminal_state_digest_offline": "d3568d31937e58be1633bfa44727cf045fd850c552ef0fa3971b3623a24ae136",
+      "terminal_state_digest_loopback": "9fa88072faa42fc4f6d589f5217e5b7b96a026f2b151532b14e7cc7da7cecc94",
+      "codex_g1_c4_baseline_state_hash": "4cc9f7fb701377d56e75355ccdb264dc6786b420eb70967f3d58665fb3df8150",
       "matched_codex_g1_c4_baseline": true
     },
     "SHORT": {
-      "fixture_sha256": "d6bf849411f82db75f433f91985b7c8698fbbd1834685fb706453de3cad1dc11",
+      "sealed_fixture_sha256": "3ab532b7082732f13902b872b3d7b8ea89e5867c407b52558161b3556960960c",
+      "source_event_hash": "a7885f1ad6ea14fa24501f4343b6b8fe3ac7741b30532a41889c05b205fe2f87",
+      "journal_hash": "e33b4bcb18bfe15607258c726526d35bbac717d8feb1fbe2da8e27808df94d3f",
       "final_spendable_cash": "1000.34054750",
       "total_fees": "0.09545250",
       "total_funding": "0.00000000",
       "realized_pnl": "0.43600000",
-      "terminal_state_digest": "fa9b4c475f1f55da09f1f4d35e28d1e8138d1aa760b67e4f8cc58511815a562d",
+      "terminal_state_digest_offline": "ce190084de4ce7c68becaeee3ba99a0ab70a25b4ad25fe88c53482df4d114299",
+      "terminal_state_digest_loopback": "d0e20115238c4c1c8e8836988fc3966cd4cfbc3305da8f9413df76fbd726ee28",
+      "codex_g1_c4_baseline_state_hash": "cbf1b105390d6e10790b22026a994fa37f9288ddbd3abaa8903394e50c2b21c5",
       "matched_codex_g1_c4_baseline": true
     }
   },
@@ -89,15 +103,15 @@
     "distinct_crash_boundaries_verified": 10,
     "exit_code": 91,
     "boundaries": [
-      "before_llm_wal",
-      "after_llm_wal_before_core",
-      "after_llm_core_before_outbox_stage",
-      "after_outbox_stage_before_http_post",
-      "after_http_post_before_receipt_wal",
-      "after_operator_envelope_wal_before_core_approve",
-      "after_core_approve_before_place",
-      "after_fill_entry_before_ack",
-      "after_tp1_before_partial_ack",
+      "after_operator_receipt_fsync",
+      "before_approve",
+      "after_approve_before_place",
+      "after_place_before_entry",
+      "after_simulated_entry",
+      "after_feishu_ack",
+      "after_tp1_before_ack",
+      "at_stop_before_snapshot",
+      "at_stop_after_snapshot",
       "double_pending_ack"
     ],
     "torn_wal_tail_quarantine_verified": true,
