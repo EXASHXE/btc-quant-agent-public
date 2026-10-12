@@ -47,14 +47,15 @@ ALLOWED_REST_HOSTS: tuple[str, ...] = (
     "fapi.binance.com",
 )
 
-FORBIDDEN_HOST_PATTERNS: tuple[str, ...] = (
-    "dapi.binance.com",       # COIN-M strictly forbidden
-    "api.binance.com",        # Spot strictly forbidden
+FORBIDDEN_HOSTS: tuple[str, ...] = (
+    "dapi.binance.com",          # COIN-M strictly forbidden
+    "api.binance.com",           # Spot strictly forbidden
     "testnet.binancefuture.com", # Testnet forbidden
     "testnet.binance.vision",
 )
 
 FORBIDDEN_PRIVATE_KEYWORDS: tuple[str, ...] = (
+    "order",
     "apikey",
     "api_key",
     "secretkey",
@@ -65,6 +66,7 @@ FORBIDDEN_PRIVATE_KEYWORDS: tuple[str, ...] = (
     "signature",
     "privatekey",
     "wallet",
+    "userdata",
 )
 
 

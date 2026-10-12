@@ -162,13 +162,14 @@ class OrderBookIntegrityEngine:
 
         # 2. First update bridging rule
         if self.final_update_id == self.snapshot_update_id:
-            # First event after snapshot MUST have U <= snapshot_update_id <= u
-            if not (U <= self.snapshot_update_id <= u):
-                if U > self.snapshot_update_id + 1:
-                    # Sequence gap between snapshot and stream
-                    self.reset(f"GAP_SNAPSHOT_TO_STREAM: U={U} > snap={self.snapshot_update_id}+1")
-                    return self.get_integrity_receipt(observed_wall_ms)
-                # Stale update
+            if pu is not None and pu == self.snapshot_update_id:
+                # Contiguous with snapshot via pu
+                pass
+            elif U <= self.snapshot_update_id <= u:
+                # Overlaps snapshot via U/u
+                pass
+            else:
+                self.reset(f"GAP_SNAPSHOT_TO_STREAM: pu={pu}, U={U}, u={u} vs snap={self.snapshot_update_id}")
                 return self.get_integrity_receipt(observed_wall_ms)
         else:
             # 3. Subsequent event rule: pu == prev_final_update_id
