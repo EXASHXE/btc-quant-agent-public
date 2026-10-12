@@ -1,0 +1,139 @@
+{
+  "task_id": "V06_G2_GEMINI_A_FLOW_FUNDING_ENTRY_R1",
+  "controller_dispatch_sha": "99df4ed8e820984d69d7b895be8808b892ed7f5f",
+  "exact_start_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "protocol_stage": "STAGE_1_PRE_OUTCOME_BINDING_FREEZE",
+  "research_budget": {
+    "max_candidate_identities": 3,
+    "fixed_horizons_hours": [
+      12,
+      18
+    ],
+    "max_selectable_trials": 6,
+    "cost_regimes": [
+      "STRESS_44BP_PRIMARY",
+      "BASE_22BP_SECONDARY"
+    ]
+  },
+  "candidate_identity_hashes": {
+    "F1_AGGRESSOR_FLOW_ABSORPTION_12H": "e4eafd99bb2a80f476a2f04856148a161ca3d13b6dc739242dbc2a94a110d937",
+    "F1_AGGRESSOR_FLOW_ABSORPTION_18H": "3a9e37561956969344ce317665a71b797cd01a6bf99d01da39a6c975e3753819",
+    "F2_REALIZED_FUNDING_REVERSAL_12H": "ea4b8eae3376b1d63ac669d0534f02e512e7472879cc2eeaf07e7d8c18638feb",
+    "F2_REALIZED_FUNDING_REVERSAL_18H": "9c99c1246d53bcca3d9971840490a0882853621bf3a0dea9aeef2a59982e2ba0",
+    "F3_MARK_LAST_DISLOCATION_REPAIR_12H": "bbd9dc1539b94d11fdc3c05f9dfd4cbf38f09beb65446f8700c2835d0ba0cd26",
+    "F3_MARK_LAST_DISLOCATION_REPAIR_18H": "bb2e127aead2e2ce1a229122ac0188d203655036644da473a042eb1b0ab2f494"
+  },
+  "candidate_configurations": [
+    {
+      "id": "F1_AGGRESSOR_FLOW_ABSORPTION_12H",
+      "family": "F1_FLOW_PRICE_DIVERGENCE",
+      "horizon_hours": 12,
+      "stop_mult": 1.5,
+      "target_r": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Microstructure absorption: aggressive taker flow dominates 1h window but price progress fails or reverses, forecasting mean reversion in direction of passive liquidity.",
+      "clock_type": "hourly_closed_bar",
+      "parameters": {
+        "flow_imbalance_threshold": 0.2,
+        "price_progress_sign_divergence": true
+      }
+    },
+    {
+      "id": "F1_AGGRESSOR_FLOW_ABSORPTION_18H",
+      "family": "F1_FLOW_PRICE_DIVERGENCE",
+      "horizon_hours": 18,
+      "stop_mult": 1.5,
+      "target_r": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Microstructure absorption with 18h extended horizon: passive absorption resolution over multi-session duration.",
+      "clock_type": "hourly_closed_bar",
+      "parameters": {
+        "flow_imbalance_threshold": 0.2,
+        "price_progress_sign_divergence": true
+      }
+    },
+    {
+      "id": "F2_REALIZED_FUNDING_REVERSAL_12H",
+      "family": "F2_REALIZED_FUNDING_CROWDING",
+      "horizon_hours": 12,
+      "stop_mult": 1.5,
+      "target_r": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Perps leverage crowding flip: consecutive settled funding rates reverse sign (+ to - or - to +), combined with retrospective price confirmation, signaling speculative crowding washout.",
+      "clock_type": "settled_funding_with_1m_lag",
+      "parameters": {
+        "min_settlement_lag_minutes": 1,
+        "require_price_confirmation": true
+      }
+    },
+    {
+      "id": "F2_REALIZED_FUNDING_REVERSAL_18H",
+      "family": "F2_REALIZED_FUNDING_CROWDING",
+      "horizon_hours": 18,
+      "stop_mult": 1.5,
+      "target_r": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Perps leverage crowding flip with 18h extended horizon to capture medium-term repositioning.",
+      "clock_type": "settled_funding_with_1m_lag",
+      "parameters": {
+        "min_settlement_lag_minutes": 1,
+        "require_price_confirmation": true
+      }
+    },
+    {
+      "id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H",
+      "family": "F3_MARK_LAST_DISLOCATION",
+      "horizon_hours": 12,
+      "stop_mult": 1.5,
+      "target_r": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Fair value basis repair: Last trade price deviates from Mark price over sustained 1h window, and volume flow moves in reversion direction, capturing basis convergence.",
+      "clock_type": "hourly_closed_bar",
+      "parameters": {
+        "basis_threshold_bps": 3.0,
+        "flow_confirmation": true
+      }
+    },
+    {
+      "id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H",
+      "family": "F3_MARK_LAST_DISLOCATION",
+      "horizon_hours": 18,
+      "stop_mult": 1.5,
+      "target_r": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Fair value basis repair with 18h horizon for sustained dislocation normalization.",
+      "clock_type": "hourly_closed_bar",
+      "parameters": {
+        "basis_threshold_bps": 3.0,
+        "flow_confirmation": true
+      }
+    }
+  ],
+  "frozen_implementation_sha256": {
+    "scripts/strategy_research/g2_flow_funding_entries_r1/__init__.py": "4c389b9aca874daef39601db55b0b2a0cab981331973394eccc6e80f79fb4e77",
+    "scripts/strategy_research/g2_flow_funding_entries_r1/sources.py": "115b23dadc3b95f39e7c163daae4ce5eb50bc1c79121d3671fdaf6c2fa1c5b9c",
+    "scripts/strategy_research/g2_flow_funding_entries_r1/signals.py": "7ca739efcb3c3821be3debfe110d13592f30b28ff5ee0c94208f5d4ab803a8ad",
+    "scripts/strategy_research/g2_flow_funding_entries_r1/book.py": "d0409f04cb2350f171d95c2e303874ba361b22cb1b8cf216de274b0fbb9c180e",
+    "scripts/strategy_research/g2_flow_funding_entries_r1/account.py": "617466e3badc196abfff9df1432b7a919885e50c65204f7e84f8618b9fc34073",
+    "scripts/strategy_research/g2_flow_funding_entries_r1/statistics.py": "89c1d9c0a0017575bbd7b6cf7f44ebfa0d8bb9a9ee68be17ea7bef010ea25b89",
+    "scripts/strategy_research/g2_flow_funding_entries_r1/run.py": "5be3af5800359df32e2678a16dbe6a9e221d3e117e609c4c6b7e35cfc0559168",
+    "tests/test_v06_g2_flow_funding_entries_r1_sources.py": "be6bed25cf2d8d847b4b24f4789a13da290e20d1097e459a1017375d10500195",
+    "tests/test_v06_g2_flow_funding_entries_r1_signals.py": "dd0db049fee503205edcc1447e33794a653bce3201142718906abeb259dd3c6c",
+    "tests/test_v06_g2_flow_funding_entries_r1_book.py": "031ae4a65997e3810e058b5365a53b9007b6ca529589b1cb45a849bf3bb221b5",
+    "tests/test_v06_g2_flow_funding_entries_r1_account.py": "b1e4c9891ade1eb1798c4910046f9876a1a1256efe34a6f92e083ebdbec6c66e",
+    "tests/test_v06_g2_flow_funding_entries_r1_statistics.py": "a87aea89c9f20cb3033afd3b9b22c85c698fc360dc936b0b00d4538b631df5d2",
+    "tests/test_v06_g2_flow_funding_entries_r1_contract.py": "0696e9e9fc2d7f6e4571905fb2e4a3247b4cbcae5ab154d3086d87a94c9c3379",
+    "docs/strategy_research/g2_flow_funding_entries_r1/FROZEN_EXECUTION_METHOD.md": "361db28b7cea9e698d7ee00877cc2a3e47832e5c12e4286949e721a7c30b62fa"
+  },
+  "sample_viability_predeclaration": {
+    "min_executed_trades_per_identity": 30,
+    "development_period": "2021-02..2023-12",
+    "warmup_period": "2021-01",
+    "folds_count": 35
+  },
+  "falsification_gates": {
+    "profit_factor_stress_min": 1.0,
+    "pnl_2023_stress_min": 0.0,
+    "simultaneous_ci_95_strictly_positive": true
+  }
+}
