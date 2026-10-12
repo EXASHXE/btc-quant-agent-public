@@ -1,0 +1,35 @@
+{
+  "R2_terminal": "DEVELOPMENT_NO_GO",
+  "actual_agent_mode": "UNKNOWN",
+  "authority_file_sha256": "f26b9120ecc4003d19b783c69c8508f91e03ce60dc362f25a187bb1be9bb4f9b",
+  "authority_sha": "c852c7285f92d0780cba23a44cb8d8afb7b5428a",
+  "base_parent": "644f573c3d982ef97fc4317018eaa349fa403796",
+  "base_sha": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
+  "candidate_count": 27,
+  "created_utc": "2026-10-12T17:06:10.826036+00:00",
+  "expected_freeze_commit_parent": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
+  "first_push_receipt": "record subsequently; verify remote C1 before scoring",
+  "new_R3_scoring_at_freeze": "NOT_EXECUTED",
+  "pinned_read_only_source_sha256": {
+    "docs/strategy_research/g2_r3/flow_regime_r2/BTC_FLOW_REGIME_DEVELOPMENT_REPORT.md": "296680ee5d12a309588638d16a6774017121b5935eeaaf051238d562ab218623",
+    "evidence/v0.6/b_line/g2_btc_flow_regime_r2/DEVELOPMENT_RESULTS.json": "d8ef8b8903fe18da6175aa10da2cae6b5bb0737525b1a431e1a98c5a42b86a44",
+    "evidence/v0.6/b_line/g2_btc_flow_regime_r2/FROZEN_R2_ROSTER.json": "2e9a9191be881edf790699d116fd89e03bd94fc280975619559c8251ecab220e",
+    "evidence/v0.6/b_line/g2_btc_flow_regime_r2/FROZEN_R2_SOURCE_SPLIT.json": "90c1340d89d3fa0df18b45a7594676600bc1dfc9a4a33174a23cd532bcb1887f",
+    "evidence/v0.6/b_line/g2_btc_flow_regime_r2/SOURCE_MANIFEST_DEVELOPMENT.json": "1890fad8ef5c3455c2794f2c861e1dd65af76768c01691a4cf4b5827b5c30ce7",
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py": "eac5bad4afa9280d781da2b0df820d81f21daf868fc7362ea587a1bebabcc4d5",
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/signals.py": "451f11e9cda64d5d6b48a2c17a270dabf811760e7016f6c6972f26f64d2bc307",
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/sources.py": "ef07d5aae8ec1e65ab4a76228c167f65f58d41e950bb2158a45ce6d58d1b834a",
+    "scripts/strategy_research/g2_btc_flow_regime_r2/signals.py": "1548042fb478f56ffa8fceffe15c3fe250267a5087f5e59e81c6942a74105cdf",
+    "scripts/strategy_research/g2_btc_flow_regime_r2/sources.py": "71ba269deb7514912b045c1c56d4d73b4cb8678b358b5734f2fd475b2a717ae5"
+  },
+  "protocol_sha256": "93c3bdf0d8c9ef65482d1eb9fc3d7cdfb187ed59603fc87e31efb2fa58340bdc",
+  "public_remote_freeze_sha": "DERIVE_FROM_C1_COMMIT_NOT_SELF_REFERENCED",
+  "restricted_data_reads": 0,
+  "roster_sha256": "07ded62808cb61a1ed9efac7b8d8c45482b74d98619d2594ae6c8e4309bfaa6b",
+  "schema": "R3_PRE_OUTCOME_FREEZE_IDENTITY_V1",
+  "source_years_authorized": [
+    2021,
+    2022,
+    2023
+  ]
+}

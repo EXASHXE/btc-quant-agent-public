@@ -1,0 +1,757 @@
+{
+  "account": {
+    "allocation_fraction": 0.5,
+    "cooldown_hours": 1,
+    "disable_peak_known_equity_loss_USDT": 100,
+    "entry_sizing_source": "pinned R2 replay._size with candidate cap; no actual funding debit",
+    "equity_reserve_fraction": 0.05,
+    "initial_funding_reserve_adverse_bps_hourly": 8,
+    "monthly_initial_USDT": 1000,
+    "risk_close": "full close next open on causal DD/notional breach; differs from R2 partial exposure reductions"
+  },
+  "actual_agent_mode": "UNKNOWN",
+  "additional_execution_stress": {
+    "exit_slippage_additional_bps": 3,
+    "exit_spread_additional_bps": 2,
+    "selection_allowed": false
+  },
+  "authority_sha": "c852c7285f92d0780cba23a44cb8d8afb7b5428a",
+  "authorized_archives": [
+    {
+      "month": 1,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-01.zip",
+      "year": 2021
+    },
+    {
+      "month": 2,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-02.zip",
+      "year": 2021
+    },
+    {
+      "month": 5,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-05.zip",
+      "year": 2021
+    },
+    {
+      "month": 6,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-06.zip",
+      "year": 2021
+    },
+    {
+      "month": 8,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-08.zip",
+      "year": 2021
+    },
+    {
+      "month": 9,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-09.zip",
+      "year": 2021
+    },
+    {
+      "month": 11,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-11.zip",
+      "year": 2021
+    },
+    {
+      "month": 12,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-12.zip",
+      "year": 2021
+    },
+    {
+      "month": 1,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-01.zip",
+      "year": 2022
+    },
+    {
+      "month": 2,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-02.zip",
+      "year": 2022
+    },
+    {
+      "month": 5,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-05.zip",
+      "year": 2022
+    },
+    {
+      "month": 6,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-06.zip",
+      "year": 2022
+    },
+    {
+      "month": 8,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-08.zip",
+      "year": 2022
+    },
+    {
+      "month": 9,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-09.zip",
+      "year": 2022
+    },
+    {
+      "month": 11,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-11.zip",
+      "year": 2022
+    },
+    {
+      "month": 12,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-12.zip",
+      "year": 2022
+    },
+    {
+      "month": 1,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-01.zip",
+      "year": 2023
+    },
+    {
+      "month": 2,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-02.zip",
+      "year": 2023
+    },
+    {
+      "month": 5,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-05.zip",
+      "year": 2023
+    },
+    {
+      "month": 6,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-06.zip",
+      "year": 2023
+    },
+    {
+      "month": 8,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-08.zip",
+      "year": 2023
+    },
+    {
+      "month": 9,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-09.zip",
+      "year": 2023
+    },
+    {
+      "month": 11,
+      "role": "WARMUP",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-11.zip",
+      "year": 2023
+    },
+    {
+      "month": 12,
+      "role": "SCORED",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-12.zip",
+      "year": 2023
+    }
+  ],
+  "barriers": {
+    "G2_ALPHA_AUTHORITY": "NONE",
+    "G3_G4_TESTNET_LIVE_AUTHORITY": "NONE",
+    "owner_data_access": 0,
+    "private_account_or_order_calls": 0,
+    "reserved_2024_25_access": 0
+  },
+  "base_sha": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
+  "candidates": [
+    {
+      "cap_hours": 8,
+      "entry": "A",
+      "exit": "X0",
+      "id": "A_X0_H08",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 18,
+      "entry": "A",
+      "exit": "X0",
+      "id": "A_X0_H18",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 24,
+      "entry": "A",
+      "exit": "X0",
+      "id": "A_X0_H24",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 8,
+      "entry": "A",
+      "exit": "X1",
+      "id": "A_X1_H08",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 18,
+      "entry": "A",
+      "exit": "X1",
+      "id": "A_X1_H18",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 24,
+      "entry": "A",
+      "exit": "X1",
+      "id": "A_X1_H24",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 8,
+      "entry": "A",
+      "exit": "X2",
+      "id": "A_X2_H08",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 18,
+      "entry": "A",
+      "exit": "X2",
+      "id": "A_X2_H18",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 24,
+      "entry": "A",
+      "exit": "X2",
+      "id": "A_X2_H24",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 8,
+      "entry": "B",
+      "exit": "X0",
+      "id": "B_X0_H08",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 18,
+      "entry": "B",
+      "exit": "X0",
+      "id": "B_X0_H18",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 24,
+      "entry": "B",
+      "exit": "X0",
+      "id": "B_X0_H24",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 8,
+      "entry": "B",
+      "exit": "X1",
+      "id": "B_X1_H08",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 18,
+      "entry": "B",
+      "exit": "X1",
+      "id": "B_X1_H18",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 24,
+      "entry": "B",
+      "exit": "X1",
+      "id": "B_X1_H24",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 8,
+      "entry": "B",
+      "exit": "X2",
+      "id": "B_X2_H08",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 18,
+      "entry": "B",
+      "exit": "X2",
+      "id": "B_X2_H18",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 24,
+      "entry": "B",
+      "exit": "X2",
+      "id": "B_X2_H24",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 8,
+      "entry": "C",
+      "exit": "X0",
+      "id": "C_X0_H08",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 18,
+      "entry": "C",
+      "exit": "X0",
+      "id": "C_X0_H18",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 24,
+      "entry": "C",
+      "exit": "X0",
+      "id": "C_X0_H24",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 8,
+      "entry": "C",
+      "exit": "X1",
+      "id": "C_X1_H08",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 18,
+      "entry": "C",
+      "exit": "X1",
+      "id": "C_X1_H18",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 24,
+      "entry": "C",
+      "exit": "X1",
+      "id": "C_X1_H24",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 8,
+      "entry": "C",
+      "exit": "X2",
+      "id": "C_X2_H08",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 18,
+      "entry": "C",
+      "exit": "X2",
+      "id": "C_X2_H18",
+      "side": "BOTH"
+    },
+    {
+      "cap_hours": 24,
+      "entry": "C",
+      "exit": "X2",
+      "id": "C_X2_H24",
+      "side": "BOTH"
+    }
+  ],
+  "clock": {
+    "bar_receipt_delay_ms": 60000,
+    "close_exclusive": true,
+    "common_entry_cutoff_ack_ms": 60000,
+    "common_entry_cutoff_hours": 24,
+    "decision_to_order_ms": 60000,
+    "fill_ack_delay_ms": 60000,
+    "replacement_after_observation_ms": 60000
+  },
+  "costs": {
+    "BASE": {
+      "fee_bps": 6,
+      "nominal_roundtrip_bps": 22,
+      "slippage_bps": 3,
+      "spread_bps": 2
+    },
+    "STRESS": {
+      "fee_bps": 12,
+      "nominal_roundtrip_bps": 44,
+      "slippage_bps": 6,
+      "spread_bps": 4
+    }
+  },
+  "development_gate": {
+    "X0": "BASELINE_COMPARATOR_NOT_NEW_PROMOTION",
+    "active_months_min": 6,
+    "active_years_min": 2,
+    "equal_represented_year_mean_net_bps_gt": 0,
+    "max_month_closed_and_dense_MTM_DD_pct_le": 15,
+    "maximum_hypotheses_ready": 3,
+    "net_and_paired_Bonferroni_p_le": 0.05,
+    "nonnegative_years_min": 2,
+    "paired_delta_gt": 0,
+    "paired_tail5_degradation_bps_max": 10,
+    "profit_factor_gt": 1,
+    "stress_completed_trades_min": 50
+  },
+  "entry_A_exact_R2_candidate": {
+    "allocation_fraction": 0.5,
+    "cooldown_hours": 1,
+    "economic_hypothesis": "Directional aggressive-volume confirmation of acceptance may identify persistent inventory transfer; counterparties covering or reallocating could pay a large trend continuation move. Must demonstrate gross exceed44bp; not asserted liquidation or informed-flow proof.",
+    "family": "FLOW_CONFIRMED_TREND",
+    "formula": "4h trend C>EMA20>EMA50/short mirror; signed EMA20 change vs3barsago>0; ER12_4h>=.30. Current15m C strictly breaks PRIOR8quarter HH/LL; signedbody>=.30ATR15; signedCLV>=.40; side*I15>=.15 and side*I_latest1h>=.08; V15>=1.20*meanPRIOR20V15. Stop=C15-side*1.5ATR1h.",
+    "horizon_hours": 8,
+    "id": "FLOW_CONFIRMED_TREND_08H",
+    "risk_max_bps": 300,
+    "risk_min_bps": 30,
+    "selection_allowed": true,
+    "side": "BOTH",
+    "stop_atr_multiplier": 1.5,
+    "target_R": 2
+  },
+  "entry_B": {
+    "breakout": {
+      "edge_extension_ATR15": 0.1,
+      "prior_15m_edge_bars": 8,
+      "prior_volume_window": 20,
+      "signed_I15_min": 0.1,
+      "signed_body_ATR15_min": 0.2,
+      "volume_multiplier": 1.1
+    },
+    "invalidate_wrong_close_ATR15": 0.25,
+    "pending_per_side": 1,
+    "reaccept": {
+      "breaks_previous_bar_extreme": true,
+      "edge_extension_ATR15": 0.1,
+      "last_bar_after_breakout": 4,
+      "prior_volume_multiplier": 1,
+      "signed_I15_min": 0.1,
+      "signed_body_current_ATR15_min": 0.2
+    },
+    "regime": {
+      "1h_ema": 20,
+      "1h_ema_slope_lag": 3,
+      "4h_ER12_min": 0.25,
+      "4h_ema": [
+        20,
+        50
+      ],
+      "4h_ema_slope_lag": 3,
+      "signed_1h_I_min": 0.05
+    },
+    "retest": {
+      "first_bar_after_breakout": 1,
+      "last_retest_bar_after_breakout": 3,
+      "signed_close_edge_min": 0,
+      "signed_extreme_ATR15_range": [
+        -0.25,
+        0.2
+      ]
+    },
+    "same_bar_new_setup_after_invalidation_or_expiry": true,
+    "stop_structure_buffer_ATR1h": 0.25
+  },
+  "entry_C": {
+    "4h_ER12_max": 0.25,
+    "4h_distance_EMA20_ATR4_max": 1.25,
+    "breakout_close_outside": true,
+    "breakout_extension_ATR15": 0.15,
+    "breakout_signed_I_max": -0.15,
+    "breakout_signed_body_max": 0,
+    "breakout_volume_multiplier": 1.2,
+    "confirmation_I_reversal_min": 0.25,
+    "confirmation_edge_extension_ATR15": 0.1,
+    "confirmation_exact_next_bar": true,
+    "confirmation_signed_I_min": 0.1,
+    "confirmation_signed_body_ATR15_min": 0.2,
+    "prior_15m_channel_bars": 16,
+    "prior_volume_window": 20,
+    "stop_two_bar_extreme_buffer_ATR1h": 0.25
+  },
+  "exits": {
+    "X0": {
+      "initial_qty_fractions": [
+        1
+      ],
+      "targets_R": [
+        2
+      ]
+    },
+    "X1": {
+      "TP1_transition": "residual cost-inclusive break-even next minute after ACK",
+      "initial_qty_fractions": [
+        0.4,
+        0.3,
+        0.3
+      ],
+      "targets_R": [
+        1,
+        1.8,
+        3
+      ]
+    },
+    "X2": {
+      "TP1_transition": "latest available closed hour then next minute, tighten only",
+      "initial_qty_fractions": [
+        0.5,
+        0.5
+      ],
+      "targets_R": [
+        1.5,
+        3
+      ],
+      "trailing_ATR1h_multiplier": 1.5
+    }
+  },
+  "filters": {
+    "lot_BTC": "0.001",
+    "min_notional_USDT": "5",
+    "status": "ASSUMED_HISTORICAL_FILTERS_UNKNOWN",
+    "tick_USDT": "0.1"
+  },
+  "folds": [
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2021-02",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 2,
+      "purge_hours_each_edge": 24,
+      "score_end": "2021-02-28T00:00:00+00:00",
+      "score_start": "2021-02-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 1,
+      "year": 2021
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2021-06",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 6,
+      "purge_hours_each_edge": 24,
+      "score_end": "2021-06-30T00:00:00+00:00",
+      "score_start": "2021-06-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 5,
+      "year": 2021
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2021-09",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 9,
+      "purge_hours_each_edge": 24,
+      "score_end": "2021-09-30T00:00:00+00:00",
+      "score_start": "2021-09-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 8,
+      "year": 2021
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2021-12",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 12,
+      "purge_hours_each_edge": 24,
+      "score_end": "2021-12-31T00:00:00+00:00",
+      "score_start": "2021-12-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 11,
+      "year": 2021
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2022-02",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 2,
+      "purge_hours_each_edge": 24,
+      "score_end": "2022-02-28T00:00:00+00:00",
+      "score_start": "2022-02-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 1,
+      "year": 2022
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2022-06",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 6,
+      "purge_hours_each_edge": 24,
+      "score_end": "2022-06-30T00:00:00+00:00",
+      "score_start": "2022-06-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 5,
+      "year": 2022
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2022-09",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 9,
+      "purge_hours_each_edge": 24,
+      "score_end": "2022-09-30T00:00:00+00:00",
+      "score_start": "2022-09-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 8,
+      "year": 2022
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2022-12",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 12,
+      "purge_hours_each_edge": 24,
+      "score_end": "2022-12-31T00:00:00+00:00",
+      "score_start": "2022-12-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 11,
+      "year": 2022
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2023-02",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 2,
+      "purge_hours_each_edge": 24,
+      "score_end": "2023-02-28T00:00:00+00:00",
+      "score_start": "2023-02-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 1,
+      "year": 2023
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2023-06",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 6,
+      "purge_hours_each_edge": 24,
+      "score_end": "2023-06-30T00:00:00+00:00",
+      "score_start": "2023-06-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 5,
+      "year": 2023
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2023-09",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 9,
+      "purge_hours_each_edge": 24,
+      "score_end": "2023-09-30T00:00:00+00:00",
+      "score_start": "2023-09-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 8,
+      "year": 2023
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2023-12",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 12,
+      "purge_hours_each_edge": 24,
+      "score_end": "2023-12-31T00:00:00+00:00",
+      "score_start": "2023-12-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 11,
+      "year": 2023
+    }
+  ],
+  "funding": {
+    "cadences": [
+      "UTC8H_PLUS_MINUS_15S",
+      "UNKNOWN_HOURLY"
+    ],
+    "cash_not_debited_for_invented_settlements": true,
+    "pnl_label": "NET_EX_FUNDING_PROXY",
+    "realized": "UNKNOWN",
+    "sensitivity_only_adverse_bps": [
+      4,
+      8
+    ]
+  },
+  "global": {
+    "ATR1h_volatility_bps_range": [
+      15,
+      250
+    ],
+    "ATR_window": 20,
+    "entry_gap_ATR1h_max": 0.25,
+    "risk_raw_bps_range": [
+      30,
+      300
+    ],
+    "warmup_1h_bars_min": 20,
+    "warmup_4h_bars_min": 60
+  },
+  "inference": {
+    "bootstrap_draws": 10000,
+    "ci_quantiles": [
+      0.025,
+      0.975
+    ],
+    "hypotheses": 27,
+    "multiplicity": "BONFERRONI_27",
+    "one_sided_centered_bootstrap_p": "(1+count(bootstrap-observed>=observed))/(B+1)",
+    "primary_cluster": "UTC_CALENDAR_WEEK_WITHIN_YEAR",
+    "seed": 27182026,
+    "sensitivity_cluster": "CALENDAR_MONTH_WITHIN_YEAR",
+    "undefined_resamples": "count explicitly, no zero imputation"
+  },
+  "protocol_sha256": "93c3bdf0d8c9ef65482d1eb9fc3d7cdfb187ed59603fc87e31efb2fa58340bdc",
+  "retunes_allowed": 0,
+  "schema": "EXIT_AWARE_R3_FROZEN_27_V1",
+  "scientific_grade": "EXPOSED_DEVELOPMENT_ONLY_NOT_OOS",
+  "source_header_aliases": [
+    [
+      "open_time"
+    ],
+    [
+      "open"
+    ],
+    [
+      "high"
+    ],
+    [
+      "low"
+    ],
+    [
+      "close"
+    ],
+    [
+      "volume"
+    ],
+    [
+      "close_time"
+    ],
+    [
+      "quote_volume",
+      "quote_asset_volume"
+    ],
+    [
+      "count",
+      "number_of_trades"
+    ],
+    [
+      "taker_buy_volume",
+      "taker_buy_base_asset_volume"
+    ],
+    [
+      "taker_buy_quote_volume",
+      "taker_buy_quote_asset_volume"
+    ],
+    [
+      "ignore"
+    ]
+  ],
+  "source_rights": {
+    "attribution": "Binance Vision / Binance public data",
+    "derived_results_license": "CC BY-NC-SA 4.0",
+    "scope": "non-commercial historical research only; no live execution authorization",
+    "terms_url": "https://github.com/binance/binance-public-data/blob/master/TERMS_AND_CONDITIONS.md"
+  },
+  "task_id": "V06_G2_CODEX_BTC_EXIT_AWARE_DEVELOPMENT_R3",
+  "trials_max": 27
+}
