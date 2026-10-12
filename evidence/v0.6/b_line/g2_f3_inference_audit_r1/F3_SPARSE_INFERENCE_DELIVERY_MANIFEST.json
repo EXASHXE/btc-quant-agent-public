@@ -1,0 +1,54 @@
+{
+  "task_id": "V06_G2_GEMINI_F3_SPARSE_INFERENCE_AUDIT_R1",
+  "delivery_timestamp_utc": "2026-10-12T04:38:58.150027+00:00",
+  "terminal_decision": "F3_SPARSE_MECHANISM_SOURCE_AND_STATS_DIAGNOSED",
+  "first_freeze_sha": "6d20579486cc62daf5420e61ced2f8dc4732a414",
+  "exact_start_sha": "f25954b45577cebb7624fae86cd91df9071a87ab",
+  "files_count": 11,
+  "files": {
+    "docs/strategy_research/g2_f3_inference_audit_r1/FROZEN_FORENSIC_METHOD.md": {
+      "bytes": 11561,
+      "sha256": "db0dfbf612384e6d68aa6a383c05e162b3dea7ab22328e53ce48f8a9a3988777"
+    },
+    "docs/strategy_research/g2_f3_inference_audit_r1/F3_SPARSE_INFERENCE_AUDIT_REPORT.md": {
+      "bytes": 14687,
+      "sha256": "5ef2c68254664f5af6fd5c3f60eb03df3eef8be4e6e5d2b9380037b177dc3f6e"
+    },
+    "scripts/strategy_research/g2_f3_inference_audit_r1/__init__.py": {
+      "bytes": 135,
+      "sha256": "066635b634f174a4b0c065ebd4d1e54add8c4b732436fd656ff58a0a5e1ce74e"
+    },
+    "scripts/strategy_research/g2_f3_inference_audit_r1/degenerate_studentizer.py": {
+      "bytes": 8281,
+      "sha256": "91a97e049a8d61f10fba1ec942b25830385d4e70976b38afd250ecd2a524ddca"
+    },
+    "scripts/strategy_research/g2_f3_inference_audit_r1/diagnostics.py": {
+      "bytes": 11481,
+      "sha256": "819331b4d7cb0a4559eeaacf08f1aecaa3211571cfe26ef063ae9661f0aeb3b0"
+    },
+    "scripts/strategy_research/g2_f3_inference_audit_r1/alternative_stats.py": {
+      "bytes": 6813,
+      "sha256": "9f0b028d2a5280226fe9297f1405e5d75942125887268a0160b7b28d78bcdbd0"
+    },
+    "scripts/strategy_research/g2_f3_inference_audit_r1/reconciliation.py": {
+      "bytes": 6079,
+      "sha256": "9f36bc9cb0699708b5bd525238c4e029947d99d87a56a983465f96f6147a248a"
+    },
+    "scripts/strategy_research/g2_f3_inference_audit_r1/audit_runner.py": {
+      "bytes": 8230,
+      "sha256": "68085907730e1838a285f85876f5474bb3f23234d6c5db1701940e9572bcfc6e"
+    },
+    "tests/test_v06_g2_f3_inference_audit_r1_forensics.py": {
+      "bytes": 22701,
+      "sha256": "143afcd4155d70920ac261325523ae6d0c37bec4cbe38f9798049a108838d989"
+    },
+    "evidence/v0.6/b_line/g2_f3_inference_audit_r1/F3_SPARSE_INFERENCE_AUDIT_EVIDENCE.json": {
+      "bytes": 65751,
+      "sha256": "12fa4458d530765a9f970f45c16c985d69bcfb6e2dc4c5b133be91915bdce208"
+    },
+    "evidence/v0.6/b_line/g2_f3_inference_audit_r1/SOURCE_AUDIT_RECEIPTS.json": {
+      "bytes": 5293,
+      "sha256": "756ff2dd36188027b39152da5ad6b41be508973bb95aa59c75cd2a2f06c9f9fd"
+    }
+  }
+}

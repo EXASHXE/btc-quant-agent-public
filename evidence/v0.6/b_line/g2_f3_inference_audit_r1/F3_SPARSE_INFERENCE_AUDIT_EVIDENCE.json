@@ -1,0 +1,1737 @@
+{
+  "task_id": "V06_G2_GEMINI_F3_SPARSE_INFERENCE_AUDIT_R1",
+  "terminal_verdict": "F3_SPARSE_MECHANISM_SOURCE_AND_STATS_DIAGNOSED",
+  "f3_ledgers_reconciliation": {
+    "F3_12H_STRESS": {
+      "file_name": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_STRESS_orders.jsonl",
+      "file_sha256": "139a8f1175956ec6f52007f73313448a6927e30cc7dbf7ccfe3e23fa11422936",
+      "n_trades": 12,
+      "all_journal_valid": true,
+      "all_net_valid": true,
+      "all_cash_valid": true,
+      "initial_cash": 1000.0,
+      "ending_cash": 1108.1061065944284,
+      "net_pnl_usdt": 108.10610659442841,
+      "total_gross_usdt": 147.1902199999998,
+      "total_fee_usdt": 26.14144656,
+      "total_drag_usdt": 21.80781999999999,
+      "total_funding_usdt": 8.865153154428768,
+      "total_net_usdt": 108.1061065944286,
+      "profit_factor": 2.151313673650514,
+      "max_drawdown_usdt": 45.070978190888354,
+      "max_drawdown_pct": 4.056897722120552,
+      "peak_equity_usdt": 1110.9715175991578,
+      "annual_reconciliation": {
+        "2021": {
+          "n": 9,
+          "net_usdt": 65.90053940826952,
+          "wins": 4,
+          "losses": 5
+        },
+        "2022": {
+          "n": 2,
+          "net_usdt": 31.934808762706155,
+          "wins": 1,
+          "losses": 1
+        },
+        "2023": {
+          "n": 1,
+          "net_usdt": 10.270758423452929,
+          "wins": 1,
+          "losses": 0
+        }
+      },
+      "trade_checks": [
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612429200000_-1",
+          "cash_before": 1000.0,
+          "cash_after": 988.7768269710975,
+          "cash_delta": -11.223173028902465,
+          "journal_sum": -11.223173028902435,
+          "net_after_funding_usdt": -11.223173028902435,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612630800000_-1",
+          "cash_before": 988.7768269710975,
+          "cash_after": 1023.1387535546139,
+          "cash_delta": 34.36192658351638,
+          "journal_sum": 34.3619265835164,
+          "net_after_funding_usdt": 34.3619265835164,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612792800000_-1",
+          "cash_before": 1023.1387535546139,
+          "cash_after": 995.1795563396124,
+          "cash_delta": -27.959197215001495,
+          "journal_sum": -27.95919721500147,
+          "net_after_funding_usdt": -27.95919721500147,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612850400000_-1",
+          "cash_before": 995.1795563396124,
+          "cash_after": 1004.1809136242598,
+          "cash_delta": 9.001357284647383,
+          "journal_sum": 9.00135728464741,
+          "net_after_funding_usdt": 9.00135728464741,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1614009600000_-1",
+          "cash_before": 1004.1809136242598,
+          "cash_after": 1015.247215229622,
+          "cash_delta": 11.066301605362241,
+          "journal_sum": 11.066301605362225,
+          "net_after_funding_usdt": 11.066301605362225,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1617721200000_-1",
+          "cash_before": 1015.247215229622,
+          "cash_after": 1014.2113655991576,
+          "cash_delta": -1.0358496304644405,
+          "journal_sum": -1.0358496304644333,
+          "net_after_funding_usdt": -1.0358496304644331,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1621425600000_-1",
+          "cash_before": 1014.2113655991576,
+          "cash_after": 1110.9715175991578,
+          "cash_delta": 96.76015200000018,
+          "journal_sum": 96.76015200000008,
+          "net_after_funding_usdt": 96.76015200000008,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1621458000000_-1",
+          "cash_before": 1110.9715175991578,
+          "cash_after": 1076.6976446106862,
+          "cash_delta": -34.27387298847157,
+          "journal_sum": -34.27387298847155,
+          "net_after_funding_usdt": -34.27387298847156,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1625126400000_1",
+          "cash_before": 1076.6976446106862,
+          "cash_after": 1065.9005394082694,
+          "cash_delta": -10.797105202416788,
+          "journal_sum": -10.797105202416692,
+          "net_after_funding_usdt": -10.797105202416693,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1652144400000_1",
+          "cash_before": 1065.9005394082694,
+          "cash_after": 1106.4441981082693,
+          "cash_delta": 40.543658699999924,
+          "journal_sum": 40.54365869999996,
+          "net_after_funding_usdt": 40.54365869999996,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1653760800000_-1",
+          "cash_before": 1106.4441981082693,
+          "cash_after": 1097.8353481709755,
+          "cash_delta": -8.608849937293826,
+          "journal_sum": -8.608849937293806,
+          "net_after_funding_usdt": -8.608849937293806,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1681113600000_1",
+          "cash_before": 1097.8353481709755,
+          "cash_after": 1108.1061065944284,
+          "cash_delta": 10.27075842345289,
+          "journal_sum": 10.27075842345293,
+          "net_after_funding_usdt": 10.270758423452929,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        }
+      ]
+    },
+    "F3_18H_STRESS": {
+      "file_name": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_STRESS_orders.jsonl",
+      "file_sha256": "422f789fe3339a7a90a6f4c45004d64353d8e52cce0af233c7b1b8537263b810",
+      "n_trades": 12,
+      "all_journal_valid": true,
+      "all_net_valid": true,
+      "all_cash_valid": true,
+      "initial_cash": 1000.0,
+      "ending_cash": 1109.7045970355875,
+      "net_pnl_usdt": 109.70459703558754,
+      "total_gross_usdt": 146.66434999999964,
+      "total_fee_usdt": 25.949338679999997,
+      "total_drag_usdt": 21.652849999999724,
+      "total_funding_usdt": 10.642435715587675,
+      "total_net_usdt": 109.7045970355876,
+      "profit_factor": 1.7741093076276437,
+      "max_drawdown_usdt": 85.26339205483987,
+      "max_drawdown_pct": 7.2535689570951005,
+      "peak_equity_usdt": 1175.4681393280093,
+      "annual_reconciliation": {
+        "2021": {
+          "n": 9,
+          "net_usdt": 90.20474727316947,
+          "wins": 5,
+          "losses": 4
+        },
+        "2022": {
+          "n": 2,
+          "net_usdt": 9.540326442706213,
+          "wins": 1,
+          "losses": 1
+        },
+        "2023": {
+          "n": 1,
+          "net_usdt": 9.95952331971193,
+          "wins": 1,
+          "losses": 0
+        }
+      },
+      "trade_checks": [
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612429200000_-1",
+          "cash_before": 1000.0,
+          "cash_after": 1005.3116681413036,
+          "cash_delta": 5.311668141303585,
+          "journal_sum": 5.3116681413036275,
+          "net_after_funding_usdt": 5.3116681413036275,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612630800000_-1",
+          "cash_before": 1005.3116681413036,
+          "cash_after": 1039.67359472482,
+          "cash_delta": 34.36192658351649,
+          "journal_sum": 34.3619265835164,
+          "net_after_funding_usdt": 34.3619265835164,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612792800000_-1",
+          "cash_before": 1039.67359472482,
+          "cash_after": 1011.7143975098186,
+          "cash_delta": -27.959197215001495,
+          "journal_sum": -27.95919721500147,
+          "net_after_funding_usdt": -27.95919721500147,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612850400000_-1",
+          "cash_before": 1011.7143975098186,
+          "cash_after": 1019.6077844824866,
+          "cash_delta": 7.893386972668054,
+          "journal_sum": 7.893386972668035,
+          "net_after_funding_usdt": 7.893386972668034,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1614009600000_-1",
+          "cash_before": 1019.6077844824866,
+          "cash_after": 1097.1915899584737,
+          "cash_delta": 77.5838054759871,
+          "journal_sum": 77.58380547598713,
+          "net_after_funding_usdt": 77.58380547598713,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1617721200000_-1",
+          "cash_before": 1097.1915899584737,
+          "cash_after": 1082.7396603280092,
+          "cash_delta": -14.45192963046452,
+          "journal_sum": -14.451929630464434,
+          "net_after_funding_usdt": -14.451929630464434,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1621425600000_-1",
+          "cash_before": 1082.7396603280092,
+          "cash_after": 1175.4681393280093,
+          "cash_delta": 92.7284790000001,
+          "journal_sum": 92.72847900000008,
+          "net_after_funding_usdt": 92.72847900000008,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1621458000000_-1",
+          "cash_before": 1175.4681393280093,
+          "cash_after": 1097.1585868595378,
+          "cash_delta": -78.30955246847157,
+          "journal_sum": -78.30955246847161,
+          "net_after_funding_usdt": -78.30955246847161,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1625126400000_1",
+          "cash_before": 1097.1585868595378,
+          "cash_after": 1090.2047472731695,
+          "cash_delta": -6.953839586368304,
+          "journal_sum": -6.953839586368304,
+          "net_after_funding_usdt": -6.953839586368304,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1652144400000_1",
+          "cash_before": 1090.2047472731695,
+          "cash_after": 1113.7877463731695,
+          "cash_delta": 23.582999100000052,
+          "journal_sum": 23.58299910000002,
+          "net_after_funding_usdt": 23.58299910000002,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1653760800000_-1",
+          "cash_before": 1113.7877463731695,
+          "cash_after": 1099.7450737158756,
+          "cash_delta": -14.042672657293906,
+          "journal_sum": -14.042672657293808,
+          "net_after_funding_usdt": -14.042672657293807,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1681113600000_1",
+          "cash_before": 1099.7450737158756,
+          "cash_after": 1109.7045970355875,
+          "cash_delta": 9.959523319711934,
+          "journal_sum": 9.95952331971193,
+          "net_after_funding_usdt": 9.95952331971193,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        }
+      ]
+    },
+    "F3_12H_BASE": {
+      "file_name": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_BASE_orders.jsonl",
+      "file_sha256": "82de3dd7319798e68027596298a2f7691804c4bcd1513992ba9a9ffd583c1f7a",
+      "n_trades": 12,
+      "all_journal_valid": true,
+      "all_net_valid": true,
+      "all_cash_valid": true,
+      "initial_cash": 1000.0,
+      "ending_cash": 1126.1408471140885,
+      "net_pnl_usdt": 126.1408471140885,
+      "total_gross_usdt": 141.40718999999973,
+      "total_fee_usdt": 13.163437199999999,
+      "total_drag_usdt": 10.998389999999581,
+      "total_funding_usdt": 8.895484314088057,
+      "total_net_usdt": 126.14084711408822,
+      "profit_factor": 2.4900181759376894,
+      "max_drawdown_usdt": 42.519696701691146,
+      "max_drawdown_pct": 3.790761838267954,
+      "peak_equity_usdt": 1126.1408471140885,
+      "annual_reconciliation": {
+        "2021": {
+          "n": 9,
+          "net_usdt": 79.14656764792885,
+          "wins": 5,
+          "losses": 4
+        },
+        "2022": {
+          "n": 2,
+          "net_usdt": 36.049295402706306,
+          "wins": 1,
+          "losses": 1
+        },
+        "2023": {
+          "n": 1,
+          "net_usdt": 10.94498406345307,
+          "wins": 1,
+          "losses": 0
+        }
+      },
+      "trade_checks": [
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612429200000_-1",
+          "cash_before": 1000.0,
+          "cash_after": 990.36797376156,
+          "cash_delta": -9.632026238439948,
+          "journal_sum": -9.63202623844,
+          "net_after_funding_usdt": -9.63202623844,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612630800000_-1",
+          "cash_before": 990.36797376156,
+          "cash_after": 1025.3126037850766,
+          "cash_delta": 34.94463002351654,
+          "journal_sum": 34.944630023516495,
+          "net_after_funding_usdt": 34.944630023516495,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612792800000_-1",
+          "cash_before": 1025.3126037850766,
+          "cash_after": 999.378661270075,
+          "cash_delta": -25.933942515001604,
+          "journal_sum": -25.93394251500156,
+          "net_after_funding_usdt": -25.93394251500156,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612850400000_-1",
+          "cash_before": 999.378661270075,
+          "cash_after": 1010.3333382547223,
+          "cash_delta": 10.954676984647335,
+          "journal_sum": 10.954676984647353,
+          "net_after_funding_usdt": 10.954676984647353,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1614009600000_-1",
+          "cash_before": 1010.3333382547223,
+          "cash_after": 1023.3677346200845,
+          "cash_delta": 13.034396365362227,
+          "journal_sum": 13.034396365362202,
+          "net_after_funding_usdt": 13.034396365362202,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1617721200000_-1",
+          "cash_before": 1023.3677346200845,
+          "cash_after": 1024.3690523496202,
+          "cash_delta": 1.0013177295356854,
+          "journal_sum": 1.0013177295356135,
+          "net_after_funding_usdt": 1.0013177295356135,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1621425600000_-1",
+          "cash_before": 1024.3690523496202,
+          "cash_after": 1121.6662643496202,
+          "cash_delta": 97.29721199999994,
+          "journal_sum": 97.29721199999986,
+          "net_after_funding_usdt": 97.29721199999986,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1621458000000_-1",
+          "cash_before": 1121.6662643496202,
+          "cash_after": 1087.9665892103455,
+          "cash_delta": -33.69967513927463,
+          "journal_sum": -33.6996751392747,
+          "net_after_funding_usdt": -33.6996751392747,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1625126400000_1",
+          "cash_before": 1087.9665892103455,
+          "cash_after": 1079.146567647929,
+          "cash_delta": -8.820021562416514,
+          "journal_sum": -8.820021562416418,
+          "net_after_funding_usdt": -8.82002156241642,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1652144400000_1",
+          "cash_before": 1079.146567647929,
+          "cash_after": 1121.767451547929,
+          "cash_delta": 42.62088390000008,
+          "journal_sum": 42.62088390000007,
+          "net_after_funding_usdt": 42.62088390000007,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1653760800000_-1",
+          "cash_before": 1121.767451547929,
+          "cash_after": 1115.1958630506354,
+          "cash_delta": -6.57158849729376,
+          "journal_sum": -6.571588497293761,
+          "net_after_funding_usdt": -6.57158849729376,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1681113600000_1",
+          "cash_before": 1115.1958630506354,
+          "cash_after": 1126.1408471140885,
+          "cash_delta": 10.944984063453148,
+          "journal_sum": 10.944984063453072,
+          "net_after_funding_usdt": 10.94498406345307,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        }
+      ]
+    },
+    "F3_18H_BASE": {
+      "file_name": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_BASE_orders.jsonl",
+      "file_sha256": "f6052af7acfd9c13ee71a035a8770afe7bc205073e064ecd2167649e4fbe84c4",
+      "n_trades": 12,
+      "all_journal_valid": true,
+      "all_net_valid": true,
+      "all_cash_valid": true,
+      "initial_cash": 1000.0,
+      "ending_cash": 1128.1036180555875,
+      "net_pnl_usdt": 128.1036180555875,
+      "total_gross_usdt": 141.28114999999957,
+      "total_fee_usdt": 12.97631766,
+      "total_drag_usdt": 10.843649999999485,
+      "total_funding_usdt": 10.642435715587675,
+      "total_net_usdt": 128.1036180555878,
+      "profit_factor": 1.9735252515621309,
+      "max_drawdown_usdt": 81.2558030348398,
+      "max_drawdown_pct": 6.8564286075337195,
+      "peak_equity_usdt": 1185.103903008009,
+      "annual_reconciliation": {
+        "2021": {
+          "n": 9,
+          "net_usdt": 103.84809997316948,
+          "wins": 5,
+          "losses": 4
+        },
+        "2022": {
+          "n": 2,
+          "net_usdt": 13.642200202706231,
+          "wins": 1,
+          "losses": 1
+        },
+        "2023": {
+          "n": 1,
+          "net_usdt": 10.61331787971207,
+          "wins": 1,
+          "losses": 0
+        }
+      },
+      "trade_checks": [
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612429200000_-1",
+          "cash_before": 1000.0,
+          "cash_after": 1007.2712839813036,
+          "cash_delta": 7.271283981303554,
+          "journal_sum": 7.271283981303592,
+          "net_after_funding_usdt": 7.271283981303593,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612630800000_-1",
+          "cash_before": 1007.2712839813036,
+          "cash_after": 1042.21591400482,
+          "cash_delta": 34.944630023516424,
+          "journal_sum": 34.944630023516495,
+          "net_after_funding_usdt": 34.944630023516495,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612792800000_-1",
+          "cash_before": 1042.21591400482,
+          "cash_after": 1016.2819714898184,
+          "cash_delta": -25.933942515001604,
+          "journal_sum": -25.93394251500156,
+          "net_after_funding_usdt": -25.93394251500156,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612850400000_-1",
+          "cash_before": 1016.2819714898184,
+          "cash_after": 1026.1319017024864,
+          "cash_delta": 9.849930212668028,
+          "journal_sum": 9.849930212667951,
+          "net_after_funding_usdt": 9.849930212667951,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1614009600000_-1",
+          "cash_before": 1026.1319017024864,
+          "cash_after": 1104.2594589784735,
+          "cash_delta": 78.1275572759871,
+          "journal_sum": 78.12755727598721,
+          "net_after_funding_usdt": 78.12755727598721,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1617721200000_-1",
+          "cash_before": 1104.2594589784735,
+          "cash_after": 1091.8607415080091,
+          "cash_delta": -12.398717470464362,
+          "journal_sum": -12.398717470464387,
+          "net_after_funding_usdt": -12.398717470464387,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1621425600000_-1",
+          "cash_before": 1091.8607415080091,
+          "cash_after": 1185.103903008009,
+          "cash_delta": 93.24316149999981,
+          "journal_sum": 93.24316149999987,
+          "net_after_funding_usdt": 93.24316149999987,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1621458000000_-1",
+          "cash_before": 1185.103903008009,
+          "cash_after": 1108.8198036795375,
+          "cash_delta": -76.28409932847148,
+          "journal_sum": -76.28409932847146,
+          "net_after_funding_usdt": -76.28409932847144,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1625126400000_1",
+          "cash_before": 1108.8198036795375,
+          "cash_after": 1103.8480999731692,
+          "cash_delta": -4.9717037063683165,
+          "journal_sum": -4.971703706368264,
+          "net_after_funding_usdt": -4.971703706368265,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1652144400000_1",
+          "cash_before": 1103.8480999731692,
+          "cash_after": 1129.4891974731693,
+          "cash_delta": 25.641097500000114,
+          "journal_sum": 25.64109750000004,
+          "net_after_funding_usdt": 25.64109750000004,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1653760800000_-1",
+          "cash_before": 1129.4891974731693,
+          "cash_after": 1117.4903001758755,
+          "cash_delta": -11.998897297293752,
+          "journal_sum": -11.998897297293809,
+          "net_after_funding_usdt": -11.998897297293809,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1681113600000_1",
+          "cash_before": 1117.4903001758755,
+          "cash_after": 1128.1036180555875,
+          "cash_delta": 10.613317879711985,
+          "journal_sum": 10.61331787971207,
+          "net_after_funding_usdt": 10.61331787971207,
+          "journal_matches": true,
+          "net_matches": true,
+          "cash_delta_matches_net": true
+        }
+      ]
+    }
+  },
+  "signal_vs_executed_reconciliation": {
+    "signals_total": 16,
+    "executed_trades": 12,
+    "rejections": {
+      "FILLED": 12,
+      "POSITION_ACK_OR_COOLDOWN": 4
+    },
+    "rejection_mechanism": "SINGLE_POSITION_AND_4H_COOLDOWN_CONSTRAINT"
+  },
+  "diagnostics": {
+    "support_14d": {
+      "n_executed_trades": 12,
+      "n_total_blocks": 76,
+      "n_active_blocks": 8,
+      "n_zero_blocks": 68,
+      "zero_block_fraction": 0.8947368421052632,
+      "n_distinct_weeks": 9,
+      "annual_counts": {
+        "2021": 9,
+        "2022": 2,
+        "2023": 1
+      },
+      "passes_sample_viability_n30": false,
+      "evaluation_span_days": 1064.0
+    },
+    "support_7d": {
+      "n_executed_trades": 12,
+      "n_total_blocks": 152,
+      "n_active_blocks": 9,
+      "n_zero_blocks": 143,
+      "zero_block_fraction": 0.9407894736842105,
+      "n_distinct_weeks": 9,
+      "annual_counts": {
+        "2021": 9,
+        "2022": 2,
+        "2023": 1
+      },
+      "passes_sample_viability_n30": false,
+      "evaluation_span_days": 1064.0
+    },
+    "horizon_overlap": {
+      "n_12h": 12,
+      "n_18h": 12,
+      "common_event_keys": 12,
+      "identical_entry_count": 12,
+      "identical_exit_outcome_count": 4,
+      "identical_exit_pct": 33.33333333333333,
+      "details": [
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1612429200000_-1",
+          "entry_at": 1612429260000,
+          "side": -1,
+          "same_entry": true,
+          "exit_reason_12h": "TIME_CAP",
+          "exit_reason_18h": "TIME_CAP",
+          "dur_12h": 720.0,
+          "dur_18h": 1080.0,
+          "net_bps_12h": -125.38296939767002,
+          "net_bps_18h": 59.34085862318582,
+          "same_exit_outcome": false
+        },
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1612630800000_-1",
+          "entry_at": 1612630860000,
+          "side": -1,
+          "same_entry": true,
+          "exit_reason_12h": "TARGET",
+          "exit_reason_18h": "TARGET",
+          "dur_12h": 419.9999833333333,
+          "dur_18h": 419.9999833333333,
+          "net_bps_12h": 383.8346594604119,
+          "net_bps_18h": 383.8346594604119,
+          "same_exit_outcome": true
+        },
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1612792800000_-1",
+          "entry_at": 1612792860000,
+          "side": -1,
+          "same_entry": true,
+          "exit_reason_12h": "STOP",
+          "exit_reason_18h": "STOP",
+          "dur_12h": 447.9999833333333,
+          "dur_18h": 447.9999833333333,
+          "net_bps_12h": -307.8882407927124,
+          "net_bps_18h": -307.8882407927124,
+          "same_exit_outcome": true
+        },
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1612850400000_-1",
+          "entry_at": 1612850460000,
+          "side": -1,
+          "same_entry": true,
+          "exit_reason_12h": "TIME_CAP",
+          "exit_reason_18h": "TIME_CAP",
+          "dur_12h": 720.0,
+          "dur_18h": 1080.0,
+          "net_bps_12h": 100.77064355043449,
+          "net_bps_18h": 88.36686067167157,
+          "same_exit_outcome": false
+        },
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1614009600000_-1",
+          "entry_at": 1614009660000,
+          "side": -1,
+          "same_entry": true,
+          "exit_reason_12h": "TIME_CAP",
+          "exit_reason_18h": "TARGET",
+          "dur_12h": 720.0,
+          "dur_18h": 974.9999833333334,
+          "net_bps_12h": 122.64407121915595,
+          "net_bps_18h": 859.83502922417,
+          "same_exit_outcome": false
+        },
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1617721200000_-1",
+          "entry_at": 1617721260000,
+          "side": -1,
+          "same_entry": true,
+          "exit_reason_12h": "TIME_CAP",
+          "exit_reason_18h": "STOP",
+          "dur_12h": 720.0,
+          "dur_18h": 901.9999833333334,
+          "net_bps_12h": -11.164099511661767,
+          "net_bps_18h": -155.7588821629435,
+          "same_exit_outcome": false
+        },
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1621425600000_-1",
+          "entry_at": 1621425660000,
+          "side": -1,
+          "same_entry": true,
+          "exit_reason_12h": "TARGET",
+          "exit_reason_18h": "TARGET",
+          "dur_12h": 50.99998333333333,
+          "dur_18h": 50.99998333333333,
+          "net_bps_12h": 1044.2154397391953,
+          "net_bps_18h": 1044.2154397391953,
+          "same_exit_outcome": true
+        },
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1621458000000_-1",
+          "entry_at": 1621458060000,
+          "side": -1,
+          "same_entry": true,
+          "exit_reason_12h": "TIME_CAP",
+          "exit_reason_18h": "STOP",
+          "dur_12h": 720.0,
+          "dur_18h": 919.9999833333334,
+          "net_bps_12h": -387.73954933704323,
+          "net_bps_18h": -885.9141945564173,
+          "same_exit_outcome": false
+        },
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1625126400000_1",
+          "entry_at": 1625126460000,
+          "side": 1,
+          "same_entry": true,
+          "exit_reason_12h": "TIME_CAP",
+          "exit_reason_18h": "TIME_CAP",
+          "dur_12h": 720.0,
+          "dur_18h": 1080.0,
+          "net_bps_12h": -119.74271927017976,
+          "net_bps_18h": -77.11989888308096,
+          "same_exit_outcome": false
+        },
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1652144400000_1",
+          "entry_at": 1652144460000,
+          "side": 1,
+          "same_entry": true,
+          "exit_reason_12h": "TIME_CAP",
+          "exit_reason_18h": "TIME_CAP",
+          "dur_12h": 720.0,
+          "dur_18h": 1080.0,
+          "net_bps_12h": 440.1388982973564,
+          "net_bps_18h": 256.0152580019022,
+          "same_exit_outcome": false
+        },
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1653760800000_-1",
+          "entry_at": 1653760860000,
+          "side": -1,
+          "same_entry": true,
+          "exit_reason_12h": "TIME_CAP",
+          "exit_reason_18h": "STOP",
+          "dur_12h": 720.0,
+          "dur_18h": 976.9999833333334,
+          "net_bps_12h": -93.0952178491354,
+          "net_bps_18h": -151.85601790450255,
+          "same_exit_outcome": false
+        },
+        {
+          "key": "F3_MARK_LAST_DISLOCATION_REPAIR_XX_1681113600000_1",
+          "entry_at": 1681113660000,
+          "side": 1,
+          "same_entry": true,
+          "exit_reason_12h": "TARGET",
+          "exit_reason_18h": "TARGET",
+          "dur_12h": 526.9999833333334,
+          "dur_18h": 526.9999833333334,
+          "net_bps_12h": 110.03189000208506,
+          "net_bps_18h": 110.03189000208508,
+          "same_exit_outcome": true
+        }
+      ]
+    },
+    "leave_one_out_influence_12h": {
+      "n": 12,
+      "total_mean_net_bps": 96.38523384251971,
+      "total_net_usdt": 108.10610659442861,
+      "total_profit_factor": 2.151313673650514,
+      "top_dominant_event": {
+        "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1621425600000_-1",
+        "fold": "2021-05",
+        "trade_index": 7,
+        "trade_net_bps": 1044.2154397391953,
+        "trade_net_usdt": 96.76015200000008,
+        "profit_share_pct": 89.50479769196195,
+        "mean_net_bps_loo": 10.218851488276478,
+        "delta_mean_bps": 86.16638235424324,
+        "net_usdt_loo": 11.345954594428521,
+        "pf_loo": 1.1208326992497264
+      },
+      "top_1_profit_share_pct": 89.50479769196195,
+      "is_highly_concentrated": true,
+      "influences": [
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612429200000_-1",
+          "fold": "2021-02",
+          "trade_index": 1,
+          "trade_net_bps": -125.38296939767002,
+          "trade_net_usdt": -11.223173028902435,
+          "profit_share_pct": -10.381627257197731,
+          "mean_net_bps_loo": 116.54597959162787,
+          "delta_mean_bps": -20.16074574910816,
+          "net_usdt_loo": 119.32927962333105,
+          "pf_loo": 2.443356033636173
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612630800000_-1",
+          "fold": "2021-02",
+          "trade_index": 2,
+          "trade_net_bps": 383.8346594604119,
+          "trade_net_usdt": 34.3619265835164,
+          "profit_share_pct": 31.7853705641521,
+          "mean_net_bps_loo": 70.25346787725678,
+          "delta_mean_bps": 26.13176596526293,
+          "net_usdt_loo": 73.7441800109122,
+          "pf_loo": 1.7853643561249453
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612792800000_-1",
+          "fold": "2021-02",
+          "trade_index": 3,
+          "trade_net_bps": -307.8882407927124,
+          "trade_net_usdt": -27.95919721500147,
+          "profit_share_pct": -25.862736246614936,
+          "mean_net_bps_loo": 133.13736790026806,
+          "delta_mean_bps": -36.75213405774835,
+          "net_usdt_loo": 136.06530380943008,
+          "pf_loo": 3.0635073584740566
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1612850400000_-1",
+          "fold": "2021-02",
+          "trade_index": 4,
+          "trade_net_bps": 100.77064355043449,
+          "trade_net_usdt": 9.00135728464741,
+          "profit_share_pct": 8.326409643459778,
+          "mean_net_bps_loo": 95.98656023270927,
+          "delta_mean_bps": 0.3986736098104444,
+          "net_usdt_loo": 99.1047493097812,
+          "pf_loo": 2.0554505809012062
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1614009600000_-1",
+          "fold": "2021-02",
+          "trade_index": 5,
+          "trade_net_bps": 122.64407121915595,
+          "trade_net_usdt": 11.066301605362225,
+          "profit_share_pct": 10.236518503879356,
+          "mean_net_bps_loo": 93.99806680828004,
+          "delta_mean_bps": 2.387167034239667,
+          "net_usdt_loo": 97.03980498906637,
+          "pf_loo": 2.033459236409586
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1617721200000_-1",
+          "fold": "2021-04",
+          "trade_index": 6,
+          "trade_net_bps": -11.164099511661767,
+          "trade_net_usdt": -1.0358496304644331,
+          "profit_share_pct": -0.9581786479005591,
+          "mean_net_bps_loo": 106.1624459656271,
+          "delta_mean_bps": -9.77721212310739,
+          "net_usdt_loo": 109.14195622489302,
+          "pf_loo": 2.1753109245548585
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1621425600000_-1",
+          "fold": "2021-05",
+          "trade_index": 7,
+          "trade_net_bps": 1044.2154397391953,
+          "trade_net_usdt": 96.76015200000008,
+          "profit_share_pct": 89.50479769196195,
+          "mean_net_bps_loo": 10.218851488276478,
+          "delta_mean_bps": 86.16638235424324,
+          "net_usdt_loo": 11.345954594428521,
+          "pf_loo": 1.1208326992497264
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1621458000000_-1",
+          "fold": "2021-05",
+          "trade_index": 8,
+          "trade_net_bps": -387.73954933704323,
+          "trade_net_usdt": -34.27387298847156,
+          "profit_share_pct": -31.703919480750137,
+          "mean_net_bps_loo": 140.39657776793447,
+          "delta_mean_bps": -44.011343925414764,
+          "net_usdt_loo": 142.37997958290015,
+          "pf_loo": 3.3879572262304762
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1625126400000_1",
+          "fold": "2021-07",
+          "trade_index": 9,
+          "trade_net_bps": -119.74271927017976,
+          "trade_net_usdt": -10.797105202416693,
+          "profit_share_pct": -9.987507220959465,
+          "mean_net_bps_loo": 116.03322958003785,
+          "delta_mean_bps": -19.647995737518144,
+          "net_usdt_loo": 118.90321179684528,
+          "pf_loo": 2.430828674023828
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1652144400000_1",
+          "fold": "2022-05",
+          "trade_index": 10,
+          "trade_net_bps": 440.1388982973564,
+          "trade_net_usdt": 40.54365869999996,
+          "profit_share_pct": 37.50357863881246,
+          "mean_net_bps_loo": 65.13490071026183,
+          "delta_mean_bps": 31.25033313225788,
+          "net_usdt_loo": 67.56244789442864,
+          "pf_loo": 1.7195298446735927
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1653760800000_-1",
+          "fold": "2022-05",
+          "trade_index": 11,
+          "trade_net_bps": -93.0952178491354,
+          "trade_net_usdt": -8.608849937293806,
+          "profit_share_pct": -7.963333625167735,
+          "mean_net_bps_loo": 113.61072945085199,
+          "delta_mean_bps": -17.22549560833228,
+          "net_usdt_loo": 116.71495653172242,
+          "pf_loo": 2.368461178898895
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H_1681113600000_1",
+          "fold": "2023-04",
+          "trade_index": 12,
+          "trade_net_bps": 110.03189000208506,
+          "trade_net_usdt": 10.270758423452929,
+          "profit_share_pct": 9.500627436324901,
+          "mean_net_bps_loo": 95.14462873710468,
+          "delta_mean_bps": 1.2406051054150282,
+          "net_usdt_loo": 97.83534817097568,
+          "pf_loo": 2.0419316508935133
+        }
+      ]
+    },
+    "leave_one_out_influence_18h": {
+      "n": 12,
+      "total_mean_net_bps": 101.92523011858043,
+      "total_net_usdt": 109.70459703558761,
+      "total_profit_factor": 1.774109307627644,
+      "top_dominant_event": {
+        "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1621425600000_-1",
+        "fold": "2021-05",
+        "trade_index": 7,
+        "trade_net_bps": 1044.2154397391953,
+        "trade_net_usdt": 92.72847900000008,
+        "profit_share_pct": 84.52560923214497,
+        "mean_net_bps_loo": 16.26248378943362,
+        "delta_mean_bps": 85.66274632914681,
+        "net_usdt_loo": 16.976118035587522,
+        "pf_loo": 1.1197886992326385
+      },
+      "top_1_profit_share_pct": 84.52560923214497,
+      "is_highly_concentrated": true,
+      "influences": [
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612429200000_-1",
+          "fold": "2021-02",
+          "trade_index": 1,
+          "trade_net_bps": 59.34085862318582,
+          "trade_net_usdt": 5.3116681413036275,
+          "profit_share_pct": 4.841791761543547,
+          "mean_net_bps_loo": 105.79653661816174,
+          "delta_mean_bps": -3.8713064995813085,
+          "net_usdt_loo": 104.39292889428398,
+          "pf_loo": 1.7366285469455867
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612630800000_-1",
+          "fold": "2021-02",
+          "trade_index": 2,
+          "trade_net_bps": 383.8346594604119,
+          "trade_net_usdt": 34.3619265835164,
+          "profit_share_pct": 31.322230345889302,
+          "mean_net_bps_loo": 76.29710017841393,
+          "delta_mean_bps": 25.628129940166502,
+          "net_usdt_loo": 75.34267045207122,
+          "pf_loo": 1.5316410071635445
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612792800000_-1",
+          "fold": "2021-02",
+          "trade_index": 3,
+          "trade_net_bps": -307.8882407927124,
+          "trade_net_usdt": -27.95919721500147,
+          "profit_share_pct": -25.485893910108114,
+          "mean_net_bps_loo": 139.18100020142523,
+          "delta_mean_bps": -37.255770082844805,
+          "net_usdt_loo": 137.66379425058906,
+          "pf_loo": 2.210146109257124
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1612850400000_-1",
+          "fold": "2021-02",
+          "trade_index": 4,
+          "trade_net_bps": 88.36686067167157,
+          "trade_net_usdt": 7.893386972668034,
+          "profit_share_pct": 7.195128723828646,
+          "mean_net_bps_loo": 103.1578091592085,
+          "delta_mean_bps": -1.2325790406280674,
+          "net_usdt_loo": 101.81121006291957,
+          "pf_loo": 1.7184111464806962
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1614009600000_-1",
+          "fold": "2021-02",
+          "trade_index": 5,
+          "trade_net_bps": 859.83502922417,
+          "trade_net_usdt": 77.58380547598713,
+          "profit_share_pct": 70.72065125112246,
+          "mean_net_bps_loo": 33.02433929079955,
+          "delta_mean_bps": 68.90089082778087,
+          "net_usdt_loo": 32.12079155960046,
+          "pf_loo": 1.226654163877819
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1617721200000_-1",
+          "fold": "2021-04",
+          "trade_index": 6,
+          "trade_net_bps": -155.7588821629435,
+          "trade_net_usdt": -14.451929630464434,
+          "profit_share_pct": -13.173495022980944,
+          "mean_net_bps_loo": 125.35105850780988,
+          "delta_mean_bps": -23.42582838922945,
+          "net_usdt_loo": 124.15652666605205,
+          "pf_loo": 1.9755727901392053
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1621425600000_-1",
+          "fold": "2021-05",
+          "trade_index": 7,
+          "trade_net_bps": 1044.2154397391953,
+          "trade_net_usdt": 92.72847900000008,
+          "profit_share_pct": 84.52560923214497,
+          "mean_net_bps_loo": 16.26248378943362,
+          "delta_mean_bps": 85.66274632914681,
+          "net_usdt_loo": 16.976118035587522,
+          "pf_loo": 1.1197886992326385
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1621458000000_-1",
+          "fold": "2021-05",
+          "trade_index": 8,
+          "trade_net_bps": -885.9141945564173,
+          "trade_net_usdt": -78.30955246847161,
+          "profit_share_pct": -71.38219781534623,
+          "mean_net_bps_loo": 191.72881417994387,
+          "delta_mean_bps": -89.80358406136344,
+          "net_usdt_loo": 188.01414950405922,
+          "pf_loo": 3.96516558895656
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1625126400000_1",
+          "fold": "2021-07",
+          "trade_index": 9,
+          "trade_net_bps": -77.11989888308096,
+          "trade_net_usdt": -6.953839586368304,
+          "profit_share_pct": -6.338694798826445,
+          "mean_net_bps_loo": 118.20206002782237,
+          "delta_mean_bps": -16.27682990924194,
+          "net_usdt_loo": 116.65843662195591,
+          "pf_loo": 1.8656540143559182
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1652144400000_1",
+          "fold": "2022-05",
+          "trade_index": 10,
+          "trade_net_bps": 256.0152580019022,
+          "trade_net_usdt": 23.58299910000002,
+          "profit_share_pct": 21.49681940160613,
+          "mean_net_bps_loo": 87.91704576555118,
+          "delta_mean_bps": 14.00818435302925,
+          "net_usdt_loo": 86.12159793558759,
+          "pf_loo": 1.6077004277959057
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1653760800000_-1",
+          "fold": "2022-05",
+          "trade_index": 11,
+          "trade_net_bps": -151.85601790450255,
+          "trade_net_usdt": -14.042672657293807,
+          "profit_share_pct": -12.800441400590017,
+          "mean_net_bps_loo": 124.99625266613343,
+          "delta_mean_bps": -23.071022547553,
+          "net_usdt_loo": 123.74726969288142,
+          "pf_loo": 1.9692401487685185
+        },
+        {
+          "event_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H_1681113600000_1",
+          "fold": "2023-04",
+          "trade_index": 12,
+          "trade_net_bps": 110.03189000208508,
+          "trade_net_usdt": 9.95952331971193,
+          "profit_share_pct": 9.0784922317167,
+          "mean_net_bps_loo": 101.18826103826183,
+          "delta_mean_bps": 0.7369690803186018,
+          "net_usdt_loo": 99.74507371587568,
+          "pf_loo": 1.7038318542696722
+        }
+      ]
+    },
+    "economics_12h": {
+      "n": 12,
+      "gross_usdt": 147.1902199999998,
+      "fee_entry_usdt": 13.089626759999998,
+      "fee_exit_usdt": 13.051819799999999,
+      "total_fee_usdt": 26.14144656,
+      "execution_drag_usdt": 21.80781999999999,
+      "trading_net_usdt": 99.24095343999984,
+      "funding_usdt": 8.865153154428768,
+      "net_usdt": 108.1061065944286,
+      "gross_to_fee_ratio": 5.6305307995166975,
+      "win_count": 6,
+      "loss_count": 6,
+      "win_rate_pct": 50.0
+    },
+    "economics_18h": {
+      "n": 12,
+      "gross_usdt": 146.66434999999964,
+      "fee_entry_usdt": 13.009364639999998,
+      "fee_exit_usdt": 12.93997404,
+      "total_fee_usdt": 25.949338679999997,
+      "execution_drag_usdt": 21.652849999999724,
+      "trading_net_usdt": 99.06216131999993,
+      "funding_usdt": 10.642435715587675,
+      "net_usdt": 109.7045970355876,
+      "gross_to_fee_ratio": 5.651949431491241,
+      "win_count": 7,
+      "loss_count": 5,
+      "win_rate_pct": 58.333333333333336
+    },
+    "pf_sentinels_12h": {
+      "2021": {
+        "n": 9,
+        "profit_factor": 0.0,
+        "total_net_usdt": 0.0,
+        "is_division_by_zero_sentinel": false,
+        "scientific_interpretation": "CALCULATED_FINITE_RATIO"
+      },
+      "2022": {
+        "n": 2,
+        "profit_factor": 0.0,
+        "total_net_usdt": 0.0,
+        "is_division_by_zero_sentinel": false,
+        "scientific_interpretation": "CALCULATED_FINITE_RATIO"
+      },
+      "2023": {
+        "n": 1,
+        "profit_factor": 0.0,
+        "total_net_usdt": 0.0,
+        "is_division_by_zero_sentinel": false,
+        "scientific_interpretation": "CALCULATED_FINITE_RATIO"
+      }
+    }
+  },
+  "degenerate_studentizer_audit": {
+    "14_day_block_bootstrap": {
+      "n_blocks": 76,
+      "n_rounds": 2000,
+      "floor": 1e-06,
+      "simultaneous_q95_max_t": 2402715.5941717396,
+      "contaminating_candidates": [
+        "F1_AGGRESSOR_FLOW_ABSORPTION_12H",
+        "F1_AGGRESSOR_FLOW_ABSORPTION_18H"
+      ],
+      "candidates": {
+        "F1_AGGRESSOR_FLOW_ABSORPTION_12H": {
+          "n_nonzero_blocks": 2,
+          "zero_fraction": 0.9736842105263158,
+          "baseline_mean_bps": -2.4027155941717395,
+          "theoretical_all_zero_prob": 0.13175821003523122,
+          "empirical_all_zero_rate_pct": 13.100000000000001,
+          "theoretical_degenerate_t": 2402715.5941717396,
+          "empirical_standalone_q95": 2402715.5941717396,
+          "causes_degenerate_critical_value": true
+        },
+        "F1_AGGRESSOR_FLOW_ABSORPTION_18H": {
+          "n_nonzero_blocks": 2,
+          "zero_fraction": 0.9736842105263158,
+          "baseline_mean_bps": -2.4027155941717395,
+          "theoretical_all_zero_prob": 0.13175821003523122,
+          "empirical_all_zero_rate_pct": 13.100000000000001,
+          "theoretical_degenerate_t": 2402715.5941717396,
+          "empirical_standalone_q95": 2402715.5941717396,
+          "causes_degenerate_critical_value": true
+        },
+        "F2_REALIZED_FUNDING_REVERSAL_12H": {
+          "n_nonzero_blocks": 15,
+          "zero_fraction": 0.8026315789473685,
+          "baseline_mean_bps": -26.98119584150777,
+          "theoretical_all_zero_prob": 5.536489077641429e-08,
+          "empirical_all_zero_rate_pct": 0.0,
+          "theoretical_degenerate_t": 26981195.84150777,
+          "empirical_standalone_q95": 2.0870245457154986,
+          "causes_degenerate_critical_value": false
+        },
+        "F2_REALIZED_FUNDING_REVERSAL_18H": {
+          "n_nonzero_blocks": 15,
+          "zero_fraction": 0.8026315789473685,
+          "baseline_mean_bps": -20.01532796948798,
+          "theoretical_all_zero_prob": 5.536489077641429e-08,
+          "empirical_all_zero_rate_pct": 0.0,
+          "theoretical_degenerate_t": 20015327.96948798,
+          "empirical_standalone_q95": 2.128602318662868,
+          "causes_degenerate_critical_value": false
+        },
+        "F3_MARK_LAST_DISLOCATION_REPAIR_12H": {
+          "n_nonzero_blocks": 8,
+          "zero_fraction": 0.8947368421052632,
+          "baseline_mean_bps": 15.218721133029428,
+          "theoretical_all_zero_prob": 0.00021322805838957108,
+          "empirical_all_zero_rate_pct": 0.0,
+          "theoretical_degenerate_t": 15218721.13302943,
+          "empirical_standalone_q95": 5.337595308995685,
+          "causes_degenerate_critical_value": false
+        },
+        "F3_MARK_LAST_DISLOCATION_REPAIR_18H": {
+          "n_nonzero_blocks": 8,
+          "zero_fraction": 0.8947368421052632,
+          "baseline_mean_bps": 16.093457387144277,
+          "theoretical_all_zero_prob": 0.00021322805838957108,
+          "empirical_all_zero_rate_pct": 0.0,
+          "theoretical_degenerate_t": 16093457.387144277,
+          "empirical_standalone_q95": 3.7137691056516493,
+          "causes_degenerate_critical_value": false
+        }
+      },
+      "simulation_intervals": {
+        "F1_AGGRESSOR_FLOW_ABSORPTION_12H": {
+          "mean_block_net_bps": -2.4027155941717395,
+          "block_se": 1.6878376872855547,
+          "q95_critical_value": 2402715.5941717396,
+          "simultaneous_ci_95": [
+            -4055396.3343873606,
+            4055391.5289561725
+          ],
+          "ci_width_bps": 8110787.863343533,
+          "spans_zero": true,
+          "all_zero_draws": 262,
+          "all_zero_rate_pct": 13.100000000000001,
+          "standalone_q95": 2402715.5941717396
+        },
+        "F1_AGGRESSOR_FLOW_ABSORPTION_18H": {
+          "mean_block_net_bps": -2.4027155941717395,
+          "block_se": 1.6878376872855547,
+          "q95_critical_value": 2402715.5941717396,
+          "simultaneous_ci_95": [
+            -4055396.3343873606,
+            4055391.5289561725
+          ],
+          "ci_width_bps": 8110787.863343533,
+          "spans_zero": true,
+          "all_zero_draws": 262,
+          "all_zero_rate_pct": 13.100000000000001,
+          "standalone_q95": 2402715.5941717396
+        },
+        "F2_REALIZED_FUNDING_REVERSAL_12H": {
+          "mean_block_net_bps": -26.98119584150777,
+          "block_se": 11.0529906258806,
+          "q95_critical_value": 2402715.5941717396,
+          "simultaneous_ci_95": [
+            -26557219.920233216,
+            26557165.957841534
+          ],
+          "ci_width_bps": 53114385.87807475,
+          "spans_zero": true,
+          "all_zero_draws": 0,
+          "all_zero_rate_pct": 0.0,
+          "standalone_q95": 2.0870245457154986
+        },
+        "F2_REALIZED_FUNDING_REVERSAL_18H": {
+          "mean_block_net_bps": -20.01532796948798,
+          "block_se": 11.479403332564281,
+          "q95_critical_value": 2402715.5941717396,
+          "simultaneous_ci_95": [
+            -27581761.414267205,
+            27581721.38361127
+          ],
+          "ci_width_bps": 55163482.797878474,
+          "spans_zero": true,
+          "all_zero_draws": 0,
+          "all_zero_rate_pct": 0.0,
+          "standalone_q95": 2.128602318662868
+        },
+        "F3_MARK_LAST_DISLOCATION_REPAIR_12H": {
+          "mean_block_net_bps": 15.218721133029428,
+          "block_se": 10.760502614640926,
+          "q95_critical_value": 2402715.5941717396,
+          "simultaneous_ci_95": [
+            -25854412.214602396,
+            25854442.65204466
+          ],
+          "ci_width_bps": 51708854.86664706,
+          "spans_zero": true,
+          "all_zero_draws": 0,
+          "all_zero_rate_pct": 0.0,
+          "standalone_q95": 5.337595308995685
+        },
+        "F3_MARK_LAST_DISLOCATION_REPAIR_18H": {
+          "mean_block_net_bps": 16.093457387144277,
+          "block_se": 12.743296624221298,
+          "q95_critical_value": 2402715.5941717396,
+          "simultaneous_ci_95": [
+            -30618501.426715214,
+            30618533.613629986
+          ],
+          "ci_width_bps": 61237035.0403452,
+          "spans_zero": true,
+          "all_zero_draws": 0,
+          "all_zero_rate_pct": 0.0,
+          "standalone_q95": 3.7137691056516493
+        }
+      },
+      "root_cause_summary": "The simultaneous max-|T| studentizer explodes because sparse candidates (with few non-zero blocks) frequently yield all-zero resamples where sample variance vanishes. The denominator b_se is clamped to floor=1e-06, producing t = |mean| / floor on the order of 10^6. Whenever the all-zero draw probability exceeds 5% (which occurs for any candidate with k <= 2 non-zero blocks), the simultaneous q95 is mathematically forced to this million-scale artifact, blowing up confidence intervals for all evaluated candidates regardless of their individual sample properties."
+    },
+    "7_day_block_bootstrap": {
+      "n_blocks": 152,
+      "n_rounds": 2000,
+      "floor": 1e-06,
+      "simultaneous_q95_max_t": 1201357.7970858698,
+      "contaminating_candidates": [
+        "F1_AGGRESSOR_FLOW_ABSORPTION_12H",
+        "F1_AGGRESSOR_FLOW_ABSORPTION_18H"
+      ],
+      "candidates": {
+        "F1_AGGRESSOR_FLOW_ABSORPTION_12H": {
+          "n_nonzero_blocks": 2,
+          "zero_fraction": 0.9868421052631579,
+          "baseline_mean_bps": -1.2013577970858698,
+          "theoretical_all_zero_prob": 0.13355065084723075,
+          "empirical_all_zero_rate_pct": 12.45,
+          "theoretical_degenerate_t": 1201357.7970858698,
+          "empirical_standalone_q95": 1201357.7970858698,
+          "causes_degenerate_critical_value": true
+        },
+        "F1_AGGRESSOR_FLOW_ABSORPTION_18H": {
+          "n_nonzero_blocks": 2,
+          "zero_fraction": 0.9868421052631579,
+          "baseline_mean_bps": -1.2013577970858698,
+          "theoretical_all_zero_prob": 0.13355065084723075,
+          "empirical_all_zero_rate_pct": 12.45,
+          "theoretical_degenerate_t": 1201357.7970858698,
+          "empirical_standalone_q95": 1201357.7970858698,
+          "causes_degenerate_critical_value": true
+        },
+        "F2_REALIZED_FUNDING_REVERSAL_12H": {
+          "n_nonzero_blocks": 22,
+          "zero_fraction": 0.8552631578947368,
+          "baseline_mean_bps": -13.490597920753885,
+          "theoretical_all_zero_prob": 4.777098355340004e-11,
+          "empirical_all_zero_rate_pct": 0.0,
+          "theoretical_degenerate_t": 13490597.920753885,
+          "empirical_standalone_q95": 2.03988588095748,
+          "causes_degenerate_critical_value": false
+        },
+        "F2_REALIZED_FUNDING_REVERSAL_18H": {
+          "n_nonzero_blocks": 22,
+          "zero_fraction": 0.8552631578947368,
+          "baseline_mean_bps": -10.00766398474399,
+          "theoretical_all_zero_prob": 4.777098355340004e-11,
+          "empirical_all_zero_rate_pct": 0.0,
+          "theoretical_degenerate_t": 10007663.98474399,
+          "empirical_standalone_q95": 1.999393645166883,
+          "causes_degenerate_critical_value": false
+        },
+        "F3_MARK_LAST_DISLOCATION_REPAIR_12H": {
+          "n_nonzero_blocks": 9,
+          "zero_fraction": 0.9407894736842105,
+          "baseline_mean_bps": 7.609360566514714,
+          "theoretical_all_zero_prob": 9.350876627355643e-05,
+          "empirical_all_zero_rate_pct": 0.0,
+          "theoretical_degenerate_t": 7609360.566514715,
+          "empirical_standalone_q95": 3.45211831971088,
+          "causes_degenerate_critical_value": false
+        },
+        "F3_MARK_LAST_DISLOCATION_REPAIR_18H": {
+          "n_nonzero_blocks": 9,
+          "zero_fraction": 0.9407894736842105,
+          "baseline_mean_bps": 8.046728693572138,
+          "theoretical_all_zero_prob": 9.350876627355643e-05,
+          "empirical_all_zero_rate_pct": 0.0,
+          "theoretical_degenerate_t": 8046728.693572138,
+          "empirical_standalone_q95": 3.531037691429824,
+          "causes_degenerate_critical_value": false
+        }
+      },
+      "simulation_intervals": {
+        "F1_AGGRESSOR_FLOW_ABSORPTION_12H": {
+          "mean_block_net_bps": -1.2013577970858698,
+          "block_se": 0.8467824288568376,
+          "q95_critical_value": 1201357.7970858698,
+          "simultaneous_ci_95": [
+            -1017289.8747002699,
+            1017287.4719846756
+          ],
+          "ci_width_bps": 2034577.3466849455,
+          "spans_zero": true,
+          "all_zero_draws": 249,
+          "all_zero_rate_pct": 12.45,
+          "standalone_q95": 1201357.7970858698
+        },
+        "F1_AGGRESSOR_FLOW_ABSORPTION_18H": {
+          "mean_block_net_bps": -1.2013577970858698,
+          "block_se": 0.8467824288568376,
+          "q95_critical_value": 1201357.7970858698,
+          "simultaneous_ci_95": [
+            -1017289.8747002699,
+            1017287.4719846756
+          ],
+          "ci_width_bps": 2034577.3466849455,
+          "spans_zero": true,
+          "all_zero_draws": 249,
+          "all_zero_rate_pct": 12.45,
+          "standalone_q95": 1201357.7970858698
+        },
+        "F2_REALIZED_FUNDING_REVERSAL_12H": {
+          "mean_block_net_bps": -13.490597920753885,
+          "block_se": 5.492255106841049,
+          "q95_critical_value": 1201357.7970858698,
+          "simultaneous_ci_95": [
+            -6598176.986786102,
+            6598150.005590261
+          ],
+          "ci_width_bps": 13196326.992376363,
+          "spans_zero": true,
+          "all_zero_draws": 0,
+          "all_zero_rate_pct": 0.0,
+          "standalone_q95": 2.03988588095748
+        },
+        "F2_REALIZED_FUNDING_REVERSAL_18H": {
+          "mean_block_net_bps": -10.00766398474399,
+          "block_se": 5.82273451429523,
+          "q95_critical_value": 1201357.7970858698,
+          "simultaneous_ci_95": [
+            -6995197.516773565,
+            6995177.501445595
+          ],
+          "ci_width_bps": 13990375.01821916,
+          "spans_zero": true,
+          "all_zero_draws": 0,
+          "all_zero_rate_pct": 0.0,
+          "standalone_q95": 1.999393645166883
+        },
+        "F3_MARK_LAST_DISLOCATION_REPAIR_12H": {
+          "mean_block_net_bps": 7.609360566514714,
+          "block_se": 5.814066458141694,
+          "q95_critical_value": 1201357.7970858698,
+          "simultaneous_ci_95": [
+            -6984766.462903384,
+            6984781.681624517
+          ],
+          "ci_width_bps": 13969548.144527901,
+          "spans_zero": true,
+          "all_zero_draws": 0,
+          "all_zero_rate_pct": 0.0,
+          "standalone_q95": 3.45211831971088
+        },
+        "F3_MARK_LAST_DISLOCATION_REPAIR_18H": {
+          "mean_block_net_bps": 8.046728693572138,
+          "block_se": 7.016782492655682,
+          "q95_critical_value": 1201357.7970858698,
+          "simultaneous_ci_95": [
+            -8429658.311278835,
+            8429674.40473622
+          ],
+          "ci_width_bps": 16859332.716015056,
+          "spans_zero": true,
+          "all_zero_draws": 0,
+          "all_zero_rate_pct": 0.0,
+          "standalone_q95": 3.531037691429824
+        }
+      },
+      "root_cause_summary": "The simultaneous max-|T| studentizer explodes because sparse candidates (with few non-zero blocks) frequently yield all-zero resamples where sample variance vanishes. The denominator b_se is clamped to floor=1e-06, producing t = |mean| / floor on the order of 10^6. Whenever the all-zero draw probability exceeds 5% (which occurs for any candidate with k <= 2 non-zero blocks), the simultaneous q95 is mathematically forced to this million-scale artifact, blowing up confidence intervals for all evaluated candidates regardless of their individual sample properties."
+    }
+  },
+  "statistical_alternatives": {
+    "interval_refusal": {
+      "should_refuse_interval": true,
+      "refusal_status": "SPARSE_SUPPORT_REFUSAL",
+      "reasons": [
+        "Trades count 12 < minimum required 30",
+        "Active blocks count 8 < minimum required 10"
+      ],
+      "n_trades": 12,
+      "n_active_blocks": 8,
+      "min_trades_threshold": 30,
+      "min_active_blocks_threshold": 10
+    },
+    "sign_test_12h": {
+      "n": 12,
+      "k_wins": 6,
+      "k_losses": 6,
+      "win_rate_pct": 50.0,
+      "p_value_two_sided": 1.0,
+      "score_95_ci": [
+        0.22286731265852722,
+        0.7771326873414728
+      ],
+      "statistically_significant_at_05": false
+    },
+    "sign_test_18h": {
+      "n": 12,
+      "k_wins": 7,
+      "k_losses": 5,
+      "win_rate_pct": 58.333333333333336,
+      "p_value_two_sided": 0.7744140625,
+      "score_95_ci": [
+        0.2859928121039238,
+        0.8402581867868694
+      ],
+      "statistically_significant_at_05": false
+    },
+    "adverse_sensitivity_12h": {
+      "base_total_net_usdt": 108.1061065944286,
+      "base_mean_net_bps": 96.38523384251971,
+      "sensitivity_cases": [
+        {
+          "shifted_wins_count": 1,
+          "new_total_net_usdt": 6.945954594428525,
+          "new_mean_net_bps": 5.700613864253433,
+          "new_profit_factor": 1.0706621823685483,
+          "remains_profitable": true
+        },
+        {
+          "shifted_wins_count": 2,
+          "new_total_net_usdt": -37.99770410557144,
+          "new_mean_net_bps": -34.64429432719293,
+          "new_profit_factor": 0.6300055858449443,
+          "remains_profitable": false
+        }
+      ]
+    },
+    "adverse_sensitivity_18h": {
+      "base_total_net_usdt": 109.7045970355876,
+      "base_mean_net_bps": 101.92523011858043,
+      "sensitivity_cases": [
+        {
+          "shifted_wins_count": 1,
+          "new_total_net_usdt": 12.576118035587523,
+          "new_mean_net_bps": 11.240610140314153,
+          "new_profit_factor": 1.0860687089693344,
+          "remains_profitable": true
+        },
+        {
+          "shifted_wins_count": 2,
+          "new_total_net_usdt": -69.40768744039961,
+          "new_mean_net_bps": -64.07897562836668,
+          "new_profit_factor": 0.5388720270279637,
+          "remains_profitable": false
+        }
+      ]
+    },
+    "exploratory_fixed_se_bootstrap_12h": {
+      "n_blocks": 76,
+      "mean_bps": 15.218721133029428,
+      "se_sample_bps": 10.760502614640926,
+      "fixed_se_q95_t": 1.8729218423349465,
+      "fixed_se_ci_95": [
+        -4.934859248433865,
+        35.37230151449272
+      ],
+      "percentile_ci_95": [
+        -1.7364284857651662,
+        39.749354195382864
+      ],
+      "fixed_ci_spans_zero": true,
+      "percentile_ci_spans_zero": true,
+      "caveat": "EXPLORATORY_DESCRIPTIVE_ONLY_CANNOT_GRANT_PROMOTION"
+    }
+  },
+  "source_causality": {
+    "last_1m_close": {
+      "role": "TRADEABLE_FILL_PROXY",
+      "description": "Last traded transaction price from completed 1m trade kline.",
+      "execution_delay_enforced": "1 minute (t_entry = t_decision + 1m)",
+      "known_at_soundness": "SOUND_POINT_IN_TIME_PROXY"
+    },
+    "mark_1m_close": {
+      "role": "VALUATION_PROXY_NON_TRADEABLE",
+      "description": "Composite Mark price used by exchange for margin and liquidation checks. Not an executable book or order queue; cannot be directly traded against.",
+      "known_at_soundness": "VALUATION_ONLY_NOT_EXECUTABLE"
+    },
+    "mark_exchange_publication_timestamp": {
+      "role": "HISTORICAL_BROADCAST_TIME",
+      "description": "Exact historical network dissemination timestamp of the Mark feed is UNKNOWN in public archived 1m CSV klines. Archive records are retrospective 1m buckets.",
+      "known_at_soundness": "RETROSPECTIVE_ARCHIVE_UNKNOWN_INTRAMINUTE_BROADCAST"
+    },
+    "settled_funding_timestamp": {
+      "role": "CASHFLOW_SETTLEMENT_TIME",
+      "description": "Settled rate published at 8h intervals; 1m delay enforced before entry.",
+      "known_at_soundness": "BOUNDED_POINT_IN_TIME"
+    },
+    "feature_construction_causality": {
+      "uses_future_extrema": false,
+      "uses_completed_bars_only": true,
+      "intra_hour_warmup_preserved": true
+    }
+  }
+}
