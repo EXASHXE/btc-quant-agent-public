@@ -18,6 +18,7 @@ from pathlib import Path
 from scripts.market_data.forward_public_feed_r1.connector import BinancePublicFeedClient
 from scripts.market_data.forward_public_feed_r1.proxy_route import (
     ProxyRouteConfig,
+    build_redacted_route_diagnostic,
     run_desensitized_network_diagnostic,
 )
 
@@ -44,6 +45,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_diag.add_argument("--proxy-host", default=None, help="Proxy host (e.g. 127.0.0.1).")
     p_diag.add_argument("--proxy-port", type=int, default=None, help="Proxy port (e.g. 7890).")
     p_diag.add_argument("--report-out", default=None, help="File path to write diagnostic JSON.")
+    p_diag.add_argument("--redacted", action="store_true", help="Output strictly redacted network diagnostic.")
 
     # 2. fixture
     p_fix = subparsers.add_parser("fixture", help="Generate deterministic exchange fixture frames.")
@@ -85,6 +87,8 @@ def run_proxy_diagnostic(args: argparse.Namespace) -> int:
         port=args.proxy_port,
     )
     result = run_desensitized_network_diagnostic(cfg)
+    if getattr(args, "redacted", False):
+        result = build_redacted_route_diagnostic(result)
     json_str = json.dumps(result, indent=2)
     print(json_str)
 
@@ -272,7 +276,13 @@ def run_public_source_smoke(args: argparse.Namespace) -> int:
         print(json.dumps(stats, indent=2))
         if args.report_out:
             Path(args.report_out).write_text(json.dumps(stats, indent=2), encoding="utf-8")
-        return 0 if stats["status"] == "PUBLIC_SMOKE_VERIFIED" else 1
+        accepted = (
+            "PUBLIC_SMOKE_VERIFIED",
+            "PUBLIC_MULTI_CHANNEL_SOURCE_VERIFIED",
+            "L2_CONTINUOUS_WINDOW_VERIFIED",
+            "SHORT_DIAGNOSTIC",
+        )
+        return 0 if stats["status"] in accepted else 1
     finally:
         loop.close()
 

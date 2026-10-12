@@ -6,6 +6,7 @@ supporting Linux / WSL2 Windows Host Clash and Mihomo local proxies.
 
 from __future__ import annotations
 
+import hashlib
 import http.client
 import os
 import platform
@@ -510,3 +511,81 @@ def run_desensitized_network_diagnostic(config: ProxyRouteConfig) -> dict[str, A
         "diagnostic_code": terminal_code.value,
         "error_detail": error_detail,
     }
+
+
+def build_redacted_route_diagnostic(raw_diagnostic: dict[str, Any]) -> dict[str, Any]:
+    """Build strictly redacted diagnostic omitting host, port, gateway, and NO_PROXY.
+
+    Outputs ONLY:
+    - proxy_enabled: bool
+    - proxy_kind: str
+    - loopback_or_host: str ("loopback" | "remote_host" | "none")
+    - route_hash: str (irreversible truncated SHA256 of host:port:kind)
+    - session_id: str
+    - diagnostic_code: str
+    - layers: sanitized layer statuses without IP, port, or gateway
+    - error_detail: sanitized error string (IP and port scrubbed)
+    """
+    cfg = raw_diagnostic.get("configured_route", {})
+    mode = cfg.get("mode", "disabled")
+    kind = cfg.get("kind", "none")
+    raw_host = cfg.get("host")
+    raw_port = cfg.get("port")
+    route_epoch = cfg.get("route_epoch", "route-epoch-0")
+
+    proxy_enabled = (mode == "public-clash-explicit")
+
+    if not proxy_enabled or not raw_host:
+        loopback_or_host = "none" if mode == "disabled" else ("direct" if mode == "public-direct" else "none")
+        route_str = f"direct:{mode}:{route_epoch}"
+    else:
+        if raw_host in ("127.0.0.1", "localhost", "::1"):
+            loopback_or_host = "loopback"
+        else:
+            loopback_or_host = "remote_host"
+        route_str = f"{raw_host}:{raw_port}:{kind}:{route_epoch}"
+
+    route_hash = hashlib.sha256(route_str.encode("utf-8")).hexdigest()[:16]
+
+    session_id = raw_diagnostic.get("session_id")
+    if not session_id:
+        ts = raw_diagnostic.get("timestamp_utc", "session")
+        session_id = f"diag-{hashlib.sha256(f'{ts}:{route_hash}'.encode()).hexdigest()[:12]}"
+
+    raw_layers = raw_diagnostic.get("layers", {})
+    sanitized_layers: dict[str, Any] = {}
+
+    for layer_name in ("layer_1_local_tcp", "layer_2_proxy_negotiation", "layer_3_tls_rest_verify", "layer_4_ws_connect_verify"):
+        layer_data = raw_layers.get(layer_name, {})
+        sanitized_layer: dict[str, Any] = {"status": layer_data.get("status", "SKIPPED")}
+        if layer_name == "layer_3_tls_rest_verify":
+            if "status_code" in layer_data:
+                sanitized_layer["status_code"] = layer_data["status_code"]
+            if "bytes" in layer_data:
+                sanitized_layer["bytes"] = layer_data["bytes"]
+        elif layer_name == "layer_4_ws_connect_verify":
+            if "frame_bytes" in layer_data:
+                sanitized_layer["frame_bytes"] = layer_data["frame_bytes"]
+            if "stream" in layer_data:
+                sanitized_layer["stream"] = layer_data["stream"]
+        sanitized_layers[layer_name] = sanitized_layer
+
+    raw_err = raw_diagnostic.get("error_detail")
+    sanitized_err = None
+    if raw_err:
+        scrubbed = re.sub(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b", "[REDACTED_IP]", str(raw_err))
+        scrubbed = re.sub(r"port \d+", "port [REDACTED_PORT]", scrubbed)
+        scrubbed = re.sub(r":\d{2,5}\b", ":[REDACTED_PORT]", scrubbed)
+        sanitized_err = scrubbed
+
+    return {
+        "proxy_enabled": proxy_enabled,
+        "proxy_kind": kind if proxy_enabled else "none",
+        "loopback_or_host": loopback_or_host,
+        "route_hash": route_hash,
+        "session_id": session_id,
+        "diagnostic_code": raw_diagnostic.get("diagnostic_code", NetworkErrorCode.NETWORK_DISABLED.value),
+        "layers": sanitized_layers,
+        "error_detail": sanitized_err,
+    }
+

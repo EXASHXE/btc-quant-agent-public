@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import socket
-import ssl
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -294,11 +292,35 @@ class BinancePublicFeedClient:
 
         stats: dict[str, Any] = {
             "status": "RUNNING",
+            "qualification_level": "NOT_TESTED",
             "events_received": 0,
             "public_depth_events": 0,
             "market_events": 0,
             "duration_seconds": duration_seconds,
+            "raw_public_depth_update": 0,
+            "REST_snapshot": 0,
+            "aggTrade": 0,
+            "markPriceTick": 0,
+            "kline_closed_1m": 0,
+            "kline_open_1m": 0,
+            "estimatedFunding": 0,
+            "settledFunding": 0,
+            "invalidFrames": 0,
+            "sourceDropped": 0,
+            "rebootstrap": 0,
             "rebootstrap_count": 0,
+            "clockUncertain": 0,
+            "receiver_ingress_epoch": self.time_authority.connection_epoch,
+            "route_epoch": getattr(self.proxy_config, "route_epoch", "route-epoch-0"),
+            "manifest_sha": None,
+            "mark_first_seen_ms": None,
+            "mark_last_seen_ms": None,
+            "mark_span_seconds": 0.0,
+            "book_continuous": True,
+            "wss_public_depth_connected": False,
+            "wss_market_connected": False,
+            "wss_public_depth_error": None,
+            "wss_market_error": None,
             "public_epoch": f"pub-{self.time_authority.connection_epoch}",
             "market_epoch": f"mkt-{self.time_authority.connection_epoch}",
             "error": None,
@@ -323,12 +345,15 @@ class BinancePublicFeedClient:
             if snap_event is not None:
                 stats["events_received"] += 1
                 stats["public_depth_events"] += 1
+                stats["REST_snapshot"] += 1
+                stats["manifest_sha"] = snap_man_sha
                 if event_writer is not None:
                     event_writer.append_event(snap_event)
                 if on_event_callback is not None:
                     on_event_callback(snap_event)
         except Exception as exc:  # noqa: BLE001
             stats["status"] = "NOT_TESTED_SOURCE_UNREACHABLE"
+            stats["qualification_level"] = "SOURCE_UNAVAILABLE"
             stats["error"] = f"REST depth snapshot failed: {exc}"
             return stats
 
@@ -353,6 +378,8 @@ class BinancePublicFeedClient:
                 if fund_event is not None:
                     stats["events_received"] += 1
                     stats["market_events"] += 1
+                    stats["settledFunding"] += 1
+                    stats["manifest_sha"] = fund_man_sha
                     if event_writer is not None:
                         event_writer.append_event(fund_event)
         except (urllib.error.URLError, OSError, json.JSONDecodeError, KeyError, ValueError, ContractValidationError):
@@ -369,6 +396,14 @@ class BinancePublicFeedClient:
                     ping_interval=20,
                     ping_timeout=10,
                 ) as ws:
+                    if stream_tag == "public_depth":
+                        stats["wss_public_depth_connected"] = True
+                    elif stream_tag == "market_events":
+                        stats["wss_market_connected"] = True
+                    elif stream_tag == "custom":
+                        stats["wss_public_depth_connected"] = True
+                        stats["wss_market_connected"] = True
+
                     while asyncio.get_event_loop().time() < stop_time:
                         timeout_left = max(0.1, stop_time - asyncio.get_event_loop().time())
                         try:
@@ -392,16 +427,51 @@ class BinancePublicFeedClient:
                             ingress.observed_monotonic_ns,
                             raw_manifest_sha256=raw_manifest_sha,
                         )
-                        if event is not None:
-                            stats["events_received"] += 1
-                            if stream_tag == "public_depth":
-                                stats["public_depth_events"] += 1
+                        if event is None:
+                            stats["invalidFrames"] += 1
+                            continue
+
+                        stats["events_received"] += 1
+                        stats["manifest_sha"] = raw_manifest_sha
+                        if stream_tag == "public_depth":
+                            stats["public_depth_events"] += 1
+                        else:
+                            stats["market_events"] += 1
+
+                        if event.channel == "depth_delta":
+                            stats["raw_public_depth_update"] += 1
+                            if event.book is not None and not event.book.continuous:
+                                stats["book_continuous"] = False
+                        elif event.channel == "agg_trade":
+                            stats["aggTrade"] += 1
+                        elif event.channel == "mark_price":
+                            stats["markPriceTick"] += 1
+                            now_ms = event.provider_event_ms or event.observed_wall_utc_ms
+                            if stats["mark_first_seen_ms"] is None:
+                                stats["mark_first_seen_ms"] = now_ms
+                            stats["mark_last_seen_ms"] = now_ms
+                            stats["mark_span_seconds"] = max(
+                                0.0,
+                                round((stats["mark_last_seen_ms"] - stats["mark_first_seen_ms"]) / 1000.0, 3)
+                            )
+                            if "r" in event.payload or "estimatedSettlePrice" in event.payload:
+                                stats["estimatedFunding"] += 1
+                        elif event.channel == "last_kline_1m":
+                            k = event.payload.get("k", {})
+                            if k.get("x") is True:
+                                stats["kline_closed_1m"] += 1
                             else:
-                                stats["market_events"] += 1
-                            if event_writer is not None:
-                                event_writer.append_event(event)
-                            if on_event_callback is not None:
-                                on_event_callback(event)
+                                stats["kline_open_1m"] += 1
+                        elif event.channel == "funding_settled":
+                            stats["settledFunding"] += 1
+
+                        if "CLOCK_UNCERTAIN" in event.reason_codes:
+                            stats["clockUncertain"] += 1
+
+                        if event_writer is not None:
+                            event_writer.append_event(event)
+                        if on_event_callback is not None:
+                            on_event_callback(event)
 
                         if self.book_engine.needs_rebootstrap:
                             try:
@@ -422,20 +492,53 @@ class BinancePublicFeedClient:
                                 if reb_event is not None and event_writer is not None:
                                     event_writer.append_event(reb_event)
                                 stats["rebootstrap_count"] += 1
+                                stats["rebootstrap"] += 1
+                                stats["REST_snapshot"] += 1
                             except Exception as reb_exc:  # noqa: BLE001
                                 stats["rebootstrap_error"] = str(reb_exc)
-            except (socket.gaierror, ssl.SSLError, ConnectionRefusedError, websockets.WebSocketException, OSError) as exc:
-                stats["error"] = f"WebSocket stream {stream_tag} error: {exc}"
-
+            except Exception as exc:  # noqa: BLE001
+                stats["sourceDropped"] += 1
+                err_msg = str(exc)
+                if stream_tag == "public_depth":
+                    stats["wss_public_depth_error"] = err_msg
+                elif stream_tag == "market_events":
+                    stats["wss_market_error"] = err_msg
+                else:
+                    stats["error"] = err_msg
+        tasks = [asyncio.create_task(_consume_stream(u, tag)) for u, tag in target_urls]
         try:
-            tasks = [_consume_stream(u, tag) for u, tag in target_urls]
-            await asyncio.gather(*tasks)
-            if stats["events_received"] > 0:
-                stats["status"] = "PUBLIC_SMOKE_VERIFIED"
-            else:
-                stats["status"] = "WS_CONNECTED_NO_EVENTS"
-        except (socket.gaierror, ssl.SSLError, ConnectionRefusedError, websockets.WebSocketException, OSError) as exc:
-            stats["status"] = "NOT_TESTED_SOURCE_UNREACHABLE"
-            stats["error"] = f"WebSocket connection failed: {exc}"
+            await asyncio.gather(*tasks, return_exceptions=True)
+        finally:
+            for t in tasks:
+                if not t.done():
+                    t.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
 
+        # Qualification level evaluation
+        if custom_url is not None:
+            depth_ok = stats["wss_public_depth_connected"] and (stats["wss_public_depth_error"] is None)
+            market_ok = depth_ok
+        else:
+            depth_ok = stats["wss_public_depth_connected"] and (stats["wss_public_depth_error"] is None)
+            market_ok = stats["wss_market_connected"] and (stats["wss_market_error"] is None)
+
+        if not depth_ok and not market_ok:
+            if stats["REST_snapshot"] > 0:
+                stats["status"] = "SOURCE_UNAVAILABLE"
+            else:
+                stats["status"] = "NOT_TESTED_SOURCE_UNREACHABLE"
+        elif not depth_ok or not market_ok:
+            stats["status"] = "PUBLIC_SOURCE_PARTIAL"
+        elif stats["duration_seconds"] < 120 or stats["mark_span_seconds"] < 120.0 or stats["kline_closed_1m"] < 2:
+            stats["status"] = "SHORT_DIAGNOSTIC"
+        elif stats["aggTrade"] == 0 or stats["raw_public_depth_update"] == 0:
+            stats["status"] = "PUBLIC_SOURCE_PARTIAL"
+        else:
+            book_ok = self.book_engine.book_continuous and not self.book_engine.needs_rebootstrap and stats["book_continuous"]
+            if book_ok:
+                stats["status"] = "L2_CONTINUOUS_WINDOW_VERIFIED"
+            else:
+                stats["status"] = "PUBLIC_MULTI_CHANNEL_SOURCE_VERIFIED"
+
+        stats["qualification_level"] = stats["status"]
         return stats
