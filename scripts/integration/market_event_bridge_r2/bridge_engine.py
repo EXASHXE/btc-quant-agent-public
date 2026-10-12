@@ -7,16 +7,18 @@ to B's PublicFeedAdapter and C's MarketPitPort.
 
 from __future__ import annotations
 
+import decimal
 import hashlib
 import json
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import Any
 
 from scripts.market_data.forward_public_feed_r1.order_book import OrderBookIntegrityEngine
 
 from .book_ladder import OrderBookLadderAdapter, Top10BookSnapshot
 from .c_composite_bar import CCompositeBarBuilder
-from .funding_adapter import SettledFundingLedger
+from .funding_adapter import MarkPriceWitness, SettledFundingLedger
 from .mark_aggregator import DerivedMark1MBar, MarkPriceAggregator
 
 
@@ -69,6 +71,7 @@ class MarketEventBridgeR2:
         self.stats = BridgeStats()
         self.last_derived_mark_bar: DerivedMark1MBar | None = None
         self.last_mark_tick_price: float | None = None
+        self.last_mark_witness: MarkPriceWitness | None = None
         self.last_top10_snapshot: Top10BookSnapshot | None = None
         self.witness_records: list[dict[str, Any]] = []
 
@@ -80,6 +83,7 @@ class MarketEventBridgeR2:
             epoch_num = int(self.route_epoch.split("-")[-1]) if "-" in self.route_epoch and self.route_epoch.split("-")[-1].isdigit() else 0
             self.route_epoch = f"route-epoch-{epoch_num + 1}"
         self.connection_epoch += 1
+        self.last_mark_witness = None
         self.book_engine.reset(reason="ROUTE_NODE_SWITCH")
 
     def process_fixture_sequence(
@@ -163,6 +167,23 @@ class MarketEventBridgeR2:
             except (ValueError, TypeError):
                 pass
             prov_e = frame.get("E", observed_wall_utc_ms)
+            try:
+                dec_p = Decimal(str(mark_p))
+                if dec_p > Decimal(0):
+                    self.last_mark_witness = MarkPriceWitness(
+                        price=dec_p,
+                        observed_wall_utc_ms=observed_wall_utc_ms,
+                        available_at_ms=observed_wall_utc_ms,
+                        provider_event_ms=prov_e,
+                        source_sha=payload_sha,
+                        route_epoch=self.route_epoch,
+                        connection_epoch=self.connection_epoch,
+                        quality="VERIFIED",
+                        reason_codes=("OK",),
+                    )
+            except (ValueError, TypeError, decimal.InvalidOperation):
+                self.last_mark_witness = None
+
             derived_bar = self.mark_aggregator.ingest_tick(
                 provider_event_ms=prov_e,
                 mark_price=mark_p,
@@ -283,12 +304,32 @@ class MarketEventBridgeR2:
 
         # 6. Settled Funding Record
         elif "fundingRate" in frame and "fundingTime" in frame:
-            mark_p = self.last_mark_tick_price or (self.last_derived_mark_bar.close if self.last_derived_mark_bar else None)
+            witness = self.last_mark_witness
+            if witness is None and self.last_derived_mark_bar is not None:
+                try:
+                    dec_p = Decimal(str(self.last_derived_mark_bar.close))
+                    if dec_p > Decimal(0):
+                        witness = MarkPriceWitness(
+                            price=dec_p,
+                            observed_wall_utc_ms=self.last_derived_mark_bar.derived_available_at_ms,
+                            available_at_ms=self.last_derived_mark_bar.derived_available_at_ms,
+                            provider_event_ms=self.last_derived_mark_bar.bar_close_ms,
+                            source_sha="derived_mark_bar_witness",
+                            route_epoch=self.route_epoch,
+                            connection_epoch=self.connection_epoch,
+                            quality="VERIFIED",
+                            reason_codes=("OK",),
+                        )
+                except (ValueError, TypeError, decimal.InvalidOperation):
+                    witness = None
+
             entry = self.funding_ledger.ingest_settled_funding(
                 raw_record=frame,
-                contemporaneous_mark_price=mark_p,
+                contemporaneous_mark_price=witness,
                 observed_wall_utc_ms=observed_wall_utc_ms,
                 raw_manifest_sha256=raw_manifest_sha256,
+                current_route_epoch=self.route_epoch,
+                current_connection_epoch=self.connection_epoch,
             )
             if entry is not None:
                 self.stats.settled_fundings_adapted += 1
@@ -330,9 +371,9 @@ class MarketEventBridgeR2:
                         "channel": "funding_settled",
                         "provider_event_ms": entry.funding_time_ms,
                         "provider_transaction_ms": entry.funding_time_ms,
-                        "observed_wall_utc_ms": entry.funding_time_ms,
+                        "observed_wall_utc_ms": observed_wall_utc_ms,
                         "observed_monotonic_ns": observed_monotonic_ns,
-                        "available_at_ms": entry.funding_time_ms,
+                        "available_at_ms": observed_wall_utc_ms,
                         "source_stream_id": self.c_bar_builder.stream_id,
                         "connection_epoch": self.connection_epoch,
                         "source_sequence": None,
@@ -342,8 +383,14 @@ class MarketEventBridgeR2:
                         "reason_codes": ["OK"],
                         "raw_source_manifest_sha256": self.c_bar_builder.manifest_sha256,
                     }
-                    self.c_port.ingest_envelope(c_fund_env)
-                    self.stats.c_events_dispatched += 1
-                    result["emitted_to_c"] = True
+                    try:
+                        self.c_port.ingest_envelope(c_fund_env)
+                        self.stats.c_events_dispatched += 1
+                        result["emitted_to_c"] = True
+                        result["c_consumer_status"] = "ACCEPTED"
+                    except Exception as exc:  # noqa: BLE001
+                        result["emitted_to_c"] = False
+                        result["c_consumer_status"] = "C_CONSUMER_CONTRACT_BLOCKED"
+                        result["c_contract_block_reason"] = str(exc)
 
         return result
