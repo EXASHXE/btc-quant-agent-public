@@ -1,0 +1,692 @@
+{
+  "report_version": "bridge-after-synthetic-witnesses-v1",
+  "task_id": "V06_GEMINI_GOAL_ABC_R2_CLASH_ROUTED_PUBLIC_SOURCE_PIT_BRIDGE",
+  "total_frames_processed": 1812,
+  "mark_bars_derived": 10,
+  "top10_book_snapshots": 601,
+  "settled_fundings_adapted": 1,
+  "c_composite_bars_emitted": 0,
+  "sample_witnesses": [
+    {
+      "frame_index": 0,
+      "event_type": "snapshot/funding",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": 1000000,
+          "first_update_id": 1000000,
+          "final_update_id": 1000000,
+          "previous_final_update_id": null,
+          "continuous": true,
+          "best_bid": "63999.50",
+          "best_ask": "64000.50",
+          "bids": [
+            [
+              63999.5,
+              1.1
+            ],
+            [
+              63999.0,
+              1.2
+            ],
+            [
+              63998.5,
+              1.3
+            ],
+            [
+              63998.0,
+              1.4
+            ],
+            [
+              63997.5,
+              1.5
+            ],
+            [
+              63997.0,
+              1.6
+            ],
+            [
+              63996.5,
+              1.7
+            ],
+            [
+              63996.0,
+              1.8
+            ],
+            [
+              63995.5,
+              1.9
+            ],
+            [
+              63995.0,
+              2.0
+            ]
+          ],
+          "asks": [
+            [
+              64000.5,
+              1.1
+            ],
+            [
+              64001.0,
+              1.2
+            ],
+            [
+              64001.5,
+              1.3
+            ],
+            [
+              64002.0,
+              1.4
+            ],
+            [
+              64002.5,
+              1.5
+            ],
+            [
+              64003.0,
+              1.6
+            ],
+            [
+              64003.5,
+              1.7
+            ],
+            [
+              64004.0,
+              1.8
+            ],
+            [
+              64004.5,
+              1.9
+            ],
+            [
+              64005.0,
+              2.0
+            ]
+          ],
+          "observed_depth_levels": 48,
+          "stale_age_ms": 0,
+          "quality": "VERIFIED",
+          "reason_codes": [
+            "OK"
+          ],
+          "top10_ladder_sha256": "5d7960ca255aa1c3d7029970b0000baa7e37744c4838c8e40e08eb9a26fde47c",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": -4.712701612903226e-05
+        }
+      }
+    },
+    {
+      "frame_index": 3,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 6,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 9,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 12,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 15,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 18,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 21,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 24,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 27,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 30,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 33,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 36,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 39,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 42,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 45,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 48,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 51,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 54,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    },
+    {
+      "frame_index": 57,
+      "event_type": "depthUpdate",
+      "result": {
+        "status": "INGESTED",
+        "emitted_to_b": false,
+        "emitted_to_c": false,
+        "top10_snapshot": {
+          "snapshot_update_id": null,
+          "first_update_id": null,
+          "final_update_id": null,
+          "previous_final_update_id": null,
+          "continuous": false,
+          "best_bid": null,
+          "best_ask": null,
+          "bids": [],
+          "asks": [],
+          "observed_depth_levels": 0,
+          "stale_age_ms": 0,
+          "quality": "DEGRADED",
+          "reason_codes": [
+            "UNBOOTSTRAPPED_OR_DISCONTINUOUS_BOOK",
+            "INCOMPLETE_L2_DEPTH: bids=0, asks=0 < 10"
+          ],
+          "top10_ladder_sha256": "2d4f725be0b016653f9da2487292ce5a22b4da3d3171f92a3e67c2cc760cf989",
+          "route_epoch": "route-epoch-0",
+          "top10_imbalance": null
+        }
+      }
+    }
+  ]
+}

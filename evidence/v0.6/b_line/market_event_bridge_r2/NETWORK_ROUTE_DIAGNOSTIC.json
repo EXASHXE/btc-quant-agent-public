@@ -1,0 +1,44 @@
+{
+  "timestamp_utc": "2026-10-12T11:31:45Z",
+  "duration_ms": 2.98,
+  "environment": {
+    "os": "Linux",
+    "release": "6.6.87.2-microsoft-standard-WSL2",
+    "python_version": "3.12.3",
+    "is_wsl": true,
+    "wsl_network_mode": "nat_or_mirrored",
+    "detected_gateway_ip": "192.168.31.1"
+  },
+  "ambient_env_proxies": {
+    "HTTP_PROXY": "http://127.0.0.1:7897",
+    "HTTPS_PROXY": "http://127.0.0.1:7897",
+    "NO_PROXY": "localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8",
+    "http_proxy": "http://127.0.0.1:7897",
+    "https_proxy": "http://127.0.0.1:7897",
+    "no_proxy": "localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8"
+  },
+  "configured_route": {
+    "mode": "disabled",
+    "kind": "http",
+    "host": null,
+    "port": null,
+    "route_epoch": "route-epoch-0",
+    "has_proxy": false
+  },
+  "layers": {
+    "layer_1_local_tcp": {
+      "status": "SKIPPED"
+    },
+    "layer_2_proxy_negotiation": {
+      "status": "SKIPPED"
+    },
+    "layer_3_tls_rest_verify": {
+      "status": "SKIPPED"
+    },
+    "layer_4_ws_connect_verify": {
+      "status": "SKIPPED"
+    }
+  },
+  "diagnostic_code": "NETWORK_DISABLED",
+  "error_detail": null
+}

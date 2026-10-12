@@ -1,0 +1,27 @@
+{
+  "schema_version": "settled-funding-decimal-ledger-v1",
+  "symbol": "BTCUSDT",
+  "total_settlements": 1,
+  "duplicate_count": 0,
+  "rejected_count": 0,
+  "journal_records": [
+    {
+      "symbol": "BTCUSDT",
+      "funding_time_ms": 1728720000000,
+      "funding_rate": "0.00010000",
+      "mark_price": "64047.09",
+      "settlement_id": "BTCUSDT:1728720000000:0.00010000",
+      "settled": true,
+      "rate_type": "SETTLED_REALIZED",
+      "derived_available_at_ms": 1728720181100,
+      "feature_known_at_ms": 1728720181100,
+      "producer_manifest_sha256": "manifest-1811",
+      "quality": "VERIFIED",
+      "reason_codes": [
+        "OK"
+      ],
+      "sample_long_1btc_cash_flow": "-6.40470900",
+      "sample_short_1btc_cash_flow": "6.40470900"
+    }
+  ]
+}
