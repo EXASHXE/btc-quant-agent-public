@@ -32,6 +32,166 @@ def git(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(["git", *args], cwd=ROOT, text=True, capture_output=True, check=False)
 
 
+OWNER_FEED_MATRIX: dict[str, object] = {
+    "owner": "FEED",
+    "root_prefix": "scripts/market_data/forward_public_feed_r1/",
+    "description": (
+        "2026 Binance /public and /market websocket routing, proxy_route, order_book, "
+        "contracts, health, time_authority, replay, durability, fixture, and CLI"
+    ),
+    "known_modules": {
+        "scripts/market_data/forward_public_feed_r1/__init__.py": "package_init",
+        "scripts/market_data/forward_public_feed_r1/cli.py": "cli",
+        "scripts/market_data/forward_public_feed_r1/connector.py": "binance_2026_public_market_ws_routing",
+        "scripts/market_data/forward_public_feed_r1/contracts.py": "contracts",
+        "scripts/market_data/forward_public_feed_r1/durability.py": "durability",
+        "scripts/market_data/forward_public_feed_r1/fixture.py": "fixture",
+        "scripts/market_data/forward_public_feed_r1/health.py": "health",
+        "scripts/market_data/forward_public_feed_r1/order_book.py": "order_book",
+        "scripts/market_data/forward_public_feed_r1/proxy_route.py": "proxy_route",
+        "scripts/market_data/forward_public_feed_r1/replay.py": "replay",
+        "scripts/market_data/forward_public_feed_r1/time_authority.py": "time_authority",
+    },
+    "owned_test_glob": "tests/test_v06_forward_public_feed_r1_*.py",
+    "dependent_test_globs": (
+        "tests/test_v06_forward_public_feed_r1_*.py",
+        "tests/test_v06_market_event_bridge_r2_*.py",
+    ),
+    "expected_owned_tests": (
+        "tests/test_v06_forward_public_feed_r1_adversarial.py",
+        "tests/test_v06_forward_public_feed_r1_book.py",
+        "tests/test_v06_forward_public_feed_r1_connector.py",
+        "tests/test_v06_forward_public_feed_r1_contracts.py",
+        "tests/test_v06_forward_public_feed_r1_durability.py",
+        "tests/test_v06_forward_public_feed_r1_e2e_scenarios.py",
+        "tests/test_v06_forward_public_feed_r1_health.py",
+        "tests/test_v06_forward_public_feed_r1_proxy_route.py",
+        "tests/test_v06_forward_public_feed_r1_replay.py",
+        "tests/test_v06_forward_public_feed_r1_reviewer_fixes.py",
+        "tests/test_v06_forward_public_feed_r1_source_qualification.py",
+        "tests/test_v06_forward_public_feed_r1_time.py",
+    ),
+    "boundary_planner_test": "tests/test_ci_test_plan.py",
+}
+
+OWNER_BRIDGE_MATRIX: dict[str, object] = {
+    "owner": "BRIDGE",
+    "root_prefix": "scripts/integration/market_event_bridge_r2/",
+    "description": (
+        "Market event bridge R2/R3 engine, portable_ci_refs pinned B/C harness, "
+        "mark_aggregator, book_ladder, funding_adapter, c_composite_bar, "
+        "source_qualification, fixtures, evidence generator, and CLI"
+    ),
+    "known_modules": {
+        "scripts/integration/market_event_bridge_r2/__init__.py": "package_init",
+        "scripts/integration/market_event_bridge_r2/__main__.py": "module_entrypoint",
+        "scripts/integration/market_event_bridge_r2/book_ladder.py": "book",
+        "scripts/integration/market_event_bridge_r2/bridge_engine.py": "bridge_engine",
+        "scripts/integration/market_event_bridge_r2/c_composite_bar.py": "c_composite_bar",
+        "scripts/integration/market_event_bridge_r2/cli.py": "cli",
+        "scripts/integration/market_event_bridge_r2/fixtures.py": "fixtures",
+        "scripts/integration/market_event_bridge_r2/funding_adapter.py": "funding",
+        "scripts/integration/market_event_bridge_r2/generate_r3_evidence.py": "generate_r3_evidence",
+        "scripts/integration/market_event_bridge_r2/mark_aggregator.py": "mark",
+        "scripts/integration/market_event_bridge_r2/portable_ci_refs.py": "portable_ci_refs",
+        "scripts/integration/market_event_bridge_r2/source_qualification.py": "source_qualification",
+    },
+    "owned_test_glob": "tests/test_v06_market_event_bridge_r2_*.py",
+    "dependent_test_globs": (
+        "tests/test_v06_market_event_bridge_r2_*.py",
+        "tests/test_v06_forward_public_feed_r1_*.py",
+    ),
+    "downstream_consumer_probe_tests": (
+        "tests/test_v06_market_event_bridge_r2_portable_ci.py",
+        "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+        "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+        "tests/test_v06_market_event_bridge_r2_funding_pit_provenance.py",
+    ),
+    "expected_owned_tests": (
+        "tests/test_v06_market_event_bridge_r2_binance_2026_routes.py",
+        "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+        "tests/test_v06_market_event_bridge_r2_clash_proxy_network.py",
+        "tests/test_v06_market_event_bridge_r2_depth_ladder_l2.py",
+        "tests/test_v06_market_event_bridge_r2_funding_pit_provenance.py",
+        "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py",
+        "tests/test_v06_market_event_bridge_r2_portable_ci.py",
+        "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+        "tests/test_v06_market_event_bridge_r2_stress_and_security.py",
+    ),
+    "boundary_planner_test": "tests/test_ci_test_plan.py",
+}
+
+RISK_OWNERSHIP_MATRICES: dict[str, dict[str, object]] = {
+    "FEED": OWNER_FEED_MATRIX,
+    "BRIDGE": OWNER_BRIDGE_MATRIX,
+}
+
+CRITICAL_HARNESS_FILES = frozenset({
+    "pyproject.toml",
+    "pytest.ini",
+    "tests/conftest.py",
+    "setup.py",
+    "setup.cfg",
+    "tox.ini",
+    "mypy.ini",
+})
+
+
+def _normalize_changed_path(raw_path: object) -> str | None:
+    """Normalize changed path to POSIX relative form; return None on traversal or invalid syntax."""
+    if not isinstance(raw_path, str):
+        return None
+    if not raw_path or raw_path != raw_path.strip() or "\x00" in raw_path:
+        return None
+    norm = raw_path.replace("\\", "/")
+    if norm.startswith("/") or ":" in norm:
+        return None
+    norm = norm.removeprefix("./")
+    if not norm or "//" in norm or norm.endswith("/"):
+        return None
+    parts = norm.split("/")
+    if any(part in ("", ".", "..") for part in parts):
+        return None
+    try:
+        resolved_root = ROOT.resolve()
+        (resolved_root / norm).resolve().relative_to(resolved_root)
+    except (ValueError, OSError):
+        return None
+    return norm
+
+
+def _has_deletion_marker(norm_path: str) -> bool:
+    stem_tokens = set(re.split(r"[_\-.]+", Path(norm_path).stem.lower()))
+    return bool(stem_tokens.intersection({"deleted", "removed", "missing", "nonexistent", "renamed"}))
+
+
+def _resolve_feed_bridge_suite() -> list[str] | None:
+    """Resolve and verify the coupled FEED + BRIDGE focused test suite.
+
+    Fails closed (returns None) if any expected baseline test file is missing on disk.
+    """
+    expected_all = (
+        *OWNER_FEED_MATRIX["expected_owned_tests"],  # type: ignore[misc]
+        *OWNER_BRIDGE_MATRIX["expected_owned_tests"],  # type: ignore[misc]
+        *OWNER_BRIDGE_MATRIX["downstream_consumer_probe_tests"],  # type: ignore[misc]
+    )
+    for req_test in expected_all:
+        if not (ROOT / req_test).is_file():
+            return None
+
+    selected: set[str] = set()
+    for pat in (
+        *OWNER_FEED_MATRIX["dependent_test_globs"],  # type: ignore[misc]
+        *OWNER_BRIDGE_MATRIX["dependent_test_globs"],  # type: ignore[misc]
+    ):
+        selected.update(files(pat))
+    selected.update(OWNER_BRIDGE_MATRIX["downstream_consumer_probe_tests"])  # type: ignore[arg-type]
+
+    if not selected or not all(req in selected for req in expected_all):
+        return None
+    return sorted(selected)
+
+
 def changed_paths(
     before: str = "",
     event: str = "push",
@@ -44,6 +204,11 @@ def changed_paths(
     Fails closed (returns None) if base or merge-base is missing or invalid.
     Includes added, modified, deleted, and renamed paths (non-silent).
     """
+    if event not in ("push", "pull_request", "workflow_dispatch", "schedule"):
+        return None
+    if git("cat-file", "-e", "HEAD^{commit}").returncode != 0:
+        return None
+
     base: str | None = None
 
     if event == "pull_request":
@@ -124,12 +289,23 @@ def changed_paths(
 
 
 def files(pattern: str) -> list[str]:
-    return [str(f.relative_to(ROOT)) for f in sorted(ROOT.glob(pattern)) if f.is_file()]
+    return [f.relative_to(ROOT).as_posix() for f in sorted(ROOT.glob(pattern)) if f.is_file()]
+
+
+def _add_mapped_patterns(found: set[str], patterns: tuple[str, ...]) -> bool:
+    """Resolve patterns and add to found; return False if no existing test files matched."""
+    matched: list[str] = []
+    for pat in patterns:
+        matched.extend(files(pat))
+    if not matched:
+        return False
+    found.update(matched)
+    return True
 
 
 def classify(changed: list[str] | None) -> dict[str, object]:
     """Classify changed files into test execution plan."""
-    if changed is None:
+    if changed is None or not isinstance(changed, list):
         return {"mode": "full", "tests": [], "changed": [], "reason": "unknown-base-fail-closed"}
     if not changed:
         return {"mode": "none", "tests": [], "changed": [], "reason": "empty-diff"}
@@ -137,66 +313,229 @@ def classify(changed: list[str] | None) -> dict[str, object]:
     found: set[str] = set()
     full = False
 
-    for name in changed:
+    feed_root = str(OWNER_FEED_MATRIX["root_prefix"])
+    feed_known = OWNER_FEED_MATRIX["known_modules"]  # type: ignore[assignment]
+    bridge_root = str(OWNER_BRIDGE_MATRIX["root_prefix"])
+    bridge_known = OWNER_BRIDGE_MATRIX["known_modules"]  # type: ignore[assignment]
+
+    for raw_name in changed:
+        name = _normalize_changed_path(raw_name)
+        if name is None:
+            full = True
+            continue
+
         # Critical build and testing harness configs require full suite
-        if name in ("pyproject.toml", "pytest.ini", "tests/conftest.py"):
+        if name in CRITICAL_HARNESS_FILES:
             full = True
         # Documentation and evidence only changes do not trigger business test suites
-        elif name.startswith(("docs/", "evidence/", "reviews/", "prompts/")) or name.endswith(".md"):
+        elif (
+            (name.startswith(("docs/", "evidence/", "reviews/", "prompts/")) or ("/" not in name and name.endswith(".md")))
+            and not name.endswith((".py", ".sh"))
+        ):
             continue
         # CI workflows and planner scripts select CI planner unit tests
         elif name.startswith((".github/workflows/", "scripts/ci/")):
-            found.update(files("tests/test_ci_*.py"))
-        # Python tests changed directly
-        elif name.startswith("tests/test_") and name.endswith(".py"):
-            if (ROOT / name).is_file():
-                found.add(name)
+            if not (ROOT / name).is_file() or not _add_mapped_patterns(found, ("tests/test_ci_*.py",)):
+                full = True
+        # Explicit Owner Matrix 1: FEED (scripts/market_data/forward_public_feed_r1/**)
+        elif name.startswith(feed_root):
+            if not name.endswith(".py") or _has_deletion_marker(name):
+                full = True
+            elif name in feed_known and not (ROOT / name).is_file():
+                # Deleted or renamed known FEED production module must fail closed
+                full = True
             else:
+                suite = _resolve_feed_bridge_suite()
+                if suite is None:
+                    full = True
+                else:
+                    found.update(suite)
+        # Explicit Owner Matrix 2: BRIDGE (scripts/integration/market_event_bridge_r2/**)
+        elif name.startswith(bridge_root):
+            if not name.endswith(".py") or _has_deletion_marker(name):
+                full = True
+            elif name in bridge_known and not (ROOT / name).is_file():
+                # Deleted or renamed known BRIDGE production module must fail closed
+                full = True
+            else:
+                suite = _resolve_feed_bridge_suite()
+                if suite is None:
+                    full = True
+                else:
+                    found.update(suite)
+        # Python tests changed directly (top-level tests/test_*.py only)
+        elif name.startswith("tests/test_") and name.endswith(".py") and "/" not in name[len("tests/"):]:
+            if not (ROOT / name).is_file():
                 # Deleted or renamed test file must not pass silently
                 full = True
+            else:
+                found.add(name)
+                if name.startswith((
+                    "tests/test_v06_forward_public_feed_r1_",
+                    "tests/test_v06_market_event_bridge_r2_",
+                )):
+                    suite = _resolve_feed_bridge_suite()
+                    if suite is None:
+                        full = True
+                    else:
+                        found.update(suite)
         # MarketWatch and Tactical subsystem
         elif name.startswith("src/btc_quant_agent/market_watch/"):
-            for pat in ("tests/test_market_watch.py", "tests/test_shadow.py", "tests/test_tactical*.py"):
-                found.update(files(pat))
+            if not (ROOT / name).is_file() or not _add_mapped_patterns(
+                found,
+                ("tests/test_market_watch.py", "tests/test_shadow.py", "tests/test_tactical*.py"),
+            ):
+                full = True
         # Shared configuration changes map to broader configuration and tactical suites
         elif name.startswith("configs/") or name == "src/btc_quant_agent/config.py":
-            found.update(files("tests/test_config*.py"))
-            found.update(files("tests/test_market_watch.py"))
-            found.update(files("tests/test_tactical*.py"))
+            if not (ROOT / name).is_file() or not _add_mapped_patterns(
+                found,
+                ("tests/test_config*.py", "tests/test_market_watch.py", "tests/test_tactical*.py"),
+            ):
+                full = True
         # Shared data layer changes map to data and consumer suites
         elif name.startswith("src/btc_quant_agent/data/"):
-            found.update(files("tests/test_binance*.py"))
-            found.update(files("tests/test_derivatives*.py"))
-            found.update(files("tests/test_forward_derivatives*.py"))
-            found.update(files("tests/test_data_manifest*.py"))
-            found.update(files("tests/test_market_watch.py"))
+            if not (ROOT / name).is_file() or not _add_mapped_patterns(
+                found,
+                (
+                    "tests/test_binance*.py",
+                    "tests/test_derivatives*.py",
+                    "tests/test_forward_derivatives*.py",
+                    "tests/test_data_manifest*.py",
+                    "tests/test_market_watch.py",
+                ),
+            ):
+                full = True
         # Shared notify layer
         elif name.startswith("src/btc_quant_agent/notify/"):
-            found.update(files("tests/test_notify*.py"))
-            found.update(files("tests/test_market_watch.py"))
+            if not (ROOT / name).is_file() or not _add_mapped_patterns(
+                found,
+                ("tests/test_notify*.py", "tests/test_market_watch.py"),
+            ):
+                full = True
         # Shared CLI and catalog tooling
         elif name in ("src/btc_quant_agent/cli.py", "tools/catalog_surfaces.py"):
-            found.update(files("tests/test_explain*.py"))
-            found.update(files("tests/test_market_watch.py"))
-            found.update(files("tests/test_tactical*.py"))
+            if not (ROOT / name).is_file() or not _add_mapped_patterns(
+                found,
+                ("tests/test_explain*.py", "tests/test_market_watch.py", "tests/test_tactical*.py"),
+            ):
+                full = True
         # Shared domain models
         elif name == "src/btc_quant_agent/domain.py":
-            found.update(files("tests/test_structure*.py"))
-            found.update(files("tests/test_derivatives*.py"))
-            found.update(files("tests/test_market_watch.py"))
-            found.update(files("tests/test_tactical*.py"))
+            if not (ROOT / name).is_file() or not _add_mapped_patterns(
+                found,
+                (
+                    "tests/test_structure*.py",
+                    "tests/test_derivatives*.py",
+                    "tests/test_market_watch.py",
+                    "tests/test_tactical*.py",
+                ),
+            ):
+                full = True
         # Validation scripts
         elif name.startswith("scripts/rc2/validation/"):
-            found.update(files("tests/test_rc2*.py"))
+            if not (ROOT / name).is_file() or not _add_mapped_patterns(found, ("tests/test_rc2*.py",)):
+                full = True
         else:
             # Unmapped executable or source change must fail closed to full suite
             full = True
 
+    if not full and found and not all((ROOT / t).is_file() for t in found):
+        full = True
+
     return {
         "mode": "full" if full else ("focused" if found else "none"),
-        "tests": sorted(found),
+        "tests": [] if full else sorted(found),
         "changed": changed,
         "reason": "risk-mapped",
+    }
+
+
+def export_risk_ownership_matrix() -> dict[str, object]:
+    """Export serializable risk ownership dependency matrix for FEED and BRIDGE."""
+    return {
+        "schema_version": "B_LINE_CI_RISK_OWNERSHIP_MATRIX_V1",
+        "code_sha": git("rev-parse", "HEAD").stdout.strip(),
+        "owners": {
+            owner_key: {
+                "owner": matrix["owner"],
+                "root_prefix": matrix["root_prefix"],
+                "description": matrix["description"],
+                "known_modules": dict(matrix["known_modules"]),  # type: ignore[arg-type]
+                "owned_test_glob": matrix["owned_test_glob"],
+                "dependent_test_globs": list(matrix["dependent_test_globs"]),  # type: ignore[arg-type]
+                "expected_owned_tests": list(matrix["expected_owned_tests"]),  # type: ignore[arg-type]
+                "downstream_consumer_probe_tests": list(
+                    matrix.get("downstream_consumer_probe_tests", ())  # type: ignore[arg-type]
+                ),
+                "boundary_planner_test": matrix["boundary_planner_test"],
+            }
+            for owner_key, matrix in RISK_OWNERSHIP_MATRICES.items()
+        },
+        "fail_closed_invariants": {
+            "unknown_executable_source": "full",
+            "deleted_or_renamed_source_or_test": "full",
+            "critical_harness_files": sorted(CRITICAL_HARNESS_FILES),
+            "unknown_or_missing_merge_base": "full",
+            "empty_selected_test_set_for_non_docs": "full_or_runtime_error",
+            "forced_profile_full_overrides_focused": True,
+        },
+    }
+
+
+def build_dry_run_plan(
+    changed: list[str] | None,
+    *,
+    profile: str = "focused",
+    event: str = "push",
+) -> dict[str, object]:
+    """Build hermetic dry-run plan receipt from synthetic or resolved changed paths."""
+    if profile not in ("focused", "integration", "full"):
+        raise ValueError(f"Unsupported profile: {profile}")
+
+    plan = classify(changed)
+    effective_mode = profile if profile != "focused" else str(plan["mode"])
+    if effective_mode == "full":
+        selected_tests: list[str] = []
+    elif effective_mode == "integration":
+        candidates = [
+            "tests/test_market_watch.py",
+            "tests/test_tactical_feature_evidence_v2.py",
+            "tests/test_tactical_grid_shadow_evaluation_v1.py",
+            "tests/test_tactical_policy_b0.py",
+            "tests/test_tactical_shadow_evaluation_v2.py",
+            "tests/test_explain.py",
+            "tests/test_notify.py",
+            "tests/test_config.py",
+        ]
+        selected_tests = [x for x in candidates if (ROOT / x).is_file()]
+    else:
+        selected_tests = list(plan["tests"])  # type: ignore[arg-type]
+
+    feed_expected = set(OWNER_FEED_MATRIX["expected_owned_tests"])  # type: ignore[arg-type]
+    bridge_expected = set(OWNER_BRIDGE_MATRIX["expected_owned_tests"])  # type: ignore[arg-type]
+    selected_set = set(selected_tests)
+
+    includes_h40_h41 = (
+        True
+        if effective_mode == "full"
+        else any("h40" in t or "h41" in t or "h39" in t for t in selected_tests)
+    )
+
+    return {
+        "schema_version": "B_LINE_CI_PLAN_V1",
+        "code_sha": git("rev-parse", "HEAD").stdout.strip(),
+        "event": event,
+        "profile_requested": profile,
+        "classified_mode": plan["mode"],
+        "mode": effective_mode,
+        "tests": selected_tests,
+        "selected_test_file_count": len(selected_tests),
+        "changed": plan["changed"],
+        "reason": "forced-profile-full" if (profile == "full" and plan["mode"] != "full") else plan["reason"],
+        "includes_feed_suite": effective_mode == "full" or feed_expected.issubset(selected_set),
+        "includes_bridge_suite": effective_mode == "full" or bridge_expected.issubset(selected_set),
+        "includes_h40_h41": includes_h40_h41,
     }
 
 
@@ -213,9 +552,12 @@ def lint_baseline(changed: list[str]) -> None:
     if result.returncode not in (0, 1):
         raise RuntimeError(result.stderr)
     findings = json.loads(result.stdout or "[]")
-    observed = {str(Path(f["filename"]).resolve().relative_to(ROOT)) for f in findings}
+    observed = {Path(f["filename"]).resolve().relative_to(ROOT).as_posix() for f in findings}
+    normalized_changed = {
+        norm for c in changed if (norm := _normalize_changed_path(c)) is not None
+    }
     forbidden = observed - KNOWN_EXE001
-    touched = observed.intersection(changed)
+    touched = observed.intersection(normalized_changed or set(changed))
     if forbidden or touched:
         raise RuntimeError(f"New/touched EXE001 violation: new={forbidden}, touched={touched}")
     print("EXE001 inherited allowlist (not a lint PASS for these files):", sorted(observed))
@@ -284,16 +626,35 @@ def parse_junit_xml(junit_path: Path) -> dict[str, object]:
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Fail-closed, path-aware B-line CI planner")
-    p.add_argument("action", choices=["plan", "lint", "run"])
+    p.add_argument("action", choices=["plan", "lint", "run", "dry-run", "matrix"])
     p.add_argument("--before", default="")
     p.add_argument("--event", default="push")
     p.add_argument("--base-ref", default="")
     p.add_argument("--pr-base-sha", default="")
     p.add_argument("--profile", choices=["focused", "integration", "full"], default="focused")
+    p.add_argument("--synthetic-changed", nargs="*", default=None)
     args = p.parse_args()
 
     plan_path = ROOT / "ci-test-plan.json"
     junit_path = ROOT / "ci-junit.xml"
+
+    if args.action == "matrix":
+        print(json.dumps(export_risk_ownership_matrix(), indent=2))
+        return
+
+    if args.action == "dry-run":
+        changed = (
+            args.synthetic_changed
+            if args.synthetic_changed is not None
+            else changed_paths(
+                before=args.before,
+                event=args.event,
+                base_ref=args.base_ref or None,
+                pr_base_sha=args.pr_base_sha or None,
+            )
+        )
+        print(json.dumps(build_dry_run_plan(changed, profile=args.profile, event=args.event), indent=2))
+        return
 
     if args.action == "plan":
         changed = changed_paths(
@@ -402,3 +763,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
