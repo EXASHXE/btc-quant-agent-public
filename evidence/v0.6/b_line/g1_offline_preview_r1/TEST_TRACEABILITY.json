@@ -1,0 +1,345 @@
+{
+  "stage": "implementation",
+  "cases": [
+    {
+      "F_ID": "F001",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation0-SOURCE_UNAUTHORIZED]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F002",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation1-BAR_PIT_INVALID]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F003",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation2-BAR_PIT_INVALID]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F004",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation3-DECIMAL_BOUNDS]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F005",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation4-BAR_OHLC_INVALID]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F006",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation5-BAR_OHLC_INVALID]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F007",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation6-DECIMAL_BOUNDS]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F008",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation7-DECIMAL_BOUNDS]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F009",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_bar_fails_closed[mutation8-SCHEMA_FIELDS]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F010",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation0-PROPOSAL_SOURCE_DRIFT]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F011",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation1-PROPOSAL_SOURCE_DRIFT]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F012",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation2-PROPOSAL_PIT_OR_EXPIRY]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F013",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation3-PROPOSAL_PIT_OR_EXPIRY]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F014",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation4-QUANTITY_INVALID]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F015",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation5-QUANTITY_INVALID]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F016",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation6-LEVEL_ORDER_INVALID]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F017",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation7-LEVEL_ORDER_INVALID]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F018",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation8-HORIZON_INVALID]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F019",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation9-PROPOSAL_VERSION]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F020",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation10-EXIT_IDENTITY_INVALID]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F021",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation11-PROPOSAL_PIT_OR_EXPIRY]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F022",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_bad_proposal_fails_closed[mutation12-SCHEMA_FIELDS]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F023",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation0-ANALYSIS_STALE_OR_HALLUCINATED]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F024",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation1-ANALYSIS_STALE_OR_HALLUCINATED]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F025",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation2-ANALYSIS_AUTHORITY_OR_CLOCK]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F026",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation3-ANALYSIS_AUTHORITY_OR_CLOCK]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F027",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation4-SECRET_IN_EVENT]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F028",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_model_has_no_authority[mutation5-SCHEMA_FIELDS]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F029",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_manual_gate_and_entry_ack",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F030",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_signed_funding_and_replay_rejected",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F031",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_short_funding_sign_and_mark_not_last",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F032",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_partial_cash_waits_for_ack_and_uses_residual_for_funding",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F033",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_tp_touch_does_not_fill_and_stop_precedes_tp",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F034",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_stop_update_needs_later_bar_and_never_loosens",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F035",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_final_stop_ack_and_cooldown",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F036",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_reordered_and_duplicate_event_fail_without_mutation",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F037",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_outbox_receipt_cannot_change_cash",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F038",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_outbox_tracks_execution_without_bar_noise",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F039",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_analysis_bool_version_and_expiry_rejected",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F040",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_time_cap_uses_first_completed_bar_last_close_and_stop_priority",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F041",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_core.py::test_trusted_fixture_rejects_implicit_approval",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F042",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_crash_boundaries_replay_once[before_append]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F043",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_crash_boundaries_replay_once[after_append]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F044",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_crash_boundaries_replay_once[after_fsync]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F045",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_crash_boundaries_replay_once[after_snapshot]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F046",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_duplicate_same_event_no_wal_cash_change",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F047",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_reused_id_changed_body_fails",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F048",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[truncated]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F049",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[malformed]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F050",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[hash]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F051",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[sequence]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F052",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[state]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F053",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[genesis]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F054",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[duplicatekey]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F055",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_wal_tamper_quarantine_no_ready_state[nonfinite]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F056",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_checkpoint_mutation_rejected",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F057",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_checkpoint_ahead_of_wal_rejected",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F058",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_changed_initial_policy_fail_closed",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F059",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_single_writer_lock",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F060",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_symlink_output_refused_before_follow",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F061",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_invalid_event_not_durable_transaction",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F062",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_strict_json_rejects[{\"x\":1,\"x\":2}]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F063",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_strict_json_rejects[{\"a\":NaN}]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F064",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_strict_json_rejects[{\"a\":Infinity}]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F065",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_strict_json_rejects[{]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F066",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_strict_json_rejects[[1,]",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F067",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_import_surface_sealed",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    },
+    {
+      "F_ID": "F068",
+      "pytest_node": "tests/test_v06_g1_offline_preview_r1_wal.py::test_actual_network_monkeypatch_zero",
+      "assertion_contract": "coded assertion in this node; unsafe rejection has no state/financial WAL effect or explicit quarantine; safe replay equals reference"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Offline descriptive mock analysis R1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "signal_id",
+    "proposal_hash",
+    "source_hash",
+    "as_of",
+    "summary",
+    "risk"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "signal_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proposal_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "as_of": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4102444800000
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "risk": {
+      "const": "DESCRIPTIVE_ONLY"
+    }
+  }
+}
