@@ -1,0 +1,119 @@
+{
+  "audit_version": "market-event-bridge-r2-v1",
+  "task_id": "V06_GEMINI_GOAL_ABC_R2_CLASH_ROUTED_PUBLIC_SOURCE_PIT_BRIDGE",
+  "controller_authority_sha": "acf59828f878f3b1cc56e257dd952a8cd2c9ea97",
+  "upstream_shas": {
+    "a_feed_exact_start_sha": "df00997f344eba82f7cca0d03ee1617948abee44",
+    "b_dependency_read_only_sha": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+    "c_dependency_read_only_sha": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+    "g1_core_read_only_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce"
+  },
+  "incompatibilities": [
+    {
+      "id": "INCOMPAT_1_MARK_TICK_VS_B_KLINE_CONSUMER",
+      "severity": "CRITICAL_SIGNAL_BLOCKER",
+      "producer": "A (forward_public_feed_r1/connector.py)",
+      "consumer": "B (strategy_research/forward_shadow_research_r1/adapter.py)",
+      "description": "A emits 1-second markPriceUpdate ticks without candle structure; B adapter routes Channel.MARK_PRICE to parse_kline_payload expecting candle dictionary {'k': {...}}.",
+      "witness_input": {
+        "e": "markPriceUpdate",
+        "E": 1728720000000,
+        "s": "BTCUSDT",
+        "p": "64000.50",
+        "i": "64001.00",
+        "r": "0.00010000",
+        "T": 1728720000000
+      },
+      "actual_consumer_result": {
+        "bar_open_ms": 0,
+        "bar_close_ms": 1728720000000,
+        "closed": false,
+        "open": 0.0,
+        "high": 0.0,
+        "low": 0.0,
+        "close": 0.0,
+        "volume": 0.0,
+        "taker_buy_volume": 0.0,
+        "quality": "VERIFIED"
+      },
+      "failure_mode": "closed evaluates to False and close evaluates to 0.0; pending_mark_1m is never set; minute-bar pairing never occurs; P1 signal permanently starved.",
+      "reproducible_command": "python3.12 -c \"from scripts.strategy_research.forward_shadow_research_r1.contract import parse_kline_payload; print(parse_kline_payload({'e':'markPriceUpdate','p':'64000.50'}))\""
+    },
+    {
+      "id": "INCOMPAT_2_BOOK_RECEIPT_NO_LADDERS_VS_B_IMBALANCE",
+      "severity": "HIGH_P2_SIGNAL_BLOCKER",
+      "producer": "A (forward_public_feed_r1/contracts.py:BookIntegrityV1)",
+      "consumer": "B (strategy_research/forward_shadow_research_r1/contract.py:BookIntegrityV1)",
+      "description": "A's BookIntegrityV1 contains metadata and counts (observed_depth_levels) but omits bids and asks tuples. B's top_n_imbalance requires bids and asks ladders.",
+      "witness_input": {
+        "snapshot_update_id": 100,
+        "first_update_id": 101,
+        "final_update_id": 102,
+        "previous_final_update_id": 100,
+        "continuous": true,
+        "best_bid": "64000.00",
+        "best_ask": "64001.00",
+        "observed_depth_levels": 20,
+        "stale_age_ms": 10,
+        "quality": "VERIFIED",
+        "reason_codes": ["OK"]
+      },
+      "actual_consumer_result": {
+        "bids": [],
+        "asks": [],
+        "top_n_imbalance_10": null
+      },
+      "failure_mode": "top_n_imbalance returns None; B's P2 signal logic requires top10 imbalance float; no P2 signal can ever trigger.",
+      "reproducible_command": "python3.12 -c \"from scripts.strategy_research.forward_shadow_research_r1.contract import BookIntegrityV1; b = BookIntegrityV1(1,1,1,None,True,None,None,(),(),0,0,'VERIFIED',()); print(b.top_n_imbalance(10))\""
+    },
+    {
+      "id": "INCOMPAT_3_REST_FUNDING_MISSING_FIELDS_ZERO_ACCOUNTING",
+      "severity": "FATAL_FINANCIAL_BLOCKER",
+      "producer": "A (forward_public_feed_r1/connector.py:fetch_latest_settled_funding)",
+      "consumer": "B (strategy_research/forward_shadow_research_r1/contract.py:parse_funding_payload)",
+      "description": "A returns Binance official REST format {fundingTime, fundingRate, symbol}. B's parse_funding_payload looks for {T, r, p} and defaults to 0.0.",
+      "witness_input": {
+        "symbol": "BTCUSDT",
+        "fundingRate": "0.00010000",
+        "fundingTime": 1728720000000
+      },
+      "actual_consumer_result": {
+        "funding_time_ms": 0,
+        "funding_rate": 0.0,
+        "mark_price": 0.0,
+        "settled": true
+      },
+      "failure_mode": "Silent default to 0.0 funding rate and 0.0 mark price; cash flow calculation yields 0.0 cash impact; cash ledger silently drifts; violates financial invariants.",
+      "reproducible_command": "python3.12 -c \"from scripts.strategy_research.forward_shadow_research_r1.contract import parse_funding_payload; print(parse_funding_payload({'fundingRate': '0.0001', 'fundingTime': 1728720000000}))\""
+    },
+    {
+      "id": "INCOMPAT_4_RAW_KLINE_PAYLOAD_VS_C_MARKET_PIT_PORT",
+      "severity": "CRITICAL_PORT_SAFETY_VIOLATION",
+      "producer": "A (forward_public_feed_r1/connector.py:map_raw_frame_to_event)",
+      "consumer": "C (scripts/g1g3_offline_ports_r1/market_pit_port.py:MarketPitPort)",
+      "description": "A produces raw Binance kline frame containing {'k': {...}}. C MarketPitPort expects exact composite BAR schema {'bar_open_ms', 'bar_close_ms', 'closed', 'last_open', 'last_high', 'last_low', 'last_close', 'mark_close', 'event_id'}.",
+      "witness_input": {
+        "e": "kline",
+        "E": 1728720060000,
+        "s": "BTCUSDT",
+        "k": {
+          "t": 1728720000000,
+          "T": 1728720059999,
+          "s": "BTCUSDT",
+          "i": "1m",
+          "o": "64000.00",
+          "c": "64010.00",
+          "h": "64020.00",
+          "l": "63990.00",
+          "v": "10.5",
+          "x": true
+        }
+      },
+      "actual_consumer_result": {
+        "exception": "SafetyViolation('BAR_PAYLOAD_SCHEMA_INVALID')"
+      },
+      "failure_mode": "MarketPitPort immediately rejects envelope with SafetyViolation('BAR_PAYLOAD_SCHEMA_INVALID'); fail-closed behavior halts C loop.",
+      "reproducible_command": "python3.12 -c \"from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort; p=MarketPitPort(); p.ingest_envelope({'schema_version':'market-event-v1','symbol':'BTCUSDT','product':'BINANCE_USDT_M_PERP','channel':'last_kline_1m','provider_event_ms':1,'provider_transaction_ms':None,'observed_wall_utc_ms':1,'observed_monotonic_ns':1,'available_at_ms':1,'source_stream_id':'SYNTHETIC_LOCAL_PIT_V1','connection_epoch':1,'source_sequence':1,'payload_sha256':'','payload':{'k':{}},'quality':'VERIFIED','reason_codes':['OK'],'raw_source_manifest_sha256':p.expected_manifest_sha256})\""
+    }
+  ]
+}
