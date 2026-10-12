@@ -1,0 +1,76 @@
+{
+  "audit_version": "v0.6-architecture-lean-r1",
+  "generated_at_utc": "2026-10-12T17:44:00Z",
+  "base_sha": "97f4040b9380f2069575a989c066d1daeef15194",
+  "authority_l2_sha": "23a5e3ca99e4224550dfd04d44c908e4e38adaf1",
+  "branch": "feature/v06-bline-gemini-boost-architecture-lean-test-r1",
+  "execution_mode": "gemini_boost_convergent",
+  "source_metrics": {
+    "scripts/market_data/forward_public_feed_r1/contracts.py": {
+      "baseline_loc": 430,
+      "post_refactor_loc": 475,
+      "loc_delta": 45,
+      "changes": "Added canonical build_market_event_envelope factory with optional book parameter and type-preserving connection_epoch."
+    },
+    "scripts/market_data/forward_public_feed_r1/proxy_route.py": {
+      "baseline_loc": 415,
+      "post_refactor_loc": 416,
+      "loc_delta": 1,
+      "changes": "Bounded Layer 1 TCP probe timeout to min(config.timeout_seconds, 0.4) for fast fail-closed on unreachable ports."
+    },
+    "scripts/integration/market_event_bridge_r2/bridge_engine.py": {
+      "baseline_loc": 397,
+      "post_refactor_loc": 380,
+      "loc_delta": -17,
+      "changes": "Consolidated 5 manual dictionary constructors to build_market_event_envelope; removed duplicate hashlib and json imports."
+    },
+    "scripts/integration/market_event_bridge_r2/funding_adapter.py": {
+      "baseline_loc": 356,
+      "post_refactor_loc": 382,
+      "loc_delta": 26,
+      "changes": "Hardened settlement mark contemporaneousness, canonical rate Decimal deduplication, and nonfinite validation."
+    },
+    "scripts/integration/market_event_bridge_r2/portable_ci_refs.py": {
+      "baseline_loc": 212,
+      "post_refactor_loc": 225,
+      "loc_delta": 13,
+      "changes": "Added process-level caches for git root, commit availability, and tar archive bytes; added safe tarfile data filter."
+    }
+  },
+  "test_metrics": {
+    "focused_feed_bridge_suite": {
+      "baseline_test_count": 394,
+      "baseline_duration_seconds": 15.98,
+      "stage1_financial_pit_tests": 38,
+      "stage2_mutation_tests": 18,
+      "post_refactor_test_count": 450,
+      "post_refactor_duration_seconds": 10.45,
+      "wall_clock_improvement_percent": 34.6,
+      "status": "ALL_PASSED"
+    },
+    "full_repository_collection": {
+      "collected_tests": 3439,
+      "errors": 0,
+      "skipped": 2,
+      "deleted_tests": 0
+    }
+  },
+  "optimization_breakdown": {
+    "wave_1_envelope_deduplication": {
+      "dictionaries_centralized": 5,
+      "redundant_hash_logic_removed": true,
+      "loc_net_reduction_bridge_engine": 17
+    },
+    "wave_2_socket_probe_bounding": {
+      "proxy_test_suite_baseline_seconds": 4.50,
+      "proxy_test_suite_post_seconds": 1.47,
+      "latency_eliminated_seconds": 3.03
+    },
+    "wave_3_portable_ci_memoization": {
+      "portable_ci_baseline_seconds": 3.80,
+      "portable_ci_post_seconds": 2.60,
+      "subprocess_git_calls_eliminated": 24,
+      "latency_eliminated_seconds": 1.20
+    }
+  }
+}

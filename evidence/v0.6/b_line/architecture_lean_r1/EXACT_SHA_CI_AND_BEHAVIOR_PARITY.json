@@ -1,0 +1,69 @@
+{
+  "parity_audit_id": "V06_GEMINI_BOOST_ARCHITECTURE_LEAN_TEST_RUNTIME_R1",
+  "generated_at_utc": "2026-10-12T17:44:00Z",
+  "exact_commit_shas": {
+    "exact_start_sha": "97f4040b9380f2069575a989c066d1daeef15194",
+    "authority_l2_sha": "23a5e3ca99e4224550dfd04d44c908e4e38adaf1",
+    "pinned_upstream_b_sha": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+    "pinned_upstream_c_sha": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+    "stage1_financial_pit_commit": "8415c48",
+    "stage2_three_wave_refactor_commit": "e68b2b6"
+  },
+  "branch_tracking": {
+    "repository": "EXASHXE/btc-quant-agent-public",
+    "branch": "feature/v06-bline-gemini-boost-architecture-lean-test-r1",
+    "worktree": "/root/workspace/project/quant-v0.6/gemini-boost-architecture-lean-r1"
+  },
+  "behavior_parity_verifications": [
+    {
+      "subsystem": "market_event_envelope_v1",
+      "target_file": "scripts/market_data/forward_public_feed_r1/contracts.py",
+      "parity_status": "IDENTICAL",
+      "verification_method": "Exact key comparison across 16 canonical schema fields and SHA-256 payload verification.",
+      "test_coverage": "tests/test_v06_forward_public_feed_r1_contracts.py"
+    },
+    {
+      "subsystem": "funding_settled_ledger_and_mark_witness",
+      "target_file": "scripts/integration/market_event_bridge_r2/funding_adapter.py",
+      "parity_status": "HARDENED_INVARIANT_PRESERVED",
+      "verification_method": "Enforced settlement time contemporaneousness check (60s tolerance), nonfinite rate/price fail-closed gating, and normalized Decimal rate deduplication.",
+      "test_coverage": "tests/test_v06_architecture_lean_r1_financial_pit.py (38 tests)"
+    },
+    {
+      "subsystem": "bridge_engine_dispatch",
+      "target_file": "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+      "parity_status": "IDENTICAL_DEDUPLICATED",
+      "verification_method": "All five event channels emit envelopes produced by build_market_event_envelope with identical downstream behavior for B and C.",
+      "test_coverage": "tests/test_v06_market_event_bridge_r2_c_composite_g1.py, tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py"
+    },
+    {
+      "subsystem": "proxy_socket_diagnostic",
+      "target_file": "scripts/market_data/forward_public_feed_r1/proxy_route.py",
+      "parity_status": "FAST_FAIL_EQUIVALENT",
+      "verification_method": "Closed ports produce identical diagnostic receipts and failure codes (PROXY_PORT_CLOSED) within 400ms instead of 2000ms.",
+      "test_coverage": "tests/test_v06_forward_public_feed_r1_proxy_route.py"
+    },
+    {
+      "subsystem": "portable_pinned_ci_harness",
+      "target_file": "scripts/integration/market_event_bridge_r2/portable_ci_refs.py",
+      "parity_status": "IDENTICAL_MEMOIZED",
+      "verification_method": "Materialized files match byte-for-byte against PINNED_FILE_CHECKSUMS; git root and archive extraction memoized safely in-memory.",
+      "test_coverage": "tests/test_v06_market_event_bridge_r2_portable_ci.py"
+    },
+    {
+      "subsystem": "mutation_sensitivity_battery",
+      "target_file": "tests/test_v06_architecture_lean_r1_mutation_sensitivity.py",
+      "parity_status": "PROVEN_SENSITIVE",
+      "verification_method": "18 test cases across 12 deliberate mutants (time shift, nonfinite rate, conflicting revision, mark timestamp skew, route epoch drift, hash corruption, crossed book, sequence gap, negative depth, consumer C PIT invalidation, epoch type invalidation, late arrival cash basis) all successfully caught.",
+      "test_coverage": "tests/test_v06_architecture_lean_r1_mutation_sensitivity.py (18 tests)"
+    }
+  ],
+  "ci_guardrail_compliance": {
+    "protected_tests_modified": false,
+    "scientific_holdout_tests_touched": false,
+    "ci_workflow_files_touched": false,
+    "test_plan_files_touched": false,
+    "unauthorized_directories_touched": false,
+    "overall_parity_verdict": "VERIFIED_PARITY_COMPLETE"
+  }
+}
