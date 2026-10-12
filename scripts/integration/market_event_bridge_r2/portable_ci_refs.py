@@ -8,15 +8,22 @@ file checksums, isolated execution, and hermetic guards.
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import os
 import shutil
 import subprocess
 import sys
+import tarfile
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+# Process-level immutable caches to eliminate redundant git subprocesses
+_GIT_ROOT_CACHE: Path | None = None
+_COMMITS_AVAILABLE_CACHE: set[str] = set()
+_TAR_BYTES_CACHE: dict[tuple[str, str], bytes] = {}
 
 # Pinned upstream immutable Git SHAs
 UPSTREAM_B_PINNED_SHA = "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8"
@@ -70,9 +77,14 @@ class MaterializedSourceWitness:
 
 
 def _find_git_root(start_path: Path | None = None) -> Path:
+    global _GIT_ROOT_CACHE
+    if start_path is None and _GIT_ROOT_CACHE is not None and (_GIT_ROOT_CACHE / ".git").exists():
+        return _GIT_ROOT_CACHE
     current = (start_path or Path(__file__)).resolve()
     for parent in [current, *current.parents]:
         if (parent / ".git").exists():
+            if start_path is None:
+                _GIT_ROOT_CACHE = parent
             return parent
     raise PinnedSourceError(f"No git repository found from {current}")
 
@@ -121,6 +133,8 @@ class PortablePinnedSourceHarness:
     def _ensure_commit_available(self, commit_sha: str) -> None:
         if not commit_sha or len(commit_sha) != 40 or not all(c in "0123456789abcdefABCDEF" for c in commit_sha):
             raise PinnedSourceError(f"Invalid git commit SHA: {commit_sha}")
+        if commit_sha in _COMMITS_AVAILABLE_CACHE:
+            return
         res = subprocess.run(
             ["git", "cat-file", "-e", f"{commit_sha}^{{commit}}"],
             cwd=self.git_root,
@@ -129,6 +143,7 @@ class PortablePinnedSourceHarness:
             check=False,
         )
         if res.returncode == 0:
+            _COMMITS_AVAILABLE_CACHE.add(commit_sha)
             return
 
         if not self.allow_network_fetch:
@@ -146,6 +161,7 @@ class PortablePinnedSourceHarness:
             raise PinnedUpstreamUnavailable(
                 f"PINNED_UPSTREAM_UNAVAILABLE: failed to fetch {commit_sha}: {fetch_res.stderr.strip()}"
             )
+        _COMMITS_AVAILABLE_CACHE.add(commit_sha)
 
     def materialize(
         self,
@@ -182,26 +198,27 @@ class PortablePinnedSourceHarness:
         for subpath in subpaths:
             if ".." in subpath or subpath.startswith("/"):
                 raise SecurityViolationError(f"Invalid subpath: {subpath}")
-            proc = subprocess.Popen(
-                ["git", "archive", commit_sha, subpath],
-                cwd=self.git_root,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            tar_proc = subprocess.Popen(
-                ["tar", "-x", "-C", str(target_dir)],
-                stdin=proc.stdout,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            assert proc.stdout is not None
-            proc.stdout.close()
-            _, tar_err = tar_proc.communicate()
-            _, git_err = proc.communicate()
-            if proc.returncode != 0 or tar_proc.returncode != 0:
-                raise PinnedSourceError(
-                    f"git archive extraction failed for {subpath}: {git_err.decode()} {tar_err.decode()}"
+            cache_key = (commit_sha, subpath)
+            tar_bytes = _TAR_BYTES_CACHE.get(cache_key)
+            if tar_bytes is None:
+                proc = subprocess.run(
+                    ["git", "archive", commit_sha, subpath],
+                    cwd=self.git_root,
+                    capture_output=True,
+                    check=False,
                 )
+                if proc.returncode != 0:
+                    raise PinnedSourceError(
+                        f"git archive extraction failed for {subpath}: {proc.stderr.decode()}"
+                    )
+                tar_bytes = proc.stdout
+                _TAR_BYTES_CACHE[cache_key] = tar_bytes
+
+            with tarfile.open(fileobj=io.BytesIO(tar_bytes), mode="r:*") as tf:
+                if hasattr(tarfile, "data_filter"):
+                    tf.extractall(path=target_dir, filter="data")
+                else:
+                    tf.extractall(path=target_dir)
 
         if verify_manifest and commit_sha in PINNED_FILE_CHECKSUMS:
             self._verify_checksums(target_dir, commit_sha)

@@ -8,23 +8,20 @@ to B's PublicFeedAdapter and C's MarketPitPort.
 from __future__ import annotations
 
 import decimal
-import hashlib
-import json
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
+from scripts.market_data.forward_public_feed_r1.contracts import (
+    build_market_event_envelope,
+    compute_sha256,
+)
 from scripts.market_data.forward_public_feed_r1.order_book import OrderBookIntegrityEngine
 
 from .book_ladder import OrderBookLadderAdapter, Top10BookSnapshot
 from .c_composite_bar import CCompositeBarBuilder
 from .funding_adapter import MarkPriceWitness, SettledFundingLedger
 from .mark_aggregator import DerivedMark1MBar, MarkPriceAggregator
-
-
-def _sha256(data: Any) -> str:
-    raw = json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    return hashlib.sha256(raw).hexdigest()
 
 
 @dataclass
@@ -109,7 +106,7 @@ class MarketEventBridgeR2:
     ) -> dict[str, Any]:
         """Ingest raw Binance frame or normalized A frame and dispatch causally."""
         self.stats.total_frames_ingested += 1
-        payload_sha = _sha256(frame)
+        payload_sha = compute_sha256(frame)
 
         event_type = frame.get("e")
         result: dict[str, Any] = {"status": "INGESTED", "emitted_to_b": False, "emitted_to_c": False}
@@ -134,26 +131,23 @@ class MarketEventBridgeR2:
 
             # Dispatch book to B adapter if present
             if self.b_adapter is not None:
-                b_event_dict = {
-                    "schema_version": "market-event-v1",
-                    "symbol": self.symbol,
-                    "product": "BINANCE_USDT_M_PERP",
-                    "channel": "depth_delta",
-                    "provider_event_ms": frame.get("E", observed_wall_utc_ms),
-                    "provider_transaction_ms": frame.get("T"),
-                    "observed_wall_utc_ms": observed_wall_utc_ms,
-                    "observed_monotonic_ns": observed_monotonic_ns,
-                    "available_at_ms": observed_wall_utc_ms,
-                    "source_stream_id": f"{self.symbol.lower()}@depth@100ms",
-                    "connection_epoch": str(self.connection_epoch),
-                    "source_sequence": frame.get("u"),
-                    "payload_sha256": payload_sha,
-                    "payload": frame,
-                    "quality": top10.quality,
-                    "reason_codes": list(top10.reason_codes),
-                    "raw_source_manifest_sha256": raw_manifest_sha256,
-                    "book": top10.to_b_book_dict(),
-                }
+                b_event_dict = build_market_event_envelope(
+                    symbol=self.symbol,
+                    channel="depth_delta",
+                    payload=frame,
+                    observed_wall_utc_ms=observed_wall_utc_ms,
+                    observed_monotonic_ns=observed_monotonic_ns,
+                    available_at_ms=observed_wall_utc_ms,
+                    provider_event_ms=frame.get("E", observed_wall_utc_ms),
+                    provider_transaction_ms=frame.get("T"),
+                    source_stream_id=f"{self.symbol.lower()}@depth@100ms",
+                    connection_epoch=self.connection_epoch,
+                    source_sequence=frame.get("u"),
+                    quality=top10.quality,
+                    reason_codes=list(top10.reason_codes),
+                    raw_source_manifest_sha256=raw_manifest_sha256,
+                    book=top10.to_b_book_dict(),
+                )
                 self.b_adapter.ingest_dict(b_event_dict)
                 self.stats.b_events_dispatched += 1
                 result["emitted_to_b"] = True
@@ -203,25 +197,22 @@ class MarketEventBridgeR2:
                 # Dispatch derived mark bar to B adapter as completed kline
                 if self.b_adapter is not None:
                     b_mark_payload = derived_bar.to_b_kline_payload()
-                    b_mark_event = {
-                        "schema_version": "market-event-v1",
-                        "symbol": self.symbol,
-                        "product": "BINANCE_USDT_M_PERP",
-                        "channel": "mark_price",
-                        "provider_event_ms": derived_bar.bar_close_ms,
-                        "provider_transaction_ms": derived_bar.bar_close_ms,
-                        "observed_wall_utc_ms": derived_bar.derived_available_at_ms,
-                        "observed_monotonic_ns": observed_monotonic_ns,
-                        "available_at_ms": derived_bar.derived_available_at_ms,
-                        "source_stream_id": f"{self.symbol.lower()}@markPrice@1m",
-                        "connection_epoch": str(self.connection_epoch),
-                        "source_sequence": derived_bar.sample_count,
-                        "payload_sha256": _sha256(b_mark_payload),
-                        "payload": b_mark_payload,
-                        "quality": derived_bar.quality,
-                        "reason_codes": list(derived_bar.reason_codes),
-                        "raw_source_manifest_sha256": raw_manifest_sha256,
-                    }
+                    b_mark_event = build_market_event_envelope(
+                        symbol=self.symbol,
+                        channel="mark_price",
+                        payload=b_mark_payload,
+                        provider_event_ms=derived_bar.bar_close_ms,
+                        provider_transaction_ms=derived_bar.bar_close_ms,
+                        observed_wall_utc_ms=derived_bar.derived_available_at_ms,
+                        observed_monotonic_ns=observed_monotonic_ns,
+                        available_at_ms=derived_bar.derived_available_at_ms,
+                        source_stream_id=f"{self.symbol.lower()}@markPrice@1m",
+                        connection_epoch=self.connection_epoch,
+                        source_sequence=derived_bar.sample_count,
+                        quality=derived_bar.quality,
+                        reason_codes=list(derived_bar.reason_codes),
+                        raw_source_manifest_sha256=raw_manifest_sha256,
+                    )
                     self.b_adapter.ingest_dict(b_mark_event)
                     self.stats.b_events_dispatched += 1
                     result["emitted_to_b"] = True
@@ -230,25 +221,22 @@ class MarketEventBridgeR2:
         elif event_type == "aggTrade":
             self.stats.trades_ingested += 1
             if self.b_adapter is not None:
-                b_trade_event = {
-                    "schema_version": "market-event-v1",
-                    "symbol": self.symbol,
-                    "product": "BINANCE_USDT_M_PERP",
-                    "channel": "agg_trade",
-                    "provider_event_ms": frame.get("E", observed_wall_utc_ms),
-                    "provider_transaction_ms": frame.get("T"),
-                    "observed_wall_utc_ms": observed_wall_utc_ms,
-                    "observed_monotonic_ns": observed_monotonic_ns,
-                    "available_at_ms": observed_wall_utc_ms,
-                    "source_stream_id": f"{self.symbol.lower()}@aggTrade",
-                    "connection_epoch": str(self.connection_epoch),
-                    "source_sequence": frame.get("a"),
-                    "payload_sha256": payload_sha,
-                    "payload": frame,
-                    "quality": "VERIFIED",
-                    "reason_codes": ["OK"],
-                    "raw_source_manifest_sha256": raw_manifest_sha256,
-                }
+                b_trade_event = build_market_event_envelope(
+                    symbol=self.symbol,
+                    channel="agg_trade",
+                    payload=frame,
+                    provider_event_ms=frame.get("E", observed_wall_utc_ms),
+                    provider_transaction_ms=frame.get("T"),
+                    observed_wall_utc_ms=observed_wall_utc_ms,
+                    observed_monotonic_ns=observed_monotonic_ns,
+                    available_at_ms=observed_wall_utc_ms,
+                    source_stream_id=f"{self.symbol.lower()}@aggTrade",
+                    connection_epoch=self.connection_epoch,
+                    source_sequence=frame.get("a"),
+                    quality="VERIFIED",
+                    reason_codes=["OK"],
+                    raw_source_manifest_sha256=raw_manifest_sha256,
+                )
                 self.b_adapter.ingest_dict(b_trade_event)
                 self.stats.b_events_dispatched += 1
                 result["emitted_to_b"] = True
@@ -267,25 +255,22 @@ class MarketEventBridgeR2:
 
                 # Forward Last 1m to B adapter
                 if self.b_adapter is not None:
-                    b_kline_event = {
-                        "schema_version": "market-event-v1",
-                        "symbol": self.symbol,
-                        "product": "BINANCE_USDT_M_PERP",
-                        "channel": "last_kline_1m",
-                        "provider_event_ms": frame.get("E", observed_wall_utc_ms),
-                        "provider_transaction_ms": frame.get("T"),
-                        "observed_wall_utc_ms": observed_wall_utc_ms,
-                        "observed_monotonic_ns": observed_monotonic_ns,
-                        "available_at_ms": observed_wall_utc_ms,
-                        "source_stream_id": f"{self.symbol.lower()}@kline_1m",
-                        "connection_epoch": str(self.connection_epoch),
-                        "source_sequence": k.get("L"),
-                        "payload_sha256": payload_sha,
-                        "payload": frame,
-                        "quality": "VERIFIED",
-                        "reason_codes": ["OK"],
-                        "raw_source_manifest_sha256": raw_manifest_sha256,
-                    }
+                    b_kline_event = build_market_event_envelope(
+                        symbol=self.symbol,
+                        channel="last_kline_1m",
+                        payload=frame,
+                        observed_wall_utc_ms=observed_wall_utc_ms,
+                        observed_monotonic_ns=observed_monotonic_ns,
+                        available_at_ms=observed_wall_utc_ms,
+                        provider_event_ms=frame.get("E", observed_wall_utc_ms),
+                        provider_transaction_ms=frame.get("T"),
+                        source_stream_id=f"{self.symbol.lower()}@kline_1m",
+                        connection_epoch=self.connection_epoch,
+                        source_sequence=k.get("L"),
+                        quality="VERIFIED",
+                        reason_codes=["OK"],
+                        raw_source_manifest_sha256=raw_manifest_sha256,
+                    )
                     self.b_adapter.ingest_dict(b_kline_event)
                     self.stats.b_events_dispatched += 1
                     result["emitted_to_b"] = True
@@ -342,25 +327,22 @@ class MarketEventBridgeR2:
                 # Dispatch to B
                 if self.b_adapter is not None:
                     b_fund_payload = entry.to_b_funding_payload()
-                    b_fund_event = {
-                        "schema_version": "market-event-v1",
-                        "symbol": self.symbol,
-                        "product": "BINANCE_USDT_M_PERP",
-                        "channel": "funding_settled",
-                        "provider_event_ms": entry.funding_time_ms,
-                        "provider_transaction_ms": entry.funding_time_ms,
-                        "observed_wall_utc_ms": observed_wall_utc_ms,
-                        "observed_monotonic_ns": observed_monotonic_ns,
-                        "available_at_ms": observed_wall_utc_ms,
-                        "source_stream_id": f"{self.symbol.lower()}@fundingRate",
-                        "connection_epoch": str(self.connection_epoch),
-                        "source_sequence": None,
-                        "payload_sha256": _sha256(b_fund_payload),
-                        "payload": b_fund_payload,
-                        "quality": "VERIFIED",
-                        "reason_codes": ["OK"],
-                        "raw_source_manifest_sha256": raw_manifest_sha256,
-                    }
+                    b_fund_event = build_market_event_envelope(
+                        symbol=self.symbol,
+                        channel="funding_settled",
+                        payload=b_fund_payload,
+                        observed_wall_utc_ms=observed_wall_utc_ms,
+                        observed_monotonic_ns=observed_monotonic_ns,
+                        available_at_ms=observed_wall_utc_ms,
+                        provider_event_ms=entry.funding_time_ms,
+                        provider_transaction_ms=entry.funding_time_ms,
+                        source_stream_id=f"{self.symbol.lower()}@fundingRate",
+                        connection_epoch=self.connection_epoch,
+                        source_sequence=None,
+                        quality="VERIFIED",
+                        reason_codes=["OK"],
+                        raw_source_manifest_sha256=raw_manifest_sha256,
+                    )
                     self.b_adapter.ingest_dict(b_fund_event)
                     self.stats.b_events_dispatched += 1
                     result["emitted_to_b"] = True
@@ -368,25 +350,22 @@ class MarketEventBridgeR2:
                 # Dispatch to C
                 if self.c_port is not None:
                     c_fund_payload = entry.to_c_funding_payload()
-                    c_fund_env = {
-                        "schema_version": "market-event-v1",
-                        "symbol": self.symbol,
-                        "product": "BINANCE_USDT_M_PERP",
-                        "channel": "funding_settled",
-                        "provider_event_ms": entry.funding_time_ms,
-                        "provider_transaction_ms": entry.funding_time_ms,
-                        "observed_wall_utc_ms": observed_wall_utc_ms,
-                        "observed_monotonic_ns": observed_monotonic_ns,
-                        "available_at_ms": observed_wall_utc_ms,
-                        "source_stream_id": self.c_bar_builder.stream_id,
-                        "connection_epoch": self.connection_epoch,
-                        "source_sequence": None,
-                        "payload_sha256": _sha256(c_fund_payload),
-                        "payload": c_fund_payload,
-                        "quality": "VERIFIED",
-                        "reason_codes": ["OK"],
-                        "raw_source_manifest_sha256": self.c_bar_builder.manifest_sha256,
-                    }
+                    c_fund_env = build_market_event_envelope(
+                        symbol=self.symbol,
+                        channel="funding_settled",
+                        payload=c_fund_payload,
+                        observed_wall_utc_ms=observed_wall_utc_ms,
+                        observed_monotonic_ns=observed_monotonic_ns,
+                        available_at_ms=observed_wall_utc_ms,
+                        provider_event_ms=entry.funding_time_ms,
+                        provider_transaction_ms=entry.funding_time_ms,
+                        source_stream_id=self.c_bar_builder.stream_id,
+                        connection_epoch=self.connection_epoch,
+                        source_sequence=None,
+                        quality="VERIFIED",
+                        reason_codes=["OK"],
+                        raw_source_manifest_sha256=self.c_bar_builder.manifest_sha256,
+                    )
                     try:
                         self.c_port.ingest_envelope(c_fund_env)
                         self.stats.c_events_dispatched += 1

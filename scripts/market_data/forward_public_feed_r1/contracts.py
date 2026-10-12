@@ -427,3 +427,49 @@ class MarketEventV1:
             raw_source_manifest_sha256=str(data.get("raw_source_manifest_sha256", "")),
             book=book,
         )
+
+
+def build_market_event_envelope(
+    symbol: str,
+    channel: str,
+    payload: dict[str, Any],
+    observed_wall_utc_ms: int,
+    observed_monotonic_ns: int,
+    available_at_ms: int,
+    provider_event_ms: int | None = None,
+    provider_transaction_ms: int | None = None,
+    source_stream_id: str = "",
+    connection_epoch: str | int = "1",
+    source_sequence: int | None = None,
+    quality: str = "VERIFIED",
+    reason_codes: list[str] | None = None,
+    raw_source_manifest_sha256: str = "",
+    product: str = ALLOWED_PRODUCT,
+    schema_version: str = SCHEMA_VERSION,
+    book: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Canonical factory for market-event-v1 envelope dictionaries."""
+    payload_sha = compute_sha256(payload)
+    envelope: dict[str, Any] = {
+        "schema_version": schema_version,
+        "symbol": symbol,
+        "product": product,
+        "channel": channel,
+        "provider_event_ms": provider_event_ms,
+        "provider_transaction_ms": provider_transaction_ms,
+        "observed_wall_utc_ms": observed_wall_utc_ms,
+        "observed_monotonic_ns": observed_monotonic_ns,
+        "available_at_ms": available_at_ms,
+        "source_stream_id": source_stream_id,
+        "connection_epoch": connection_epoch,
+        "source_sequence": source_sequence,
+        "payload_sha256": payload_sha,
+        "payload": payload,
+        "quality": quality,
+        "reason_codes": list(reason_codes) if reason_codes is not None else ["OK"],
+        "raw_source_manifest_sha256": raw_source_manifest_sha256,
+    }
+    if book is not None:
+        envelope["book"] = book
+    return envelope
+

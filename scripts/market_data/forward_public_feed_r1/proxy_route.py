@@ -397,7 +397,8 @@ def run_desensitized_network_diagnostic(config: ProxyRouteConfig) -> dict[str, A
         if config.mode == "public-clash-explicit":
             assert config.host is not None and config.port is not None
             # Layer 1: Local TCP Probe
-            tcp_ok = probe_tcp_socket(config.host, config.port, timeout=2.0)
+            tcp_probe_timeout = min(config.timeout_seconds, 0.4)
+            tcp_ok = probe_tcp_socket(config.host, config.port, timeout=tcp_probe_timeout)
             if not tcp_ok:
                 layers["layer_1_local_tcp"] = {"status": "FAILED", "host": config.host, "port": config.port}
                 terminal_code = NetworkErrorCode.PROXY_PORT_CLOSED
