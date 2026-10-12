@@ -1,0 +1,1081 @@
+{
+  "scope": "Focused offline Python accounting and import review; no release authority",
+  "baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+  "baseline_parent": "b86843bb11a10e0a3a293d4d918671c6c41d08fa",
+  "audit_branch": "feature/v06-bline-codex-r3-independent-causal-audit-r1",
+  "python": "3.12.3",
+  "reference_revisions": {
+    "B": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+    "C": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+  },
+  "harness_commit": "0e5f1b2d3d6682ea69de90e8693d705a5872d655",
+  "harness_files": [
+    {
+      "path": "scripts/audits/r3_codex_causal_audit_r1/review.py",
+      "sha256": "869b903ed155b45388f736dc34479e5355ac94e92a9157c77ffd258a6b207573"
+    },
+    {
+      "path": "tests/test_v06_r3_codex_causal_audit_r1_focused.py",
+      "sha256": "5d2a20de6997d08666803495ec8610764581a812732800d5637348a0462fd500"
+    }
+  ],
+  "source_files": [
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "scripts/integration/market_event_bridge_r2/__init__.py",
+      "sha256": "71bfac7f9e325ca65684f984f39523977eaa6bbe91d61e280d91e807869855c1"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+      "sha256": "9b48d3e8564e2ce4053e57a88b85dc3df71ecec0e3df1ab5ea9a60ac47043838"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "scripts/integration/market_event_bridge_r2/funding_adapter.py",
+      "sha256": "cbd5abfa82f6d812e27c7864322c3f77fa4db900c529c2b822fe0a1c8d13c062"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "scripts/integration/market_event_bridge_r2/mark_aggregator.py",
+      "sha256": "0fb3676e85ffea93b66e3ee38fe50ba041b8538f321a002c3fffd88f4f08092b"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "scripts/integration/market_event_bridge_r2/c_composite_bar.py",
+      "sha256": "49b21e5cbb02863c743d169fc05400c6bf5ee1eac4b8aa017281d3a9cd63a63c"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "scripts/integration/market_event_bridge_r2/book_ladder.py",
+      "sha256": "1f89e6f26ea3e7f7f92067e0d89e7f0de2e9a237f09060e55a9bdb2b66fd9cfb"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "scripts/market_data/forward_public_feed_r1/__init__.py",
+      "sha256": "7de91b6e5a35dc884e5ddc0ca30d0829c17c35629c16472d48b0de89931c5758"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "scripts/market_data/forward_public_feed_r1/order_book.py",
+      "sha256": "c6e1bd36df7d5ab5efd0c4554eb747b3beb0a636cd8947c21c683bd7a8eea0df"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "scripts/market_data/forward_public_feed_r1/contracts.py",
+      "sha256": "7294502100771e872787a3ba0914278e07a46abf80b7b1ea8586b42f43fc4100"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+      "sha256": "5d4ce1e7032fa7b1d1af4d2f4313b2dc507c06b5bac2479dfbdc04f9cbb44258"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "tests/test_v06_market_event_bridge_r2_depth_ladder_l2.py",
+      "sha256": "b31c0e60bd534771f935449eb7bacf2d1f669cb73fd1332d24ac9c91b7a50827"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py",
+      "sha256": "0e7aa8bd9cec70599b0ffa221be3e2d6807189163b4adc21836dace2ded93fe2"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+      "sha256": "813c7fab53f9935c5d4b6267ab8abbc25616937201b0924f0be07ae29908bf6c"
+    },
+    {
+      "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "path": "tests/test_v06_market_event_bridge_r2_stress_and_security.py",
+      "sha256": "eaa91726457c52c10a1bbc5dd812bfff9ae4a74fcc990907b58dd269db4f152a"
+    },
+    {
+      "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "path": "scripts/strategy_research/forward_shadow_research_r1/__init__.py",
+      "sha256": "ebee94f04f1475df61aff64f2776e3ae996471f38aa20ac13b4c9b745f111c88"
+    },
+    {
+      "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "path": "scripts/strategy_research/forward_shadow_research_r1/adapter.py",
+      "sha256": "fa31bc3fe2ee5bdadd8b5554d0f01e53986c8a304caa53005f357963d6bba9a3"
+    },
+    {
+      "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "path": "scripts/strategy_research/forward_shadow_research_r1/contract.py",
+      "sha256": "ecc809f8922cb20283305993b3e54307777f121f5e59bea0fa1bb04af9389d0a"
+    },
+    {
+      "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "path": "scripts/strategy_research/forward_shadow_research_r1/execution.py",
+      "sha256": "a598f7e593e85320d6b77dd27a0cb4792402f4e7ac60bc1812ffdb4fcf1e6680"
+    },
+    {
+      "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "path": "scripts/strategy_research/forward_shadow_research_r1/account.py",
+      "sha256": "185e0723300b632f54692e08603eb158dca8f606ba5855a085d2025a3c27eb2e"
+    },
+    {
+      "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "path": "scripts/strategy_research/forward_shadow_research_r1/registry.py",
+      "sha256": "c3c2669196bc538e0d0e224839c484cbc6e661ed0bbc06aaa26008d1b044192f"
+    },
+    {
+      "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "path": "scripts/strategy_research/forward_shadow_research_r1/signals.py",
+      "sha256": "ae340ac4e5d5aa3bc67b2276bad684715b0b1c03e32f9b748b4376a48f594006"
+    },
+    {
+      "revision": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+      "path": "scripts/g1g3_offline_ports_r1/__init__.py",
+      "sha256": "95eb8fdb131e11431bdc9569033767dbe0d98dcb215b1d024535a33602c3af61"
+    },
+    {
+      "revision": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+      "path": "scripts/g1g3_offline_ports_r1/market_pit_port.py",
+      "sha256": "e57e3319f14547a8031adebae0aab61ee041751c1f949f152410959c7454b9c9"
+    },
+    {
+      "revision": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+      "path": "scripts/g1_offline_preview_r1/model.py",
+      "sha256": "086d6ec8747f82d59b6f8f42bfefd2d9c61e5f962707b4f9119f784741dd206e"
+    },
+    {
+      "revision": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+      "path": "scripts/g1_offline_preview_r1/fixtures.py",
+      "sha256": "9999418e5cb1f9fd98d1f4cae5c1d460a9593b28c9f7f338a3043374fa4ea8b0"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "delay_200",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "b_ingress": 180200,
+        "c_ingress": 180200,
+        "c_available": 180200,
+        "earlier_decision_rejected": true
+      },
+      "observed": {
+        "b_ingress": 180200,
+        "b_accounting_receive_time": 180200,
+        "c_ingress": 180000,
+        "c_available": 180000,
+        "c_feature_known": 180000,
+        "earlier_decision_rejected": false,
+        "c_status": "ACCEPTED",
+        "entry_known_at": 180200
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "delay_30000",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "b_ingress": 210000,
+        "c_ingress": 210000,
+        "c_available": 210000,
+        "earlier_decision_rejected": true
+      },
+      "observed": {
+        "b_ingress": 210000,
+        "b_accounting_receive_time": 210000,
+        "c_ingress": 180000,
+        "c_available": 180000,
+        "c_feature_known": 180000,
+        "earlier_decision_rejected": false,
+        "c_status": "ACCEPTED",
+        "entry_known_at": 210000
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "delay_10800000",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "b_ingress": 10980000,
+        "c_ingress": 10980000,
+        "c_available": 10980000,
+        "earlier_decision_rejected": true
+      },
+      "observed": {
+        "b_ingress": 10980000,
+        "b_accounting_receive_time": 10980000,
+        "c_ingress": 180000,
+        "c_available": 180000,
+        "c_feature_known": 180000,
+        "earlier_decision_rejected": false,
+        "c_status": "ACCEPTED",
+        "entry_known_at": 10980000
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "correct_c_receipt",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "corrected_receipt_envelope": "ACCEPTED",
+        "available_at_ms": 180200
+      },
+      "observed": {
+        "corrected_receipt_envelope": "FUNDING_PIT_INVALID",
+        "available_at_ms": 180200
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "mark_missing",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "entry_quality": "not VERIFIED",
+        "explicit_status": "NO_REALIZED_CASH_BASIS / UNKNOWN / COST_INCOMPLETE",
+        "cash_basis": "finite positive settlement-time mark with ingress/source/epoch provenance"
+      },
+      "observed": {
+        "bridge_status": "INGESTED",
+        "entry": null,
+        "route_epoch": "route-epoch-0",
+        "cached_mark": "None",
+        "dispatched_b": false,
+        "dispatched_c": false
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "mark_stale",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "entry_quality": "not VERIFIED",
+        "explicit_status": "NO_REALIZED_CASH_BASIS / UNKNOWN / COST_INCOMPLETE",
+        "cash_basis": "finite positive settlement-time mark with ingress/source/epoch provenance"
+      },
+      "observed": {
+        "bridge_status": "INGESTED",
+        "entry": {
+          "schema_version": "settled-funding-entry-v1",
+          "derivation_version": "settled-funding-entry-v1",
+          "symbol": "BTCUSDT",
+          "funding_time_ms": 180000,
+          "funding_rate": "0.0001",
+          "mark_price": "60000.0",
+          "settlement_id": "BTCUSDT:180000:0.0001",
+          "settled": true,
+          "rate_type": "SETTLED_REALIZED",
+          "source_observed_wall_utc_ms": 180000,
+          "source_available_at_ms": 180000,
+          "derived_available_at_ms": 180000,
+          "feature_known_at_ms": 180000,
+          "clock_uncertainty_ms": 0,
+          "route_epoch": "route-epoch-0",
+          "connection_epoch": 1,
+          "parent_event_sha256": [],
+          "raw_source_manifest_sha256": "synthetic-funding-source",
+          "producer_manifest_sha256": "synthetic-funding-source",
+          "producer_upstream_sha": "df00997f344eba82f7cca0d03ee1617948abee44",
+          "quality": "VERIFIED",
+          "reason_codes": [
+            "OK"
+          ],
+          "canonical_sha256": "9d751e7e769848ffb96e96772eb3d6df6f740e1cac8bb0bb45d4672bb4b9dc37"
+        },
+        "route_epoch": "route-epoch-0",
+        "cached_mark": "60000.0",
+        "dispatched_b": true,
+        "dispatched_c": true,
+        "cash_long_1btc": "-6.00000000"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "mark_after_settlement",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "entry_quality": "not VERIFIED",
+        "explicit_status": "NO_REALIZED_CASH_BASIS / UNKNOWN / COST_INCOMPLETE",
+        "cash_basis": "finite positive settlement-time mark with ingress/source/epoch provenance"
+      },
+      "observed": {
+        "bridge_status": "INGESTED",
+        "entry": {
+          "schema_version": "settled-funding-entry-v1",
+          "derivation_version": "settled-funding-entry-v1",
+          "symbol": "BTCUSDT",
+          "funding_time_ms": 180000,
+          "funding_rate": "0.0001",
+          "mark_price": "90000.0",
+          "settlement_id": "BTCUSDT:180000:0.0001",
+          "settled": true,
+          "rate_type": "SETTLED_REALIZED",
+          "source_observed_wall_utc_ms": 10980000,
+          "source_available_at_ms": 10980000,
+          "derived_available_at_ms": 10980000,
+          "feature_known_at_ms": 10980000,
+          "clock_uncertainty_ms": 0,
+          "route_epoch": "route-epoch-0",
+          "connection_epoch": 1,
+          "parent_event_sha256": [],
+          "raw_source_manifest_sha256": "synthetic-funding-source",
+          "producer_manifest_sha256": "synthetic-funding-source",
+          "producer_upstream_sha": "df00997f344eba82f7cca0d03ee1617948abee44",
+          "quality": "VERIFIED",
+          "reason_codes": [
+            "OK"
+          ],
+          "canonical_sha256": "dca03d44d63740c57af0e189715fabfeea011a7a5132b5fcd553cdd34ecb415d"
+        },
+        "route_epoch": "route-epoch-0",
+        "cached_mark": "90000.0",
+        "dispatched_b": true,
+        "dispatched_c": true,
+        "cash_long_1btc": "-9.00000000"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "mark_route_switch",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "entry_quality": "not VERIFIED",
+        "explicit_status": "NO_REALIZED_CASH_BASIS / UNKNOWN / COST_INCOMPLETE",
+        "cash_basis": "finite positive settlement-time mark with ingress/source/epoch provenance"
+      },
+      "observed": {
+        "bridge_status": "INGESTED",
+        "entry": {
+          "schema_version": "settled-funding-entry-v1",
+          "derivation_version": "settled-funding-entry-v1",
+          "symbol": "BTCUSDT",
+          "funding_time_ms": 180000,
+          "funding_rate": "0.0001",
+          "mark_price": "60000.0",
+          "settlement_id": "BTCUSDT:180000:0.0001",
+          "settled": true,
+          "rate_type": "SETTLED_REALIZED",
+          "source_observed_wall_utc_ms": 180000,
+          "source_available_at_ms": 180000,
+          "derived_available_at_ms": 180000,
+          "feature_known_at_ms": 180000,
+          "clock_uncertainty_ms": 0,
+          "route_epoch": "route-epoch-0",
+          "connection_epoch": 1,
+          "parent_event_sha256": [],
+          "raw_source_manifest_sha256": "synthetic-funding-source",
+          "producer_manifest_sha256": "synthetic-funding-source",
+          "producer_upstream_sha": "df00997f344eba82f7cca0d03ee1617948abee44",
+          "quality": "VERIFIED",
+          "reason_codes": [
+            "OK"
+          ],
+          "canonical_sha256": "9d751e7e769848ffb96e96772eb3d6df6f740e1cac8bb0bb45d4672bb4b9dc37"
+        },
+        "route_epoch": "route-epoch-1",
+        "cached_mark": "60000.0",
+        "dispatched_b": true,
+        "dispatched_c": true,
+        "cash_long_1btc": "-6.00000000"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "mark_infinity",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "entry_quality": "not VERIFIED",
+        "explicit_status": "NO_REALIZED_CASH_BASIS / UNKNOWN / COST_INCOMPLETE",
+        "cash_basis": "finite positive settlement-time mark with ingress/source/epoch provenance"
+      },
+      "observed": {
+        "uncaught_exception": "ValueError",
+        "journal_entries": 1,
+        "journal": [
+          {
+            "schema_version": "settled-funding-entry-v1",
+            "derivation_version": "settled-funding-entry-v1",
+            "symbol": "BTCUSDT",
+            "funding_time_ms": 180000,
+            "funding_rate": "0.0001",
+            "mark_price": "Infinity",
+            "settlement_id": "BTCUSDT:180000:0.0001",
+            "settled": true,
+            "rate_type": "SETTLED_REALIZED",
+            "source_observed_wall_utc_ms": 180000,
+            "source_available_at_ms": 180000,
+            "derived_available_at_ms": 180000,
+            "feature_known_at_ms": 180000,
+            "clock_uncertainty_ms": 0,
+            "route_epoch": "route-epoch-0",
+            "connection_epoch": 1,
+            "parent_event_sha256": [],
+            "raw_source_manifest_sha256": "synthetic-funding-source",
+            "producer_manifest_sha256": "synthetic-funding-source",
+            "producer_upstream_sha": "df00997f344eba82f7cca0d03ee1617948abee44",
+            "quality": "VERIFIED",
+            "reason_codes": [
+              "OK"
+            ],
+            "canonical_sha256": "798ae9245c312d55193f82033582eb9b4c3b1e2d5d7e87a263759bcef7f8c295"
+          }
+        ],
+        "b_cash_callbacks": 0,
+        "c_envelopes_received": 0
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "mark_nan",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "entry_quality": "not VERIFIED",
+        "explicit_status": "NO_REALIZED_CASH_BASIS / UNKNOWN / COST_INCOMPLETE",
+        "cash_basis": "finite positive settlement-time mark with ingress/source/epoch provenance"
+      },
+      "observed": {
+        "uncaught_exception": "InvalidOperation",
+        "journal_entries": 0,
+        "journal": [],
+        "b_cash_callbacks": 0,
+        "c_envelopes_received": 0
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "decimal_long_positive",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": false,
+      "INVARIANT_PASSED": true,
+      "expected": {
+        "cash": "-9.00000000",
+        "units": "USDT",
+        "quantity_btc": "1.5",
+        "rate_fraction": "0.0001"
+      },
+      "observed": {
+        "cash": "-9.00000000",
+        "units": "USDT",
+        "opposite_quantity_cash": "9.00000000"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "decimal_short_positive",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": false,
+      "INVARIANT_PASSED": true,
+      "expected": {
+        "cash": "9.00000000",
+        "units": "USDT",
+        "quantity_btc": "-1.5",
+        "rate_fraction": "0.0001"
+      },
+      "observed": {
+        "cash": "9.00000000",
+        "units": "USDT",
+        "opposite_quantity_cash": "-9.00000000"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "decimal_long_negative",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": false,
+      "INVARIANT_PASSED": true,
+      "expected": {
+        "cash": "9.00000000",
+        "units": "USDT",
+        "quantity_btc": "1.5",
+        "rate_fraction": "-0.0001"
+      },
+      "observed": {
+        "cash": "9.00000000",
+        "units": "USDT",
+        "opposite_quantity_cash": "-9.00000000"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "decimal_short_negative",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": false,
+      "INVARIANT_PASSED": true,
+      "expected": {
+        "cash": "-9.00000000",
+        "units": "USDT",
+        "quantity_btc": "-1.5",
+        "rate_fraction": "-0.0001"
+      },
+      "observed": {
+        "cash": "-9.00000000",
+        "units": "USDT",
+        "opposite_quantity_cash": "9.00000000"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "decimal_rounding",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": false,
+      "INVARIANT_PASSED": true,
+      "expected": {
+        "cash": "-0.00000002",
+        "rounding": "ROUND_HALF_EVEN"
+      },
+      "observed": {
+        "cash": "-2E-8",
+        "rounding": "ROUND_HALF_EVEN"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "dedupe_identical",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": false,
+      "INVARIANT_PASSED": true,
+      "expected": {
+        "journal_entries": 1,
+        "same_entry": true,
+        "duplicate_count": 1
+      },
+      "observed": {
+        "journal_entries": 1,
+        "same_entry": true,
+        "duplicate_count": 1,
+        "sum_long_cash": "-6.00000000"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "dedupe_equivalent_rate",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "journal_entries": 1,
+        "same_entry": true,
+        "duplicate_count": 1
+      },
+      "observed": {
+        "journal_entries": 2,
+        "same_entry": false,
+        "duplicate_count": 0,
+        "sum_long_cash": "-12.00000000"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "missing_rate",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "accepted": false,
+        "cash_basis": "incomplete rate"
+      },
+      "observed": {
+        "accepted": true,
+        "rate": "0.0",
+        "quality": "VERIFIED",
+        "cash": "-0E-8"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "pinned_import_identity",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": false,
+      "INVARIANT_PASSED": true,
+      "expected": {
+        "wrong_hash_rejected": true,
+        "wrong_origin_rejected": true,
+        "b_revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+        "c_revision": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+      },
+      "observed": {
+        "wrong_hash_rejected": true,
+        "wrong_origin_rejected": true,
+        "b_revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+        "c_revision": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+        "executed_modules": [
+          {
+            "module": "scripts.integration.market_event_bridge_r2",
+            "path": "scripts/integration/market_event_bridge_r2/__init__.py",
+            "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+            "sha256": "71bfac7f9e325ca65684f984f39523977eaa6bbe91d61e280d91e807869855c1"
+          },
+          {
+            "module": "scripts.market_data.forward_public_feed_r1.contracts",
+            "path": "scripts/market_data/forward_public_feed_r1/contracts.py",
+            "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+            "sha256": "7294502100771e872787a3ba0914278e07a46abf80b7b1ea8586b42f43fc4100"
+          },
+          {
+            "module": "scripts.market_data.forward_public_feed_r1",
+            "path": "scripts/market_data/forward_public_feed_r1/__init__.py",
+            "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+            "sha256": "7de91b6e5a35dc884e5ddc0ca30d0829c17c35629c16472d48b0de89931c5758"
+          },
+          {
+            "module": "scripts.market_data.forward_public_feed_r1.order_book",
+            "path": "scripts/market_data/forward_public_feed_r1/order_book.py",
+            "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+            "sha256": "c6e1bd36df7d5ab5efd0c4554eb747b3beb0a636cd8947c21c683bd7a8eea0df"
+          },
+          {
+            "module": "scripts.integration.market_event_bridge_r2.book_ladder",
+            "path": "scripts/integration/market_event_bridge_r2/book_ladder.py",
+            "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+            "sha256": "1f89e6f26ea3e7f7f92067e0d89e7f0de2e9a237f09060e55a9bdb2b66fd9cfb"
+          },
+          {
+            "module": "scripts.integration.market_event_bridge_r2.mark_aggregator",
+            "path": "scripts/integration/market_event_bridge_r2/mark_aggregator.py",
+            "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+            "sha256": "0fb3676e85ffea93b66e3ee38fe50ba041b8538f321a002c3fffd88f4f08092b"
+          },
+          {
+            "module": "scripts.integration.market_event_bridge_r2.c_composite_bar",
+            "path": "scripts/integration/market_event_bridge_r2/c_composite_bar.py",
+            "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+            "sha256": "49b21e5cbb02863c743d169fc05400c6bf5ee1eac4b8aa017281d3a9cd63a63c"
+          },
+          {
+            "module": "scripts.integration.market_event_bridge_r2.funding_adapter",
+            "path": "scripts/integration/market_event_bridge_r2/funding_adapter.py",
+            "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+            "sha256": "cbd5abfa82f6d812e27c7864322c3f77fa4db900c529c2b822fe0a1c8d13c062"
+          },
+          {
+            "module": "scripts.integration.market_event_bridge_r2.bridge_engine",
+            "path": "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+            "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+            "sha256": "9b48d3e8564e2ce4053e57a88b85dc3df71ecec0e3df1ab5ea9a60ac47043838"
+          },
+          {
+            "module": "scripts.strategy_research.forward_shadow_research_r1.contract",
+            "path": "scripts/strategy_research/forward_shadow_research_r1/contract.py",
+            "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+            "sha256": "ecc809f8922cb20283305993b3e54307777f121f5e59bea0fa1bb04af9389d0a"
+          },
+          {
+            "module": "scripts.strategy_research.forward_shadow_research_r1.account",
+            "path": "scripts/strategy_research/forward_shadow_research_r1/account.py",
+            "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+            "sha256": "185e0723300b632f54692e08603eb158dca8f606ba5855a085d2025a3c27eb2e"
+          },
+          {
+            "module": "scripts.strategy_research.forward_shadow_research_r1.registry",
+            "path": "scripts/strategy_research/forward_shadow_research_r1/registry.py",
+            "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+            "sha256": "c3c2669196bc538e0d0e224839c484cbc6e661ed0bbc06aaa26008d1b044192f"
+          },
+          {
+            "module": "scripts.strategy_research.forward_shadow_research_r1.signals",
+            "path": "scripts/strategy_research/forward_shadow_research_r1/signals.py",
+            "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+            "sha256": "ae340ac4e5d5aa3bc67b2276bad684715b0b1c03e32f9b748b4376a48f594006"
+          },
+          {
+            "module": "scripts.strategy_research.forward_shadow_research_r1.execution",
+            "path": "scripts/strategy_research/forward_shadow_research_r1/execution.py",
+            "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+            "sha256": "a598f7e593e85320d6b77dd27a0cb4792402f4e7ac60bc1812ffdb4fcf1e6680"
+          },
+          {
+            "module": "scripts.strategy_research.forward_shadow_research_r1.adapter",
+            "path": "scripts/strategy_research/forward_shadow_research_r1/adapter.py",
+            "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+            "sha256": "fa31bc3fe2ee5bdadd8b5554d0f01e53986c8a304caa53005f357963d6bba9a3"
+          },
+          {
+            "module": "scripts.strategy_research.forward_shadow_research_r1",
+            "path": "scripts/strategy_research/forward_shadow_research_r1/__init__.py",
+            "revision": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+            "sha256": "ebee94f04f1475df61aff64f2776e3ae996471f38aa20ac13b4c9b745f111c88"
+          },
+          {
+            "module": "scripts.g1g3_offline_ports_r1",
+            "path": "scripts/g1g3_offline_ports_r1/__init__.py",
+            "revision": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+            "sha256": "95eb8fdb131e11431bdc9569033767dbe0d98dcb215b1d024535a33602c3af61"
+          },
+          {
+            "module": "scripts.g1_offline_preview_r1.model",
+            "path": "scripts/g1_offline_preview_r1/model.py",
+            "revision": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+            "sha256": "086d6ec8747f82d59b6f8f42bfefd2d9c61e5f962707b4f9119f784741dd206e"
+          },
+          {
+            "module": "scripts.g1_offline_preview_r1.fixtures",
+            "path": "scripts/g1_offline_preview_r1/fixtures.py",
+            "revision": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+            "sha256": "9999418e5cb1f9fd98d1f4cae5c1d460a9593b28c9f7f338a3043374fa4ea8b0"
+          },
+          {
+            "module": "scripts.g1g3_offline_ports_r1.market_pit_port",
+            "path": "scripts/g1g3_offline_ports_r1/market_pit_port.py",
+            "revision": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+            "sha256": "e57e3319f14547a8031adebae0aab61ee041751c1f949f152410959c7454b9c9"
+          }
+        ]
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    },
+    {
+      "case_id": "legacy_imports",
+      "input_label": "SYNTHETIC_ONLY",
+      "BUG_REPRODUCED": true,
+      "INVARIANT_PASSED": false,
+      "expected": {
+        "development_machine_paths": 0,
+        "collection_permission_errors": 0
+      },
+      "observed": {
+        "modules": [
+          {
+            "path": "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+            "absolute_path_lines": [
+              22
+            ],
+            "observed": "PermissionError"
+          },
+          {
+            "path": "tests/test_v06_market_event_bridge_r2_depth_ladder_l2.py",
+            "absolute_path_lines": [
+              13
+            ],
+            "observed": "PermissionError"
+          },
+          {
+            "path": "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py",
+            "absolute_path_lines": [
+              14
+            ],
+            "observed": "PermissionError"
+          },
+          {
+            "path": "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+            "absolute_path_lines": [
+              24,
+              25
+            ],
+            "observed": "PermissionError"
+          },
+          {
+            "path": "tests/test_v06_market_event_bridge_r2_stress_and_security.py",
+            "absolute_path_lines": [
+              40,
+              41
+            ],
+            "observed": "PermissionError"
+          }
+        ],
+        "collection_permission_errors": 5,
+        "simulation": "SYNTHETIC runner filesystem import preambles; no host development directory stat"
+      },
+      "source_baseline": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+      "B_source": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "C_source": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+    }
+  ],
+  "summary": {
+    "cases_run": 20,
+    "BUG_REPRODUCED": 13,
+    "INVARIANT_PASSED": 7,
+    "BASELINE_OBSERVATION_MATCHED": true
+  },
+  "determinations": [
+    "FUNDING_TIMESTAMP_CORRECTION_REQUIRED",
+    "FUNDING_REFERENCE_PRICE_CORRECTION_REQUIRED",
+    "TEST_IMPORTS_REPAIR_REQUIRED"
+  ],
+  "network_attempts_in_probes": 0,
+  "protected_data_accessed": 0,
+  "original_actions_run": {
+    "id": "38252226915",
+    "verification": "USER_REPORTED_NOT_FETCHED_OFFLINE"
+  },
+  "test_execution": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3.12 -m pytest -q --noconftest tests/test_v06_r3_codex_causal_audit_r1_focused.py --tb=short -p no:cacheprovider",
+    "python": "3.12.3",
+    "pytest": "pytest 9.0.3",
+    "harness_commit": "0e5f1b2d3d6682ea69de90e8693d705a5872d655",
+    "exit_code": 0,
+    "passed": 20,
+    "failed": 0,
+    "skipped": 0,
+    "xfail": 0,
+    "stdout": "....................                                                     [100%]\n20 passed in 4.73s\n",
+    "interpretation": "20 expected baseline observations; application invariants: 13 violated, 7 verified",
+    "replay_command": "PYTHONDONTWRITEBYTECODE=1 python3.12 scripts/audits/r3_codex_causal_audit_r1/review.py",
+    "replay_exit_code": 0
+  },
+  "finding_groups": [
+    {
+      "id": "F01",
+      "severity": "HIGH",
+      "cases": [
+        "delay_200",
+        "delay_30000",
+        "delay_10800000"
+      ],
+      "source_locations": [
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+          "lines": [
+            333,
+            335
+          ]
+        }
+      ],
+      "summary": "C backdates ingress and availability; B preserves actual ingress",
+      "target": "Both consumers use actual receipt and reject earlier decisions"
+    },
+    {
+      "id": "F02",
+      "severity": "HIGH",
+      "cases": [
+        "correct_c_receipt"
+      ],
+      "source_locations": [
+        {
+          "revision": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+          "path": "scripts/g1g3_offline_ports_r1/market_pit_port.py",
+          "lines": [
+            362,
+            370
+          ]
+        }
+      ],
+      "summary": "C rejects correct delayed availability",
+      "target": "Separate record discovery time from settlement time"
+    },
+    {
+      "id": "F03",
+      "severity": "HIGH",
+      "cases": [
+        "mark_stale",
+        "mark_after_settlement",
+        "mark_route_switch"
+      ],
+      "source_locations": [
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+          "lines": [
+            83,
+            162,
+            286
+          ]
+        }
+      ],
+      "summary": "Scalar price lacks settlement-time, ingress, source and route provenance",
+      "target": "Explicit settlement reference witness; unknown realized basis if insufficient"
+    },
+    {
+      "id": "F04",
+      "severity": "HIGH",
+      "cases": [
+        "mark_infinity",
+        "mark_nan"
+      ],
+      "source_locations": [
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "scripts/integration/market_event_bridge_r2/funding_adapter.py",
+          "lines": [
+            145,
+            146,
+            170
+          ]
+        }
+      ],
+      "summary": "Nonfinite values escape controlled status; Infinity mutates ledger before dispatch failure",
+      "target": "Finite validation and staged mutation/publication contract"
+    },
+    {
+      "id": "F05",
+      "severity": "MEDIUM",
+      "cases": [
+        "mark_missing"
+      ],
+      "source_locations": [
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+          "lines": [
+            111,
+            349
+          ]
+        },
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "scripts/integration/market_event_bridge_r2/funding_adapter.py",
+          "lines": [
+            140,
+            143
+          ]
+        }
+      ],
+      "summary": "Missing mark rejected but bridge leaves generic INGESTED status",
+      "target": "Explicit incomplete financial result"
+    },
+    {
+      "id": "F06",
+      "severity": "HIGH",
+      "cases": [
+        "dedupe_equivalent_rate"
+      ],
+      "source_locations": [
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "scripts/integration/market_event_bridge_r2/funding_adapter.py",
+          "lines": [
+            150,
+            151
+          ]
+        }
+      ],
+      "summary": "Equivalent rate formatting creates duplicate economic settlements",
+      "target": "Canonical symbol/time identity with conflict handling"
+    },
+    {
+      "id": "F07",
+      "severity": "HIGH",
+      "cases": [
+        "missing_rate"
+      ],
+      "source_locations": [
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "scripts/integration/market_event_bridge_r2/funding_adapter.py",
+          "lines": [
+            129
+          ]
+        }
+      ],
+      "summary": "Ledger API defaults absent rate to verified zero",
+      "target": "Required rate; explicit incomplete output"
+    },
+    {
+      "id": "F08",
+      "severity": "HIGH",
+      "cases": [
+        "legacy_imports"
+      ],
+      "source_locations": [
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+          "lines": [
+            22
+          ]
+        },
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "tests/test_v06_market_event_bridge_r2_depth_ladder_l2.py",
+          "lines": [
+            13
+          ]
+        },
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py",
+          "lines": [
+            14
+          ]
+        },
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+          "lines": [
+            24,
+            25
+          ]
+        },
+        {
+          "revision": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "path": "tests/test_v06_market_event_bridge_r2_stress_and_security.py",
+          "lines": [
+            40,
+            41
+          ]
+        }
+      ],
+      "summary": "Five absolute development path preambles fail under synthetic runner permissions",
+      "target": "Portable pinned Git object/artifact loader; isolated origins and fail-closed absence"
+    }
+  ],
+  "limitations": [
+    "Original GitHub Actions run is user-reported; no CI run executed or fetched",
+    "Legacy import witness executes actual filesystem preambles with synthetic Path.exists, not full CI",
+    "B schema/adapter real; accounting callback sink synthetic; no full strategy/account engine",
+    "C validator/translator real; no reducer or WAL sidecar",
+    "The latest request supersedes the earlier broader 36-case audit scope"
+  ],
+  "scope_integrity": {
+    "application_files_modified": 0,
+    "existing_tests_modified": 0,
+    "ci_configuration_modified": 0,
+    "other_branches_modified": 0,
+    "protected_data_read": 0,
+    "market_proxy_broker_account_order_calls": 0
+  }
+}
