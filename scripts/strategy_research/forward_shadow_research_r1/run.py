@@ -15,7 +15,7 @@ from typing import Any
 
 try:
     from .adapter import PublicFeedAdapter
-    from .contract import Channel, sha256_hex
+    from .contract import BookIntegrityV1, Channel, sha256_hex
     from .execution import ShadowExecutionEngine
     from .fixtures import (
         generate_warmup_hourly_bars,
@@ -37,6 +37,7 @@ except (ImportError, ValueError):
         sys.path.insert(0, str(repo_root))
     from scripts.strategy_research.forward_shadow_research_r1.adapter import PublicFeedAdapter
     from scripts.strategy_research.forward_shadow_research_r1.contract import (
+        BookIntegrityV1,
         Channel,
         sha256_hex,
     )
@@ -98,7 +99,8 @@ def run_developmental_synthetic_suite(
 
     hypotheses = get_default_hypotheses()
 
-    start_sim_time = 1776000000000  # Synthetic future epoch (e.g. 2026-04-12)
+    # Align start_sim_time with 15m (900,000 ms) decision boundary
+    start_sim_time = (1776000000000 // 900000) * 900000
     warmup_bars = generate_warmup_hourly_bars(
         start_time_ms=start_sim_time - (210 * 3600 * 1000),
         hours_count=210,
@@ -113,32 +115,25 @@ def run_developmental_synthetic_suite(
         engine.set_warmup_hourly_bars(warmup_bars)
 
     # Generate synthetic event stream
-    # Phase A: 35 minutes of normal market baseline flow
     curr_time = start_sim_time
     total_events_generated = 0
 
-    def feed_all(event_dict: dict[str, Any]) -> None:
+    def feed_all(event_dict: dict[str, Any], book_obj: BookIntegrityV1 | None = None) -> None:
         nonlocal total_events_generated
         total_events_generated += 1
+        if book_obj is not None:
+            for eng in engines.values():
+                eng.on_book_update(book_obj)
         for adp in adapters.values():
             adp.ingest_dict(event_dict)
 
-    # 1. Warmup initial 35 1m bars
-    for m in range(35):
+    # 1. Warmup initial 30 1m bars (minutes 0 to 29)
+    for m in range(30):
         bar_open = curr_time
         bar_close = curr_time + 60000 - 1
-        price = 65000.0 + (m * 0.5)
+        price = 65000.0
         kline = make_kline_event(
             channel=Channel.LAST_KLINE_1M,
-            bar_open_ms=bar_open,
-            bar_close_ms=bar_close,
-            open_price=price,
-            high_price=price + 2.0,
-            low_price=price - 2.0,
-            close_price=price,
-        )
-        mark = make_kline_event(
-            channel=Channel.MARK_PRICE,
             bar_open_ms=bar_open,
             bar_close_ms=bar_close,
             open_price=price,
@@ -146,35 +141,40 @@ def run_developmental_synthetic_suite(
             low_price=price - 1.0,
             close_price=price,
         )
+        mark = make_kline_event(
+            channel=Channel.MARK_PRICE,
+            bar_open_ms=bar_open,
+            bar_close_ms=bar_close,
+            open_price=price,
+            high_price=price + 0.5,
+            low_price=price - 0.5,
+            close_price=price,
+        )
         book = make_test_book(best_bid=price - 0.5, best_ask=price + 0.5)
-        feed_all(kline.to_dict())
+        feed_all(kline.to_dict(), book)
         feed_all(mark.to_dict())
-        for eng in engines.values():
-            eng.on_book_update(book)
         curr_time += 60000
 
-    # 2. Inject P1 dislocation synthetic pattern at next 15m interval
-    # Last is below Mark by 40 bps (> 5bp and 2x spread) and restoring from -60 bps 5m prior
-    for m in range(15):
+    # 2. Inject P1 dislocation synthetic pattern (minutes 30 to 44, ending at minute 45 boundary)
+    # Last is below Mark by 40 USDT (-6.15 bps > 5bp and 2x spread) and restoring from -60 USDT (-9.23 bps) 5m prior
+    for m in range(30, 45):
         bar_open = curr_time
         bar_close = curr_time + 60000 - 1
         mark_price = 65000.0
-        # 5m prior (m=9): Last = 65000 - 39.0 (-60 bps)
-        # Decision (m=14): Last = 65000 - 26.0 (-40 bps) -> restoring towards 0!
-        if m < 9:
-            last_price = 65000.0 - 45.0
-        elif m < 14:
-            last_price = 65000.0 - 39.0
+        if m < 39:
+            last_price = 65000.0 - 70.0
+        elif m < 44:
+            last_price = 65000.0 - 60.0  # 5m prior
         else:
-            last_price = 65000.0 - 26.0
+            last_price = 65000.0 - 40.0  # Decision at bar 44: restoring upward!
 
         kline = make_kline_event(
             channel=Channel.LAST_KLINE_1M,
             bar_open_ms=bar_open,
             bar_close_ms=bar_close,
             open_price=last_price,
-            high_price=last_price + 3.0,
-            low_price=last_price - 3.0,
+            high_price=last_price + 2.0,
+            low_price=last_price - 2.0,
             close_price=last_price,
         )
         mark = make_kline_event(
@@ -187,42 +187,27 @@ def run_developmental_synthetic_suite(
             close_price=mark_price,
         )
         book = make_test_book(best_bid=last_price - 0.25, best_ask=last_price + 0.25)
-        feed_all(kline.to_dict())
+        feed_all(kline.to_dict(), book)
         feed_all(mark.to_dict())
-        for eng in engines.values():
-            eng.on_book_update(book)
         curr_time += 60000
 
-    # 3. Inject P2 orderflow synthetic pattern (heavy aggressive buying and top10 bid skew)
-    for t_idx in range(50):
-        # Buy trades (is_buyer_maker = False => buyer taker)
+    # 3. Advance across minutes 45 to 59:
+    # - P1 long position moves towards profit target (> 65150) and closes
+    # - Feed aggressor buy trades for P2 over last 15m
+    for t_idx in range(40):
         tr = make_agg_trade_event(
             trade_id=t_idx + 1,
-            trade_time_ms=curr_time - 10000 + (t_idx * 100),
+            trade_time_ms=curr_time + (t_idx * 15000),
             price=65000.0,
             quantity=2.0,
-            is_buyer_maker=False,
+            is_buyer_maker=False,  # Buyer aggressor
         )
         feed_all(tr.to_dict())
 
-    # Feed skewed book (> +0.10 imbalance)
-    skewed_book = make_test_book(
-        best_bid=65000.0,
-        best_ask=65001.0,
-        depth_levels=10,
-        bids_skew=2.5,
-        asks_skew=0.8,
-    )
-    for eng in engines.values():
-        eng.on_book_update(skewed_book)
-
-    # 4. Advance time across horizon to simulate position holding and exit
-    # Also inject settled funding event during holding
-    funding_time = curr_time + (2 * 3600 * 1000)  # within holding period
-    for h_min in range(60):
+    for m in range(45, 60):
         bar_open = curr_time
         bar_close = curr_time + 60000 - 1
-        p = 65000.0 + (h_min * 2.0)  # gradual upward movement towards target
+        p = 65000.0 + ((m - 44) * 12.0)  # Reaches > 65150, triggering P1 profit target
         kline = make_kline_event(
             channel=Channel.LAST_KLINE_1M,
             bar_open_ms=bar_open,
@@ -237,17 +222,30 @@ def run_developmental_synthetic_suite(
             bar_open_ms=bar_open,
             bar_close_ms=bar_close,
             open_price=p,
-            high_price=p + 2.0,
+            high_price=p + 1.0,
             low_price=p - 1.0,
             close_price=p,
         )
-        book = make_test_book(best_bid=p - 0.5, best_ask=p + 0.5)
-        feed_all(kline.to_dict())
+        if m == 59:
+            # Skewed book at decision boundary (minute 60) for P2
+            book = make_test_book(best_bid=p - 0.5, best_ask=p + 0.5, bids_skew=2.5, asks_skew=0.8)
+        else:
+            book = make_test_book(best_bid=p - 0.5, best_ask=p + 0.5)
+        feed_all(kline.to_dict(), book)
         feed_all(mark.to_dict())
-        for eng in engines.values():
-            eng.on_book_update(book)
+        curr_time += 60000
 
-        if bar_close >= funding_time and (bar_open < funding_time):
+    # 4. Advance across minutes 60 to 74:
+    # - P2 long position moves towards profit target and closes
+    # - Inject settled official funding event during holding
+    funding_time = curr_time + (2 * 60 * 1000)
+    for m in range(60, 75):
+        bar_open = curr_time
+        bar_close = curr_time + 60000 - 1
+        p = 65180.0 + ((m - 59) * 26.0)  # Reaches > 65550, triggering P2 profit target
+        book = make_test_book(best_bid=p - 0.5, best_ask=p + 0.5)
+
+        if curr_time <= funding_time <= bar_close:
             funding_ev = make_funding_settled_event(
                 funding_time_ms=funding_time,
                 funding_rate=0.0001,  # 1 bp positive funding
@@ -255,6 +253,55 @@ def run_developmental_synthetic_suite(
             )
             feed_all(funding_ev.to_dict())
 
+        kline = make_kline_event(
+            channel=Channel.LAST_KLINE_1M,
+            bar_open_ms=bar_open,
+            bar_close_ms=bar_close,
+            open_price=p,
+            high_price=p + 6.0,
+            low_price=p - 1.0,
+            close_price=p,
+        )
+        mark = make_kline_event(
+            channel=Channel.MARK_PRICE,
+            bar_open_ms=bar_open,
+            bar_close_ms=bar_close,
+            open_price=p,
+            high_price=p + 1.0,
+            low_price=p - 1.0,
+            close_price=p,
+        )
+        feed_all(kline.to_dict(), book)
+        feed_all(mark.to_dict())
+        curr_time += 60000
+
+    # 5. Negative Control Cases (minutes 75 to 90, ending at minute 90 boundary):
+    # - Minute 90 evaluation: neutral price (dislocation = 0 < 5bp) -> NO_SIGNAL
+    for m in range(75, 90):
+        bar_open = curr_time
+        bar_close = curr_time + 60000 - 1
+        p = 65500.0
+        kline = make_kline_event(
+            channel=Channel.LAST_KLINE_1M,
+            bar_open_ms=bar_open,
+            bar_close_ms=bar_close,
+            open_price=p,
+            high_price=p + 1.0,
+            low_price=p - 1.0,
+            close_price=p,
+        )
+        mark = make_kline_event(
+            channel=Channel.MARK_PRICE,
+            bar_open_ms=bar_open,
+            bar_close_ms=bar_close,
+            open_price=p,
+            high_price=p + 0.5,
+            low_price=p - 0.5,
+            close_price=p,
+        )
+        book = make_test_book(best_bid=p - 0.5, best_ask=p + 0.5)
+        feed_all(kline.to_dict(), book)
+        feed_all(mark.to_dict())
         curr_time += 60000
 
     # Finalize all 6 engines

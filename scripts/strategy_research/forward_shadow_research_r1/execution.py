@@ -119,8 +119,8 @@ class ShadowExecutionEngine:
 
         if is_15m_boundary and len(self.last_bars_1m) >= 30:
             self.total_decision_evaluations += 1
-            decision_at_ms = last_bar_1m.bar_close_ms
-            feature_known_at_ms = max(current_available_at_ms, decision_at_ms)
+            feature_known_at_ms = max(current_available_at_ms, last_bar_1m.bar_close_ms + 1)
+            decision_at_ms = feature_known_at_ms + 1
 
             # Evaluate signal
             proposal = self.signal_engine.evaluate(
@@ -202,12 +202,40 @@ class ShadowExecutionEngine:
 
         if exit_reason is not None:
             # Execute conservative exit quote
-            # If book available and valid, use book; else use conservative bar extremes
-            best_bid = self.latest_book.best_bid if (self.latest_book and self.latest_book.best_bid) else last_bar.low
-            best_ask = self.latest_book.best_ask if (self.latest_book and self.latest_book.best_ask) else last_bar.high
-            if best_bid >= best_ask:
-                best_bid = last_bar.close * 0.9999
-                best_ask = last_bar.close * 1.0001
+            if (
+                self.latest_book
+                and self.latest_book.best_bid is not None
+                and self.latest_book.best_ask is not None
+            ):
+                current_bid = self.latest_book.best_bid
+                current_ask = self.latest_book.best_ask
+            else:
+                current_bid = last_bar.low
+                current_ask = last_bar.high
+
+            if current_bid >= current_ask:
+                current_bid = last_bar.close * 0.9999
+                current_ask = last_bar.close * 1.0001
+
+            # Conservative quote for STOP LOSS: cannot exit at a better price than the stop price!
+            if exit_reason == ExitReason.STOP_LOSS:
+                if pos.direction == 1:
+                    best_bid = min(pos.stop_price, current_bid)
+                    best_ask = best_bid + 1.0
+                else:
+                    best_ask = max(pos.stop_price, current_ask)
+                    best_bid = best_ask - 1.0
+            elif exit_reason == ExitReason.PROFIT_TARGET:
+                if pos.direction == 1:
+                    best_bid = min(pos.target_price, current_bid) if current_bid >= pos.target_price else pos.target_price
+                    best_ask = best_bid + 1.0
+                else:
+                    best_ask = max(pos.target_price, current_ask) if current_ask <= pos.target_price else pos.target_price
+                    best_bid = best_ask - 1.0
+            else:
+                # Time cap / horizon
+                best_bid = current_bid
+                best_ask = current_ask
 
             self.account.close_shadow_position(
                 exit_fill_ms=last_bar.bar_close_ms,

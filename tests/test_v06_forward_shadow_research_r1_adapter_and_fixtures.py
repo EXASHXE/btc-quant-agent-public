@@ -200,3 +200,35 @@ def test_fixture_generators():
     # Check continuous
     for i in range(1, len(warmup)):
         assert warmup[i].bar_open_ms == warmup[i - 1].bar_close_ms + 1
+
+
+def test_adapter_gap_rebuild_drops_desynced_bars():
+    """Verify that when one stream has gaps or desyncs, adapter drops desynced bars and realigns."""
+    hyp = get_default_hypotheses()["P1_BASIS_REVERSION_V2_SHADOW_6H"]
+    engine = ShadowExecutionEngine(hyp)
+    adapter = PublicFeedAdapter(engine)
+
+    # Ingest Last bar for minute 10: open 600,000, close 659,999
+    last_10 = make_kline_event(Channel.LAST_KLINE_1M, 600000, 659999, 65000.0, 65001.0, 64999.0, 65000.0)
+    adapter.ingest_dict(last_10.to_dict())
+    assert adapter.pending_last_1m is not None
+
+    # Ingest Mark bar for minute 11 (gap: minute 10 Mark was dropped!): open 660,000, close 719,999
+    mark_11 = make_kline_event(Channel.MARK_PRICE, 660000, 719999, 65000.0, 65001.0, 64999.0, 65000.0)
+    adapter.ingest_dict(mark_11.to_dict())
+
+    # Because last_10.bar_close_ms (659999) < mark_11.bar_close_ms (719999), desynced last_10 is dropped!
+    assert adapter.pending_last_1m is None
+    # mark_11 remains pending waiting for matching last bar
+    assert adapter.pending_mark_1m is not None
+
+    # Now ingest Last bar for minute 11 (matching mark_11)
+    last_11 = make_kline_event(Channel.LAST_KLINE_1M, 660000, 719999, 65000.0, 65001.0, 64999.0, 65000.0)
+    adapter.ingest_dict(last_11.to_dict())
+
+    # Flushed and paired!
+    assert adapter.pending_last_1m is None
+    assert adapter.pending_mark_1m is None
+    assert len(engine.last_bars_1m) == 1
+    assert engine.last_bars_1m[0].bar_open_ms == 660000
+

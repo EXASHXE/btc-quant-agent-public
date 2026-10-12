@@ -4,12 +4,12 @@
   "criteria": {
     "p1_events": {
       "required": 30,
-      "actual": 0,
+      "actual": 1,
       "passed": false
     },
     "p2_events": {
       "required": 30,
-      "actual": 0,
+      "actual": 1,
       "passed": false
     },
     "distinct_utc_weeks": {

@@ -121,6 +121,8 @@ class BarData:
     close: float
     volume: float
     taker_buy_volume: float = 0.0
+    quality: Quality = Quality.VERIFIED
+    available_at_ms: int = 0
 
 
 @dataclass(frozen=True)
@@ -306,7 +308,11 @@ class MarketEventV1:
         )
 
 
-def parse_kline_payload(payload: dict[str, Any]) -> BarData:
+def parse_kline_payload(
+    payload: dict[str, Any],
+    quality: Quality = Quality.VERIFIED,
+    available_at_ms: int = 0,
+) -> BarData:
     """Parse standard Binance USD-M Futures kline payload into BarData."""
     # Binance kline payload structure: {'k': {'t': open_time, 'T': close_time, 'o': open, ... 'x': is_closed}}
     # or direct fields
@@ -321,6 +327,8 @@ def parse_kline_payload(payload: dict[str, Any]) -> BarData:
         close=float(k.get("c", 0.0)),
         volume=float(k.get("v", 0.0)),
         taker_buy_volume=float(k.get("V", 0.0)),
+        quality=quality,
+        available_at_ms=available_at_ms,
     )
 
 

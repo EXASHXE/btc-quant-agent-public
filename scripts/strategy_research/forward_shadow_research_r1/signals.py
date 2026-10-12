@@ -23,6 +23,8 @@ class SignalStatus(str, Enum):
     PROPOSED = "PROPOSED"
     NO_SIGNAL = "NO_SIGNAL"
     NO_SIGNAL_INCOMPLETE_BOOK = "NO_SIGNAL_INCOMPLETE_BOOK"
+    NO_SIGNAL_INCOMPLETE_5M_BAR = "NO_SIGNAL_INCOMPLETE_5M_BAR"
+    NO_SIGNAL_UNVERIFIED_SOURCE = "NO_SIGNAL_UNVERIFIED_SOURCE"
     NO_SIGNAL_PREMIUM_NOT_RESTORING = "NO_SIGNAL_PREMIUM_NOT_RESTORING"
     NO_SIGNAL_ABNORMAL_VOLATILITY = "NO_SIGNAL_ABNORMAL_VOLATILITY"
     NO_SIGNAL_INCOMPATIBLE_IMBALANCE = "NO_SIGNAL_INCOMPATIBLE_IMBALANCE"
@@ -45,6 +47,18 @@ class AggregatedBar:
     volume: float
     is_complete: bool
     bar_count: int
+
+
+@dataclass(frozen=True)
+class PreconfirmationSummary:
+    bar_5m: AggregatedBar | None = None
+    bar_15m: AggregatedBar | None = None
+    bar_30m: AggregatedBar | None = None
+    mark_5m: AggregatedBar | None = None
+    mark_15m: AggregatedBar | None = None
+    mark_30m: AggregatedBar | None = None
+    is_valid: bool = False
+    reason: str = ""
 
 
 @dataclass(frozen=True)
@@ -72,6 +86,7 @@ class SignalProposal:
     atr_result: ATRResult | None
     stop_price: float | None
     target_price: float | None
+    preconfirmation: PreconfirmationSummary | None = None
     metrics: dict[str, float] = field(default_factory=dict)
     reason_codes: tuple[str, ...] = field(default_factory=tuple)
 
@@ -79,14 +94,16 @@ class SignalProposal:
 def aggregate_1m_bars(bars_1m: Sequence[BarData], expected_count: int) -> AggregatedBar | None:
     """Aggregate consecutive 1m bars into a higher timeframe bar (e.g. 5m, 15m, 30m, 60m).
 
-    Fails closed (returns None) if any bar is missing, unclosed, or discontinuous.
+    Fails closed (returns None) if any bar is missing, unclosed, unverified, or discontinuous.
     """
     if len(bars_1m) != expected_count:
         return None
 
-    # Verify continuity
+    # Verify continuity and quality
     for i in range(len(bars_1m)):
         if not bars_1m[i].closed:
+            return None
+        if bars_1m[i].quality != Quality.VERIFIED:
             return None
         if i > 0 and bars_1m[i].bar_open_ms != bars_1m[i - 1].bar_close_ms + 1:
             return None
@@ -306,6 +323,52 @@ class SignalEngine:
                 reason_codes=("INSUFFICIENT_1M_BARS_FOR_30M_CAP",),
             )
 
+        # Compute preconfirmation bars (5m, 15m, 30m) from verified 1m data
+        last_5m = aggregate_1m_bars(last_bars_1m[-5:], 5)
+        last_15m = aggregate_1m_bars(last_bars_1m[-15:], 15)
+        last_30m = aggregate_1m_bars(last_bars_1m[-30:], 30)
+        mark_5m = aggregate_1m_bars(mark_bars_1m[-5:], 5)
+        mark_15m = aggregate_1m_bars(mark_bars_1m[-15:], 15)
+        mark_30m = aggregate_1m_bars(mark_bars_1m[-30:], 30)
+
+        preconf_valid = (
+            last_5m is not None
+            and last_15m is not None
+            and last_30m is not None
+            and mark_5m is not None
+            and mark_15m is not None
+            and mark_30m is not None
+        )
+        preconf = PreconfirmationSummary(
+            bar_5m=last_5m,
+            bar_15m=last_15m,
+            bar_30m=last_30m,
+            mark_5m=mark_5m,
+            mark_15m=mark_15m,
+            mark_30m=mark_30m,
+            is_valid=preconf_valid,
+            reason="VERIFIED" if preconf_valid else "INCOMPLETE_OR_UNVERIFIED_PRECONFIRMATION_BARS",
+        )
+
+        if not preconf_valid:
+            return SignalProposal(
+                family=self.hypothesis.family,
+                cell_id=self.hypothesis.cell_id,
+                decision_at_ms=decision_at_ms,
+                feature_known_at_ms=feature_known_at_ms,
+                direction=SignalDirection.FLAT,
+                status=SignalStatus.NO_SIGNAL_UNVERIFIED_SOURCE,
+                proposed_entry_price=None,
+                best_bid=latest_book.best_bid if latest_book else None,
+                best_ask=latest_book.best_ask if latest_book else None,
+                mark_price=mark_bars_1m[-1].close if mark_bars_1m else None,
+                atr_result=atr_res,
+                stop_price=None,
+                target_price=None,
+                preconfirmation=preconf,
+                reason_codes=("SOURCES_NOT_VERIFIED_OR_BARS_INCOMPLETE",),
+            )
+
         # Check time alignment of 15m decision window (last 15 bars)
         for i in range(-15, 0):
             lb = last_bars_1m[i]
@@ -325,7 +388,26 @@ class SignalEngine:
                     atr_result=atr_res,
                     stop_price=None,
                     target_price=None,
+                    preconfirmation=preconf,
                     reason_codes=("LAST_MARK_1M_TIME_MISALIGNMENT",),
+                )
+            if lb.quality != Quality.VERIFIED or mb.quality != Quality.VERIFIED:
+                return SignalProposal(
+                    family=self.hypothesis.family,
+                    cell_id=self.hypothesis.cell_id,
+                    decision_at_ms=decision_at_ms,
+                    feature_known_at_ms=feature_known_at_ms,
+                    direction=SignalDirection.FLAT,
+                    status=SignalStatus.NO_SIGNAL_UNVERIFIED_SOURCE,
+                    proposed_entry_price=None,
+                    best_bid=latest_book.best_bid if latest_book else None,
+                    best_ask=latest_book.best_ask if latest_book else None,
+                    mark_price=mark_bars_1m[-1].close if mark_bars_1m else None,
+                    atr_result=atr_res,
+                    stop_price=None,
+                    target_price=None,
+                    preconfirmation=preconf,
+                    reason_codes=("SOURCES_NOT_VERIFIED",),
                 )
 
         # Check book validity for spread calculation and quote execution
@@ -334,6 +416,9 @@ class SignalEngine:
             or latest_book.best_bid is None
             or latest_book.best_ask is None
             or latest_book.quality != Quality.VERIFIED
+            or not latest_book.continuous
+            or latest_book.stale_age_ms > self.hypothesis.stale_depth_max_ms
+            or latest_book.stale_age_ms < 0
             or latest_book.best_bid >= latest_book.best_ask
         ):
             return SignalProposal(
@@ -350,11 +435,30 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 reason_codes=("INVALID_OR_MISSING_BOOK",),
             )
 
-        mark_close = mark_bars_1m[-1].close
-        last_close = last_bars_1m[-1].close
+        mark_close = mark_15m.close
+        last_close = last_15m.close
+        if mark_close <= 0:
+            return SignalProposal(
+                family=self.hypothesis.family,
+                cell_id=self.hypothesis.cell_id,
+                decision_at_ms=decision_at_ms,
+                feature_known_at_ms=feature_known_at_ms,
+                direction=SignalDirection.FLAT,
+                status=SignalStatus.NO_SIGNAL,
+                proposed_entry_price=None,
+                best_bid=latest_book.best_bid,
+                best_ask=latest_book.best_ask,
+                mark_price=None,
+                atr_result=atr_res,
+                stop_price=None,
+                target_price=None,
+                preconfirmation=preconf,
+                reason_codes=("INVALID_NON_POSITIVE_MARK_PRICE",),
+            )
 
         # Effective top bid/ask spread
         top_spread = (latest_book.best_ask - latest_book.best_bid) / mark_close
@@ -389,6 +493,7 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 metrics=metrics,
                 reason_codes=("DISLOCATION_BELOW_THRESHOLD",),
             )
@@ -421,6 +526,7 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 metrics=metrics,
                 reason_codes=("PREMIUM_NOT_SHRINKING_TOWARD_ZERO",),
             )
@@ -447,13 +553,14 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 metrics=metrics,
                 reason_codes=("DIRECTIONAL_RESTORATION_MISMATCH",),
             )
 
         # Step 3: 30m abnormal vol cap
-        high_30m = max(b.high for b in last_bars_1m[-30:])
-        low_30m = min(b.low for b in last_bars_1m[-30:])
+        high_30m = last_30m.high
+        low_30m = last_30m.low
         vol_range_bps = ((high_30m - low_30m) / mark_close) * 10000.0
         metrics["vol_range_30m_bps"] = vol_range_bps
 
@@ -472,6 +579,7 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 metrics=metrics,
                 reason_codes=(f"ABNORMAL_VOL_CAP_EXCEEDED_{vol_range_bps:.1f}BPS",),
             )
@@ -502,6 +610,7 @@ class SignalEngine:
             atr_result=atr_res,
             stop_price=stop_price,
             target_price=target_price,
+            preconfirmation=preconf,
             metrics=metrics,
             reason_codes=("P1_BASIS_REVERSION_PROPOSAL_VERIFIED",),
         )
@@ -543,6 +652,44 @@ class SignalEngine:
                 reason_codes=("INSUFFICIENT_BARS_FOR_30M_FILTER",),
             )
 
+        # Compute preconfirmation bars (5m, 15m, 30m) from verified 1m data
+        last_5m = aggregate_1m_bars(last_bars_1m[-5:], 5)
+        last_15m = aggregate_1m_bars(last_bars_1m[-15:], 15)
+        last_30m = aggregate_1m_bars(last_bars_1m[-30:], 30)
+
+        preconf_valid = (
+            last_5m is not None
+            and last_15m is not None
+            and last_30m is not None
+        )
+        preconf = PreconfirmationSummary(
+            bar_5m=last_5m,
+            bar_15m=last_15m,
+            bar_30m=last_30m,
+            is_valid=preconf_valid,
+            reason="VERIFIED" if preconf_valid else "INCOMPLETE_OR_UNVERIFIED_PRECONFIRMATION_BARS",
+        )
+
+        # 5m incomplete bar prohibited
+        if last_5m is None or not last_5m.is_complete:
+            return SignalProposal(
+                family=self.hypothesis.family,
+                cell_id=self.hypothesis.cell_id,
+                decision_at_ms=decision_at_ms,
+                feature_known_at_ms=feature_known_at_ms,
+                direction=SignalDirection.FLAT,
+                status=SignalStatus.NO_SIGNAL_INCOMPLETE_5M_BAR,
+                proposed_entry_price=None,
+                best_bid=latest_book.best_bid if latest_book else None,
+                best_ask=latest_book.best_ask if latest_book else None,
+                mark_price=None,
+                atr_result=atr_res,
+                stop_price=None,
+                target_price=None,
+                preconfirmation=preconf,
+                reason_codes=("5M_INCOMPLETE_BAR_PROHIBITED",),
+            )
+
         # Strict L2 book verification: must exist, be verified, continuous, and have top 10 depth
         if (
             latest_book is None
@@ -565,11 +712,16 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 reason_codes=("NO_VERIFIED_L2_CONTINUOUS_BOOK",),
             )
 
-        # Check crossed spread or depth staleness
-        if latest_book.best_bid is None or latest_book.best_ask is None or latest_book.best_bid >= latest_book.best_ask:
+        # Check crossed spread
+        if (
+            latest_book.best_bid is None
+            or latest_book.best_ask is None
+            or latest_book.best_bid >= latest_book.best_ask
+        ):
             return SignalProposal(
                 family=self.hypothesis.family,
                 cell_id=self.hypothesis.cell_id,
@@ -584,30 +736,16 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 reason_codes=("CROSSED_OR_EMPTY_SPREAD",),
-            )
-
-        if latest_book.stale_age_ms > self.hypothesis.stale_depth_max_ms:
-            return SignalProposal(
-                family=self.hypothesis.family,
-                cell_id=self.hypothesis.cell_id,
-                decision_at_ms=decision_at_ms,
-                feature_known_at_ms=feature_known_at_ms,
-                direction=SignalDirection.FLAT,
-                status=SignalStatus.FILL_UNCERTAIN,
-                proposed_entry_price=None,
-                best_bid=latest_book.best_bid,
-                best_ask=latest_book.best_ask,
-                mark_price=None,
-                atr_result=atr_res,
-                stop_price=None,
-                target_price=None,
-                reason_codes=("DEPTH_STALE_OVER_1000MS",),
             )
 
         # Step 1: Compute 15m aggressor traded notional imbalance
         cutoff_15m_ms = decision_at_ms - (15 * 60 * 1000)
-        trades_15m = [t for t in recent_agg_trades if t.trade_time_ms >= cutoff_15m_ms]
+        trades_15m = [
+            t for t in recent_agg_trades
+            if cutoff_15m_ms <= t.trade_time_ms <= decision_at_ms
+        ]
 
         buy_notional = 0.0
         sell_notional = 0.0
@@ -636,6 +774,7 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 reason_codes=("ZERO_AGG_TRADES_IN_15M",),
             )
 
@@ -658,6 +797,7 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 reason_codes=("CANNOT_COMPUTE_BOOK_IMBALANCE",),
             )
 
@@ -691,11 +831,32 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 metrics=metrics,
                 reason_codes=("IMBALANCE_CONDITIONS_NOT_MET_OR_INCOMPATIBLE",),
             )
 
         # Step 4: 30m prior close directional agreement filter
+        if last_30m is None or not last_30m.is_complete:
+            return SignalProposal(
+                family=self.hypothesis.family,
+                cell_id=self.hypothesis.cell_id,
+                decision_at_ms=decision_at_ms,
+                feature_known_at_ms=feature_known_at_ms,
+                direction=SignalDirection.FLAT,
+                status=SignalStatus.NO_SIGNAL,
+                proposed_entry_price=None,
+                best_bid=latest_book.best_bid,
+                best_ask=latest_book.best_ask,
+                mark_price=None,
+                atr_result=atr_res,
+                stop_price=None,
+                target_price=None,
+                preconfirmation=preconf,
+                metrics=metrics,
+                reason_codes=("30M_INCOMPLETE_BAR_PROHIBITED",),
+            )
+
         close_now = last_bars_1m[-1].close
         close_30m_ago = last_bars_1m[-30].close
         metrics["close_now"] = close_now
@@ -716,6 +877,7 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 metrics=metrics,
                 reason_codes=("LONG_FILTER_MISMATCH_CLOSE_BELOW_30M_AGO",),
             )
@@ -734,11 +896,37 @@ class SignalEngine:
                 atr_result=atr_res,
                 stop_price=None,
                 target_price=None,
+                preconfirmation=preconf,
                 metrics=metrics,
                 reason_codes=("SHORT_FILTER_MISMATCH_CLOSE_ABOVE_30M_AGO",),
             )
 
         # Step 5: Shadow entry price (actionable executable quote)
+        # If stream sampling misses minimum book age or size -> FILL_UNCERTAIN
+        if (
+            latest_book.stale_age_ms > self.hypothesis.stale_depth_max_ms
+            or latest_book.stale_age_ms < 0
+            or latest_book.observed_depth_levels < self.hypothesis.book_top_levels * 2
+        ):
+            return SignalProposal(
+                family=self.hypothesis.family,
+                cell_id=self.hypothesis.cell_id,
+                decision_at_ms=decision_at_ms,
+                feature_known_at_ms=feature_known_at_ms,
+                direction=direction,
+                status=SignalStatus.FILL_UNCERTAIN,
+                proposed_entry_price=None,
+                best_bid=latest_book.best_bid,
+                best_ask=latest_book.best_ask,
+                mark_price=None,
+                atr_result=atr_res,
+                stop_price=None,
+                target_price=None,
+                preconfirmation=preconf,
+                metrics=metrics,
+                reason_codes=("STREAM_SAMPLING_INSUFFICIENT_BOOK_AGE_OR_SIZE",),
+            )
+
         entry_price = latest_book.best_ask if direction == SignalDirection.LONG else latest_book.best_bid
 
         # Stops and Targets based on 1h ATR(14)
@@ -763,6 +951,7 @@ class SignalEngine:
             atr_result=atr_res,
             stop_price=stop_price,
             target_price=target_price,
+            preconfirmation=preconf,
             metrics=metrics,
             reason_codes=("P2_ORDERFLOW_RESILIENCE_PROPOSAL_VERIFIED",),
         )

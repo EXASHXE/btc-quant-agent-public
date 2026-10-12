@@ -13,6 +13,7 @@ from scripts.strategy_research.forward_shadow_research_r1.contract import (
     AggTradeData,
     BarData,
     BookIntegrityV1,
+    Quality,
 )
 from scripts.strategy_research.forward_shadow_research_r1.fixtures import (
     generate_warmup_hourly_bars,
@@ -462,3 +463,162 @@ def test_exactly_six_selectable_observation_cells():
         "P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_12H",
         "P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_18H",
     }
+
+
+def test_p1_fails_on_stale_or_discontinuous_depth():
+    hyp = get_default_hypotheses()["P1_BASIS_REVERSION_V2_SHADOW_6H"]
+    engine = SignalEngine(hyp)
+
+    mark_bars = [make_dummy_1m_bar(i, 65000.0, 65005.0, 64995.0, 65000.0) for i in range(35)]
+    last_bars = []
+    for i in range(35):
+        p = 65000.0 - (55.0 if i < 34 else 35.0)
+        last_bars.append(make_dummy_1m_bar(i, p, p + 2.0, p - 2.0, p))
+
+    hourly_bars = generate_warmup_hourly_bars(1700000000000 - (210 * 3600 * 1000), 210)
+    decision_ms = last_bars[-1].bar_close_ms
+
+    # Stale depth > 1000ms
+    stale_book = make_test_book(best_bid=64964.5, best_ask=64965.5, stale_age_ms=1500)
+    prop_stale = engine.evaluate(
+        decision_at_ms=decision_ms,
+        feature_known_at_ms=decision_ms,
+        last_bars_1m=last_bars,
+        mark_bars_1m=mark_bars,
+        recent_agg_trades=(),
+        latest_book=stale_book,
+        hourly_bars_for_atr=hourly_bars,
+    )
+    assert prop_stale.status == SignalStatus.UNFILLABLE_OR_UNKNOWN
+
+    # Discontinuous L2 book
+    disc_book = make_test_book(best_bid=64964.5, best_ask=64965.5, continuous=False)
+    prop_disc = engine.evaluate(
+        decision_at_ms=decision_ms,
+        feature_known_at_ms=decision_ms,
+        last_bars_1m=last_bars,
+        mark_bars_1m=mark_bars,
+        recent_agg_trades=(),
+        latest_book=disc_book,
+        hourly_bars_for_atr=hourly_bars,
+    )
+    assert prop_disc.status == SignalStatus.UNFILLABLE_OR_UNKNOWN
+
+
+def test_p1_fails_on_unverified_source():
+    hyp = get_default_hypotheses()["P1_BASIS_REVERSION_V2_SHADOW_6H"]
+    engine = SignalEngine(hyp)
+
+    mark_bars = [make_dummy_1m_bar(i, 65000.0, 65005.0, 64995.0, 65000.0) for i in range(35)]
+    last_bars = []
+    for i in range(35):
+        p = 65000.0 - (55.0 if i < 34 else 35.0)
+        # Corrupt bar at index 32 with DEGRADED quality
+        bar = make_dummy_1m_bar(i, p, p + 2.0, p - 2.0, p)
+        if i == 32:
+            bar = BarData(
+                bar_open_ms=bar.bar_open_ms,
+                bar_close_ms=bar.bar_close_ms,
+                closed=True,
+                open=bar.open,
+                high=bar.high,
+                low=bar.low,
+                close=bar.close,
+                volume=bar.volume,
+                quality=Quality.DEGRADED,
+            )
+        last_bars.append(bar)
+
+    book = make_test_book(best_bid=64964.5, best_ask=64965.5)
+    hourly_bars = generate_warmup_hourly_bars(1700000000000 - (210 * 3600 * 1000), 210)
+    decision_ms = last_bars[-1].bar_close_ms
+
+    prop = engine.evaluate(
+        decision_at_ms=decision_ms,
+        feature_known_at_ms=decision_ms,
+        last_bars_1m=last_bars,
+        mark_bars_1m=mark_bars,
+        recent_agg_trades=(),
+        latest_book=book,
+        hourly_bars_for_atr=hourly_bars,
+    )
+    assert prop.status == SignalStatus.NO_SIGNAL_UNVERIFIED_SOURCE
+
+
+def test_p2_fails_on_incomplete_5m_bar():
+    hyp = get_default_hypotheses()["P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_6H"]
+    engine = SignalEngine(hyp)
+
+    last_bars = []
+    for i in range(35):
+        bar = make_dummy_1m_bar(i, 65000.0 + (i * 0.1), 65002.0, 64998.0, 65000.0 + (i * 0.1))
+        # Bar in the last 5 minutes (index 33) is not closed
+        if i == 33:
+            bar = BarData(
+                bar_open_ms=bar.bar_open_ms,
+                bar_close_ms=bar.bar_close_ms,
+                closed=False,
+                open=bar.open,
+                high=bar.high,
+                low=bar.low,
+                close=bar.close,
+                volume=bar.volume,
+            )
+        last_bars.append(bar)
+
+    decision_ms = last_bars[-1].bar_close_ms
+    book = make_test_book(best_bid=65003.0, best_ask=65004.0, bids_skew=2.0, asks_skew=0.8)
+    hourly_bars = generate_warmup_hourly_bars(1700000000000 - (210 * 3600 * 1000), 210)
+
+    trades = [
+        AggTradeData(1, 65000.0, 10.0, 1, 2, decision_ms - 5000, is_buyer_maker=False)
+    ]
+
+    prop = engine.evaluate(
+        decision_at_ms=decision_ms,
+        feature_known_at_ms=decision_ms,
+        last_bars_1m=last_bars,
+        mark_bars_1m=(),
+        recent_agg_trades=trades,
+        latest_book=book,
+        hourly_bars_for_atr=hourly_bars,
+    )
+    assert prop.status == SignalStatus.NO_SIGNAL_INCOMPLETE_5M_BAR
+
+
+def test_p2_emits_fill_uncertain_on_stale_or_thin_book():
+    hyp = get_default_hypotheses()["P2_ORDERFLOW_BOOK_RESILIENCE_SHADOW_6H"]
+    engine = SignalEngine(hyp)
+
+    last_bars = [make_dummy_1m_bar(i, 65000.0 + (i * 0.1), 65002.0, 64998.0, 65000.0 + (i * 0.1)) for i in range(35)]
+    decision_ms = last_bars[-1].bar_close_ms
+
+    trades = [
+        AggTradeData(i + 1, 65000.0, 2.0, i * 10, i * 10 + 1, decision_ms - (5 * 60 * 1000) + (i * 1000), is_buyer_maker=False)
+        for i in range(20)
+    ]
+
+    hourly_bars = generate_warmup_hourly_bars(1700000000000 - (210 * 3600 * 1000), 210)
+
+    # Valid imbalance but stale book (> 1000ms)
+    stale_book = make_test_book(
+        best_bid=65003.0,
+        best_ask=65004.0,
+        bids_skew=2.0,
+        asks_skew=0.8,
+        stale_age_ms=1200,
+    )
+
+    prop = engine.evaluate(
+        decision_at_ms=decision_ms,
+        feature_known_at_ms=decision_ms,
+        last_bars_1m=last_bars,
+        mark_bars_1m=(),
+        recent_agg_trades=trades,
+        latest_book=stale_book,
+        hourly_bars_for_atr=hourly_bars,
+    )
+    assert prop.status == SignalStatus.FILL_UNCERTAIN
+    assert prop.direction == SignalDirection.LONG
+    assert prop.proposed_entry_price is None
+

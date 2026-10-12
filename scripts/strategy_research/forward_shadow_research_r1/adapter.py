@@ -135,13 +135,21 @@ class PublicFeedAdapter:
                 self.engine.on_funding_settled(funding_data, event.available_at_ms)
 
         elif event.channel == Channel.LAST_KLINE_1M:
-            bar_data = parse_kline_payload(event.payload)
+            bar_data = parse_kline_payload(
+                event.payload,
+                quality=event.quality,
+                available_at_ms=event.available_at_ms,
+            )
             if bar_data.closed:
                 self.pending_last_1m = bar_data
                 self._check_and_flush_paired_minute(event.available_at_ms)
 
         elif event.channel == Channel.MARK_PRICE:
-            bar_data = parse_kline_payload(event.payload)
+            bar_data = parse_kline_payload(
+                event.payload,
+                quality=event.quality,
+                available_at_ms=event.available_at_ms,
+            )
             if bar_data.closed:
                 self.pending_mark_1m = bar_data
                 self._check_and_flush_paired_minute(event.available_at_ms)
@@ -154,10 +162,15 @@ class PublicFeedAdapter:
                 self.pending_last_1m.bar_open_ms == self.pending_mark_1m.bar_open_ms
                 and self.pending_last_1m.bar_close_ms == self.pending_mark_1m.bar_close_ms
             ):
+                max_avail = max(
+                    self.pending_last_1m.available_at_ms,
+                    self.pending_mark_1m.available_at_ms,
+                    current_available_ms,
+                )
                 self.engine.on_minute_bars(
                     last_bar_1m=self.pending_last_1m,
                     mark_bar_1m=self.pending_mark_1m,
-                    current_available_at_ms=current_available_ms,
+                    current_available_at_ms=max_avail,
                 )
                 self.pending_last_1m = None
                 self.pending_mark_1m = None

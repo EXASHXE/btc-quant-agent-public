@@ -20,6 +20,9 @@ from scripts.strategy_research.forward_shadow_research_r1.contract import (
 from scripts.strategy_research.forward_shadow_research_r1.execution import (
     ShadowExecutionEngine,
 )
+from scripts.strategy_research.forward_shadow_research_r1.fixtures import (
+    make_test_book,
+)
 from scripts.strategy_research.forward_shadow_research_r1.registry import (
     get_default_hypotheses,
 )
@@ -322,3 +325,96 @@ def test_deterministic_receipt_sha256():
     )
     assert len(pos.receipt_sha256) == 64
     assert pos.receipt_sha256 != ""
+
+
+def test_stop_loss_quote_bounded_under_bouncing_market_bid():
+    """Ensure that a long stop loss cannot exit at an unearned higher price if the book bounces above stop."""
+    hyp = get_default_hypotheses()["P1_BASIS_REVERSION_V2_SHADOW_6H"]
+    engine = ShadowExecutionEngine(hyp)
+
+    start_ms = 1700000000000
+    pos = engine.account.open_shadow_position(
+        cell_id=hyp.cell_id,
+        direction=1,
+        entry_decision_ms=start_ms,
+        entry_fill_ms=start_ms,
+        best_bid=65000.0,
+        best_ask=65001.0,
+        stop_price=64000.0,
+        target_price=67000.0,
+        horizon_ms=6 * 3600 * 1000,
+    )
+    assert pos is not None
+
+    # The minute bar dipped to 63900 (triggering stop loss)
+    bar = BarData(
+        bar_open_ms=start_ms + 60000,
+        bar_close_ms=start_ms + 119999,
+        closed=True,
+        open=65000.0,
+        high=65100.0,
+        low=63900.0,  # Stop loss breached!
+        close=65000.0,
+        volume=10.0,
+    )
+    mark_bar = bar
+
+    # But the current book has already bounced to 66000!
+    bounced_book = make_test_book(best_bid=66000.0, best_ask=66001.0)
+    engine.on_book_update(bounced_book)
+
+    engine._evaluate_active_position_exits(bar, mark_bar)
+
+    assert engine.account.active_position is None
+    closed = engine.account.closed_positions[-1]
+    assert closed.exit_reason == ExitReason.STOP_LOSS
+    # Exit price must be bounded by stop_price (64000.0), NOT 66000.0!
+    assert closed.exit_price <= 64000.0
+    assert closed.gross_pnl_usdt < 0.0  # Must be a loss, never a fake profit!
+
+
+def test_stop_loss_quote_bounded_for_short_under_favorable_ask():
+    """Ensure that a short stop loss cannot exit at an unearned lower price if the book drops below stop."""
+    hyp = get_default_hypotheses()["P1_BASIS_REVERSION_V2_SHADOW_6H"]
+    engine = ShadowExecutionEngine(hyp)
+
+    start_ms = 1700000000000
+    pos = engine.account.open_shadow_position(
+        cell_id=hyp.cell_id,
+        direction=-1,  # Short
+        entry_decision_ms=start_ms,
+        entry_fill_ms=start_ms,
+        best_bid=65000.0,
+        best_ask=65001.0,
+        stop_price=66000.0,
+        target_price=63000.0,
+        horizon_ms=6 * 3600 * 1000,
+    )
+    assert pos is not None
+
+    # The minute bar spiked to 66100 (triggering short stop loss)
+    bar = BarData(
+        bar_open_ms=start_ms + 60000,
+        bar_close_ms=start_ms + 119999,
+        closed=True,
+        open=65000.0,
+        high=66100.0,  # Short stop breached!
+        low=64900.0,
+        close=65000.0,
+        volume=10.0,
+    )
+    mark_bar = bar
+
+    # But the current book dropped back to 64000!
+    bounced_book = make_test_book(best_bid=63999.0, best_ask=64000.0)
+    engine.on_book_update(bounced_book)
+
+    engine._evaluate_active_position_exits(bar, mark_bar)
+
+    assert engine.account.active_position is None
+    closed = engine.account.closed_positions[-1]
+    assert closed.exit_reason == ExitReason.STOP_LOSS
+    # Exit price must be bounded by stop_price (66000.0), NOT 64000.0!
+    assert closed.exit_price >= 66000.0
+    assert closed.gross_pnl_usdt < 0.0  # Must be a loss, never a fake profit!
+
