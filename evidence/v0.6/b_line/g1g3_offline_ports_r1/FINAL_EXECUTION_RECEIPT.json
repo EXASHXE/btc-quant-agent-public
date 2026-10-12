@@ -1,0 +1,140 @@
+{
+  "terminal": "G1G3_OFFLINE_LOOPBACK_PORTS_VERIFIED",
+  "task_id": "V06_GEMINI_GOAL_C_G1G3_OFFLINE_PORTS_R1",
+  "controller_dispatch_sha": "e35724f1d1ee7458709e003dfc5673c826c68ffd",
+  "start_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+  "branch": "feature/v06-bline-gemini-g1g3-offline-ports-r1",
+  "worktree": "/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1",
+  "scratch_dir": "/tmp/btc-g1g3_offline_ports_r1",
+  "commit_chain": [
+    {
+      "commit": "C1",
+      "sha": "c1f8099707a5709000b21011a2b2d6edbd7b9d42",
+      "parent": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+      "ci_run_id": 38213769358,
+      "nonforce_remote_exact_verified": true
+    },
+    {
+      "commit": "C2",
+      "sha": "381b9024db6139b8dbad75334862700acbb3abcc",
+      "parent": "c1f8099707a5709000b21011a2b2d6edbd7b9d42",
+      "ci_run_id": 38217510520,
+      "nonforce_remote_exact_verified": true
+    },
+    {
+      "commit": "C3",
+      "sha": "5f88bbd370c831cd22ad7586392974c0773decf2",
+      "parent": "381b9024db6139b8dbad75334862700acbb3abcc",
+      "ci_run_id": 38218000160,
+      "nonforce_remote_exact_verified": true
+    }
+  ],
+  "final_evidence_commit_identity": "SELF_SHA_CANNOT_BE_EMBEDDED; terminal response provides remote exact C4 SHA/parent and CI run ID",
+  "source_manifest_receipt": "C4_FINAL_SOURCE_MANIFEST.json",
+  "e2e_loopback_reproduction_receipt": "E2E_LOOPBACK_REPRODUCTION_RECEIPT.json",
+  "process_crash_recovery_receipt": "PROCESS_CRASH_RECOVERY_RECEIPT.json",
+  "ci_implementation_coverage_receipt": "CI_IMPLEMENTATION_COVERAGE.json",
+  "validation_environment": {
+    "python": "3.12.3",
+    "pytest": "8.4.2",
+    "ruff": "0.15.10",
+    "venv": "/tmp/btc-g1g3_offline_ports_r1/venv-py312"
+  },
+  "pytest_g1g3_sidecar": {
+    "command": "PYTHONPATH=/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1:/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1/src /tmp/btc-g1g3_offline_ports_r1/venv-py312/bin/python -m pytest tests/test_v06_g1g3_offline_ports_r1_*.py -q",
+    "passed": 142,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "duration_seconds": 202.98,
+    "suites": {
+      "test_v06_g1g3_offline_ports_r1_operator_auth.py": 32,
+      "test_v06_g1g3_offline_ports_r1_bounded_llm.py": 27,
+      "test_v06_g1g3_offline_ports_r1_feishu_outbox.py": 22,
+      "test_v06_g1g3_offline_ports_r1_core_integration.py": 26,
+      "test_v06_g1g3_offline_ports_r1_recovery_and_guards.py": 35
+    }
+  },
+  "pytest_g1_read_only_core": {
+    "command": "PYTHONPATH=/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1/src /tmp/btc-g1g3_offline_ports_r1/venv-py312/bin/python -m pytest tests/test_v06_g1_offline_preview_r1_*.py -q",
+    "passed": 145,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "ruff": "PASS",
+  "compile": "PASS",
+  "json_validation": "PASS",
+  "financial_baseline_reproduction": {
+    "LONG": {
+      "fixture_sha256": "ae6c70f7c26b752df1cfc2cc803d6a941a62e1699749365f4902d335cb93fe4f",
+      "final_spendable_cash": "1000.33834810",
+      "total_fees": "0.09565440",
+      "total_funding": "-0.00499750",
+      "realized_pnl": "0.43900000",
+      "terminal_state_digest": "7997f1d95da51c78113199e772da8a77e12d31b8e801d63fbcd1695e74f632e0",
+      "matched_codex_g1_c4_baseline": true
+    },
+    "SHORT": {
+      "fixture_sha256": "d6bf849411f82db75f433f91985b7c8698fbbd1834685fb706453de3cad1dc11",
+      "final_spendable_cash": "1000.34054750",
+      "total_fees": "0.09545250",
+      "total_funding": "0.00000000",
+      "realized_pnl": "0.43600000",
+      "terminal_state_digest": "fa9b4c475f1f55da09f1f4d35e28d1e8138d1aa760b67e4f8cc58511815a562d",
+      "matched_codex_g1_c4_baseline": true
+    }
+  },
+  "subprocess_crash_recovery": {
+    "distinct_crash_boundaries_verified": 10,
+    "exit_code": 91,
+    "boundaries": [
+      "before_llm_wal",
+      "after_llm_wal_before_core",
+      "after_llm_core_before_outbox_stage",
+      "after_outbox_stage_before_http_post",
+      "after_http_post_before_receipt_wal",
+      "after_operator_envelope_wal_before_core_approve",
+      "after_core_approve_before_place",
+      "after_fill_entry_before_ack",
+      "after_tp1_before_partial_ack",
+      "double_pending_ack"
+    ],
+    "torn_wal_tail_quarantine_verified": true,
+    "zero_duplicate_cash_charges": true,
+    "zero_duplicate_feishu_deliveries": true,
+    "zero_false_approvals": true
+  },
+  "runtime_counters": {
+    "false_approvals_accepted": 0,
+    "actual_private_or_network_calls": 0,
+    "duplicate_cash_charges": 0,
+    "oversize_exposure": 0,
+    "phantom_spendable_ack": 0,
+    "non_loopback_connect_attempts_blocked": 0
+  },
+  "read_only_g1_core_immutability": {
+    "verified": true,
+    "files_checked": 13,
+    "modified_bytes": 0
+  },
+  "explicit_non_claims": {
+    "readiness": "OFFLINE_LOOPBACK_ONLY",
+    "power_loss_durability_proven": false,
+    "live_or_testnet_ordering_authorized": false,
+    "binance_api_connected": false,
+    "real_feishu_webhook_connected": false,
+    "real_external_llm_connected": false,
+    "protected_data_accessed": false,
+    "production_src_modified": false
+  },
+  "no_grant": [
+    "ALPHA",
+    "PRODUCTION_ACCEPTANCE",
+    "TESTNET",
+    "LIVE",
+    "REAL_MONEY",
+    "PROTECTED_DATA",
+    "FOLLOW_ON_TASK"
+  ]
+}

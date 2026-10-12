@@ -1,0 +1,142 @@
+{
+  "evidence_kind": "GitHub Actions job/step metadata for feature/v06-bline-gemini-g1g3-offline-ports-r1 and local Python 3.12.3 / pytest 8.4.2 / ruff 0.15.10 verification",
+  "task_id": "V06_GEMINI_GOAL_C_G1G3_OFFLINE_PORTS_R1",
+  "branch": "feature/v06-bline-gemini-g1g3-offline-ports-r1",
+  "base_commit_codex_g1_c4": {
+    "headSha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+    "databaseId": 38207278792,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38207278792"
+  },
+  "C1": {
+    "headSha": "c1f8099707a5709000b21011a2b2d6edbd7b9d42",
+    "databaseId": 38213769358,
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38213769358",
+    "jobs": [
+      {
+        "databaseId": 114694923415,
+        "name": "Risk-based quality (Python 3.12)",
+        "status": "completed",
+        "conclusion": "failure",
+        "startedAt": "2026-10-12T06:09:49Z",
+        "completedAt": "2026-10-12T06:26:12Z",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38213769358/job/114694923415",
+        "steps": [
+          {"number": 1, "name": "Set up job", "status": "completed", "conclusion": "success"},
+          {"number": 2, "name": "Run actions/checkout@v4", "status": "completed", "conclusion": "success"},
+          {"number": 3, "name": "Fetch v0.6 immutable base for merge-base resolution", "status": "completed", "conclusion": "success"},
+          {"number": 4, "name": "Ensure cache directory exists for docs-only/zero-pip FAST paths", "status": "completed", "conclusion": "success"},
+          {"number": 5, "name": "Run actions/setup-python@v5", "status": "completed", "conclusion": "success"},
+          {"number": 6, "name": "Build fail-closed test plan", "status": "completed", "conclusion": "success"},
+          {"number": 7, "name": "Classify impact before heavy dependency installation", "status": "completed", "conclusion": "success"},
+          {"number": 8, "name": "Install tiny CI-planner dependencies", "status": "completed", "conclusion": "skipped"},
+          {"number": 9, "name": "Install production/research validation dependencies", "status": "completed", "conclusion": "success"},
+          {"number": 10, "name": "Ruff with bounded historical EXE001 debt", "status": "completed", "conclusion": "success"},
+          {"number": 11, "name": "Type-check production package on production changes", "status": "completed", "conclusion": "success"},
+          {"number": 12, "name": "Compile Python", "status": "completed", "conclusion": "success"},
+          {"number": 13, "name": "Validate changed JSON artifacts", "status": "completed", "conclusion": "success"},
+          {"number": 14, "name": "Tests selected by risk/changed scope", "status": "completed", "conclusion": "failure"},
+          {"number": 15, "name": "Retain scoped test evidence", "status": "completed", "conclusion": "success"}
+        ]
+      }
+    ],
+    "step_14_classification": "scripts/ci/test_plan.py classifies new scripts/g1g3_offline_ports_r1/* paths outside src/tests/docs/evidence as unknown_changed -> full legacy suite mode; all C1 g1g3 tests (32/32) pass locally under pytest 8.4.2"
+  },
+  "C2": {
+    "headSha": "381b9024db6139b8dbad75334862700acbb3abcc",
+    "databaseId": 38217510520,
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38217510520",
+    "jobs": [
+      {
+        "databaseId": 114706675621,
+        "name": "Risk-based quality (Python 3.12)",
+        "status": "completed",
+        "conclusion": "failure",
+        "startedAt": "2026-10-12T07:03:54Z",
+        "completedAt": "2026-10-12T07:20:09Z",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38217510520/job/114706675621",
+        "steps": [
+          {"number": 1, "name": "Set up job", "status": "completed", "conclusion": "success"},
+          {"number": 2, "name": "Run actions/checkout@v4", "status": "completed", "conclusion": "success"},
+          {"number": 3, "name": "Fetch v0.6 immutable base for merge-base resolution", "status": "completed", "conclusion": "success"},
+          {"number": 4, "name": "Ensure cache directory exists for docs-only/zero-pip FAST paths", "status": "completed", "conclusion": "success"},
+          {"number": 5, "name": "Run actions/setup-python@v5", "status": "completed", "conclusion": "success"},
+          {"number": 6, "name": "Build fail-closed test plan", "status": "completed", "conclusion": "success"},
+          {"number": 7, "name": "Classify impact before heavy dependency installation", "status": "completed", "conclusion": "success"},
+          {"number": 8, "name": "Install tiny CI-planner dependencies", "status": "completed", "conclusion": "skipped"},
+          {"number": 9, "name": "Install production/research validation dependencies", "status": "completed", "conclusion": "success"},
+          {"number": 10, "name": "Ruff with bounded historical EXE001 debt", "status": "completed", "conclusion": "success"},
+          {"number": 11, "name": "Type-check production package on production changes", "status": "completed", "conclusion": "success"},
+          {"number": 12, "name": "Compile Python", "status": "completed", "conclusion": "success"},
+          {"number": 13, "name": "Validate changed JSON artifacts", "status": "completed", "conclusion": "success"},
+          {"number": 14, "name": "Tests selected by risk/changed scope", "status": "completed", "conclusion": "failure"},
+          {"number": 15, "name": "Retain scoped test evidence", "status": "completed", "conclusion": "success"}
+        ]
+      }
+    ],
+    "step_14_classification": "scripts/ci/test_plan.py classifies new scripts/g1g3_offline_ports_r1/* paths as unknown_changed -> full legacy suite mode; all C1+C2 g1g3 tests (81/81) pass locally under pytest 8.4.2"
+  },
+  "C3": {
+    "headSha": "5f88bbd370c831cd22ad7586392974c0773decf2",
+    "databaseId": 38218000160,
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38218000160",
+    "jobs": [
+      {
+        "databaseId": 114708265752,
+        "name": "Risk-based quality (Python 3.12)",
+        "status": "completed",
+        "conclusion": "failure",
+        "startedAt": "2026-10-12T07:10:53Z",
+        "completedAt": "2026-10-12T07:21:16Z",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38218000160/job/114708265752",
+        "steps": [
+          {"number": 1, "name": "Set up job", "status": "completed", "conclusion": "success"},
+          {"number": 2, "name": "Run actions/checkout@v4", "status": "completed", "conclusion": "success"},
+          {"number": 3, "name": "Fetch v0.6 immutable base for merge-base resolution", "status": "completed", "conclusion": "success"},
+          {"number": 4, "name": "Ensure cache directory exists for docs-only/zero-pip FAST paths", "status": "completed", "conclusion": "success"},
+          {"number": 5, "name": "Run actions/setup-python@v5", "status": "completed", "conclusion": "success"},
+          {"number": 6, "name": "Build fail-closed test plan", "status": "completed", "conclusion": "success"},
+          {"number": 7, "name": "Classify impact before heavy dependency installation", "status": "completed", "conclusion": "success"},
+          {"number": 8, "name": "Install tiny CI-planner dependencies", "status": "completed", "conclusion": "skipped"},
+          {"number": 9, "name": "Install production/research validation dependencies", "status": "completed", "conclusion": "success"},
+          {"number": 10, "name": "Ruff with bounded historical EXE001 debt", "status": "completed", "conclusion": "success"},
+          {"number": 11, "name": "Type-check production package on production changes", "status": "completed", "conclusion": "success"},
+          {"number": 12, "name": "Compile Python", "status": "completed", "conclusion": "success"},
+          {"number": 13, "name": "Validate changed JSON artifacts", "status": "completed", "conclusion": "success"},
+          {"number": 14, "name": "Tests selected by risk/changed scope", "status": "completed", "conclusion": "failure"},
+          {"number": 15, "name": "Retain scoped test evidence", "status": "completed", "conclusion": "success"}
+        ]
+      }
+    ],
+    "step_14_classification": "Ruff, Mypy, Compile Python, and Validate changed JSON artifacts all succeeded; Step 14 invokes console script `pytest` without repository root on PYTHONPATH; all 142/142 g1g3 tests pass locally via `python -m pytest`"
+  },
+  "C4": "ACTUAL_STATUS_IN_TERMINAL_RESPONSE_AFTER_PUSH",
+  "local_verification": {
+    "python_version": "3.12.3",
+    "pytest_version": "8.4.2",
+    "ruff_version": "0.15.10",
+    "g1g3_test_suites": {
+      "tests/test_v06_g1g3_offline_ports_r1_operator_auth.py": 32,
+      "tests/test_v06_g1g3_offline_ports_r1_bounded_llm.py": 27,
+      "tests/test_v06_g1g3_offline_ports_r1_feishu_outbox.py": 22,
+      "tests/test_v06_g1g3_offline_ports_r1_core_integration.py": 26,
+      "tests/test_v06_g1g3_offline_ports_r1_recovery_and_guards.py": 35
+    },
+    "g1g3_total_passed": 142,
+    "g1g3_total_failed": 0,
+    "g1g3_total_skipped": 0,
+    "g1_read_only_core_total_passed": 145,
+    "ruff_check": "PASS",
+    "ruff_format_check": "PASS",
+    "compileall": "PASS"
+  },
+  "no_legacy_suite_repair": true,
+  "read_only_g1_core_modified_bytes": 0
+}
