@@ -18,6 +18,10 @@ import sys
 import time
 from pathlib import Path
 
+_ROOT_DIR = str(Path(__file__).resolve().parent.parent)
+if _ROOT_DIR not in sys.path:
+    sys.path.insert(0, _ROOT_DIR)
+
 import pytest
 
 from scripts.integration.market_event_bridge_r2.bridge_engine import MarketEventBridgeR2
@@ -35,14 +39,6 @@ from scripts.market_data.forward_public_feed_r1.proxy_route import (
     sanitize_env_proxy_map,
     validate_2026_routed_url,
 )
-
-# Ensure B and C worktrees are on sys.path
-B_DIR = Path("/root/workspace/project/quant-v0.6/gemini-forward-shadow-research-r1")
-C_DIR = Path("/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1")
-if B_DIR.exists() and str(B_DIR) not in sys.path:
-    sys.path.insert(0, str(B_DIR))
-if C_DIR.exists() and str(C_DIR) not in sys.path:
-    sys.path.insert(0, str(C_DIR))
 
 
 def test_default_network_disabled_fail_closed():

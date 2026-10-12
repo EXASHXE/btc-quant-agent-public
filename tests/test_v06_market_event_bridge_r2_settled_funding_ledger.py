@@ -20,13 +20,17 @@ from scripts.integration.market_event_bridge_r2.funding_adapter import (
     SettledFundingLedger,
 )
 
-# Ensure B and C worktrees are on sys.path if present
-B_DIR = Path("/root/workspace/project/quant-v0.6/gemini-forward-shadow-research-r1")
-C_DIR = Path("/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1")
-if B_DIR.exists() and str(B_DIR) not in sys.path:
-    sys.path.insert(0, str(B_DIR))
-if C_DIR.exists() and str(C_DIR) not in sys.path:
-    sys.path.insert(0, str(C_DIR))
+_ROOT_DIR = str(Path(__file__).resolve().parent.parent)
+if _ROOT_DIR not in sys.path:
+    sys.path.insert(0, _ROOT_DIR)
+
+from scripts.integration.market_event_bridge_r2.portable_ci_refs import (
+    ensure_portable_b_on_path,
+    ensure_portable_c_on_path,
+)
+
+ensure_portable_b_on_path()
+ensure_portable_c_on_path()
 
 
 def test_settled_funding_entry_creation():
@@ -416,12 +420,9 @@ def test_ledger_report_generation():
 
 
 def test_interop_with_b_parse_funding_payload():
-    try:
-        from scripts.strategy_research.forward_shadow_research_r1.contract import (
-            parse_funding_payload,
-        )
-    except ImportError:
-        pytest.skip("B forward_shadow_research_r1 worktree not available")
+    from scripts.strategy_research.forward_shadow_research_r1.contract import (
+        parse_funding_payload,
+    )
 
     entry = SettledFundingEntry(
         symbol="BTCUSDT",
@@ -446,10 +447,7 @@ def test_interop_with_b_parse_funding_payload():
 
 
 def test_interop_with_c_market_pit_port():
-    try:
-        from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
-    except ImportError:
-        pytest.skip("C g1g3_offline_ports_r1 worktree not available")
+    from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
 
     port = MarketPitPort(
         expected_stream_id="btcusdt@kline_1m",

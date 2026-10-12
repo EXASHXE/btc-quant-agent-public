@@ -18,10 +18,13 @@ import pytest
 from scripts.integration.market_event_bridge_r2.c_composite_bar import CCompositeBarBuilder
 from scripts.integration.market_event_bridge_r2.mark_aggregator import DerivedMark1MBar
 
-# Ensure C worktree is on sys.path
-C_DIR = Path("/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1")
-if C_DIR.exists() and str(C_DIR) not in sys.path:
-    sys.path.insert(0, str(C_DIR))
+_ROOT_DIR = str(Path(__file__).resolve().parent.parent)
+if _ROOT_DIR not in sys.path:
+    sys.path.insert(0, _ROOT_DIR)
+
+from scripts.integration.market_event_bridge_r2.portable_ci_refs import ensure_portable_c_on_path
+
+ensure_portable_c_on_path()
 
 
 def _make_mock_mark_bar(
@@ -203,10 +206,7 @@ def test_c_composite_builder_sequence_and_epoch():
 
 
 def test_c_market_pit_port_accepts_composite_bar():
-    try:
-        from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
-    except ImportError:
-        pytest.skip("C g1g3_offline_ports_r1 worktree not available")
+    from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
 
     builder = CCompositeBarBuilder(
         stream_id="btcusdt@kline_1m",
@@ -242,10 +242,7 @@ def test_c_market_pit_port_accepts_composite_bar():
 
 
 def test_c_market_pit_port_translates_bar_to_g1_event():
-    try:
-        from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
-    except ImportError:
-        pytest.skip("C g1g3_offline_ports_r1 worktree not available")
+    from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
 
     builder = CCompositeBarBuilder(
         stream_id="btcusdt@kline_1m",
@@ -285,10 +282,7 @@ def test_c_market_pit_port_translates_bar_to_g1_event():
 
 
 def test_c_market_pit_port_rejects_missing_payload_key():
-    try:
-        from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort, SafetyViolation
-    except ImportError:
-        pytest.skip("C g1g3_offline_ports_r1 worktree not available")
+    from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort, SafetyViolation
 
     builder = CCompositeBarBuilder(stream_id="btcusdt@kline_1m", raw_manifest_sha256="m1")
     port = MarketPitPort(expected_stream_id="btcusdt@kline_1m", expected_manifest_sha256="m1")
@@ -306,10 +300,7 @@ def test_c_market_pit_port_rejects_missing_payload_key():
 
 
 def test_c_market_pit_port_rejects_unclosed_bar():
-    try:
-        from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort, SafetyViolation
-    except ImportError:
-        pytest.skip("C g1g3_offline_ports_r1 worktree not available")
+    from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort, SafetyViolation
 
     builder = CCompositeBarBuilder(stream_id="btcusdt@kline_1m", raw_manifest_sha256="m1")
     port = MarketPitPort(expected_stream_id="btcusdt@kline_1m", expected_manifest_sha256="m1")
@@ -326,10 +317,7 @@ def test_c_market_pit_port_rejects_unclosed_bar():
 
 
 def test_c_market_pit_port_rejects_invalid_ohlc():
-    try:
-        from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort, SafetyViolation
-    except ImportError:
-        pytest.skip("C g1g3_offline_ports_r1 worktree not available")
+    from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort, SafetyViolation
 
     builder = CCompositeBarBuilder(stream_id="btcusdt@kline_1m", raw_manifest_sha256="m1")
     port = MarketPitPort(expected_stream_id="btcusdt@kline_1m", expected_manifest_sha256="m1")
@@ -343,10 +331,7 @@ def test_c_market_pit_port_rejects_invalid_ohlc():
 
 
 def test_c_market_pit_port_rejects_pit_violation():
-    try:
-        from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort, SafetyViolation
-    except ImportError:
-        pytest.skip("C g1g3_offline_ports_r1 worktree not available")
+    from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort, SafetyViolation
 
     builder = CCompositeBarBuilder(stream_id="btcusdt@kline_1m", raw_manifest_sha256="m1")
     port = MarketPitPort(expected_stream_id="btcusdt@kline_1m", expected_manifest_sha256="m1")
@@ -364,12 +349,9 @@ def test_c_market_pit_port_rejects_pit_violation():
 
 
 def test_g1_reducer_transitions_on_translated_bar():
-    try:
-        from scripts.g1_offline_preview_r1.model import initial_state
-        from scripts.g1_offline_preview_r1.reducer import transition
-        from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
-    except ImportError:
-        pytest.skip("C worktree not available")
+    from scripts.g1_offline_preview_r1.model import initial_state
+    from scripts.g1_offline_preview_r1.reducer import transition
+    from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
 
     builder = CCompositeBarBuilder(stream_id="btcusdt@kline_1m", raw_manifest_sha256="m1")
     port = MarketPitPort(expected_stream_id="btcusdt@kline_1m", expected_manifest_sha256="m1")
@@ -398,12 +380,9 @@ def test_g1_reducer_transitions_on_translated_bar():
 
 
 def test_g1_state_immutability_and_wal_replay():
-    try:
-        from scripts.g1_offline_preview_r1.model import initial_state
-        from scripts.g1_offline_preview_r1.reducer import digest, transition
-        from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
-    except ImportError:
-        pytest.skip("C worktree not available")
+    from scripts.g1_offline_preview_r1.model import initial_state
+    from scripts.g1_offline_preview_r1.reducer import digest, transition
+    from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
 
     builder = CCompositeBarBuilder(stream_id="btcusdt@kline_1m", raw_manifest_sha256="m1")
     port = MarketPitPort(expected_stream_id="btcusdt@kline_1m", expected_manifest_sha256="m1")

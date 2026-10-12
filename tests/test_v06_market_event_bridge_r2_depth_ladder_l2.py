@@ -6,13 +6,12 @@ import sys
 from decimal import Decimal
 from pathlib import Path
 
+_ROOT_DIR = str(Path(__file__).resolve().parent.parent)
+if _ROOT_DIR not in sys.path:
+    sys.path.insert(0, _ROOT_DIR)
 _SCRIPTS_DIR = str(Path(__file__).resolve().parent.parent / "scripts")
 if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
-
-_B_DIR = "/root/workspace/project/quant-v0.6/gemini-forward-shadow-research-r1"
-if _B_DIR not in sys.path and Path(_B_DIR).exists():
-    sys.path.insert(0, _B_DIR)
 
 from market_data.forward_public_feed_r1.order_book import OrderBookIntegrityEngine
 

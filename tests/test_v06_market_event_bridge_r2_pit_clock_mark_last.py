@@ -7,13 +7,16 @@ from pathlib import Path
 
 import pytest
 
+_ROOT_DIR = str(Path(__file__).resolve().parent.parent)
+if _ROOT_DIR not in sys.path:
+    sys.path.insert(0, _ROOT_DIR)
 _SCRIPTS_DIR = str(Path(__file__).resolve().parent.parent / "scripts")
 if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
 
-_C_DIR = "/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1"
-if _C_DIR not in sys.path and Path(_C_DIR).exists():
-    sys.path.insert(0, _C_DIR)
+from scripts.integration.market_event_bridge_r2.portable_ci_refs import ensure_portable_c_on_path
+
+ensure_portable_c_on_path()
 
 from scripts.g1_offline_preview_r1.model import SafetyViolation, digest
 from scripts.g1g3_offline_ports_r1.market_pit_port import MarketPitPort
