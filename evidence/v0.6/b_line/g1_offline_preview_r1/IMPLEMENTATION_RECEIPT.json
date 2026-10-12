@@ -5,7 +5,7 @@
   "branch": "feature/v06-bline-codex-g1-offline-dryrun-preview-r1",
   "requested_model_effort": "GPT-6.1 Sol High",
   "observable_root_model_effort": "NOT_EXPOSED",
-  "dependencies": "Python3.12.3 stdlib runtime; pytest8.4.2/Ruff0.16.9 verification",
+  "dependencies": "Python3.12.3 stdlib runtime; C1 pytest version initially mislabelled8.4.2; retrospective interpreter-local version9.0.3; final pinned8.4.2 receipt in FINAL_EXECUTION_RECEIPT.json; Ruff0.16.9",
   "scoped_tests": 68,
   "failures": 0,
   "Ruff_compile": "PASS",
@@ -16,5 +16,7 @@
   ],
   "source": "SYNTHETIC_ONLY; no historic market bytes or external API",
   "safety_status": "DRY_RUN_NO_NETWORK_NO_ORDERING",
-  "OS_crash_evidence": "pending next coherent engineering stage; no claim yet"
+  "OS_crash_evidence": "pending next coherent engineering stage; no claim yet",
+  "dependencies_originally_reported": "Python3.12.3 stdlib runtime; pytest8.4.2/Ruff0.16.9 verification",
+  "version_audit_amendment": "Evidence-only correction; C1 Git commit and its test result remain immutable"
 }

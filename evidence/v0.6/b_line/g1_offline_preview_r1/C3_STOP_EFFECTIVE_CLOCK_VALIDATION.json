@@ -1,0 +1,39 @@
+{
+  "stage": "C3_STOP_EFFECTIVE_CLOCK_AND_PINNED_VERIFICATION",
+  "parent": "b792c613cac70324e66f6fb6958ce269f1a55dd1",
+  "source_manifest": {
+    "scripts/g1_offline_preview_r1/__main__.py": "2df73d59f8ac7fda619c27ed113f13bb8441e61b3b027a310c9bd1f4f9a23f86",
+    "scripts/g1_offline_preview_r1/analysis_schema.json": "dea9da8a0f03740894f117a7da56cd7c99476aa3058bdf2a665107019a98e1cb",
+    "scripts/g1_offline_preview_r1/fixtures/long_24h.json": "ae6c70f7c26b752df1cfc2cc803d6a941a62e1699749365f4902d335cb93fe4f",
+    "scripts/g1_offline_preview_r1/fixtures/short_24h.json": "d6bf849411f82db75f433f91985b7c8698fbbd1834685fb706453de3cad1dc11",
+    "scripts/g1_offline_preview_r1/fixtures.py": "9999418e5cb1f9fd98d1f4cae5c1d460a9593b28c9f7f338a3043374fa4ea8b0",
+    "scripts/g1_offline_preview_r1/model.py": "086d6ec8747f82d59b6f8f42bfefd2d9c61e5f962707b4f9119f784741dd206e",
+    "scripts/g1_offline_preview_r1/reducer.py": "c0114c8cc0480b3c4c637217363833590fb231ad8529c93f85f574ce161ed89e",
+    "scripts/g1_offline_preview_r1/storage.py": "9e4ac21c501e48734a750021f8ea2f51f4f06ecc0ee2e798647718b4c453f101",
+    "tests/test_v06_g1_offline_preview_r1_core.py": "d5679c583d1122f2ce877f7686e477acc869637e7ee21643fbee1f5058e52da3",
+    "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py": "022ba64e10488632830bf05bd35ec7a3198dba995374dcaf9400a5a06591cde8",
+    "tests/test_v06_g1_offline_preview_r1_exit_safety.py": "8efc412469fa5be183bca05dacd7ba255e7ad1f20f93e39706698e8bc4cd71f0",
+    "tests/test_v06_g1_offline_preview_r1_process_recovery.py": "d6c99ea559f9c4a8c384568af52ed6aa556ecca896d9add58ca9aa5c07f04249",
+    "tests/test_v06_g1_offline_preview_r1_wal.py": "41d53a583502b4d28da92dfa9f8c9e2dde73522509009739418d9dfff42c8585"
+  },
+  "source_manifest_sha256": "60051e21cec5d4b87ff8764957bf751495c8a44ec1d57ec53886139e40df3dce",
+  "python": "3.12.3",
+  "pytest": "8.4.2",
+  "pytest_environment": "task-owned venv with existing dependencies; own worktree src for unchanged hermetic conftest",
+  "scoped_nonprocess_passed": 111,
+  "scoped_nonprocess_failed": 0,
+  "scoped_text": "........................................................................ [ 64%]\n.......................................                                  [100%]\n111 passed in 35.65s\n",
+  "prior_complete_pinned_suite": {
+    "passed": 140,
+    "failed": 0,
+    "seconds": 325.59,
+    "code_commit": "b792c613cac70324e66f6fb6958ce269f1a55dd1"
+  },
+  "new_falsifier": "BE stop cannot fill from pre-update same completed source bar",
+  "method": "update at completed minute boundary or+1ms; newstop sourcehashcannotfilluntilnextfullminute",
+  "final_143_suite": "PENDING_FINAL_EVIDENCE",
+  "cash_economics_changed": false,
+  "new_data_or_science_outcomes_accessed": false,
+  "ruff": "PASS",
+  "compile": "PASS"
+}

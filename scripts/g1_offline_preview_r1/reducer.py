@@ -350,6 +350,7 @@ def transition(state: dict[str, Any], event: dict[str, Any]) -> dict[str, Any]:
             }
         )
         s["used_signal_ids"].append(p["signal_id"])
+        s.pop("stop_update_source_hash", None)
         s["phase"] = "NO_ACTION" if p["side"] == "NO_ACTION" else "PROPOSED"
 
     elif kind == "ANALYZE":
@@ -566,6 +567,8 @@ def transition(state: dict[str, Any], event: dict[str, Any]) -> dict[str, Any]:
         _phase(s, "OPEN_RESIDUAL")
         exact(p, set())
         bar = _bar(s, at)
+        if at > bar["close_time"] + 1:
+            raise SafetyViolation("STOP_UPDATE_NOT_AT_COMPLETED_BOUNDARY")
         if (
             s["tp1_ack_at"] is None
             or at <= s["tp1_ack_at"]
@@ -590,6 +593,7 @@ def transition(state: dict[str, Any], event: dict[str, Any]) -> dict[str, Any]:
             ):
                 be -= TICK
             s["stop"] = _d(min(decimal(s["stop"]), be))
+        s["stop_update_source_hash"] = s["last_bar_hash"]
 
     elif kind in ("STOP", "TIME_CAP", "TP2"):
         _phase(s, "OPEN", "OPEN_RESIDUAL", "WAIT_TP1_ACK", "WAIT_ENTRY_ACK")
@@ -597,6 +601,8 @@ def transition(state: dict[str, Any], event: dict[str, Any]) -> dict[str, Any]:
         qty = decimal(s["remaining_qty"], positive=True)
         side = s["proposal"]["side"]
         if kind == "STOP":
+            if s.get("stop_update_source_hash") == s["last_bar_hash"]:
+                raise SafetyViolation("STOP_UPDATE_NOT_YET_EFFECTIVE")
             stop = decimal(s["stop"], positive=True)
             breached = (
                 decimal(bar["last_low"]) <= stop

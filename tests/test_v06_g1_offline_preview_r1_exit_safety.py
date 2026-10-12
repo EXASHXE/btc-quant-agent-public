@@ -166,3 +166,46 @@ def test_late_receipt_cannot_lock_pending_stop_or_advance_market_clock():
     assert s["last_at"] == clock and s["cash"] == cash
     s = next_bar(s)
     assert s["last_at"] == clock + 60000
+
+
+def residual_before_update(side="LONG"):
+    favorable = "105" if side == "LONG" else "95"
+    s = next_bar(
+        open_position(side=side, qty="0.04"),
+        last=favorable,
+        high=str(int(favorable) + 1),
+        low=str(int(favorable) - 1),
+    )
+    s = transition(s, ev("TP1", s["last_at"], {"fill_id": "half"}))
+    s = next_bar(s, last=favorable, high=str(int(favorable) + 1), low=str(int(favorable) - 1))
+    s = transition(
+        s,
+        ev(
+            "ACK",
+            s["last_at"],
+            {"ack_id": "ack-half", "order_id": s["order_id"], "fill_id": "half"},
+        ),
+    )
+    return next_bar(s, last="100", high="101", low="99")
+
+
+@pytest.mark.parametrize("side", ["LONG", "SHORT"])
+def test_new_be_stop_cannot_retroactively_fill_update_source_bar(side):
+    s = residual_before_update(side)
+    s = transition(s, ev("UPDATE_STOP", s["last_at"] + 1))
+    before = digest(s)
+    with pytest.raises(SafetyViolation, match="STOP_UPDATE_NOT_YET_EFFECTIVE"):
+        transition(s, ev("STOP", s["last_at"] + 1, {"fill_id": "retroactive"}))
+    assert digest(s) == before and not s["pending_cash"]
+    s = next_bar(s, last="100", high="101", low="99")
+    assert s["required_exit"]["kind"] == "STOP"
+    s = transition(s, ev("STOP", s["last_at"], {"fill_id": "causal-stop"}))
+    assert Decimal(s["remaining_qty"]) == 0
+
+
+def test_stop_update_after_boundary_rejects_without_financial_effect():
+    s = residual_before_update()
+    before = digest(s)
+    with pytest.raises(SafetyViolation, match="STOP_UPDATE_NOT_AT_COMPLETED_BOUNDARY"):
+        transition(s, ev("UPDATE_STOP", s["last_at"] + 2))
+    assert digest(s) == before
