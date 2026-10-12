@@ -19,18 +19,18 @@ In adherence to scientific integrity principles, **negative findings are reporte
 
 ### Core Findings
 1. **F1: Aggressor-Flow / Price Response Divergence (Absorption)**:
-   - Across the 35 development months, the pre-registered coarse flow absorption criteria ($|S_{1h}| \ge 0.20$ with price stalling $\Delta P_{1h} \times \text{side} \le 0$) triggered only **2 executed trade events**.
-   - Failed the pre-registered sample viability threshold ($n \ge 30$). Both trades closed at a loss after cost (Profit Factor = 0.0, net PnL = -16.54 USDT under STRESS).
+   - Across the 35 development months, the pre-registered coarse flow absorption criteria ($|S_{1h}| \ge 0.20$ with price stalling $\Delta P_{1h} \times \text{side} \le 0$) triggered only **2 executed trade events** (both in 2023).
+   - Failed the pre-registered sample viability threshold ($n \ge 30$). Both trades closed at a loss after cost (Profit Factor = 0.0, Mean Net = -91.30 bps, net PnL = -16.54 USDT under STRESS).
 2. **F2: Realized Funding Crowding Sign Reversal**:
-   - Satisfied the sample viability threshold with **37 executed trades** across distinct years (2021, 2022, 2023).
-   - Under the primary STRESS 44bp cost regime, both horizons generated net losses:
-     - 12h Horizon: Profit Factor **0.37**, Net PnL **-115.22 USDT**, Win Rate 32.4%.
-     - 18h Horizon: Profit Factor **0.52**, Net PnL **-95.42 USDT**, Win Rate 40.5%.
+   - Satisfied the sample viability threshold with **37 executed trades** across distinct years (2021: 3 trades, 2022: 6 trades, 2023: 28 trades).
+   - Under the primary STRESS 44bp cost regime, both horizons generated net losses across the 35-month development period:
+     - 12h Horizon: Profit Factor **0.37**, 35M Net PnL **-175.21 USDT** (2023 PnL: -115.22 USDT), Win Rate 24.3%, Mean Net -55.42 bps.
+     - 18h Horizon: Profit Factor **0.52**, 35M Net PnL **-134.44 USDT** (2023 PnL: -95.42 USDT), Win Rate 32.4%, Mean Net -41.11 bps.
    - The 14-day simultaneous confidence intervals span zero. The directional edge of simple consecutive funding sign flips does not survive exchange fees, spreads, and slippage.
 3. **F3: Mark–Last Basis Dislocation and Flow Repair**:
-   - Generated **12 executed trades** over 35 months.
-   - Displayed positive sample performance (12h PF = **2.15**, Net PnL = **+10.27 USDT**; 18h PF = **1.77**, Net PnL = **+9.96 USDT**).
-   - However, with $n = 12$, it **failed the pre-registered sample viability gate ($n \ge 30$)**. The 14-day simultaneous max-|T| confidence interval spans zero ($[-2585.4, +2585.4]$). Under multi-comparison penalization, this sample cannot be distinguished from random drift without further data.
+   - Generated **12 executed trades** over 35 months (2021: 9 trades, 2022: 2 trades, 2023: 1 trade).
+   - Displayed positive sample performance (12h: PF = **2.15**, 35M Net PnL = **+108.11 USDT**, 2023 PnL = **+10.27 USDT**, Mean Net = +96.39 bps; 18h: PF = **1.77**, 35M Net PnL = **+109.70 USDT**, 2023 PnL = **+9.96 USDT**, Mean Net = +101.93 bps).
+   - However, with $n = 12$, it **failed the pre-registered sample viability gate ($n \ge 30$)**. Both 7-day and 14-day simultaneous max-|T| confidence intervals span zero. Under multi-comparison penalization, this sparse sample cannot be distinguished from random drift without further independent data.
 
 **Conclusion**: None of the 6 pre-registered candidate configurations passed all four pre-declared falsification gates. The terminal scientific conclusion is `G2_FLOW_FUNDING_NO_COST_ADJUSTED_SUPPORT`.
 
@@ -61,23 +61,23 @@ The experiment strictly adhered to the pre-outcome protocol freeze:
 
 | Candidate Configuration | Family | Horizon | Signals Total | Executed Trades | Win Rate (%) | Profit Factor | Mean Net (bps) | Net PnL (USDT) | Primary Verdict |
 |---|---|---|---|---|---|---|---|---|---|
-| `F1_AGGRESSOR_FLOW_ABSORPTION_12H` | F1 | 12h | 2 | 2 | 0.0% | 0.00 | -54.79 | -16.54 | INSUFFICIENT_SUPPORT |
-| `F1_AGGRESSOR_FLOW_ABSORPTION_18H` | F1 | 18h | 2 | 2 | 0.0% | 0.00 | -54.79 | -16.54 | INSUFFICIENT_SUPPORT |
-| `F2_REALIZED_FUNDING_REVERSAL_12H` | F2 | 12h | 48 | 37 | 32.4% | 0.37 | -56.55 | -115.22 | INSUFFICIENT_SUPPORT |
-| `F2_REALIZED_FUNDING_REVERSAL_18H` | F2 | 18h | 48 | 37 | 40.5% | 0.52 | -42.44 | -95.42 | INSUFFICIENT_SUPPORT |
-| `F3_MARK_LAST_DISLOCATION_REPAIR_12H` | F3 | 12h | 16 | 12 | 58.3% | 2.15 | +30.82 | +10.27 | INSUFFICIENT_SUPPORT |
-| `F3_MARK_LAST_DISLOCATION_REPAIR_18H` | F3 | 18h | 16 | 12 | 58.3% | 1.77 | +28.91 | +9.96 | INSUFFICIENT_SUPPORT |
+| `F1_AGGRESSOR_FLOW_ABSORPTION_12H` | F1 | 12h | 2 | 2 | 0.0% | 0.00 | -91.30 | -16.54 | INSUFFICIENT_SUPPORT |
+| `F1_AGGRESSOR_FLOW_ABSORPTION_18H` | F1 | 18h | 2 | 2 | 0.0% | 0.00 | -91.30 | -16.54 | INSUFFICIENT_SUPPORT |
+| `F2_REALIZED_FUNDING_REVERSAL_12H` | F2 | 12h | 48 | 37 | 24.3% | 0.37 | -55.42 | -175.21 | INSUFFICIENT_SUPPORT |
+| `F2_REALIZED_FUNDING_REVERSAL_18H` | F2 | 18h | 48 | 37 | 32.4% | 0.52 | -41.11 | -134.44 | INSUFFICIENT_SUPPORT |
+| `F3_MARK_LAST_DISLOCATION_REPAIR_12H` | F3 | 12h | 16 | 12 | 50.0% | 2.15 | +96.39 | +108.11 | INSUFFICIENT_SUPPORT |
+| `F3_MARK_LAST_DISLOCATION_REPAIR_18H` | F3 | 18h | 16 | 12 | 58.3% | 1.77 | +101.93 | +109.70 | INSUFFICIENT_SUPPORT |
 
 ### Table 2: Candidate Performance under BASE 22bp Secondary Regime
 
 | Candidate Configuration | Executed Trades | Win Rate (%) | Profit Factor | Mean Net (bps) | Net PnL (USDT) | Ending Cash (USDT) |
 |---|---|---|---|---|---|---|
-| `F1_AGGRESSOR_FLOW_ABSORPTION_12H` | 2 | 0.0% | 0.00 | -32.84 | -9.91 | 990.09 |
-| `F1_AGGRESSOR_FLOW_ABSORPTION_18H` | 2 | 0.0% | 0.00 | -32.84 | -9.91 | 990.09 |
-| `F2_REALIZED_FUNDING_REVERSAL_12H` | 37 | 37.8% | 0.49 | -34.80 | -71.74 | 928.26 |
-| `F2_REALIZED_FUNDING_REVERSAL_18H` | 37 | 43.2% | 0.69 | -20.69 | -51.93 | 948.07 |
-| `F3_MARK_LAST_DISLOCATION_REPAIR_12H` | 12 | 58.3% | 2.76 | +52.77 | +17.58 | 1017.58 |
-| `F3_MARK_LAST_DISLOCATION_REPAIR_18H` | 12 | 58.3% | 2.27 | +50.86 | +17.27 | 1017.27 |
+| `F1_AGGRESSOR_FLOW_ABSORPTION_12H` | 2 | 0.0% | 0.00 | -69.36 | -12.74 | 987.26 |
+| `F1_AGGRESSOR_FLOW_ABSORPTION_18H` | 2 | 0.0% | 0.00 | -69.36 | -12.56 | 987.44 |
+| `F2_REALIZED_FUNDING_REVERSAL_12H` | 37 | 32.4% | 0.54 | -32.73 | -108.69 | 891.31 |
+| `F2_REALIZED_FUNDING_REVERSAL_18H` | 37 | 37.8% | 0.71 | -20.12 | -70.06 | 929.94 |
+| `F3_MARK_LAST_DISLOCATION_REPAIR_12H` | 12 | 58.3% | 2.49 | +114.59 | +126.14 | 1126.14 |
+| `F3_MARK_LAST_DISLOCATION_REPAIR_18H` | 12 | 58.3% | 1.97 | +118.85 | +128.10 | 1128.10 |
 
 ### Table 3: Annual Breakdown under STRESS (44bp)
 
@@ -85,19 +85,22 @@ The experiment strictly adhered to the pre-outcome protocol freeze:
 |---|---|---|---|---|---|---|
 | `F1_12H` | 2021 | 0 | 0.0% | 0.00 | 0.00 | 0.00 |
 | `F1_12H` | 2022 | 0 | 0.0% | 0.00 | 0.00 | 0.00 |
-| `F1_12H` | 2023 | 2 | 0.0% | -54.79 | 0.00 | -16.54 |
-| `F2_12H` | 2021 | 14 | 28.6% | -66.36 | 0.28 | -45.50 |
-| `F2_12H` | 2022 | 8 | 37.5% | -38.64 | 0.50 | -22.31 |
-| `F2_12H` | 2023 | 15 | 33.3% | -57.42 | 0.38 | -47.41 |
-| `F2_18H` | 2021 | 14 | 35.7% | -52.61 | 0.42 | -36.42 |
-| `F2_18H` | 2022 | 8 | 50.0% | -14.67 | 0.81 | -8.54 |
-| `F2_18H` | 2023 | 15 | 40.0% | -47.76 | 0.49 | -50.45 |
-| `F3_12H` | 2021 | 2 | 50.0% | -0.19 | 0.99 | -0.13 |
-| `F3_12H` | 2022 | 6 | 66.7% | +45.86 | 3.51 | +9.24 |
-| `F3_12H` | 2023 | 4 | 50.0% | +23.77 | 1.63 | +1.16 |
-| `F3_18H` | 2021 | 2 | 50.0% | -3.51 | 0.86 | -0.23 |
-| `F3_18H` | 2022 | 6 | 66.7% | +43.08 | 2.89 | +8.68 |
-| `F3_18H` | 2023 | 4 | 50.0% | +23.86 | 1.64 | +1.51 |
+| `F1_12H` | 2023 | 2 | 0.0% | -91.30 | 0.00 | -16.54 |
+| `F1_18H` | 2021 | 0 | 0.0% | 0.00 | 0.00 | 0.00 |
+| `F1_18H` | 2022 | 0 | 0.0% | 0.00 | 0.00 | 0.00 |
+| `F1_18H` | 2023 | 2 | 0.0% | -91.30 | 0.00 | -16.54 |
+| `F2_12H` | 2021 | 3 | 33.3% | -222.39 | 0.26 | -62.24 |
+| `F2_12H` | 2022 | 6 | 33.3% | +4.92 | 1.07 | +2.25 |
+| `F2_12H` | 2023 | 28 | 21.4% | -50.46 | 0.28 | -115.22 |
+| `F2_18H` | 2021 | 3 | 33.3% | -222.39 | 0.26 | -62.24 |
+| `F2_18H` | 2022 | 6 | 50.0% | +45.79 | 1.73 | +23.22 |
+| `F2_18H` | 2023 | 28 | 28.6% | -40.31 | 0.42 | -95.42 |
+| `F3_12H` | 2021 | 9 | 44.4% | +77.73 | 1.77 | +65.90 |
+| `F3_12H` | 2022 | 2 | 50.0% | +173.52 | 4.71 | +31.93 |
+| `F3_12H` | 2023 | 1 | 100.0% | +110.03 | 999.00 | +10.27 |
+| `F3_18H` | 2021 | 9 | 55.6% | +112.10 | 1.71 | +90.20 |
+| `F3_18H` | 2022 | 2 | 50.0% | +52.08 | 1.68 | +9.54 |
+| `F3_18H` | 2023 | 1 | 100.0% | +110.03 | 999.00 | +9.96 |
 
 ### Table 4: Objective Falsification Gate Matrix
 
@@ -117,12 +120,19 @@ The experiment strictly adhered to the pre-outcome protocol freeze:
 To calibrate uncertainty while accounting for serial dependence, we performed 2,000 rounds of calendar block bootstrapping across both 7-day and 14-day non-overlapping intervals, computing studentized max-|T| critical values simultaneously across all 6 comparisons:
 
 - **14-day Block Bootstrap ($n_{blocks} = 76$)**:
-  - Simultaneous critical value $q_{0.95}$: **2,402,715.59**
+  - Frozen studentizer critical value $q_{0.95}$: **2,402,715.59**
   - All 6 candidate configurations produced 95% simultaneous confidence intervals that span zero.
 - **7-day Block Bootstrap ($n_{blocks} = 152$)**:
-  - Similarly, all 6 candidate configurations produced intervals spanning zero.
+  - Frozen studentizer critical value $q_{0.95}$: **1,201,357.80**
+  - All 6 candidate configurations produced 95% simultaneous confidence intervals that span zero.
 
-Even for F3, where sample mean net return was positive (+30.82 bps), the small sample size ($n=12$ over 3 years) renders statistical significance unsupported after controlling for multi-trial uncertainty.
+### Forensic Studentization Analysis
+The explosive magnitude of the machine-generated studentized critical value ($q_{0.95} = 2.40 \times 10^6$ for 14d, $1.20 \times 10^6$ for 7d) stems from sample sparsity:
+- Candidate F1 generated only 2 trade events across the entire 76-block calendar ($n_{blocks}=76$).
+- In approximately 13.5% of bootstrap resamples, all 76 resampled blocks contain zero trades for Candidate F1, resulting in zero sample variance ($\text{std} = 0.0$).
+- The algorithm's variance floor ($b\_se = 10^{-6}$) caused studentized test statistics $t = |0 - \mu| / 10^{-6}$ to reach $2.40 \times 10^6$ in those degenerate draws, which directly drove the 95th percentile.
+- When evaluated under standard fixed sample standard error studentization ($t = |\bar{X}^* - \bar{X}| / SE_{sample}$), the simultaneous critical value is well-conditioned at $q_{0.95} \approx 2.14$, with realistic confidence intervals (e.g. F2 12h: $[-50.6, -3.3]$ bps per block; F3 12h: $[-7.8, +38.2]$ bps per block).
+- **Crucially, under both studentization models**, the simultaneous 95% confidence intervals span zero (or remain strictly negative for F2). Even for F3, where sample mean net return was positive (+96.39 bps), the sparse sample size ($n=12$ over 3 years) produces a lower bound that spans zero, confirming that none of the candidates achieve cost-adjusted statistical significance after controlling for multi-trial evaluation.
 
 ---
 
