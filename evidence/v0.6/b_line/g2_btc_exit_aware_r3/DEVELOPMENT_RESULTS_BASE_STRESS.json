@@ -1,4 +1,5 @@
 {
+  "TESTED_SOURCE_SHA": "3af438490da4497132a5c32c786752ca527e0d99",
   "account_identity": "INDEPENDENT_1000_USDT_MONTH_BOOKS_NO_CONTINUOUS_YEAR_ROI",
   "actual_agent_mode": "UNKNOWN",
   "base_sha": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
@@ -110249,6 +110250,58 @@
     }
   ],
   "runtime_seconds": 16.759272568000597,
+  "sample_source_traces": [
+    {
+      "candidate": "A_X0_H18",
+      "code_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "event_id": "FLOW_CONFIRMED_TREND:1:1613822400000",
+      "fold": "2021-02",
+      "hypothetical_public_source_trade_not_account_record": true,
+      "ledger_sha256": "0474467547fbb413cdbc54e0c603288b3b5bd3df6f20c8ecf5d0a97b11249180",
+      "provider_csv_sha256": "e65b4e703a5c901ef70e96faac37f461e0dd97d380a3b81d7f415e68ad800110",
+      "provider_zip_sha256": "0a270f354b15b053824a7bb87c652aa95acb4a255fc968fe0a24bdc9e785223e"
+    },
+    {
+      "candidate": "A_X2_H24",
+      "code_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "event_id": "FLOW_CONFIRMED_TREND:-1:1638590400000",
+      "fold": "2021-12",
+      "hypothetical_public_source_trade_not_account_record": true,
+      "ledger_sha256": "73378d4ed632d04be34b266639b6789ee925fb5f2770bbd10f37b26311883aa5",
+      "provider_csv_sha256": "c8aa2bc04a97934fe949d8ab3fdee7fd434bec3c029cfaa57fb73e8a1649d6c1",
+      "provider_zip_sha256": "c905c5c8ff36d0dfac3a0581225ab305f72d1e11e634953d8d3a136161d10956"
+    },
+    {
+      "candidate": "A_X0_H18",
+      "code_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "event_id": "FLOW_CONFIRMED_TREND:-1:1639836000000",
+      "fold": "2021-12",
+      "hypothetical_public_source_trade_not_account_record": true,
+      "ledger_sha256": "1b404e30b975b6252f66f776cf2551b121c18b814bfb46eb000a7f3134f344b0",
+      "provider_csv_sha256": "c8aa2bc04a97934fe949d8ab3fdee7fd434bec3c029cfaa57fb73e8a1649d6c1",
+      "provider_zip_sha256": "c905c5c8ff36d0dfac3a0581225ab305f72d1e11e634953d8d3a136161d10956"
+    },
+    {
+      "candidate": "C_X0_H18",
+      "code_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "event_id": "C:1:1613111400000",
+      "fold": "2021-02",
+      "hypothetical_public_source_trade_not_account_record": true,
+      "ledger_sha256": "c7c1575c857fb53adfdea062e8db06d62bd852b9b265abbcac861f02d6b5217a",
+      "provider_csv_sha256": "e65b4e703a5c901ef70e96faac37f461e0dd97d380a3b81d7f415e68ad800110",
+      "provider_zip_sha256": "0a270f354b15b053824a7bb87c652aa95acb4a255fc968fe0a24bdc9e785223e"
+    },
+    {
+      "candidate": "A_X0_H24",
+      "code_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "event_id": "FLOW_CONFIRMED_TREND:-1:1639063800000",
+      "fold": "2021-12",
+      "hypothetical_public_source_trade_not_account_record": true,
+      "ledger_sha256": "1d663dcea72a7152405516af30a30cc4b089dcb9f31c4aa879471751505b7e3d",
+      "provider_csv_sha256": "c8aa2bc04a97934fe949d8ab3fdee7fd434bec3c029cfaa57fb73e8a1649d6c1",
+      "provider_zip_sha256": "c905c5c8ff36d0dfac3a0581225ab305f72d1e11e634953d8d3a136161d10956"
+    }
+  ],
   "sample_trades": [
     {
       "candidate": "A_X0_H18",

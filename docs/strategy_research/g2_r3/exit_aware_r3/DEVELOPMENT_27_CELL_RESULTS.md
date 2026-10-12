@@ -122,3 +122,13 @@ PYTHONDONTWRITEBYTECODE=1 python3.12 -m scripts.strategy_research.g2_btc_exit_aw
 Download admission precedes replay and requires the remote freeze receipt; raw ZIP/CSV/NPY and full entry/leg/curve paths remain in task scratch. Five unique real-development event examples (good and bad hypothetical trades) are in result.sample_trades; five synthetic Decimal audits are in MANUAL_DECIMAL_EXIT_LEG_AUDITS.json. CI_TEST_EXECUTION_EXACT_SHA.json distinguishes source/test hashes, exact committed test SHA, local focused execution and GitHub status; no docs-only green is used as code acceptance.
 
 Binance Vision attribution. Dataset-derived analytical results are CC BY-NC-SA4.0 for noncommercial historical research. [Official data format/checksums](https://github.com/binance/binance-public-data); [dataset terms](https://github.com/binance/binance-public-data/blob/master/TERMS_AND_CONDITIONS.md).
+
+## Exact code and regression receipt
+
+Executable code/source tested SHA `3af438490da4497132a5c32c786752ca527e0d99`; parent freeze `45bf7cc72eb9a870323c5da056fc9287d42b7b22`. Local Python3.12.3 focused suite61passed/0failed/0skipped, Ruff PASS.
+
+[Actual GitHub code CI run38285054954](https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38285054954) succeeded at that exact SHA. Its actual PROFILE full test step executed2955passed,2skipped,9warnings in884.00s; the supplied3454-scale expectation is not the actual count at this snapshot. No local full repository run was performed.
+
+The final attestation commit changes only docs/evidence and leaves all executable source and tests byte-identical to the tested code commit. Its docs-only CI is not substituted for the full code gate above. Scoring ran twice on the same27frozen hypotheses and two cost cases, with no retunes; final code file hashes match the tested immutable source.
+
+Five public-development sample traces bind the hypothetical event/leg ledger to its provider ZIP/CSV hashes. Monthly equity/MTM arrays are floating-point descriptive measurements; per-leg cash, prices, fees and quantity conservation use Decimal and independent eight-place audits.

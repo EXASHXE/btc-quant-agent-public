@@ -1,0 +1,275 @@
+{
+  "TESTED_SHA": "3af438490da4497132a5c32c786752ca527e0d99",
+  "TESTED_SHA_IS_EXECUTABLE_CODE_COMMIT": true,
+  "actual_agent_mode": "UNKNOWN",
+  "base_sha": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
+  "code_file_sha256": {
+    "scripts/strategy_research/g2_btc_exit_aware_r3/engine.py": "4c3c1c1859a61f138cc45fb7a608fbd55687f69b15c8e1d41a3c9cbddf51a381",
+    "scripts/strategy_research/g2_btc_exit_aware_r3/metrics.py": "7bc87466c7415bcdfc57fa8150421c7035cf05619acb8cc1efe6faf43a788ddc",
+    "scripts/strategy_research/g2_btc_exit_aware_r3/portfolio.py": "a5b451569c7ed0d79d2b030c3ce294abd6fd2a10bb1bf5b8bfa1d2d3eab40533",
+    "scripts/strategy_research/g2_btc_exit_aware_r3/report.py": "a75f3351aa740005227f20ffa21744a2f94abf3dac7fbbbce582c8151bc08dc8",
+    "scripts/strategy_research/g2_btc_exit_aware_r3/run.py": "775a6b17afd2c9436c2ff5819e273a7faa91c4413fb3b8af873349a72f4f5d35",
+    "scripts/strategy_research/g2_btc_exit_aware_r3/signals.py": "91c2ae0a20d1f4e7bb990d50563307f15626dbdaa51a38ab4af0921504106a29",
+    "scripts/strategy_research/g2_btc_exit_aware_r3/sources.py": "b9bd116af06891c9664c531b2ce196348c0a6e0c6328770af697f2cfa8d047d1"
+  },
+  "code_push_receipt": {
+    "code_results_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+    "push_verified_utc": "2026-10-12T17:33:56.189318+00:00",
+    "remote_branch": "feature/v06-bline-g2-codex-btc-exit-aware-research-r3",
+    "remote_head": "3af438490da4497132a5c32c786752ca527e0d99"
+  },
+  "expected_3454_vs_actual": "The exact START_SHA snapshot actually collected a full profile with 2955 passed and 2 skipped; no 3454 claim.",
+  "freeze_push_time_utc": "2026-10-12T17:06:55.100883+00:00",
+  "freeze_sha": "45bf7cc72eb9a870323c5da056fc9287d42b7b22",
+  "github_code_ci": {
+    "bounded_test_log_summary": [
+      "2026-10-12T17:34:41.3378480Z PROFILE full CMD ['pytest', '-q', '--durations=20', '--junitxml=ci-junit.xml']",
+      "2026-10-12T17:49:27.2871084Z 2955 passed, 2 skipped, 9 warnings in 884.00s (0:14:44)"
+    ],
+    "jobs": [
+      {
+        "conclusion": "success",
+        "html_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38285054954/job/114931312900",
+        "id": 114931312900,
+        "name": "Risk-based quality (Python 3.12)",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Fetch v0.6 immutable base for merge-base resolution",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Ensure cache directory exists for docs-only/zero-pip FAST paths",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build fail-closed test plan",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Classify impact before heavy dependency installation",
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Install tiny CI-planner dependencies",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Install production/research validation dependencies",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Ruff with bounded historical EXE001 debt",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Type-check production package on production changes",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Compile Python",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Validate changed JSON artifacts",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Tests selected by risk/changed scope",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Retain scoped test evidence",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "status": "completed"
+          }
+        ]
+      },
+      {
+        "conclusion": "skipped",
+        "html_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38285054954/job/114931314964",
+        "id": 114931314964,
+        "name": "Compatibility manual full suite",
+        "status": "completed",
+        "steps": []
+      }
+    ],
+    "log_download_status": "SUCCESS",
+    "profile_FULL_observed": true,
+    "pytest_counts": {
+      "failed": 0,
+      "passed": 2955,
+      "runtime_seconds": 884.0,
+      "skipped": 2,
+      "warnings": 9
+    },
+    "raw_job_log_sha256": "41fa2be76d3cd0565bdc8e063bf2396ba701c89bea79d0152fef9c82c89c428e",
+    "run": {
+      "conclusion": "success",
+      "created_at": "2026-10-12T17:33:56Z",
+      "head_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "html_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38285054954",
+      "id": 38285054954,
+      "status": "completed",
+      "updated_at": "2026-10-12T17:49:31Z"
+    },
+    "scope": "FULL",
+    "step": "Tests selected by risk/changed scope",
+    "test_totals": [
+      "2955 passed, 2 skipped, 9 warnings in 884.00s"
+    ]
+  },
+  "local_focused_execution": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3.12 -m pytest -q --noconftest tests/test_v06_g2_btc_exit_aware_r3_engine.py --tb=short -p no:cacheprovider",
+    "execution_head_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+    "exit_code": 0,
+    "failed": 0,
+    "numpy_version": "2.4.4",
+    "observed_runtime_seconds": 0.34,
+    "os": "Linux",
+    "passed": 61,
+    "pytest_version": "9.0.3",
+    "python": "3.12.3",
+    "skipped": 0,
+    "xfail": 0
+  },
+  "local_full_repository_pytest": "NOT_EXECUTED; remote is the single final full gate",
+  "local_ruff": {
+    "command": "ruff check scripts/strategy_research/g2_btc_exit_aware_r3 tests/test_v06_g2_btc_exit_aware_r3_engine.py --output-format concise",
+    "result": "PASS"
+  },
+  "publication_attestation": "final receipt commit changes docs/evidence only; do not substitute its docs-only CI for this executable-code run",
+  "published_artifact_sha256": {
+    "DEVELOPMENT_RESULTS_BASE_STRESS.json": "1f90af414e4f833071180a26007072de81a9eccf17cffbfcefae5519afab6167",
+    "FREEZE_AND_SOURCE_IDENTITY.json": "ab15d7003303c85d2d571b4cebdbbfa9f7a798ad99e5f21b1528725940b40ea1",
+    "FROZEN_ROSTER_27_CELLS.json": "07ded62808cb61a1ed9efac7b8d8c45482b74d98619d2594ae6c8e4309bfaa6b",
+    "MANUAL_DECIMAL_EXIT_LEG_AUDITS.json": "d390aff979bb9c9f91724e699444f9c98ba122356243250529fa566ed3e4a146",
+    "MULTIPLICITY_SUPPORT_NEGATIVE_REPORT.json": "c8a7b94ac40d378d32b78fc341988bf71f7a3a8f6434c17b766a9b4e80698bbf",
+    "PAIRED_EXIT_DELTA_VS_X0.json": "30bbaf83d22799aebad2d0d881293c5dfb4d5a2f72d762c07400df1f81a65cbc",
+    "PUBLIC_DEVELOPMENT_SOURCE_MANIFEST.json": "688f6a7ae3a7d5c492b3f6b3b567c03d13f957f4ed952c787056c4f281be797d"
+  },
+  "real_trade_sample_source_traces": [
+    {
+      "candidate": "A_X0_H18",
+      "code_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "event_id": "FLOW_CONFIRMED_TREND:1:1613822400000",
+      "fold": "2021-02",
+      "hypothetical_public_source_trade_not_account_record": true,
+      "ledger_sha256": "0474467547fbb413cdbc54e0c603288b3b5bd3df6f20c8ecf5d0a97b11249180",
+      "provider_csv_sha256": "e65b4e703a5c901ef70e96faac37f461e0dd97d380a3b81d7f415e68ad800110",
+      "provider_zip_sha256": "0a270f354b15b053824a7bb87c652aa95acb4a255fc968fe0a24bdc9e785223e"
+    },
+    {
+      "candidate": "A_X2_H24",
+      "code_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "event_id": "FLOW_CONFIRMED_TREND:-1:1638590400000",
+      "fold": "2021-12",
+      "hypothetical_public_source_trade_not_account_record": true,
+      "ledger_sha256": "73378d4ed632d04be34b266639b6789ee925fb5f2770bbd10f37b26311883aa5",
+      "provider_csv_sha256": "c8aa2bc04a97934fe949d8ab3fdee7fd434bec3c029cfaa57fb73e8a1649d6c1",
+      "provider_zip_sha256": "c905c5c8ff36d0dfac3a0581225ab305f72d1e11e634953d8d3a136161d10956"
+    },
+    {
+      "candidate": "A_X0_H18",
+      "code_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "event_id": "FLOW_CONFIRMED_TREND:-1:1639836000000",
+      "fold": "2021-12",
+      "hypothetical_public_source_trade_not_account_record": true,
+      "ledger_sha256": "1b404e30b975b6252f66f776cf2551b121c18b814bfb46eb000a7f3134f344b0",
+      "provider_csv_sha256": "c8aa2bc04a97934fe949d8ab3fdee7fd434bec3c029cfaa57fb73e8a1649d6c1",
+      "provider_zip_sha256": "c905c5c8ff36d0dfac3a0581225ab305f72d1e11e634953d8d3a136161d10956"
+    },
+    {
+      "candidate": "C_X0_H18",
+      "code_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "event_id": "C:1:1613111400000",
+      "fold": "2021-02",
+      "hypothetical_public_source_trade_not_account_record": true,
+      "ledger_sha256": "c7c1575c857fb53adfdea062e8db06d62bd852b9b265abbcac861f02d6b5217a",
+      "provider_csv_sha256": "e65b4e703a5c901ef70e96faac37f461e0dd97d380a3b81d7f415e68ad800110",
+      "provider_zip_sha256": "0a270f354b15b053824a7bb87c652aa95acb4a255fc968fe0a24bdc9e785223e"
+    },
+    {
+      "candidate": "A_X0_H24",
+      "code_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "event_id": "FLOW_CONFIRMED_TREND:-1:1639063800000",
+      "fold": "2021-12",
+      "hypothetical_public_source_trade_not_account_record": true,
+      "ledger_sha256": "1d663dcea72a7152405516af30a30cc4b089dcb9f31c4aa879471751505b7e3d",
+      "provider_csv_sha256": "c8aa2bc04a97934fe949d8ab3fdee7fd434bec3c029cfaa57fb73e8a1649d6c1",
+      "provider_zip_sha256": "c905c5c8ff36d0dfac3a0581225ab305f72d1e11e634953d8d3a136161d10956"
+    }
+  ],
+  "recorded_utc": "2026-10-12T17:53:17.383347+00:00",
+  "schema": "R3_EXACT_SOURCE_TEST_AND_CI_RECEIPT_V1",
+  "scope_integrity": {
+    "G2_ALPHA_AUTHORITY": "NONE",
+    "REAL_FUNDS_AND_TESTNET_LIVE": "NONE",
+    "modified_CI": 0,
+    "modified_legacy_business_source": 0,
+    "modified_other_branches": 0,
+    "owner_or_protected_data_reads": 0,
+    "private_account_order_FeiShu_LLM_calls": 0,
+    "reserved_2024_25_reads": 0
+  },
+  "scoring": {
+    "all54_rows": true,
+    "all648_month_books": true,
+    "completed_portfolio_trade_records_over_independent_books": 1320,
+    "cost_scenarios_per_hypothesis": 2,
+    "distinct_hypotheses": 27,
+    "execution_count": 2,
+    "final_runtime_seconds": 16.759272568000597,
+    "real_source_collision_minutes": 0,
+    "retunes": 0,
+    "second_execution_reason": "final source identity after formatting, explicit closure binding and frozen-protocol verification; no economic retunes",
+    "synthetic_stop_first_collision_negative_test": "PASS",
+    "terminal": "R3_DEV_NO_GO"
+  },
+  "scoring_code_hashes_verified_equal_to_TESTED_SHA": true,
+  "scoring_worktree_git_head_at_execution": "45bf7cc72eb9a870323c5da056fc9287d42b7b22",
+  "source_manifest_sha256": "688f6a7ae3a7d5c492b3f6b3b567c03d13f957f4ed952c787056c4f281be797d",
+  "task_id": "V06_G2_CODEX_BTC_EXIT_AWARE_DEVELOPMENT_R3",
+  "test_file_sha256": "79c70986e79a3c4a0e8225aa07cb095df0e947ee257560c7906f758e630940d2"
+}
