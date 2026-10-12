@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import decimal
 import hashlib
 import json
 from dataclasses import dataclass, field
+from decimal import Decimal
 from typing import Any
 
 SCHEMA_VERSION: str = "market-event-v1"
@@ -122,6 +124,74 @@ def assert_no_private_identifiers(payload: Any, path: str = "") -> None:
             assert_no_private_identifiers(item, f"{path}[{idx}]")
 
 
+def get_aggressor_side(payload: dict[str, Any]) -> str:
+    """Extract trade aggressor side from Binance aggTrade frame.
+    
+    Binance USDⓈ-M 'm' field: Was the buyer the maker?
+    - If m is True: buyer was maker, so seller was taker / aggressor -> SELL.
+    - If m is False: buyer was taker / aggressor -> BUY.
+    """
+    m = payload.get("m")
+    if m is True:
+        return "SELL"
+    if m is False:
+        return "BUY"
+    return "UNKNOWN"
+
+
+def validate_provider_payload_shape(
+    channel: str,
+    payload: dict[str, Any],
+    allowed_symbol: str = ALLOWED_SYMBOL,
+) -> None:
+    """Strictly validate provider payload shape, required public fields, and symbol allowlist."""
+    assert_no_private_identifiers(payload)
+
+    # Check top-level symbol if present
+    s = payload.get("s")
+    if s is not None and s != allowed_symbol:
+        raise ContractValidationError(
+            f"Provider symbol '{s}' does not match allowed symbol '{allowed_symbol}'"
+        )
+
+    if channel == "last_kline_1m":
+        k = payload.get("k")
+        if not isinstance(k, dict):
+            raise ContractValidationError("Kline payload missing 'k' candle dictionary")
+        if k.get("s") and k.get("s") != allowed_symbol:
+            raise ContractValidationError(
+                f"Kline candle symbol '{k.get('s')}' does not match '{allowed_symbol}'"
+            )
+        for req in ("t", "T", "s", "i", "o", "c", "h", "l", "v", "x"):
+            if req not in k:
+                raise ContractValidationError(f"Kline payload missing required field '{req}'")
+
+    elif channel == "mark_price":
+        for req in ("p", "r", "T"):
+            if req not in payload:
+                raise ContractValidationError(f"Mark price payload missing required field '{req}'")
+
+    elif channel == "agg_trade":
+        for req in ("a", "p", "q", "m"):
+            if req not in payload:
+                raise ContractValidationError(f"Agg trade payload missing required field '{req}'")
+
+    elif channel == "depth_delta":
+        for req in ("U", "u", "b", "a"):
+            if req not in payload:
+                raise ContractValidationError(f"Depth delta payload missing required field '{req}'")
+
+    elif channel == "depth_snapshot":
+        for req in ("lastUpdateId", "bids", "asks"):
+            if req not in payload:
+                raise ContractValidationError(f"Depth snapshot missing required field '{req}'")
+
+    elif channel == "funding_settled":
+        for req in ("fundingRate", "fundingTime"):
+            if req not in payload:
+                raise ContractValidationError(f"Funding settled payload missing required field '{req}'")
+
+
 @dataclass(frozen=True)
 class BookIntegrityV1:
     """Order book integrity receipt snapshot."""
@@ -151,12 +221,30 @@ class BookIntegrityV1:
             raise ContractValidationError(
                 f"stale_age_ms cannot be negative: {self.stale_age_ms}"
             )
+        if self.best_bid is not None:
+            try:
+                bid_dec = Decimal(str(self.best_bid))
+                if not bid_dec.is_finite() or bid_dec <= Decimal(0):
+                    raise ContractValidationError(
+                        f"best_bid must be a positive finite decimal, got '{self.best_bid}'"
+                    )
+            except (decimal.InvalidOperation, TypeError) as exc:
+                raise ContractValidationError(f"Invalid best_bid '{self.best_bid}': {exc}") from exc
+
+        if self.best_ask is not None:
+            try:
+                ask_dec = Decimal(str(self.best_ask))
+                if not ask_dec.is_finite() or ask_dec <= Decimal(0):
+                    raise ContractValidationError(
+                        f"best_ask must be a positive finite decimal, got '{self.best_ask}'"
+                    )
+            except (decimal.InvalidOperation, TypeError) as exc:
+                raise ContractValidationError(f"Invalid best_ask '{self.best_ask}': {exc}") from exc
+
         if self.best_bid is not None and self.best_ask is not None:
-            bid = float(self.best_bid)
-            ask = float(self.best_ask)
-            if bid <= 0.0 or ask <= 0.0:
-                raise ContractValidationError("Bid and ask prices must be positive")
-            if bid >= ask and self.continuous and self.quality == "VERIFIED":
+            bid_dec = Decimal(str(self.best_bid))
+            ask_dec = Decimal(str(self.best_ask))
+            if bid_dec >= ask_dec and self.continuous and self.quality == "VERIFIED":
                 raise ContractValidationError(
                     f"Crossed book detected in VERIFIED status: bid {self.best_bid} >= ask {self.best_ask}"
                 )
@@ -242,8 +330,27 @@ class MarketEventV1:
                 f"available_at_ms ({self.available_at_ms}) cannot be earlier than "
                 f"observed_wall_utc_ms ({self.observed_wall_utc_ms})"
             )
-        # Check payload integrity
+        # Check raw source manifest digest
+        if not self.raw_source_manifest_sha256 or not isinstance(self.raw_source_manifest_sha256, str):
+            raise ContractValidationError("raw_source_manifest_sha256 must be a non-empty string digest")
+        if len(self.raw_source_manifest_sha256) == 64 and not all(c in "0123456789abcdefABCDEF" for c in self.raw_source_manifest_sha256):
+            raise ContractValidationError(
+                f"raw_source_manifest_sha256 has invalid characters: '{self.raw_source_manifest_sha256}'"
+            )
+
+        # Check payload integrity and symbol allowlist
         assert_no_private_identifiers(self.payload)
+        payload_sym = self.payload.get("s")
+        if payload_sym is not None and payload_sym != self.symbol:
+            raise ContractValidationError(
+                f"Payload symbol '{payload_sym}' does not match allowed symbol '{self.symbol}'"
+            )
+        kline_sym = self.payload.get("k", {}).get("s") if isinstance(self.payload.get("k"), dict) else None
+        if kline_sym is not None and kline_sym != self.symbol:
+            raise ContractValidationError(
+                f"Kline candle symbol '{kline_sym}' does not match allowed symbol '{self.symbol}'"
+            )
+
         expected_payload_sha = compute_sha256(self.payload)
         if self.payload_sha256 != expected_payload_sha:
             raise ContractValidationError(

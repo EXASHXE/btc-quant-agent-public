@@ -48,6 +48,7 @@ class OrderBookIntegrityEngine:
         self.last_update_wall_ms: int = 0
         self.quality: str = "UNKNOWN"
         self.reason_codes: list[str] = ["AWAITING_SNAPSHOT"]
+        self.needs_rebootstrap: bool = True
 
         # Buffering
         self._buffered_deltas: list[dict[str, Any]] = []
@@ -65,6 +66,7 @@ class OrderBookIntegrityEngine:
         self.last_update_wall_ms = 0
         self.quality = "INVALID"
         self.reason_codes = [reason]
+        self.needs_rebootstrap = True
         self._buffered_deltas.clear()
 
     def buffer_delta(self, delta_event: dict[str, Any]) -> None:
@@ -88,10 +90,16 @@ class OrderBookIntegrityEngine:
         new_bids: dict[Decimal, Decimal] = {}
         new_asks: dict[Decimal, Decimal] = {}
 
+        seen_snapshot_bids: set[Decimal] = set()
+        seen_snapshot_asks: set[Decimal] = set()
+
         try:
             for p_str, q_str in raw_bids:
                 p = Decimal(str(p_str))
                 q = Decimal(str(q_str))
+                if p in seen_snapshot_bids:
+                    raise ContractValidationError(f"Duplicate bid price level in snapshot: {p}")
+                seen_snapshot_bids.add(p)
                 if p <= 0 or q < 0:
                     raise ContractValidationError("Negative price or quantity in snapshot bids")
                 if q > 0:
@@ -100,6 +108,9 @@ class OrderBookIntegrityEngine:
             for p_str, q_str in raw_asks:
                 p = Decimal(str(p_str))
                 q = Decimal(str(q_str))
+                if p in seen_snapshot_asks:
+                    raise ContractValidationError(f"Duplicate ask price level in snapshot: {p}")
+                seen_snapshot_asks.add(p)
                 if p <= 0 or q < 0:
                     raise ContractValidationError("Negative price or quantity in snapshot asks")
                 if q > 0:
@@ -127,6 +138,7 @@ class OrderBookIntegrityEngine:
         self.is_bootstrapped = True
         self.quality = "VERIFIED"
         self.reason_codes = ["SNAPSHOT_APPLIED"]
+        self.needs_rebootstrap = False
 
         # Now drain and bridge buffered deltas
         if self._buffered_deltas:
@@ -134,6 +146,8 @@ class OrderBookIntegrityEngine:
             self._buffered_deltas.clear()
             for delta in deltas_to_process:
                 self.apply_delta(delta, observed_wall_ms)
+                if self.needs_rebootstrap:
+                    break
 
         return self.get_integrity_receipt(observed_wall_ms)
 
@@ -156,17 +170,26 @@ class OrderBookIntegrityEngine:
             self.reset("CORRUPT_DELTA_MISSING_SEQUENCE")
             return self.get_integrity_receipt(observed_wall_ms)
 
+        # Sequence validation: reversed update IDs are forbidden
+        if U > u:
+            self.reset(f"REVERSED_SEQUENCE_IDS: U={U} > u={u}")
+            return self.get_integrity_receipt(observed_wall_ms)
+
         # 1. Drop any event where u < snapshot_update_id
         if u < self.snapshot_update_id:
             return self.get_integrity_receipt(observed_wall_ms)
 
         # 2. First update bridging rule
         if self.final_update_id == self.snapshot_update_id:
+            if pu is not None and pu > self.snapshot_update_id:
+                self.reset(f"GAP_SNAPSHOT_TO_STREAM: pu={pu} > snap={self.snapshot_update_id}")
+                return self.get_integrity_receipt(observed_wall_ms)
             if pu is not None and pu == self.snapshot_update_id:
-                # Contiguous with snapshot via pu
-                pass
-            elif U <= self.snapshot_update_id <= u:
-                # Overlaps snapshot via U/u
+                if u <= pu:
+                    self.reset(f"DUPLICATE_OR_BACKWARDS_UPDATE: u={u} <= pu={pu}")
+                    return self.get_integrity_receipt(observed_wall_ms)
+            elif U <= self.snapshot_update_id + 1 and u >= self.snapshot_update_id:
+                # Overlaps snapshot via U/u or contiguous (U == snapshot + 1)
                 pass
             else:
                 self.reset(f"GAP_SNAPSHOT_TO_STREAM: pu={pu}, U={U}, u={u} vs snap={self.snapshot_update_id}")
@@ -177,20 +200,32 @@ class OrderBookIntegrityEngine:
                 if pu != self.final_update_id:
                     self.reset(f"GAP_DETECTED: pu={pu} != prev_u={self.final_update_id}")
                     return self.get_integrity_receipt(observed_wall_ms)
+                if u <= pu:
+                    self.reset(f"DUPLICATE_OR_BACKWARDS_UPDATE: u={u} <= pu={pu}")
+                    return self.get_integrity_receipt(observed_wall_ms)
             else:
                 # If pu not provided, U must follow prev_final_update_id + 1
                 if self.final_update_id is not None and U != self.final_update_id + 1:
                     self.reset(f"GAP_DETECTED: U={U} != prev_u={self.final_update_id}+1")
                     return self.get_integrity_receipt(observed_wall_ms)
 
+            if self.final_update_id is not None and u <= self.final_update_id:
+                self.reset(f"DUPLICATE_OR_BACKWARDS_UPDATE: u={u} <= prev_final_u={self.final_update_id}")
+                return self.get_integrity_receipt(observed_wall_ms)
+
         # Apply price level mutations
         raw_bids = delta.get("b", [])
         raw_asks = delta.get("a", [])
 
         try:
+            seen_bids: set[Decimal] = set()
             for p_str, q_str in raw_bids:
                 p = Decimal(str(p_str))
                 q = Decimal(str(q_str))
+                if p in seen_bids:
+                    self.reset(f"DEPTH_MUTATION_CONTRADICTION: duplicate bid price level {p}")
+                    return self.get_integrity_receipt(observed_wall_ms)
+                seen_bids.add(p)
                 if p <= 0 or q < 0:
                     self.reset("NEGATIVE_PRICE_OR_QUANTITY")
                     return self.get_integrity_receipt(observed_wall_ms)
@@ -199,9 +234,14 @@ class OrderBookIntegrityEngine:
                 else:
                     self.bids[p] = q
 
+            seen_asks: set[Decimal] = set()
             for p_str, q_str in raw_asks:
                 p = Decimal(str(p_str))
                 q = Decimal(str(q_str))
+                if p in seen_asks:
+                    self.reset(f"DEPTH_MUTATION_CONTRADICTION: duplicate ask price level {p}")
+                    return self.get_integrity_receipt(observed_wall_ms)
+                seen_asks.add(p)
                 if p <= 0 or q < 0:
                     self.reset("NEGATIVE_PRICE_OR_QUANTITY")
                     return self.get_integrity_receipt(observed_wall_ms)
@@ -254,7 +294,16 @@ class OrderBookIntegrityEngine:
             if "STALE_BOOK" not in reasons:
                 reasons.append("STALE_BOOK")
 
-        # If empty sides or unbootstrapped
+        # Check empty book sides
+        if self.is_bootstrapped and (len(self.bids) == 0 and len(self.asks) == 0):
+            quality = "DEGRADED"
+            if "EMPTY_BOOK" not in reasons:
+                reasons.append("EMPTY_BOOK")
+        elif self.is_bootstrapped and (len(self.bids) == 0 or len(self.asks) == 0):
+            if "EMPTY_BOOK_SIDE" not in reasons:
+                reasons.append("EMPTY_BOOK_SIDE")
+
+        # If unbootstrapped
         if not self.is_bootstrapped:
             quality = "UNKNOWN" if quality != "INVALID" else "INVALID"
 

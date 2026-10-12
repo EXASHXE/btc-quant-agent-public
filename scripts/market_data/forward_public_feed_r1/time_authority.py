@@ -6,10 +6,18 @@ import math
 import os
 import time
 from dataclasses import dataclass, field
-from typing import Any
+from decimal import Decimal, InvalidOperation
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from .contracts import MarketEventV1
 
 MAX_ALLOWED_CLOCK_DIVERGENCE_MS: int = 5_000
 MAX_LATENCY_SAMPLES: int = 10_000
+
+
+class PointInTimeViolationError(ValueError):
+    """Raised when cross-channel join violates Point-In-Time causality or quality."""
 
 
 @dataclass(frozen=True)
@@ -47,6 +55,7 @@ class TimeAuthority:
 
         # Latency samples (milliseconds)
         self._latency_samples: list[int] = []
+        self._offset_samples: list[int] = []
 
     def capture_ingress(
         self,
@@ -93,6 +102,9 @@ class TimeAuthority:
                     reasons.append("CLOCK_UNCERTAIN")
                     self.clock_uncertain_count += 1
 
+        if quality == "DEGRADED" and "OK" in reasons:
+            reasons.remove("OK")
+
         self.last_observed_wall_ms = wall_ms
         self.last_observed_monotonic_ns = mono_ns
 
@@ -108,13 +120,19 @@ class TimeAuthority:
         )
 
     def record_transit_latency(self, provider_event_ms: int | None, observed_wall_ms: int) -> None:
-        """Record transit latency between provider event time and receiver ingress."""
+        """Record transit latency and exchange clock offset diagnostic."""
         if provider_event_ms is not None and provider_event_ms > 0:
             latency = observed_wall_ms - provider_event_ms
             if latency >= 0:
                 self._latency_samples.append(latency)
                 if len(self._latency_samples) > MAX_LATENCY_SAMPLES:
                     self._latency_samples.pop(0)
+
+            # Record exchange clock offset (provider clock minus receiver wall clock)
+            offset = provider_event_ms - observed_wall_ms
+            self._offset_samples.append(offset)
+            if len(self._offset_samples) > MAX_LATENCY_SAMPLES:
+                self._offset_samples.pop(0)
 
     def increment_dropped_ingress(self, count: int = 1) -> None:
         """Record dropped messages due to queue overflow or buffer saturation."""
@@ -148,6 +166,11 @@ class TimeAuthority:
     def get_diagnostics(self) -> dict[str, Any]:
         """Summary of time authority health and clock diagnostic state."""
         percentiles = self.get_latency_percentiles()
+        offset_diag = {
+            "latest_ms": self._offset_samples[-1] if self._offset_samples else 0,
+            "mean_ms": round(sum(self._offset_samples) / len(self._offset_samples), 2) if self._offset_samples else 0.0,
+            "sample_count": len(self._offset_samples),
+        }
         return {
             "connection_epoch": self.connection_epoch,
             "last_observed_wall_ms": self.last_observed_wall_ms,
@@ -155,5 +178,67 @@ class TimeAuthority:
             "monotonic_violation_count": self.monotonic_violation_count,
             "dropped_ingress_count": self.dropped_ingress_count,
             "latencies": percentiles,
+            "exchange_offset": offset_diag,
             "clock_status": "CLOCK_UNCERTAIN" if self.clock_uncertain_count > 0 else "CLOCK_SYNCHRONIZED",
         }
+
+
+def join_mark_and_last(
+    mark_event: MarketEventV1,
+    last_kline_event: MarketEventV1,
+    decision_at_ms: int,
+) -> dict[str, Any]:
+    """Point-in-Time cross-channel join of Mark Price and Last 1m Candle.
+
+    Causal constraints:
+    1. Both input events must have quality == 'VERIFIED'.
+    2. Neither input event may have arrived after decision_at_ms (available_at_ms <= decision_at_ms).
+    3. Derived feature known_at is max(mark.available_at_ms, last.available_at_ms).
+    """
+    if mark_event.symbol != last_kline_event.symbol:
+        raise PointInTimeViolationError(
+            f"Cannot join: mark_event symbol '{mark_event.symbol}' != last_kline symbol '{last_kline_event.symbol}'"
+        )
+    if mark_event.quality != "VERIFIED":
+        raise PointInTimeViolationError(
+            f"Cannot join: mark_event quality '{mark_event.quality}' is not VERIFIED"
+        )
+    if last_kline_event.quality != "VERIFIED":
+        raise PointInTimeViolationError(
+            f"Cannot join: last_kline_event quality '{last_kline_event.quality}' is not VERIFIED"
+        )
+    if mark_event.available_at_ms > decision_at_ms:
+        raise PointInTimeViolationError(
+            f"Causality violation: mark_event available_at_ms {mark_event.available_at_ms} > decision_at_ms {decision_at_ms}"
+        )
+    if last_kline_event.available_at_ms > decision_at_ms:
+        raise PointInTimeViolationError(
+            f"Causality violation: last_kline_event available_at_ms {last_kline_event.available_at_ms} > decision_at_ms {decision_at_ms}"
+        )
+
+    feature_known_at_ms = max(mark_event.available_at_ms, last_kline_event.available_at_ms)
+    mark_payload = mark_event.payload
+    kline_payload = last_kline_event.payload
+    k = kline_payload.get("k", {})
+
+    mark_p = mark_payload.get("p")
+    kline_c = k.get("c")
+    basis = None
+    if mark_p is not None and kline_c is not None:
+        try:
+            basis = str(Decimal(str(kline_c)) - Decimal(str(mark_p)))
+        except (InvalidOperation, TypeError, ValueError):
+            basis = None
+
+    return {
+        "symbol": mark_event.symbol,
+        "decision_at_ms": decision_at_ms,
+        "feature_known_at_ms": feature_known_at_ms,
+        "mark_price": mark_p,
+        "index_price": mark_payload.get("i"),
+        "estimated_funding_rate": mark_payload.get("r"),
+        "kline_close": kline_c,
+        "kline_closed": k.get("x", False),
+        "mark_last_basis": basis,
+        "quality": "VERIFIED",
+    }

@@ -23,6 +23,7 @@ from .contracts import (
     ContractValidationError,
     MarketEventV1,
     compute_sha256,
+    validate_provider_payload_shape,
 )
 from .order_book import OrderBookIntegrityEngine
 from .time_authority import TimeAuthority
@@ -156,6 +157,13 @@ class BinancePublicFeedClient:
 
         event_type = data.get("e")
 
+        # Validate symbol allowlist in provider frame
+        payload_sym = data.get("s")
+        if payload_sym is not None and payload_sym != self.symbol:
+            raise ContractValidationError(
+                f"Payload symbol '{payload_sym}' does not match allowed symbol '{self.symbol}'"
+            )
+
         channel: str | None = None
         source_seq: int | None = None
         provider_event_ms: int | None = data.get("E")
@@ -164,8 +172,30 @@ class BinancePublicFeedClient:
         quality = "VERIFIED"
         reason_codes = ["OK"]
 
-        if event_type == "kline":
+        if "lastUpdateId" in data and "bids" in data and "asks" in data:
+            channel = "depth_snapshot"
+            validate_provider_payload_shape(channel, data, self.symbol)
+            book_receipt = self.book_engine.apply_snapshot(data, observed_wall_ms)
+            source_seq = data.get("lastUpdateId")
+            provider_event_ms = data.get("E", observed_wall_ms)
+            provider_tx_ms = data.get("T")
+            if not stream_id:
+                stream_id = f"{self.symbol.lower()}@depth_snapshot"
+            if not book_receipt.continuous or book_receipt.quality != "VERIFIED":
+                quality = book_receipt.quality
+                reason_codes = list(book_receipt.reason_codes)
+
+        elif "fundingRate" in data and "fundingTime" in data:
+            channel = "funding_settled"
+            validate_provider_payload_shape(channel, data, self.symbol)
+            provider_event_ms = data.get("fundingTime")
+            source_seq = None
+            if not stream_id:
+                stream_id = f"{self.symbol.lower()}@fundingRate"
+
+        elif event_type == "kline":
             channel = "last_kline_1m"
+            validate_provider_payload_shape(channel, data, self.symbol)
             k = data.get("k", {})
             source_seq = k.get("L")
             if not stream_id:
@@ -173,17 +203,20 @@ class BinancePublicFeedClient:
 
         elif event_type == "markPriceUpdate":
             channel = "mark_price"
+            validate_provider_payload_shape(channel, data, self.symbol)
             if not stream_id:
                 stream_id = f"{self.symbol.lower()}@markPrice"
 
         elif event_type == "aggTrade":
             channel = "agg_trade"
+            validate_provider_payload_shape(channel, data, self.symbol)
             source_seq = data.get("a")
             if not stream_id:
                 stream_id = f"{self.symbol.lower()}@aggTrade"
 
         elif event_type == "depthUpdate":
             channel = "depth_delta"
+            validate_provider_payload_shape(channel, data, self.symbol)
             source_seq = data.get("u")
             if not stream_id:
                 stream_id = f"{self.symbol.lower()}@depth@100ms"
@@ -225,6 +258,8 @@ class BinancePublicFeedClient:
         self,
         duration_seconds: int = 60,
         on_event_callback: Any = None,
+        raw_writer: Any = None,
+        event_writer: Any = None,
     ) -> dict[str, Any]:
         """Connect to official public combined streams for bounded duration."""
         self._assert_network_permitted()
@@ -242,17 +277,61 @@ class BinancePublicFeedClient:
             "status": "RUNNING",
             "events_received": 0,
             "duration_seconds": duration_seconds,
+            "rebootstrap_count": 0,
             "error": None,
         }
 
         # First, fetch snapshot to bridge book
         try:
-            snap_data, snap_wall, _snap_mono = self.fetch_public_depth_snapshot()
-            self.book_engine.apply_snapshot(snap_data, snap_wall)
+            snap_data, snap_wall, snap_mono = self.fetch_public_depth_snapshot()
+            snap_raw_bytes = json.dumps(snap_data)
+            if raw_writer is not None:
+                _h, snap_man_sha = raw_writer.append_raw_frame(
+                    snap_raw_bytes, snap_wall, snap_mono
+                )
+            else:
+                snap_man_sha = compute_sha256(snap_raw_bytes)
+            snap_event = self.map_raw_frame_to_event(
+                snap_raw_bytes,
+                snap_wall,
+                snap_mono,
+                raw_manifest_sha256=snap_man_sha,
+            )
+            if snap_event is not None:
+                stats["events_received"] += 1
+                if event_writer is not None:
+                    event_writer.append_event(snap_event)
+                if on_event_callback is not None:
+                    on_event_callback(snap_event)
         except Exception as exc:  # noqa: BLE001
             stats["status"] = "NOT_TESTED_SOURCE_UNREACHABLE"
             stats["error"] = f"REST depth snapshot failed: {exc}"
             return stats
+
+        # Fetch initial completed settled funding record
+        try:
+            funding_records, fund_wall, fund_mono = self.fetch_latest_settled_funding(limit=1)
+            if funding_records:
+                latest_fund = funding_records[0]
+                fund_raw_bytes = json.dumps(latest_fund)
+                if raw_writer is not None:
+                    _fh, fund_man_sha = raw_writer.append_raw_frame(
+                        fund_raw_bytes, fund_wall, fund_mono
+                    )
+                else:
+                    fund_man_sha = compute_sha256(fund_raw_bytes)
+                fund_event = self.map_raw_frame_to_event(
+                    fund_raw_bytes,
+                    fund_wall,
+                    fund_mono,
+                    raw_manifest_sha256=fund_man_sha,
+                )
+                if fund_event is not None:
+                    stats["events_received"] += 1
+                    if event_writer is not None:
+                        event_writer.append_event(fund_event)
+        except (urllib.error.URLError, OSError, json.JSONDecodeError, KeyError, ValueError, ContractValidationError):
+            pass
 
         stop_time = asyncio.get_event_loop().time() + duration_seconds
 
@@ -264,16 +343,51 @@ class BinancePublicFeedClient:
                         raw_msg = await asyncio.wait_for(ws.recv(), timeout=timeout_left)
                         ingress = self.time_authority.capture_ingress()
 
+                        if raw_writer is not None:
+                            _eh, raw_manifest_sha = raw_writer.append_raw_frame(
+                                raw_msg,
+                                ingress.observed_wall_utc_ms,
+                                ingress.observed_monotonic_ns,
+                            )
+                        else:
+                            raw_manifest_sha = compute_sha256(raw_msg)
+
                         event = self.map_raw_frame_to_event(
                             raw_msg,
                             ingress.observed_wall_utc_ms,
                             ingress.observed_monotonic_ns,
-                            raw_manifest_sha256="live_stream",
+                            raw_manifest_sha256=raw_manifest_sha,
                         )
                         if event is not None:
                             stats["events_received"] += 1
+                            if event_writer is not None:
+                                event_writer.append_event(event)
                             if on_event_callback is not None:
                                 on_event_callback(event)
+
+                        # Automatic rebootstrap if book encounters discontinuity / gap
+                        if self.book_engine.needs_rebootstrap:
+                            try:
+                                reb_snap, reb_wall, reb_mono = self.fetch_public_depth_snapshot()
+                                reb_raw_bytes = json.dumps(reb_snap)
+                                if raw_writer is not None:
+                                    _rh, reb_man_sha = raw_writer.append_raw_frame(
+                                        reb_raw_bytes, reb_wall, reb_mono
+                                    )
+                                else:
+                                    reb_man_sha = compute_sha256(reb_raw_bytes)
+                                reb_event = self.map_raw_frame_to_event(
+                                    reb_raw_bytes,
+                                    reb_wall,
+                                    reb_mono,
+                                    raw_manifest_sha256=reb_man_sha,
+                                )
+                                if reb_event is not None and event_writer is not None:
+                                    event_writer.append_event(reb_event)
+                                stats["rebootstrap_count"] += 1
+                            except (urllib.error.URLError, OSError, ValueError, RuntimeError) as reb_exc:
+                                stats["rebootstrap_error"] = str(reb_exc)
+
                     except TimeoutError:
                         break
             stats["status"] = "PUBLIC_SMOKE_VERIFIED"

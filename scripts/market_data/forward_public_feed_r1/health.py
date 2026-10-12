@@ -53,6 +53,7 @@ class HealthSupervisor:
         self.book_quality: str = "UNKNOWN"
         self.book_continuous: bool = False
         self.book_gap_count: int = 0
+        self.access_denied: bool = False
 
     def record_channel_event(
         self,
@@ -80,8 +81,19 @@ class HealthSupervisor:
         if "GAP_DETECTED" in reason_codes or "SNAPSHOT_CROSSED_BOOK" in reason_codes:
             self.book_gap_count += 1
 
-    def evaluate_source_gate(self, current_wall_ms: int) -> tuple[str, list[str]]:
+    def record_access_denial(self, reason: str = "EXCHANGE_ACCESS_DENIED") -> None:
+        """Record provider access denial or authentication rejection."""
+        self.access_denied = True
+
+    def evaluate_source_gate(
+        self,
+        current_wall_ms: int,
+        require_settled_funding: bool = False,
+    ) -> tuple[str, list[str]]:
         """Evaluate source readiness: SOURCE_READY, SOURCE_DEGRADED, or SOURCE_UNAVAILABLE."""
+        if self.access_denied:
+            return "SOURCE_UNAVAILABLE", ["EXCHANGE_ACCESS_DENIED"]
+
         reasons: list[str] = []
 
         # 1. Check book continuity
@@ -100,16 +112,32 @@ class HealthSupervisor:
                 if staleness > STALENESS_THRESHOLDS_MS[ch]:
                     reasons.append(f"STALE_{ch.upper()}_{staleness}MS")
 
-        # 3. Check clock uncertainty
+        # 3. Check settled funding requirement if mandated
+        if require_settled_funding and self.last_settled_funding_rate is None:
+            reasons.append("LAST_SETTLED_FUNDING_UNKNOWN")
+
+        # 4. Check staleness of secondary channels if they have arrived
+        for ch in ("last_kline_1m", "agg_trade", "funding_settled"):
+            last_ms = self.channel_last_wall_ms.get(ch)
+            if last_ms is not None:
+                staleness = current_wall_ms - last_ms
+                if staleness > STALENESS_THRESHOLDS_MS[ch]:
+                    reasons.append(f"STALE_{ch.upper()}_{staleness}MS")
+
+        # 5. Check consumer ingress queue drops
+        if self.time_authority.dropped_ingress_count > 0:
+            reasons.append(f"CONSUMER_INGRESS_DROPS_{self.time_authority.dropped_ingress_count}")
+
+        # 6. Check clock uncertainty
         clock_diag = self.time_authority.get_diagnostics()
         if clock_diag["clock_status"] == "CLOCK_UNCERTAIN":
             reasons.append("CLOCK_UNCERTAIN")
 
-        # 4. Check book degraded
+        # 7. Check book degraded
         if self.book_quality == "DEGRADED":
             reasons.append("BOOK_DEGRADED")
 
-        if any(r.startswith("MISSING_") for r in reasons):
+        if any(r.startswith("MISSING_") for r in reasons) or "EXCHANGE_ACCESS_DENIED" in reasons:
             return "SOURCE_UNAVAILABLE", reasons
 
         if reasons:

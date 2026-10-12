@@ -17,7 +17,7 @@ from .contracts import (
     MarketEventV1,
     compute_sha256,
 )
-from .durability import SegmentWriter
+from .durability import RawSegmentWriter, SegmentWriter
 from .fixture import DeterministicExchangeFixture
 from .health import HealthSupervisor
 from .order_book import OrderBookIntegrityEngine
@@ -68,13 +68,25 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Directory containing segment files to replay.",
     )
+    parser.add_argument(
+        "--replay-source",
+        choices=["auto", "normalized", "raw"],
+        default="auto",
+        help="Source log to replay: auto (default), normalized, or raw.",
+    )
+    parser.add_argument(
+        "--epoch",
+        default=None,
+        help="Specific connection epoch to record or replay.",
+    )
     return parser
 
 
 def run_fixture_mode(args: argparse.Namespace) -> int:
-    """Run hermetic deterministic exchange fixture generation."""
+    """Run hermetic deterministic exchange fixture generation with segregated raw and normalized logs."""
     out_dir = Path(args.output_dir)
-    epoch = f"fixture-epoch-{args.records_count}"
+    epoch = args.epoch or f"fixture-epoch-{args.records_count}"
+    raw_writer = RawSegmentWriter(base_dir=out_dir, epoch=epoch)
     writer = SegmentWriter(base_dir=out_dir, epoch=epoch)
     fix = DeterministicExchangeFixture(symbol=args.symbol)
     ta = TimeAuthority(connection_epoch=epoch)
@@ -84,6 +96,9 @@ def run_fixture_mode(args: argparse.Namespace) -> int:
     # 1. Depth snapshot
     snap_frame = fix.generate_depth_snapshot_frame(levels=20)
     snap_ingress = ta.capture_ingress()
+    _seh, snap_raw_sha = raw_writer.append_raw_frame(
+        json.dumps(snap_frame), snap_ingress.observed_wall_utc_ms, snap_ingress.observed_monotonic_ns
+    )
     book_receipt = book_engine.apply_snapshot(snap_frame, snap_ingress.observed_wall_utc_ms)
     health.record_channel_event("depth_snapshot", snap_ingress.observed_wall_utc_ms, snap_frame, "VERIFIED")
     health.record_book_status(book_receipt.quality, book_receipt.continuous, book_receipt.reason_codes)
@@ -105,12 +120,41 @@ def run_fixture_mode(args: argparse.Namespace) -> int:
         payload=snap_frame,
         quality=book_receipt.quality,
         reason_codes=book_receipt.reason_codes,
-        raw_source_manifest_sha256=writer.manifest_sha256,
+        raw_source_manifest_sha256=snap_raw_sha,
         book=book_receipt,
     )
     writer.append_event(snap_event)
 
-    # 2. Sequential frames
+    # 2. Official Settled Funding (Realized, not estimated)
+    fund_frame = fix.generate_settled_funding_frame()
+    fund_ingress = ta.capture_ingress()
+    _feh, fund_raw_sha = raw_writer.append_raw_frame(
+        json.dumps(fund_frame), fund_ingress.observed_wall_utc_ms, fund_ingress.observed_monotonic_ns
+    )
+    health.record_channel_event("funding_settled", fund_ingress.observed_wall_utc_ms, fund_frame, "VERIFIED")
+    fund_event = MarketEventV1(
+        schema_version="market-event-v1",
+        symbol=args.symbol,
+        product=ALLOWED_PRODUCT,
+        channel="funding_settled",
+        provider_event_ms=fund_frame["fundingTime"],
+        provider_transaction_ms=None,
+        observed_wall_utc_ms=fund_ingress.observed_wall_utc_ms,
+        observed_monotonic_ns=fund_ingress.observed_monotonic_ns,
+        available_at_ms=fund_ingress.available_at_ms,
+        source_stream_id=f"{args.symbol.lower()}@fundingRate",
+        connection_epoch=epoch,
+        source_sequence=None,
+        payload_sha256=compute_sha256(fund_frame),
+        payload=fund_frame,
+        quality="VERIFIED",
+        reason_codes=["OK"],
+        raw_source_manifest_sha256=fund_raw_sha,
+        book=None,
+    )
+    writer.append_event(fund_event)
+
+    # 3. Sequential stream frames
     for i in range(args.records_count):
         fix.current_time_ms += 100
         mod = i % 4
@@ -156,6 +200,10 @@ def run_fixture_mode(args: argparse.Namespace) -> int:
             b_rec = None
             stream_id = f"{args.symbol.lower()}@kline_1m"
 
+        _eh, frame_raw_sha = raw_writer.append_raw_frame(
+            json.dumps(frame), ing.observed_wall_utc_ms, ing.observed_monotonic_ns
+        )
+
         ev = MarketEventV1(
             schema_version="market-event-v1",
             symbol=args.symbol,
@@ -173,17 +221,19 @@ def run_fixture_mode(args: argparse.Namespace) -> int:
             payload=frame,
             quality=q,
             reason_codes=r,
-            raw_source_manifest_sha256=writer.manifest_sha256,
+            raw_source_manifest_sha256=frame_raw_sha,
             book=b_rec,
         )
         writer.append_event(ev)
 
-    # 3. Health event
+    # 4. Health event
     h_ev = health.create_health_event(
         current_wall_ms=ta.last_observed_wall_ms or 1728720000000,
-        raw_manifest_sha256=writer.manifest_sha256,
+        raw_manifest_sha256=raw_writer.manifest_sha256,
     )
     writer.append_event(h_ev)
+
+    raw_writer.close()
     writer.close()
 
     summary = {
@@ -191,6 +241,7 @@ def run_fixture_mode(args: argparse.Namespace) -> int:
         "output_dir": str(out_dir),
         "total_records": writer.total_records_written,
         "head_hash": writer.head_hash,
+        "raw_manifest_sha256": raw_writer.manifest_sha256,
         "manifest_sha256": writer.manifest_sha256,
     }
     print(json.dumps(summary, indent=2))
@@ -200,8 +251,8 @@ def run_fixture_mode(args: argparse.Namespace) -> int:
 def run_replay_mode(args: argparse.Namespace) -> int:
     """Run replay verification over saved immutable segment logs."""
     replay_dir = args.replay_dir or args.output_dir
-    engine = ReplayEngine(data_dir=replay_dir)
-    _events, witness = engine.replay_all()
+    engine = ReplayEngine(data_dir=replay_dir, epoch=args.epoch)
+    _events, witness = engine.replay_all(source=getattr(args, "replay_source", "auto"))
     print(json.dumps(witness.to_dict(), indent=2))
     return 0 if witness.depth_continuous else 1
 
@@ -219,15 +270,26 @@ def run_live_public_mode(args: argparse.Namespace) -> int:
         symbol=args.symbol,
         network_mode="allow-public",
     )
+    out_dir = Path(args.output_dir)
+    epoch = f"live-epoch-{args.symbol.lower()}"
+    raw_writer = RawSegmentWriter(base_dir=out_dir, epoch=epoch)
+    writer = SegmentWriter(base_dir=out_dir, epoch=epoch)
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
         stats = loop.run_until_complete(
-            client.run_bounded_public_stream(duration_seconds=args.duration_seconds)
+            client.run_bounded_public_stream(
+                duration_seconds=args.duration_seconds,
+                raw_writer=raw_writer,
+                event_writer=writer,
+            )
         )
         print(json.dumps(stats, indent=2))
         return 0
     finally:
+        raw_writer.close()
+        writer.close()
         loop.close()
 
 

@@ -45,8 +45,8 @@ def test_cli_fixture_mode_execution(tmp_path: Path) -> None:
     seg_files = list(out_dir.glob("segment_*.jsonl"))
     assert len(seg_files) >= 1
     events, _ = SegmentReader.read_segment(seg_files[0])
-    # 1 snapshot + 20 sequential + 1 health = 22 events
-    assert len(events) == 22
+    # 1 snapshot + 1 settled funding + 20 sequential + 1 health = 23 events
+    assert len(events) == 23
     assert events[-1].channel == "health"
 
 
