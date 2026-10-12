@@ -129,7 +129,12 @@ def test_01_valid_operator_alpha_signature_verifies_and_translates(tmp_path: Pat
     s = transition(s, {"id": "ANALYZE-60001", "kind": "ANALYZE", "at": 60001, "payload": analysis})
     s = transition(
         s,
-        {"id": "APPROVE-60002", "kind": "APPROVE", "at": 60002, "payload": {"token_id": "tok-alpha-1"}},
+        {
+            "id": "APPROVE-60002",
+            "kind": "APPROVE",
+            "at": 60002,
+            "payload": {"token_id": "tok-alpha-1"},
+        },
     )
     s = transition(s, {"id": "PLACE-60003", "kind": "PLACE", "at": 60003, "payload": {}})
     assert s["phase"] == "PLACED"

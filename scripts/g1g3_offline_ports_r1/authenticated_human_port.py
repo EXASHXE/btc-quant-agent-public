@@ -175,9 +175,7 @@ class AuthenticatedHumanPort:
 
     def _recover_wal(self) -> None:
         if not self.wal_path.exists():
-            fd = os.open(
-                self.wal_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600
-            )
+            fd = os.open(self.wal_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
             try:
                 header = (
                     canonical({"format": "OPERATOR_AUTH_WAL_V1", "genesis_chain": self.chain})
@@ -502,7 +500,10 @@ class AuthenticatedHumanPort:
     ) -> tuple[dict[str, Any], Path, dict[str, Any]]:
         """Materialize a newly generated, read-only (0o400) sealed fixture for the G1 core."""
         self.reject_unauthenticated_fixture(untrusted_fixture)
-        if not verified_receipt.get("approved") or verified_receipt.get("translated_g1_token") is None:
+        if (
+            not verified_receipt.get("approved")
+            or verified_receipt.get("translated_g1_token") is None
+        ):
             raise SafetyViolation("OPERATOR_DECISION_NOT_APPROVED")
         sealed = copy.deepcopy(untrusted_fixture)
         sealed["trusted_approvals"] = [copy.deepcopy(verified_receipt["translated_g1_token"])]

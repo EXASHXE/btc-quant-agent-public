@@ -66,7 +66,9 @@ BOOK_REQUIRED_KEYS = {
 
 def _check_no_secrets_in_obj(value: Any) -> None:
     text = str(value).lower()
-    if any(tok in text for tok in ("api_key", "secret", "password", "bearer ", "token=", "listenkey")):
+    if any(
+        tok in text for tok in ("api_key", "secret", "password", "bearer ", "token=", "listenkey")
+    ):
         raise SafetyViolation("MARKET_EVENT_SECRET_OR_PRIVATE_FIELD")
 
 
@@ -118,10 +120,7 @@ class MarketPitPort:
             raise SafetyViolation("BOOK_INTEGRITY_INVALID")
         if type(book["continuous"]) is not bool or not book["continuous"]:
             raise SafetyViolation("BOOK_SEQUENCE_GAP")
-        if (
-            self.last_book_final_update_id is not None
-            and prev_id != self.last_book_final_update_id
-        ):
+        if self.last_book_final_update_id is not None and prev_id != self.last_book_final_update_id:
             raise SafetyViolation("BOOK_SEQUENCE_GAP")
         if book["first_update_id"] > book["final_update_id"]:
             raise SafetyViolation("BOOK_INTEGRITY_INVALID")
@@ -203,13 +202,6 @@ class MarketPitPort:
                 if reference_at_ms - avail_ms > self.max_stale_ms:
                     raise SafetyViolation("MARKET_EVENT_STALE")
 
-            # Monotonic vs wall clock consistency check
-            if self.last_monotonic_ns >= 0:
-                if mono_ns <= self.last_monotonic_ns:
-                    raise SafetyViolation("MONOTONIC_REGRESSION")
-                if wall_ms < self.last_wall_utc_ms:
-                    raise SafetyViolation("CLOCK_UNCERTAIN")
-
             # Provenance & public-only checks
             stream_id = envelope["source_stream_id"]
             if not isinstance(stream_id, str) or not stream_id:
@@ -246,7 +238,7 @@ class MarketPitPort:
             if "CLOCK_UNCERTAIN" in envelope["reason_codes"]:
                 raise SafetyViolation("CLOCK_UNCERTAIN")
 
-            # Deduplication check before mutating state
+            # Deduplication check before monotonic advancement or state mutation
             dedupe_key = compute_market_event_dedupe_key(envelope)
             if dedupe_key in self.seen_dedupe_keys:
                 if self.seen_dedupe_keys[dedupe_key] != envelope["payload_sha256"]:
@@ -258,6 +250,13 @@ class MarketPitPort:
                     "duplicate_count": self.duplicate_envelope_count,
                     "g1_event": None,
                 }
+
+            # Monotonic vs wall clock consistency check
+            if self.last_monotonic_ns >= 0:
+                if mono_ns <= self.last_monotonic_ns:
+                    raise SafetyViolation("MONOTONIC_REGRESSION")
+                if wall_ms < self.last_wall_utc_ms:
+                    raise SafetyViolation("CLOCK_UNCERTAIN")
 
             if "book" in envelope and envelope["book"] is not None:
                 self.validate_book_integrity(envelope["book"])
