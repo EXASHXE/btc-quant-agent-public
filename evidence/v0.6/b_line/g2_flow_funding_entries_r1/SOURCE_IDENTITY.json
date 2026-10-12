@@ -1,0 +1,31 @@
+{
+  "task_id": "V06_G2_GEMINI_A_FLOW_FUNDING_ENTRY_R1",
+  "authenticated_sources": {
+    "binance_usdm_last_1m": "2021-01 through 2023-12 (36 months, 1,576,800 minutes)",
+    "binance_usdm_mark_1m": "2021-01 through 2023-12 (with R31 8-day composite repair, 1,576,800 minutes)",
+    "binance_usdm_settled_funding": "2021-01 through 2023-12 (3,285 settled events)"
+  },
+  "taker_buy_volume_proven": {
+    "raw_csv_column": 9,
+    "raw_csv_field_name": "taker_buy_volume (taker_buy_base_asset_volume)",
+    "schema_verified": true,
+    "inference_from_ohlc": false
+  },
+  "funding_publication_time": {
+    "historical_publication_known_at": "UNKNOWN_CURRENT_ARCHIVE_IS_RETROSPECTIVE",
+    "settlement_available_lag": ">= 1 minute conservative lag enforced",
+    "settlement_mark_basis": "latest completed 1m Mark close approximation"
+  },
+  "warmup_handling": {
+    "warmup_month": "2021-01 (744 hours)",
+    "evaluation_window": "2021-02-01 00:00:00 UTC through 2023-12-31 23:59:00 UTC (35 monthly folds)",
+    "continuous_timeline_assembled": true,
+    "monthly_atr_reset_defect_avoided": true
+  },
+  "receipt": {
+    "minutes_total": 1576800,
+    "hours_total": 26280,
+    "funding_events_total": 3285,
+    "source_manifest_sha256": "1f06a24b892a24430f3d2f9e5f2c46e926ed24a437785614c400a1fa536b677c"
+  }
+}

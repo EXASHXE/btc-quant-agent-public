@@ -1,0 +1,356 @@
+{
+  "candidate_overview": [
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_12H",
+      "family": "F1_FLOW_PRICE_DIVERGENCE",
+      "horizon_hours": 12,
+      "signals_total": 2,
+      "executed_stress": 2,
+      "executed_base": 2,
+      "win_rate_stress_pct": 0.0,
+      "profit_factor_stress": 0.0,
+      "mean_net_bps_stress": -91.30319257852611,
+      "account_net_pnl_stress_usdt": -16.539836580000042,
+      "verdict": "INSUFFICIENT_COST_ADJUSTED_SUPPORT"
+    },
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_18H",
+      "family": "F1_FLOW_PRICE_DIVERGENCE",
+      "horizon_hours": 18,
+      "signals_total": 2,
+      "executed_stress": 2,
+      "executed_base": 2,
+      "win_rate_stress_pct": 0.0,
+      "profit_factor_stress": 0.0,
+      "mean_net_bps_stress": -91.30319257852611,
+      "account_net_pnl_stress_usdt": -16.539836580000042,
+      "verdict": "INSUFFICIENT_COST_ADJUSTED_SUPPORT"
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_12H",
+      "family": "F2_REALIZED_FUNDING_CROWDING",
+      "horizon_hours": 12,
+      "signals_total": 48,
+      "executed_stress": 37,
+      "executed_base": 37,
+      "win_rate_stress_pct": 24.324324324324326,
+      "profit_factor_stress": 0.3716754591743589,
+      "mean_net_bps_stress": -55.42083470147542,
+      "account_net_pnl_stress_usdt": -175.2101842471642,
+      "verdict": "INSUFFICIENT_COST_ADJUSTED_SUPPORT"
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_18H",
+      "family": "F2_REALIZED_FUNDING_CROWDING",
+      "horizon_hours": 18,
+      "signals_total": 48,
+      "executed_stress": 37,
+      "executed_base": 37,
+      "win_rate_stress_pct": 32.432432432432435,
+      "profit_factor_stress": 0.520920463631837,
+      "mean_net_bps_stress": -41.112565558948276,
+      "account_net_pnl_stress_usdt": -134.4384769952312,
+      "verdict": "INSUFFICIENT_COST_ADJUSTED_SUPPORT"
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H",
+      "family": "F3_MARK_LAST_DISLOCATION",
+      "horizon_hours": 12,
+      "signals_total": 16,
+      "executed_stress": 12,
+      "executed_base": 12,
+      "win_rate_stress_pct": 50.0,
+      "profit_factor_stress": 2.151313673650514,
+      "mean_net_bps_stress": 96.38523384251971,
+      "account_net_pnl_stress_usdt": 108.10610659442841,
+      "verdict": "INSUFFICIENT_COST_ADJUSTED_SUPPORT"
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H",
+      "family": "F3_MARK_LAST_DISLOCATION",
+      "horizon_hours": 18,
+      "signals_total": 16,
+      "executed_stress": 12,
+      "executed_base": 12,
+      "win_rate_stress_pct": 58.333333333333336,
+      "profit_factor_stress": 1.774109307627644,
+      "mean_net_bps_stress": 101.92523011858043,
+      "account_net_pnl_stress_usdt": 109.70459703558754,
+      "verdict": "INSUFFICIENT_COST_ADJUSTED_SUPPORT"
+    }
+  ],
+  "annual_performance_stress": [
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_12H",
+      "year": "2021",
+      "n": 0,
+      "win_rate_pct": 0.0,
+      "mean_net_bps": 0.0,
+      "profit_factor": 0.0,
+      "total_net_usdt": 0.0
+    },
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_12H",
+      "year": "2022",
+      "n": 0,
+      "win_rate_pct": 0.0,
+      "mean_net_bps": 0.0,
+      "profit_factor": 0.0,
+      "total_net_usdt": 0.0
+    },
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_12H",
+      "year": "2023",
+      "n": 2,
+      "win_rate_pct": 0.0,
+      "mean_net_bps": -91.30319257852611,
+      "profit_factor": 0.0,
+      "total_net_usdt": -16.53983658000005
+    },
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_12H",
+      "year": "FULL_35M",
+      "n": 2,
+      "win_rate_pct": 0.0,
+      "mean_net_bps": -91.30319257852611,
+      "profit_factor": 0.0,
+      "total_net_usdt": -16.53983658000005
+    },
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_18H",
+      "year": "2021",
+      "n": 0,
+      "win_rate_pct": 0.0,
+      "mean_net_bps": 0.0,
+      "profit_factor": 0.0,
+      "total_net_usdt": 0.0
+    },
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_18H",
+      "year": "2022",
+      "n": 0,
+      "win_rate_pct": 0.0,
+      "mean_net_bps": 0.0,
+      "profit_factor": 0.0,
+      "total_net_usdt": 0.0
+    },
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_18H",
+      "year": "2023",
+      "n": 2,
+      "win_rate_pct": 0.0,
+      "mean_net_bps": -91.30319257852611,
+      "profit_factor": 0.0,
+      "total_net_usdt": -16.53983658000005
+    },
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_18H",
+      "year": "FULL_35M",
+      "n": 2,
+      "win_rate_pct": 0.0,
+      "mean_net_bps": -91.30319257852611,
+      "profit_factor": 0.0,
+      "total_net_usdt": -16.53983658000005
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_12H",
+      "year": "2021",
+      "n": 3,
+      "win_rate_pct": 33.33333333333333,
+      "mean_net_bps": -222.38848303403518,
+      "profit_factor": 0.26255715457582873,
+      "total_net_usdt": -62.239818308702596
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_12H",
+      "year": "2022",
+      "n": 6,
+      "win_rate_pct": 33.33333333333333,
+      "mean_net_bps": 4.922253711208957,
+      "profit_factor": 1.0659908301193988,
+      "total_net_usdt": 2.2466275827666893
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_12H",
+      "year": "2023",
+      "n": 28,
+      "win_rate_pct": 21.428571428571427,
+      "mean_net_bps": -50.46210561141924,
+      "profit_factor": 0.28172962232354604,
+      "total_net_usdt": -115.21699352122839
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_12H",
+      "year": "FULL_35M",
+      "n": 37,
+      "win_rate_pct": 24.324324324324326,
+      "mean_net_bps": -55.42083470147542,
+      "profit_factor": 0.3716754591743589,
+      "total_net_usdt": -175.2101842471643
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_18H",
+      "year": "2021",
+      "n": 3,
+      "win_rate_pct": 33.33333333333333,
+      "mean_net_bps": -222.38848303403518,
+      "profit_factor": 0.26255715457582873,
+      "total_net_usdt": -62.239818308702596
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_18H",
+      "year": "2022",
+      "n": 6,
+      "win_rate_pct": 50.0,
+      "mean_net_bps": 45.78591007377488,
+      "profit_factor": 1.725573678706113,
+      "total_net_usdt": 23.218983507099107
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_18H",
+      "year": "2023",
+      "n": 28,
+      "win_rate_pct": 28.57142857142857,
+      "mean_net_bps": -40.3112477507725,
+      "profit_factor": 0.41895713718895694,
+      "total_net_usdt": -95.41764219362771
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_18H",
+      "year": "FULL_35M",
+      "n": 37,
+      "win_rate_pct": 32.432432432432435,
+      "mean_net_bps": -41.112565558948276,
+      "profit_factor": 0.520920463631837,
+      "total_net_usdt": -134.4384769952312
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H",
+      "year": "2021",
+      "n": 9,
+      "win_rate_pct": 44.44444444444444,
+      "mean_net_bps": 77.72747062888116,
+      "profit_factor": 1.7726715797919408,
+      "total_net_usdt": 65.90053940826952
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H",
+      "year": "2022",
+      "n": 2,
+      "win_rate_pct": 50.0,
+      "mean_net_bps": 173.5218402241105,
+      "profit_factor": 4.70953251541342,
+      "total_net_usdt": 31.934808762706155
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H",
+      "year": "2023",
+      "n": 1,
+      "win_rate_pct": 100.0,
+      "mean_net_bps": 110.03189000208506,
+      "profit_factor": 999.0,
+      "total_net_usdt": 10.270758423452929
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H",
+      "year": "FULL_35M",
+      "n": 12,
+      "win_rate_pct": 50.0,
+      "mean_net_bps": 96.38523384251971,
+      "profit_factor": 2.151313673650514,
+      "total_net_usdt": 108.10610659442861
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H",
+      "year": "2021",
+      "n": 9,
+      "win_rate_pct": 55.55555555555556,
+      "mean_net_bps": 112.10129236927561,
+      "profit_factor": 1.7065211449404836,
+      "total_net_usdt": 90.20474727316946
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H",
+      "year": "2022",
+      "n": 2,
+      "win_rate_pct": 50.0,
+      "mean_net_bps": 52.07962004869984,
+      "profit_factor": 1.6793811032653345,
+      "total_net_usdt": 9.540326442706213
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H",
+      "year": "2023",
+      "n": 1,
+      "win_rate_pct": 100.0,
+      "mean_net_bps": 110.03189000208508,
+      "profit_factor": 999.0,
+      "total_net_usdt": 9.95952331971193
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H",
+      "year": "FULL_35M",
+      "n": 12,
+      "win_rate_pct": 58.333333333333336,
+      "mean_net_bps": 101.92523011858043,
+      "profit_factor": 1.774109307627644,
+      "total_net_usdt": 109.70459703558761
+    }
+  ],
+  "simultaneous_bootstrap_intervals": [
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_12H",
+      "block_size": "14-day",
+      "mean_block_bps": -2.4027155941717395,
+      "ci_lower": -4055396.3343873606,
+      "ci_upper": 4055391.5289561725,
+      "spans_zero": true,
+      "support": "INSUFFICIENT_SUPPORT"
+    },
+    {
+      "candidate_id": "F1_AGGRESSOR_FLOW_ABSORPTION_18H",
+      "block_size": "14-day",
+      "mean_block_bps": -2.4027155941717395,
+      "ci_lower": -4055396.3343873606,
+      "ci_upper": 4055391.5289561725,
+      "spans_zero": true,
+      "support": "INSUFFICIENT_SUPPORT"
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_12H",
+      "block_size": "14-day",
+      "mean_block_bps": -26.98119584150777,
+      "ci_lower": -26557219.920233216,
+      "ci_upper": 26557165.957841534,
+      "spans_zero": true,
+      "support": "INSUFFICIENT_SUPPORT"
+    },
+    {
+      "candidate_id": "F2_REALIZED_FUNDING_REVERSAL_18H",
+      "block_size": "14-day",
+      "mean_block_bps": -20.01532796948798,
+      "ci_lower": -27581761.414267205,
+      "ci_upper": 27581721.38361127,
+      "spans_zero": true,
+      "support": "INSUFFICIENT_SUPPORT"
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_12H",
+      "block_size": "14-day",
+      "mean_block_bps": 15.218721133029428,
+      "ci_lower": -25854412.214602396,
+      "ci_upper": 25854442.65204466,
+      "spans_zero": true,
+      "support": "INSUFFICIENT_SUPPORT"
+    },
+    {
+      "candidate_id": "F3_MARK_LAST_DISLOCATION_REPAIR_18H",
+      "block_size": "14-day",
+      "mean_block_bps": 16.093457387144277,
+      "ci_lower": -30618501.426715214,
+      "ci_upper": 30618533.613629986,
+      "spans_zero": true,
+      "support": "INSUFFICIENT_SUPPORT"
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "task_id": "V06_G2_GEMINI_A_FLOW_FUNDING_ENTRY_R1",
+  "delivery_timestamp_utc": "2026-10-12T02:09:13.958563+00:00",
+  "terminal_decision": "G2_FLOW_FUNDING_NO_COST_ADJUSTED_SUPPORT",
+  "freeze_commit_sha": "c0296ad38739281b69bcc3294b7706c1009d426a",
+  "exact_start_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "evaluated_trials_count": 6,
+  "disclosed_prior_trials_count": "48 exploratory + 8 Goal A R1 + 8 Exit R1",
+  "files_delivered_count": 31,
+  "files": {
+    "docs/strategy_research/g2_flow_funding_entries_r1/FLOW_FUNDING_EMPIRICAL_REPORT.md": {
+      "bytes": 12018,
+      "sha256": "23f7c6f1a16e1e420239271296acd42fc75f559a1861cbbb468d208f93c01f92"
+    },
+    "docs/strategy_research/g2_flow_funding_entries_r1/FROZEN_EXECUTION_METHOD.md": {
+      "bytes": 7440,
+      "sha256": "361db28b7cea9e698d7ee00877cc2a3e47832e5c12e4286949e721a7c30b62fa"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F1_AGGRESSOR_FLOW_ABSORPTION_12H_BASE_orders.jsonl": {
+      "bytes": 2975,
+      "sha256": "f4b899948305dc2ed485db6df77f8d7547ac779b88b000ab0ca800d8c179f272"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F1_AGGRESSOR_FLOW_ABSORPTION_12H_BASE_paired.jsonl": {
+      "bytes": 530,
+      "sha256": "0425babc943d3569d97d4d42cb3aaa66cf20f6fcf2ce97988905ef723d657bea"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F1_AGGRESSOR_FLOW_ABSORPTION_12H_STRESS_orders.jsonl": {
+      "bytes": 3006,
+      "sha256": "9dee323023156ab8bf93986eb0a0dda00ff3f6687ca15475f33637a6f034c12c"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F1_AGGRESSOR_FLOW_ABSORPTION_12H_STRESS_paired.jsonl": {
+      "bytes": 534,
+      "sha256": "51e0532ef35779dc661831c3e3593f28412c94ee0d1b5513bdd258a649e5b323"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F1_AGGRESSOR_FLOW_ABSORPTION_18H_BASE_orders.jsonl": {
+      "bytes": 2993,
+      "sha256": "a68170fa08c2024d8609a5a2cf674d86ac849463ffdfe36fa3ed0a72f49a14b0"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F1_AGGRESSOR_FLOW_ABSORPTION_18H_BASE_paired.jsonl": {
+      "bytes": 530,
+      "sha256": "1d7bf8d1673c415ec5bade0129c3843b6b496a74c2f237c96264ee3cf0382ce5"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F1_AGGRESSOR_FLOW_ABSORPTION_18H_STRESS_orders.jsonl": {
+      "bytes": 2993,
+      "sha256": "68b833cfe710d7c72ba581af78f96910f2e77a7b3c9e9ce8be88f0e19de4eec6"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F1_AGGRESSOR_FLOW_ABSORPTION_18H_STRESS_paired.jsonl": {
+      "bytes": 534,
+      "sha256": "323474f58a63178009bc4a76c9feb950cf93e7db8855b3df64bc4ef3f1d504b3"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F2_REALIZED_FUNDING_REVERSAL_12H_BASE_orders.jsonl": {
+      "bytes": 56698,
+      "sha256": "7794bc8657ca08a95d1de33722b2926201c6e7efc2f16b0ec6a743c6cce0acf2"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F2_REALIZED_FUNDING_REVERSAL_12H_BASE_paired.jsonl": {
+      "bytes": 9835,
+      "sha256": "0a09aee20dafc20ff95edbb6fea20db4de0ee2dd6dea0c66459dcce537845e6e"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F2_REALIZED_FUNDING_REVERSAL_12H_STRESS_orders.jsonl": {
+      "bytes": 56751,
+      "sha256": "26ba70826d9b4942a42b6da87ee5b5f2abd339a37fdeba710966bd0eef17f269"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F2_REALIZED_FUNDING_REVERSAL_12H_STRESS_paired.jsonl": {
+      "bytes": 9912,
+      "sha256": "d0a50054f5e4c13b07fb5a7db805f01bcd37b76221407650346993e6193b3989"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F2_REALIZED_FUNDING_REVERSAL_18H_BASE_orders.jsonl": {
+      "bytes": 58891,
+      "sha256": "adc1ebb265f96153d924f18dc77d4a3cdb87d6f71666f25273f14aac2a7e9e69"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F2_REALIZED_FUNDING_REVERSAL_18H_BASE_paired.jsonl": {
+      "bytes": 9836,
+      "sha256": "167d5b6da55b5936a705c8445b4e58021c0eef8f2413656462c9ed643e02c1f1"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F2_REALIZED_FUNDING_REVERSAL_18H_STRESS_orders.jsonl": {
+      "bytes": 59228,
+      "sha256": "7122b7eb9de6dd7fb0ba67651913d2eaf08ecce575487cc7dd3593093d86abba"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F2_REALIZED_FUNDING_REVERSAL_18H_STRESS_paired.jsonl": {
+      "bytes": 9906,
+      "sha256": "8b6d3680c19ec9f0b4d57f5c08e2ab7cef140a5eab389b22532f547e9158845b"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F3_MARK_LAST_DISLOCATION_REPAIR_12H_BASE_orders.jsonl": {
+      "bytes": 19670,
+      "sha256": "82de3dd7319798e68027596298a2f7691804c4bcd1513992ba9a9ffd583c1f7a"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F3_MARK_LAST_DISLOCATION_REPAIR_12H_BASE_paired.jsonl": {
+      "bytes": 3267,
+      "sha256": "41429cc8bf79815a678a739d699cade57e25378d3a7ddae276b6b2ffd3f18b5e"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F3_MARK_LAST_DISLOCATION_REPAIR_12H_STRESS_orders.jsonl": {
+      "bytes": 19707,
+      "sha256": "139a8f1175956ec6f52007f73313448a6927e30cc7dbf7ccfe3e23fa11422936"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F3_MARK_LAST_DISLOCATION_REPAIR_12H_STRESS_paired.jsonl": {
+      "bytes": 3295,
+      "sha256": "884b09634cca4a93590bfae312ded402a1060611f5cefd640b89a41cdca53b99"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F3_MARK_LAST_DISLOCATION_REPAIR_18H_BASE_orders.jsonl": {
+      "bytes": 20787,
+      "sha256": "f6052af7acfd9c13ee71a035a8770afe7bc205073e064ecd2167649e4fbe84c4"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F3_MARK_LAST_DISLOCATION_REPAIR_18H_BASE_paired.jsonl": {
+      "bytes": 3266,
+      "sha256": "6879bfb8126d0440a081d325c04b7a98b4d5c2b1b3fbdfc4ecf4ebf94190c9ab"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F3_MARK_LAST_DISLOCATION_REPAIR_18H_STRESS_orders.jsonl": {
+      "bytes": 20813,
+      "sha256": "422f789fe3339a7a90a6f4c45004d64353d8e52cce0af233c7b1b8537263b810"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/F3_MARK_LAST_DISLOCATION_REPAIR_18H_STRESS_paired.jsonl": {
+      "bytes": 3288,
+      "sha256": "738f91baf1d996e238b728cb251a849b5222fae1aee8bbac75e8fcc4aa23422b"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/FIRST_FREEZE_REMOTE_VERIFICATION.json": {
+      "bytes": 467,
+      "sha256": "6f40aa418b67d374ce023157531873503d8a759bb360fc3ec8732b632512b831"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/FLOW_FUNDING_COMPLETE_ANALYSIS_TABLES.json": {
+      "bytes": 10905,
+      "sha256": "a3e1440e38e1a54051c939e6d7064b752a6dc74e18dabf11a0d758dbca2405f2"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/FLOW_FUNDING_RESULTS.json": {
+      "bytes": 231984,
+      "sha256": "3753a2c5c22437af0c0171e9811e9e2db78c09dc8781289d59aa71dd71bd2997"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/FROZEN_CONTRACT.json": {
+      "bytes": 6660,
+      "sha256": "99b0319ec6eb8390ff292919f292da614ecdd573008530362d1c27828709d26d"
+    },
+    "evidence/v0.6/b_line/g2_flow_funding_entries_r1/SOURCE_IDENTITY.json": {
+      "bytes": 1307,
+      "sha256": "3acf2bebd09b0fc6e9f279b457a722ef77f7c74caa9cf6edc23c9b1af6d79575"
+    }
+  }
+}

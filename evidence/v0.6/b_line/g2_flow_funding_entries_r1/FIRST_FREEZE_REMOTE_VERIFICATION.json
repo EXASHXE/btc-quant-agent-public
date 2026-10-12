@@ -1,0 +1,11 @@
+{
+  "commit1_SHA": "c0296ad38739281b69bcc3294b7706c1009d426a",
+  "parent_SHA": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+  "remote_branch": "feature/v06-bline-gemini-g2-flow-funding-entries-r1",
+  "ls_remote_SHA": "c0296ad38739281b69bcc3294b7706c1009d426a",
+  "REMOTE_PUSH_VERIFIED": true,
+  "verified_at_UTC": "2026-10-12T02:05:43.000000+00:00",
+  "new_historical_flow_funding_outcomes_inspected": false,
+  "scoped_synthetic_tests": 50,
+  "Ruff_compile": "PASS"
+}
