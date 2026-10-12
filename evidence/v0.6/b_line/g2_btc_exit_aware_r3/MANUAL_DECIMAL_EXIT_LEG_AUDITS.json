@@ -1,0 +1,679 @@
+{
+  "audits": [
+    {
+      "PASS": true,
+      "fixture": {
+        "candles": [
+          [
+            10000,
+            10010,
+            9960,
+            9990
+          ]
+        ],
+        "event": {
+          "atr_hour": 50,
+          "decision_at": 60000,
+          "decision_close": 10000,
+          "entry_at": 120000,
+          "event_id": "SYNTHETIC_ONLY:entry",
+          "event_time": 0,
+          "side": 1,
+          "stop": 9970
+        },
+        "hourly": [],
+        "label": "SYNTHETIC_ONLY",
+        "policy": "X0",
+        "quantity": "0.127"
+      },
+      "fixture_sha256": "ce85e6855e343be6d41450213a081c8511652489381786add672e5c7ede5e51f",
+      "id": "HAND1",
+      "independent_expected_net_USDT": "-6.60171400",
+      "ledger": {
+        "cap_hours": 8,
+        "collision_minutes": 0,
+        "cost": {
+          "fee_bps": "6",
+          "slip_bps": "3",
+          "spread_bps": "2"
+        },
+        "entry": {
+          "atr_hour": "50",
+          "cap_at": 28920000,
+          "decision_at": 60000,
+          "effective_price": "10005.0",
+          "event_closed_at": 0,
+          "event_id": "SYNTHETIC_ONLY:entry",
+          "fee": "0.76238100",
+          "fill_at": 120000,
+          "initial_R": "35.0",
+          "initial_quantity": "0.127",
+          "initial_stop": "9970",
+          "order_possible_at": 120000,
+          "raw_price": "10000.0",
+          "side": 1,
+          "signal_available_at": 60000
+        },
+        "entry_at": 120000,
+        "entry_notional": "1270.0000",
+        "event_id": "SYNTHETIC_ONLY:entry",
+        "execution_drag_usdt": "1.27000000",
+        "exit_ack_at": 300000,
+        "exit_at": 239999,
+        "exit_reason": "STOP",
+        "fee_usdt": "1.52171400",
+        "fill_grade": "HYPOTHETICAL_TAKER_NO_L2_CAPACITY_PROOF",
+        "gross_bps": "-30.0000",
+        "gross_usdt": "-3.81000000",
+        "hold_minutes": 1.9999833333333332,
+        "initial_quantity": "0.127",
+        "ledger_sha256": "6e6f9e91227cb4c2d49605a2e4cbc03a321a011d8e28dee2026cc579a5c0a7b9",
+        "legs": [
+          {
+            "ack_at": 300000,
+            "effective_at": 120000,
+            "effective_price": "9965.0",
+            "fee": "0.75933300",
+            "fill_at": 239999,
+            "fill_id": "SYNTHETIC_ONLY:entry:0",
+            "quantity": "0.127",
+            "raw_price": "9970",
+            "reason": "STOP",
+            "remaining": "0.000",
+            "signed_effective_pnl": "-5.08000000",
+            "signed_gross": "-3.81000000",
+            "slippage_drag": "0.37985700",
+            "spread_drag": "0.25323800",
+            "tick_drag": "0.00190500",
+            "trigger_at": 239999
+          }
+        ],
+        "minute_path_status": "OHLC_SIMULATED_PATH",
+        "net_R": "-1.4852",
+        "net_bps": "-51.9820000",
+        "net_usdt": "-6.60171400",
+        "pnl_grade": "NET_EX_FUNDING_PROXY",
+        "policy": "X0",
+        "real_funding": "UNKNOWN",
+        "side": 1,
+        "stop_updates": []
+      },
+      "observed_net_USDT": "-6.60171400"
+    },
+    {
+      "PASS": true,
+      "fixture": {
+        "candles": [
+          [
+            10000,
+            10050,
+            9995,
+            10010
+          ],
+          [
+            10010,
+            10080,
+            10005,
+            10020
+          ],
+          [
+            10020,
+            10120,
+            10015,
+            10030
+          ]
+        ],
+        "event": {
+          "atr_hour": 50,
+          "decision_at": 60000,
+          "decision_close": 10000,
+          "entry_at": 120000,
+          "event_id": "SYNTHETIC_ONLY:entry",
+          "event_time": 0,
+          "side": 1,
+          "stop": 9970
+        },
+        "hourly": [],
+        "label": "SYNTHETIC_ONLY",
+        "policy": "X1",
+        "quantity": "0.127"
+      },
+      "fixture_sha256": "b6b14cf11cdef476ff1bd66d0bde3dcc499958a19fd98694d00b6f340a0a3deb",
+      "id": "HAND2",
+      "independent_expected_net_USDT": "6.06198322",
+      "ledger": {
+        "cap_hours": 8,
+        "collision_minutes": 0,
+        "cost": {
+          "fee_bps": "6",
+          "slip_bps": "3",
+          "spread_bps": "2"
+        },
+        "entry": {
+          "atr_hour": "50",
+          "cap_at": 28920000,
+          "decision_at": 60000,
+          "effective_price": "10005.0",
+          "event_closed_at": 0,
+          "event_id": "SYNTHETIC_ONLY:entry",
+          "fee": "0.76238100",
+          "fill_at": 120000,
+          "initial_R": "35.0",
+          "initial_quantity": "0.127",
+          "initial_stop": "9970",
+          "order_possible_at": 120000,
+          "raw_price": "10000.0",
+          "side": 1,
+          "signal_available_at": 60000
+        },
+        "entry_at": 120000,
+        "entry_notional": "1270.0000",
+        "event_id": "SYNTHETIC_ONLY:entry",
+        "execution_drag_usdt": "1.28270000",
+        "exit_ack_at": 420000,
+        "exit_at": 359999,
+        "exit_reason": "TP3",
+        "fee_usdt": "1.52931678",
+        "fill_grade": "HYPOTHETICAL_TAKER_NO_L2_CAPACITY_PROOF",
+        "gross_bps": "69.87401574803149606299212598",
+        "gross_usdt": "8.87400000",
+        "hold_minutes": 3.9999833333333332,
+        "initial_quantity": "0.127",
+        "ledger_sha256": "3f2cc9f143808bbf8e9b9d906a7a9e8597a57b3fe7e3f855a509d8c1594621c8",
+        "legs": [
+          {
+            "ack_at": 300000,
+            "effective_at": 120000,
+            "effective_price": "10034.9",
+            "fee": "0.30104700",
+            "fill_at": 239999,
+            "fill_id": "SYNTHETIC_ONLY:entry:0",
+            "quantity": "0.050",
+            "raw_price": "10040.0",
+            "reason": "TP1",
+            "remaining": "0.077",
+            "signed_effective_pnl": "1.49500000",
+            "signed_gross": "2.00000000",
+            "slippage_drag": "0.15060000",
+            "spread_drag": "0.10040000",
+            "tick_drag": "0.00400000",
+            "trigger_at": 239999
+          },
+          {
+            "ack_at": 360000,
+            "effective_at": 120000,
+            "effective_price": "10062.9",
+            "fee": "0.22943412",
+            "fill_at": 299999,
+            "fill_id": "SYNTHETIC_ONLY:entry:1",
+            "quantity": "0.038",
+            "raw_price": "10068.0",
+            "reason": "TP2",
+            "remaining": "0.039",
+            "signed_effective_pnl": "2.20020000",
+            "signed_gross": "2.58400000",
+            "slippage_drag": "0.11477520",
+            "spread_drag": "0.07651680",
+            "tick_drag": "0.00250800",
+            "trigger_at": 299999
+          },
+          {
+            "ack_at": 420000,
+            "effective_at": 120000,
+            "effective_price": "10104.9",
+            "fee": "0.23645466",
+            "fill_at": 359999,
+            "fill_id": "SYNTHETIC_ONLY:entry:2",
+            "quantity": "0.039",
+            "raw_price": "10110.0",
+            "reason": "TP3",
+            "remaining": "0.000",
+            "signed_effective_pnl": "3.89610000",
+            "signed_gross": "4.29000000",
+            "slippage_drag": "0.11828700",
+            "spread_drag": "0.07885800",
+            "tick_drag": "0.00175500",
+            "trigger_at": 359999
+          }
+        ],
+        "minute_path_status": "OHLC_SIMULATED_PATH",
+        "net_R": "1.363775752530933633295838020",
+        "net_bps": "47.73215133858267716535433071",
+        "net_usdt": "6.06198322",
+        "pnl_grade": "NET_EX_FUNDING_PROXY",
+        "policy": "X1",
+        "real_funding": "UNKNOWN",
+        "side": 1,
+        "stop_updates": []
+      },
+      "observed_net_USDT": "6.06198322"
+    },
+    {
+      "PASS": true,
+      "fixture": {
+        "candles": [
+          [
+            10000,
+            10050,
+            9995,
+            10010
+          ],
+          [
+            10010,
+            10020,
+            10005,
+            10010
+          ],
+          [
+            10010,
+            10035,
+            10005,
+            10030
+          ],
+          [
+            10030,
+            10035,
+            9990,
+            10030
+          ]
+        ],
+        "event": {
+          "atr_hour": 50,
+          "decision_at": 60000,
+          "decision_close": 10000,
+          "entry_at": 120000,
+          "event_id": "SYNTHETIC_ONLY:entry",
+          "event_time": 0,
+          "side": 1,
+          "stop": 9970
+        },
+        "hourly": [],
+        "label": "SYNTHETIC_ONLY",
+        "policy": "X1",
+        "quantity": "0.127"
+      },
+      "fixture_sha256": "2dc29b6883e21a77ec8c49f82e2a97bc8f789ed1d51798a0c35babae3b9adb98",
+      "id": "HAND3",
+      "independent_expected_net_USDT": "0.90048198",
+      "ledger": {
+        "cap_hours": 8,
+        "collision_minutes": 0,
+        "cost": {
+          "fee_bps": "6",
+          "slip_bps": "3",
+          "spread_bps": "2"
+        },
+        "entry": {
+          "atr_hour": "50",
+          "cap_at": 28920000,
+          "decision_at": 60000,
+          "effective_price": "10005.0",
+          "event_closed_at": 0,
+          "event_id": "SYNTHETIC_ONLY:entry",
+          "fee": "0.76238100",
+          "fill_at": 120000,
+          "initial_R": "35.0",
+          "initial_quantity": "0.127",
+          "initial_stop": "9970",
+          "order_possible_at": 120000,
+          "raw_price": "10000.0",
+          "side": 1,
+          "signal_available_at": 60000
+        },
+        "entry_at": 120000,
+        "entry_notional": "1270.0000",
+        "event_id": "SYNTHETIC_ONLY:entry",
+        "execution_drag_usdt": "1.28270000",
+        "exit_ack_at": 480000,
+        "exit_at": 419999,
+        "exit_reason": "STOP",
+        "fee_usdt": "1.52621802",
+        "fill_grade": "HYPOTHETICAL_TAKER_NO_L2_CAPACITY_PROOF",
+        "gross_bps": "29.20787401574803149606299213",
+        "gross_usdt": "3.70940000",
+        "hold_minutes": 4.999983333333334,
+        "initial_quantity": "0.127",
+        "ledger_sha256": "d5b79a0f744ab58924da2d6af042d5efa900565ccb0fdfc85ddc4a0446ce2e71",
+        "legs": [
+          {
+            "ack_at": 300000,
+            "effective_at": 120000,
+            "effective_price": "10034.9",
+            "fee": "0.30104700",
+            "fill_at": 239999,
+            "fill_id": "SYNTHETIC_ONLY:entry:0",
+            "quantity": "0.050",
+            "raw_price": "10040.0",
+            "reason": "TP1",
+            "remaining": "0.077",
+            "signed_effective_pnl": "1.49500000",
+            "signed_gross": "2.00000000",
+            "slippage_drag": "0.15060000",
+            "spread_drag": "0.10040000",
+            "tick_drag": "0.00400000",
+            "trigger_at": 239999
+          },
+          {
+            "ack_at": 480000,
+            "effective_at": 360000,
+            "effective_price": "10017.1",
+            "fee": "0.46279002",
+            "fill_at": 419999,
+            "fill_id": "SYNTHETIC_ONLY:entry:1",
+            "quantity": "0.077",
+            "raw_price": "10022.2",
+            "reason": "STOP",
+            "remaining": "0.000",
+            "signed_effective_pnl": "0.93170000",
+            "signed_gross": "1.70940000",
+            "slippage_drag": "0.23151282",
+            "spread_drag": "0.15434188",
+            "tick_drag": "0.00684530",
+            "trigger_at": 419999
+          }
+        ],
+        "minute_path_status": "OHLC_SIMULATED_PATH",
+        "net_R": "0.2025831226096737907761529809",
+        "net_bps": "7.090409291338582677165354331",
+        "net_usdt": "0.90048198",
+        "pnl_grade": "NET_EX_FUNDING_PROXY",
+        "policy": "X1",
+        "real_funding": "UNKNOWN",
+        "side": 1,
+        "stop_updates": [
+          {
+            "active_at": 360000,
+            "new": "10022.2",
+            "old": "9970"
+          }
+        ]
+      },
+      "observed_net_USDT": "0.90048198"
+    },
+    {
+      "PASS": true,
+      "fixture": {
+        "candles": [
+          [
+            10000,
+            10060,
+            9995,
+            10010
+          ],
+          [
+            10010,
+            10120,
+            10005,
+            10020
+          ]
+        ],
+        "event": {
+          "atr_hour": 50,
+          "decision_at": 60000,
+          "decision_close": 10000,
+          "entry_at": 120000,
+          "event_id": "SYNTHETIC_ONLY:entry",
+          "event_time": 0,
+          "side": 1,
+          "stop": 9970
+        },
+        "hourly": [
+          {
+            "atr": 10,
+            "available_at": 60000,
+            "close": 10000,
+            "end_ms": 0
+          }
+        ],
+        "label": "SYNTHETIC_ONLY",
+        "policy": "X2",
+        "quantity": "0.128"
+      },
+      "fixture_sha256": "f426e35572d4b987fc7516114b647dd1a125e437c85762205d591b9dabf72824",
+      "id": "HAND4",
+      "independent_expected_net_USDT": "7.88477568",
+      "ledger": {
+        "cap_hours": 8,
+        "collision_minutes": 0,
+        "cost": {
+          "fee_bps": "6",
+          "slip_bps": "3",
+          "spread_bps": "2"
+        },
+        "entry": {
+          "atr_hour": "50",
+          "cap_at": 28920000,
+          "decision_at": 60000,
+          "effective_price": "10005.0",
+          "event_closed_at": 0,
+          "event_id": "SYNTHETIC_ONLY:entry",
+          "fee": "0.76838400",
+          "fill_at": 120000,
+          "initial_R": "35.0",
+          "initial_quantity": "0.128",
+          "initial_stop": "9970",
+          "order_possible_at": 120000,
+          "raw_price": "10000.0",
+          "side": 1,
+          "signal_available_at": 60000
+        },
+        "entry_at": 120000,
+        "entry_notional": "1280.0000",
+        "event_id": "SYNTHETIC_ONLY:entry",
+        "execution_drag_usdt": "1.29280000",
+        "exit_ack_at": 360000,
+        "exit_at": 299999,
+        "exit_reason": "TP2",
+        "fee_usdt": "1.54242432",
+        "fill_grade": "HYPOTHETICAL_TAKER_NO_L2_CAPACITY_PROOF",
+        "gross_bps": "83.750000",
+        "gross_usdt": "10.72000000",
+        "hold_minutes": 2.9999833333333332,
+        "initial_quantity": "0.128",
+        "ledger_sha256": "fdf7af53bc2657343053ab68d6f23739ad03e73fcbcbd20b220f0b0dddb34d7b",
+        "legs": [
+          {
+            "ack_at": 300000,
+            "effective_at": 120000,
+            "effective_price": "10052.4",
+            "fee": "0.38601216",
+            "fill_at": 239999,
+            "fill_id": "SYNTHETIC_ONLY:entry:0",
+            "quantity": "0.064",
+            "raw_price": "10057.5",
+            "reason": "TP1",
+            "remaining": "0.064",
+            "signed_effective_pnl": "3.03360000",
+            "signed_gross": "3.68000000",
+            "slippage_drag": "0.19310400",
+            "spread_drag": "0.12873600",
+            "tick_drag": "0.00456000",
+            "trigger_at": 239999
+          },
+          {
+            "ack_at": 360000,
+            "effective_at": 120000,
+            "effective_price": "10104.9",
+            "fee": "0.38802816",
+            "fill_at": 299999,
+            "fill_id": "SYNTHETIC_ONLY:entry:1",
+            "quantity": "0.064",
+            "raw_price": "10110.0",
+            "reason": "TP2",
+            "remaining": "0.000",
+            "signed_effective_pnl": "6.39360000",
+            "signed_gross": "7.04000000",
+            "slippage_drag": "0.19411200",
+            "spread_drag": "0.12940800",
+            "tick_drag": "0.00288000",
+            "trigger_at": 299999
+          }
+        ],
+        "minute_path_status": "OHLC_SIMULATED_PATH",
+        "net_R": "1.759994571428571428571428571",
+        "net_bps": "61.599810000",
+        "net_usdt": "7.88477568",
+        "pnl_grade": "NET_EX_FUNDING_PROXY",
+        "policy": "X2",
+        "real_funding": "UNKNOWN",
+        "side": 1,
+        "stop_updates": []
+      },
+      "observed_net_USDT": "7.88477568"
+    },
+    {
+      "PASS": true,
+      "fixture": {
+        "candles": [
+          [
+            10000,
+            10010,
+            9950,
+            9990
+          ],
+          [
+            9990,
+            10000,
+            9920,
+            9980
+          ],
+          [
+            9980,
+            9990,
+            9890,
+            9970
+          ]
+        ],
+        "event": {
+          "atr_hour": 50,
+          "decision_at": 60000,
+          "decision_close": 10000,
+          "entry_at": 120000,
+          "event_id": "SYNTHETIC_ONLY:entry",
+          "event_time": 0,
+          "side": -1,
+          "stop": 10030
+        },
+        "hourly": [],
+        "label": "SYNTHETIC_ONLY",
+        "policy": "X1",
+        "quantity": "0.127"
+      },
+      "fixture_sha256": "495fd8e4e47dc90a550ee06b00e4bdd8b8c1afa62ef8d301853038f4a831843c",
+      "id": "HAND5",
+      "independent_expected_net_USDT": "6.08532440",
+      "ledger": {
+        "cap_hours": 8,
+        "collision_minutes": 0,
+        "cost": {
+          "fee_bps": "6",
+          "slip_bps": "3",
+          "spread_bps": "2"
+        },
+        "entry": {
+          "atr_hour": "50",
+          "cap_at": 28920000,
+          "decision_at": 60000,
+          "effective_price": "9995.0",
+          "event_closed_at": 0,
+          "event_id": "SYNTHETIC_ONLY:entry",
+          "fee": "0.76161900",
+          "fill_at": 120000,
+          "initial_R": "35.0",
+          "initial_quantity": "0.127",
+          "initial_stop": "10030",
+          "order_possible_at": 120000,
+          "raw_price": "10000.0",
+          "side": -1,
+          "signal_available_at": 60000
+        },
+        "entry_at": 120000,
+        "entry_notional": "1270.0000",
+        "event_id": "SYNTHETIC_ONLY:entry",
+        "execution_drag_usdt": "1.27000000",
+        "exit_ack_at": 420000,
+        "exit_at": 359999,
+        "exit_reason": "TP3",
+        "fee_usdt": "1.51867560",
+        "fill_grade": "HYPOTHETICAL_TAKER_NO_L2_CAPACITY_PROOF",
+        "gross_bps": "69.87401574803149606299212598",
+        "gross_usdt": "8.87400000",
+        "hold_minutes": 3.9999833333333332,
+        "initial_quantity": "0.127",
+        "ledger_sha256": "63dce48c4147a5511524605008618dd488e57f2f67920d25877113ce3cbab5eb",
+        "legs": [
+          {
+            "ack_at": 300000,
+            "effective_at": 120000,
+            "effective_price": "9965.0",
+            "fee": "0.29895000",
+            "fill_at": 239999,
+            "fill_id": "SYNTHETIC_ONLY:entry:0",
+            "quantity": "0.050",
+            "raw_price": "9960.0",
+            "reason": "TP1",
+            "remaining": "0.077",
+            "signed_effective_pnl": "1.50000000",
+            "signed_gross": "2.00000000",
+            "slippage_drag": "0.14940000",
+            "spread_drag": "0.09960000",
+            "tick_drag": "0.00100000",
+            "trigger_at": 239999
+          },
+          {
+            "ack_at": 360000,
+            "effective_at": 120000,
+            "effective_price": "9937.0",
+            "fee": "0.22656360",
+            "fill_at": 299999,
+            "fill_id": "SYNTHETIC_ONLY:entry:1",
+            "quantity": "0.038",
+            "raw_price": "9932.0",
+            "reason": "TP2",
+            "remaining": "0.039",
+            "signed_effective_pnl": "2.20400000",
+            "signed_gross": "2.58400000",
+            "slippage_drag": "0.11322480",
+            "spread_drag": "0.07548320",
+            "tick_drag": "0.00129200",
+            "trigger_at": 299999
+          },
+          {
+            "ack_at": 420000,
+            "effective_at": 120000,
+            "effective_price": "9895.0",
+            "fee": "0.23154300",
+            "fill_at": 359999,
+            "fill_id": "SYNTHETIC_ONLY:entry:2",
+            "quantity": "0.039",
+            "raw_price": "9890.0",
+            "reason": "TP3",
+            "remaining": "0.000",
+            "signed_effective_pnl": "3.90000000",
+            "signed_gross": "4.29000000",
+            "slippage_drag": "0.11571300",
+            "spread_drag": "0.07714200",
+            "tick_drag": "0.00214500",
+            "trigger_at": 359999
+          }
+        ],
+        "minute_path_status": "OHLC_SIMULATED_PATH",
+        "net_R": "1.369026861642294713160854893",
+        "net_bps": "47.91594015748031496062992126",
+        "net_usdt": "6.08532440",
+        "pnl_grade": "NET_EX_FUNDING_PROXY",
+        "policy": "X1",
+        "real_funding": "UNKNOWN",
+        "side": -1,
+        "stop_updates": []
+      },
+      "observed_net_USDT": "6.08532440"
+    }
+  ],
+  "engine_sha256": "4c3c1c1859a61f138cc45fb7a608fbd55687f69b15c8e1d41a3c9cbddf51a381",
+  "fixture_test_source_sha256": "79c70986e79a3c4a0e8225aa07cb095df0e947ee257560c7906f758e630940d2",
+  "freeze_sha": "45bf7cc72eb9a870323c5da056fc9287d42b7b22",
+  "hand_verified_cases": 5,
+  "independent_method": "fixed precomputed expectations plus re-derived adverse effective-price/fee sum in pytest; independent read-only helper also reconciled all five",
+  "label": "SYNTHETIC_ONLY_NOT_MARKET_PERFORMANCE"
+}

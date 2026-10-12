@@ -1,0 +1,379 @@
+{
+  "all_STRESS_dispositions": [
+    {
+      "candidate": "A_X0_H08",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "BASELINE_COMPARATOR_NOT_NEW_PROMOTION"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "A_X0_H18",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "BASELINE_COMPARATOR_NOT_NEW_PROMOTION"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "A_X0_H24",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "BASELINE_COMPARATOR_NOT_NEW_PROMOTION"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "A_X1_H08",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "A_X1_H18",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "A_X1_H24",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "A_X2_H08",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "A_X2_H18",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "A_X2_H24",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "B_X0_H08",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "MONTHS_LT6",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "BASELINE_COMPARATOR_NOT_NEW_PROMOTION"
+      ],
+      "n": 5,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "B_X0_H18",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "MONTHS_LT6",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "BASELINE_COMPARATOR_NOT_NEW_PROMOTION"
+      ],
+      "n": 5,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "B_X0_H24",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "MONTHS_LT6",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "BASELINE_COMPARATOR_NOT_NEW_PROMOTION"
+      ],
+      "n": 5,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "B_X1_H08",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "MONTHS_LT6",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_DELTA_NOT_POSITIVE",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 5,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "B_X1_H18",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "MONTHS_LT6",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 5,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "B_X1_H24",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "MONTHS_LT6",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 5,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "B_X2_H08",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "MONTHS_LT6",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_DELTA_NOT_POSITIVE",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 5,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "B_X2_H18",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "MONTHS_LT6",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 5,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "B_X2_H24",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "MONTHS_LT6",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 5,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "C_X0_H08",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "BASELINE_COMPARATOR_NOT_NEW_PROMOTION"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "C_X0_H18",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "BASELINE_COMPARATOR_NOT_NEW_PROMOTION"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "C_X0_H24",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "BASELINE_COMPARATOR_NOT_NEW_PROMOTION"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "C_X1_H08",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_DELTA_NOT_POSITIVE",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 35,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "C_X1_H18",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_DELTA_NOT_POSITIVE",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 35,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "C_X1_H24",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 35,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "C_X2_H08",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_DELTA_NOT_POSITIVE",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "C_X2_H18",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_DELTA_NOT_POSITIVE",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    },
+    {
+      "candidate": "C_X2_H24",
+      "gate_failures": [
+        "SUPPORT_LT50",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONNEGATIVE_YEARS_LT2",
+        "PF_NOT_GT1",
+        "NET_BONFERRONI_NOT_SIGNIFICANT",
+        "PAIRED_DELTA_NOT_POSITIVE",
+        "PAIRED_BONFERRONI_NOT_SIGNIFICANT"
+      ],
+      "n": 34,
+      "net_adjusted_p": 1
+    }
+  ],
+  "family_count": 27,
+  "freeze_sha": "45bf7cc72eb9a870323c5da056fc9287d42b7b22",
+  "method": "Bonferroni 27; UTC week primary/month sensitivity; empty eligible blocks included",
+  "resamples": 10000,
+  "seed": 27182026,
+  "source_manifest_sha256": "688f6a7ae3a7d5c492b3f6b3b567c03d13f957f4ed952c787056c4f281be797d",
+  "terminal": "R3_DEV_NO_GO",
+  "top3_eligible": []
+}

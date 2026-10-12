@@ -1,0 +1,1953 @@
+{
+  "freeze_sha": "45bf7cc72eb9a870323c5da056fc9287d42b7b22",
+  "matched_records_sha256": "c35f3ab7290fdd1cd86ebb389c5dfa17564ecd2b646e3fe2e93acfecaa4041aa",
+  "paired_episodes_are_unfunded_not_ROI": true,
+  "per_entry_records": "SCRATCH_ONLY",
+  "rows": [
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X1_H08",
+      "cost_case": "BASE",
+      "matched_entries": 35,
+      "mean_delta_bps": 10.483492684176873,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -15.584246859227374,
+          17.435640430443442
+        ],
+        "observed": 6.686056819821336,
+        "p_one_sided": 0.12638736126387362,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -158.9798247597128,
+      "tail5_candidate_bps": -149.35065088439444,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -9.995195446258007,
+          25.778199493175496
+        ],
+        "observed": 6.686056819821336,
+        "p_one_sided": 0.21477852214778523,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X1_H08",
+      "cost_case": "STRESS",
+      "matched_entries": 35,
+      "mean_delta_bps": 13.801730071608318,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 0.7559244075592441,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -9.898339342863123,
+          19.587889263273226
+        ],
+        "observed": 9.828721475547495,
+        "p_one_sided": 0.027997200279972004,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -180.81977678909385,
+      "tail5_candidate_bps": -171.2151671685429,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -6.189787739892237,
+          29.118212388836323
+        ],
+        "observed": 9.828721475547498,
+        "p_one_sided": 0.13238676132386762,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X1_H18",
+      "cost_case": "BASE",
+      "matched_entries": 35,
+      "mean_delta_bps": -5.083858182505786,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -35.54074139521503,
+          16.384151353538883
+        ],
+        "observed": -4.1825025153941136,
+        "p_one_sided": 0.6773322667733227,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -224.3062952968529,
+      "tail5_candidate_bps": -224.3062952968529,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -30.500301658363814,
+          19.616201672704374
+        ],
+        "observed": -4.182502515394113,
+        "p_one_sided": 0.6586341365863414,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X1_H18",
+      "cost_case": "STRESS",
+      "matched_entries": 35,
+      "mean_delta_bps": 5.803683021506573,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -24.793012051753145,
+          28.65502324701533
+        ],
+        "observed": 5.768735227768517,
+        "p_one_sided": 0.35096490350964904,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -246.2886685122324,
+      "tail5_candidate_bps": -246.2886685122324,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -21.625298379974975,
+          29.561043787575862
+        ],
+        "observed": 5.768735227768516,
+        "p_one_sided": 0.31666833316668336,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X1_H24",
+      "cost_case": "BASE",
+      "matched_entries": 35,
+      "mean_delta_bps": -0.9339336598348713,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -33.6183808739083,
+          23.08884193569904
+        ],
+        "observed": -0.5715894522558003,
+        "p_one_sided": 0.5649435056494351,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -224.3062952968529,
+      "tail5_candidate_bps": -224.3062952968529,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -28.02057702300888,
+          25.366292126315912
+        ],
+        "observed": -0.571589452255799,
+        "p_one_sided": 0.5395460453954605,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X1_H24",
+      "cost_case": "STRESS",
+      "matched_entries": 35,
+      "mean_delta_bps": 6.354639371582951,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -28.40449225316237,
+          31.862727734567024
+        ],
+        "observed": 6.4764271931646675,
+        "p_one_sided": 0.3491650834916508,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -246.2886685122324,
+      "tail5_candidate_bps": -246.2886685122324,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -21.467128684972685,
+          32.38766785210599
+        ],
+        "observed": 6.4764271931646675,
+        "p_one_sided": 0.3124687531246875,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X2_H08",
+      "cost_case": "BASE",
+      "matched_entries": 35,
+      "mean_delta_bps": 10.731428165686852,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 0.9881011898810119,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          0.5928293851113279,
+          23.00285975069279
+        ],
+        "observed": 11.086477663910147,
+        "p_one_sided": 0.0365963403659634,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -158.9798247597128,
+      "tail5_candidate_bps": -149.35065088439444,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          0.4493006996841723,
+          27.71547809337928
+        ],
+        "observed": 11.086477663910147,
+        "p_one_sided": 0.07379262073792621,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X2_H08",
+      "cost_case": "STRESS",
+      "matched_entries": 35,
+      "mean_delta_bps": 11.556596240314992,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          1.2537119977075646,
+          24.795906367670362
+        ],
+        "observed": 11.935242755204996,
+        "p_one_sided": 0.0387961203879612,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -180.81977678909385,
+      "tail5_candidate_bps": -171.2151671685429,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          0.9764834165574028,
+          28.967239757805476
+        ],
+        "observed": 11.935242755204996,
+        "p_one_sided": 0.06719328067193281,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X2_H18",
+      "cost_case": "BASE",
+      "matched_entries": 35,
+      "mean_delta_bps": 1.0203318414367828,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -23.738145560712876,
+          26.991619916812592
+        ],
+        "observed": 3.636536712822641,
+        "p_one_sided": 0.40675932406759324,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -224.3062952968529,
+      "tail5_candidate_bps": -224.3062952968529,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -17.77609201278855,
+          24.804848157331136
+        ],
+        "observed": 3.636536712822641,
+        "p_one_sided": 0.37596240375962403,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X2_H18",
+      "cost_case": "STRESS",
+      "matched_entries": 35,
+      "mean_delta_bps": 3.0290860611368657,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -20.954983928281813,
+          28.67118268554577
+        ],
+        "observed": 5.817952538741779,
+        "p_one_sided": 0.3124687531246875,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -246.2886685122324,
+      "tail5_candidate_bps": -246.2886685122324,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -16.543872042759325,
+          27.43383211909406
+        ],
+        "observed": 5.817952538741779,
+        "p_one_sided": 0.29087091290870914,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X2_H24",
+      "cost_case": "BASE",
+      "matched_entries": 35,
+      "mean_delta_bps": 5.570628162308769,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -22.031965255601964,
+          31.81869957569327
+        ],
+        "observed": 7.251795931998725,
+        "p_one_sided": 0.297970202979702,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -224.3062952968529,
+      "tail5_candidate_bps": -224.3062952968529,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -14.735679495325456,
+          29.18867240960564
+        ],
+        "observed": 7.2517959319987275,
+        "p_one_sided": 0.2616738326167383,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "A_X2_H24",
+      "cost_case": "STRESS",
+      "matched_entries": 35,
+      "mean_delta_bps": 2.7236820536716877,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -23.629874586785455,
+          29.790592792877774
+        ],
+        "observed": 5.546789002984485,
+        "p_one_sided": 0.34096590340965904,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 40,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 8,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -246.2886685122324,
+      "tail5_candidate_bps": -246.2886685122324,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -16.9560670724858,
+          28.121664097290104
+        ],
+        "observed": 5.546789002984485,
+        "p_one_sided": 0.31186881311868814,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 11,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X1_H08",
+      "cost_case": "BASE",
+      "matched_entries": 5,
+      "mean_delta_bps": 36.21672893714648,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          92.48469362713423
+        ],
+        "observed": 30.180607447622066,
+        "p_one_sided": 0.528047195280472,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -181.58329504545566,
+      "tail5_candidate_bps": -124.22471353798274,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          92.48469362713423
+        ],
+        "observed": 30.180607447622066,
+        "p_one_sided": 0.6203379662033797,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X1_H08",
+      "cost_case": "STRESS",
+      "matched_entries": 5,
+      "mean_delta_bps": -11.071566542378541,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          0.0
+        ],
+        "observed": -9.226305451982117,
+        "p_one_sided": 1.0,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -203.3952328747193,
+      "tail5_candidate_bps": -203.3952328747193,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          0.0
+        ],
+        "observed": -9.226305451982117,
+        "p_one_sided": 1.0,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X1_H18",
+      "cost_case": "BASE",
+      "matched_entries": 5,
+      "mean_delta_bps": 11.428109027644211,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          51.17032711129713
+        ],
+        "observed": 9.523424189703514,
+        "p_one_sided": 0.6272372762723728,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -181.58329504545566,
+      "tail5_candidate_bps": -124.22471353798274,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          51.17032711129713
+        ],
+        "observed": 9.523424189703514,
+        "p_one_sided": 0.7017298270172982,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X1_H18",
+      "cost_case": "STRESS",
+      "matched_entries": 5,
+      "mean_delta_bps": 14.378358971022084,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          42.416542522334375
+        ],
+        "observed": 11.98196580918507,
+        "p_one_sided": 0.5745425457454254,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -203.3952328747193,
+      "tail5_candidate_bps": -203.3952328747193,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          42.416542522334375
+        ],
+        "observed": 11.98196580918507,
+        "p_one_sided": 0.6552344765523448,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X1_H24",
+      "cost_case": "BASE",
+      "matched_entries": 5,
+      "mean_delta_bps": 11.428109027644211,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          51.17032711129713
+        ],
+        "observed": 9.523424189703514,
+        "p_one_sided": 0.6272372762723728,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -181.58329504545566,
+      "tail5_candidate_bps": -124.22471353798274,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          51.17032711129713
+        ],
+        "observed": 9.523424189703514,
+        "p_one_sided": 0.7017298270172982,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X1_H24",
+      "cost_case": "STRESS",
+      "matched_entries": 5,
+      "mean_delta_bps": 14.378358971022084,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          42.416542522334375
+        ],
+        "observed": 11.98196580918507,
+        "p_one_sided": 0.5745425457454254,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -203.3952328747193,
+      "tail5_candidate_bps": -203.3952328747193,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          42.416542522334375
+        ],
+        "observed": 11.98196580918507,
+        "p_one_sided": 0.6552344765523448,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X2_H08",
+      "cost_case": "BASE",
+      "matched_entries": 5,
+      "mean_delta_bps": 3.2529860982803718,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          5.421643497133953
+        ],
+        "observed": 2.7108217485669766,
+        "p_one_sided": 0.555944405559444,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -181.58329504545566,
+      "tail5_candidate_bps": -181.58329504545566,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          5.421643497133953
+        ],
+        "observed": 2.7108217485669766,
+        "p_one_sided": 0.6465353464653535,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X2_H08",
+      "cost_case": "STRESS",
+      "matched_entries": 5,
+      "mean_delta_bps": -6.689275262952863,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          0.0
+        ],
+        "observed": -5.5743960524607195,
+        "p_one_sided": 1.0,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -203.3952328747193,
+      "tail5_candidate_bps": -203.3952328747193,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          0.0
+        ],
+        "observed": -5.5743960524607195,
+        "p_one_sided": 1.0,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X2_H18",
+      "cost_case": "BASE",
+      "matched_entries": 5,
+      "mean_delta_bps": -14.940136943835885,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          5.421643497133953
+        ],
+        "observed": -12.450114119863237,
+        "p_one_sided": 0.8306169383061693,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -181.58329504545566,
+      "tail5_candidate_bps": -181.58329504545566,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          5.421643497133953
+        ],
+        "observed": -12.450114119863237,
+        "p_one_sided": 0.869013098690131,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X2_H18",
+      "cost_case": "STRESS",
+      "matched_entries": 5,
+      "mean_delta_bps": 2.1102778841008556,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          27.065738484743008
+        ],
+        "observed": 1.7585649034173798,
+        "p_one_sided": 0.6308369163083691,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -203.3952328747193,
+      "tail5_candidate_bps": -203.3952328747193,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          27.065738484743008
+        ],
+        "observed": 1.7585649034173798,
+        "p_one_sided": 0.7024297570242976,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X2_H24",
+      "cost_case": "BASE",
+      "matched_entries": 5,
+      "mean_delta_bps": -14.940136943835885,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          5.421643497133953
+        ],
+        "observed": -12.450114119863237,
+        "p_one_sided": 0.8306169383061693,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -181.58329504545566,
+      "tail5_candidate_bps": -181.58329504545566,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          5.421643497133953
+        ],
+        "observed": -12.450114119863237,
+        "p_one_sided": 0.869013098690131,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 5,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "B_X2_H24",
+      "cost_case": "STRESS",
+      "matched_entries": 5,
+      "mean_delta_bps": 2.1102778841008556,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          27.065738484743008
+        ],
+        "observed": 1.7585649034173798,
+        "p_one_sided": 0.6308369163083691,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 3947,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 1,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -203.3952328747193,
+      "tail5_candidate_bps": -203.3952328747193,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          null,
+          27.065738484743008
+        ],
+        "observed": 1.7585649034173798,
+        "p_one_sided": 0.7024297570242976,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 5095,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 1,
+      "candidate": "C_X1_H08",
+      "cost_case": "BASE",
+      "matched_entries": 37,
+      "mean_delta_bps": -9.942981812743623,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -16.704589730278716,
+          0.3803230241409533
+        ],
+        "observed": -8.343184543578234,
+        "p_one_sided": 0.9746025397460254,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -149.28544333460104,
+      "tail5_candidate_bps": -149.28544333460104,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -25.940221355713017,
+          5.71695919643954
+        ],
+        "observed": -8.343184543578237,
+        "p_one_sided": 0.831016898310169,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 1,
+      "candidate": "C_X1_H08",
+      "cost_case": "STRESS",
+      "matched_entries": 37,
+      "mean_delta_bps": -9.174878161944497,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -18.23649330295824,
+          4.110435623048618
+        ],
+        "observed": -7.468903930945803,
+        "p_one_sided": 0.9119088091190881,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -171.41013568182547,
+      "tail5_candidate_bps": -171.41013568182547,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -25.152150082424626,
+          7.781779481696596
+        ],
+        "observed": -7.468903930945802,
+        "p_one_sided": 0.7943205679432057,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 1,
+      "candidate": "C_X1_H18",
+      "cost_case": "BASE",
+      "matched_entries": 37,
+      "mean_delta_bps": -1.8258629412689664,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -16.75949299825346,
+          24.582819042880345
+        ],
+        "observed": 2.2624015485294695,
+        "p_one_sided": 0.42505749425057493,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -178.0756848052556,
+      "tail5_candidate_bps": -178.0756848052556,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -23.08739474918238,
+          24.415020681069343
+        ],
+        "observed": 2.262401548529471,
+        "p_one_sided": 0.41115888411158885,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 1,
+      "candidate": "C_X1_H18",
+      "cost_case": "STRESS",
+      "matched_entries": 37,
+      "mean_delta_bps": -0.7796268895535365,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -16.5874360903324,
+          28.73397424174064
+        ],
+        "observed": 3.865585036995818,
+        "p_one_sided": 0.38366163383661633,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -200.0422943577439,
+      "tail5_candidate_bps": -200.0422943577439,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -22.313770315058157,
+          27.742221913547176
+        ],
+        "observed": 3.865585036995818,
+        "p_one_sided": 0.36366363363663634,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 1,
+      "candidate": "C_X1_H24",
+      "cost_case": "BASE",
+      "matched_entries": 37,
+      "mean_delta_bps": 1.8741568322736832,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -16.01315498693908,
+          36.70451312622173
+        ],
+        "observed": 6.8823818300365005,
+        "p_one_sided": 0.31326867313268675,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -178.0756848052556,
+      "tail5_candidate_bps": -178.0756848052556,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -20.27828826994,
+          31.82966633309698
+        ],
+        "observed": 6.8823818300365005,
+        "p_one_sided": 0.28657134286571345,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 1,
+      "candidate": "C_X1_H24",
+      "cost_case": "STRESS",
+      "matched_entries": 37,
+      "mean_delta_bps": 3.099082780470743,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -15.646310454644377,
+          41.2073005368782
+        ],
+        "observed": 8.654980296237405,
+        "p_one_sided": 0.29027097290270976,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -200.0422943577439,
+      "tail5_candidate_bps": -200.0422943577439,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -19.6438862807192,
+          35.123266882424296
+        ],
+        "observed": 8.654980296237405,
+        "p_one_sided": 0.2506749325067493,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "C_X2_H08",
+      "cost_case": "BASE",
+      "matched_entries": 37,
+      "mean_delta_bps": -1.692697140660494,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -9.941734982683526,
+          3.722068758038884
+        ],
+        "observed": -1.588106869110395,
+        "p_one_sided": 0.7155284471552845,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -149.28544333460104,
+      "tail5_candidate_bps": -149.28544333460104,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -10.226740832659152,
+          4.984272394013111
+        ],
+        "observed": -1.588106869110396,
+        "p_one_sided": 0.6741325867413258,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "C_X2_H08",
+      "cost_case": "STRESS",
+      "matched_entries": 37,
+      "mean_delta_bps": -4.36692439890303,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -13.265247614584702,
+          0.04035363812222895
+        ],
+        "observed": -4.005469213930687,
+        "p_one_sided": 0.8581141885811419,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -171.41013568182547,
+      "tail5_candidate_bps": -171.41013568182547,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -13.059219218970398,
+          2.1426798164584144
+        ],
+        "observed": -4.005469213930687,
+        "p_one_sided": 0.84001599840016,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "C_X2_H18",
+      "cost_case": "BASE",
+      "matched_entries": 37,
+      "mean_delta_bps": -4.779039372290751,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -12.90109188889612,
+          6.553859208895424
+        ],
+        "observed": -4.458487067742577,
+        "p_one_sided": 0.816018398160184,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -178.0756848052556,
+      "tail5_candidate_bps": -178.0756848052556,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -17.40862885733894,
+          5.779746861740661
+        ],
+        "observed": -4.458487067742577,
+        "p_one_sided": 0.7828217178282172,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "C_X2_H18",
+      "cost_case": "STRESS",
+      "matched_entries": 37,
+      "mean_delta_bps": -8.581747124047878,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -17.153148319981543,
+          3.6700700986349304
+        ],
+        "observed": -7.9263733815202855,
+        "p_one_sided": 0.9527047295270473,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -200.0422943577439,
+      "tail5_candidate_bps": -200.0422943577439,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -21.52308265187227,
+          2.818804910728546
+        ],
+        "observed": -7.9263733815202855,
+        "p_one_sided": 0.8898110188981102,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "C_X2_H24",
+      "cost_case": "BASE",
+      "matched_entries": 37,
+      "mean_delta_bps": -4.194161095422247,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -12.334059029243235,
+          7.2536763336169185
+        ],
+        "observed": -3.7355855526495803,
+        "p_one_sided": 0.7655234476552345,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -178.0756848052556,
+      "tail5_candidate_bps": -178.0756848052556,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -16.681577802196426,
+          6.425096189782647
+        ],
+        "observed": -3.7355855526495803,
+        "p_one_sided": 0.7428257174282572,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    },
+    {
+      "accounts_have_different_sizing_cooldown_and_risk_fates": true,
+      "actual_account_entry_intersection": 34,
+      "actual_account_only_X0": 0,
+      "actual_account_only_alternate": 0,
+      "candidate": "C_X2_H24",
+      "cost_case": "STRESS",
+      "matched_entries": 37,
+      "mean_delta_bps": -9.12003831803181,
+      "monthly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "MONTH",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -17.581927117091443,
+          3.0109501104574243
+        ],
+        "observed": -8.647678130910068,
+        "p_one_sided": 0.971002899710029,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 0,
+        "zero_trade_blocks_included": true
+      },
+      "pair_refused": 14,
+      "paired_episodes_are_unfunded_not_ROI": true,
+      "tail5_X0_bps": -200.0422943577439,
+      "tail5_candidate_bps": -200.0422943577439,
+      "weekly_uncertainty": {
+        "Bonferroni27_p": 1,
+        "blocks": "WEEK",
+        "bootstrap_draws": 10000,
+        "ci95": [
+          -22.353217619871845,
+          2.3151160220141507
+        ],
+        "observed": -8.647678130910068,
+        "p_one_sided": 0.9058094190580942,
+        "represented_years": [
+          2021,
+          2022,
+          2023
+        ],
+        "seed": 27182026,
+        "undefined_null_draws_counted_adversarially": true,
+        "undefined_resamples": 1,
+        "zero_trade_blocks_included": true
+      }
+    }
+  ],
+  "source_manifest_sha256": "688f6a7ae3a7d5c492b3f6b3b567c03d13f957f4ed952c787056c4f281be797d"
+}
