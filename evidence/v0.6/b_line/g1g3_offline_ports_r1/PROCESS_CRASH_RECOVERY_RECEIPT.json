@@ -1,0 +1,105 @@
+{
+  "boundaries": {
+    "after_approve_before_place": {
+      "final_cash": "1000.33834810",
+      "journal_effects": 6,
+      "recovered_phase": "CLOSED",
+      "recovered_sidecar_terminal": "G1G3_OFFLINE_PORTS_BOUNDED_VERIFIED",
+      "scenario_type": "STANDARD_24H",
+      "settled_simulated_intent_count": 1,
+      "subprocess_crash_exit_code": 91
+    },
+    "after_feishu_ack": {
+      "final_cash": "1000.33834810",
+      "journal_effects": 6,
+      "recovered_phase": "CLOSED",
+      "recovered_sidecar_terminal": "G1G3_OFFLINE_PORTS_BOUNDED_VERIFIED",
+      "scenario_type": "STANDARD_24H",
+      "settled_simulated_intent_count": 1,
+      "subprocess_crash_exit_code": 91
+    },
+    "after_operator_receipt_fsync": {
+      "final_cash": "1000.33834810",
+      "journal_effects": 6,
+      "recovered_phase": "CLOSED",
+      "recovered_sidecar_terminal": "G1G3_OFFLINE_PORTS_BOUNDED_VERIFIED",
+      "scenario_type": "STANDARD_24H",
+      "settled_simulated_intent_count": 1,
+      "subprocess_crash_exit_code": 91
+    },
+    "after_place_before_entry": {
+      "final_cash": "1000.33834810",
+      "journal_effects": 6,
+      "recovered_phase": "CLOSED",
+      "recovered_sidecar_terminal": "G1G3_OFFLINE_PORTS_BOUNDED_VERIFIED",
+      "scenario_type": "STANDARD_24H",
+      "settled_simulated_intent_count": 1,
+      "subprocess_crash_exit_code": 91
+    },
+    "after_simulated_entry": {
+      "final_cash": "1000.33834810",
+      "journal_effects": 6,
+      "recovered_phase": "CLOSED",
+      "recovered_sidecar_terminal": "G1G3_OFFLINE_PORTS_BOUNDED_VERIFIED",
+      "scenario_type": "STANDARD_24H",
+      "settled_simulated_intent_count": 1,
+      "subprocess_crash_exit_code": 91
+    },
+    "after_tp1_before_ack": {
+      "final_cash": "1000.33834810",
+      "journal_effects": 6,
+      "recovered_phase": "CLOSED",
+      "recovered_sidecar_terminal": "G1G3_OFFLINE_PORTS_BOUNDED_VERIFIED",
+      "scenario_type": "STANDARD_24H",
+      "settled_simulated_intent_count": 1,
+      "subprocess_crash_exit_code": 91
+    },
+    "at_stop_after_snapshot": {
+      "final_cash": "1000.33834810",
+      "journal_effects": 6,
+      "recovered_phase": "CLOSED",
+      "recovered_sidecar_terminal": "G1G3_OFFLINE_PORTS_BOUNDED_VERIFIED",
+      "scenario_type": "STANDARD_24H",
+      "settled_simulated_intent_count": 1,
+      "subprocess_crash_exit_code": 91
+    },
+    "at_stop_before_snapshot": {
+      "final_cash": "1000.33834810",
+      "journal_effects": 6,
+      "recovered_phase": "CLOSED",
+      "recovered_sidecar_terminal": "G1G3_OFFLINE_PORTS_BOUNDED_VERIFIED",
+      "scenario_type": "STANDARD_24H",
+      "settled_simulated_intent_count": 1,
+      "subprocess_crash_exit_code": 91
+    },
+    "before_approve": {
+      "final_cash": "1000.33834810",
+      "journal_effects": 6,
+      "recovered_phase": "CLOSED",
+      "recovered_sidecar_terminal": "G1G3_OFFLINE_PORTS_BOUNDED_VERIFIED",
+      "scenario_type": "STANDARD_24H",
+      "settled_simulated_intent_count": 1,
+      "subprocess_crash_exit_code": 91
+    },
+    "double_pending_ack": {
+      "final_cash": "VERIFIED_DUAL_PENDING_CONSERVED",
+      "journal_effects": 6,
+      "recovered_phase": "CLOSED",
+      "recovered_sidecar_terminal": "G1G3_OFFLINE_PORTS_BOUNDED_VERIFIED",
+      "scenario_type": "DUAL_PENDING_ACK",
+      "settled_simulated_intent_count": 1,
+      "subprocess_crash_exit_code": 91
+    }
+  },
+  "boundaries_verified_count": 10,
+  "power_loss_durability_proven": false,
+  "process_crash_exit_code": 91,
+  "restart_same_fixture_idempotent_noop_verified": true,
+  "schema_version": 1,
+  "task_id": "V06_GEMINI_GOAL_C_G1G3_OFFLINE_PORTS_R1",
+  "torn_wal_quarantine_verified": {
+    "g1_wal_truncated_code": "WAL_TRUNCATED",
+    "sidecar_wal_truncated_code": "SIDECAR_WAL_TRUNCATED",
+    "unsafe_effects_replayed": false
+  }
+}

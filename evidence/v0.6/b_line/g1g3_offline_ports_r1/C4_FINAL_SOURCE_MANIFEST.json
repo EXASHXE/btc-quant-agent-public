@@ -1,0 +1,103 @@
+{
+  "base_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+  "codex_g1_c4_immutability": {
+    "all_matched": true,
+    "files": {
+      "scripts/g1_offline_preview_r1/__main__.py": "65dcb3d726ed5a8b828ed0288d10fa9f51340f4cf3a70cf44b4a2c62e21cd5fb",
+      "scripts/g1_offline_preview_r1/analysis_schema.json": "dea9da8a0f03740894f117a7da56cd7c99476aa3058bdf2a665107019a98e1cb",
+      "scripts/g1_offline_preview_r1/fixtures.py": "9999418e5cb1f9fd98d1f4cae5c1d460a9593b28c9f7f338a3043374fa4ea8b0",
+      "scripts/g1_offline_preview_r1/fixtures/long_24h.json": "ae6c70f7c26b752df1cfc2cc803d6a941a62e1699749365f4902d335cb93fe4f",
+      "scripts/g1_offline_preview_r1/fixtures/short_24h.json": "d6bf849411f82db75f433f91985b7c8698fbbd1834685fb706453de3cad1dc11",
+      "scripts/g1_offline_preview_r1/model.py": "086d6ec8747f82d59b6f8f42bfefd2d9c61e5f962707b4f9119f784741dd206e",
+      "scripts/g1_offline_preview_r1/reducer.py": "c0114c8cc0480b3c4c637217363833590fb231ad8529c93f85f574ce161ed89e",
+      "scripts/g1_offline_preview_r1/storage.py": "9e4ac21c501e48734a750021f8ea2f51f4f06ecc0ee2e798647718b4c453f101",
+      "tests/test_v06_g1_offline_preview_r1_core.py": "d5679c583d1122f2ce877f7686e477acc869637e7ee21643fbee1f5058e52da3",
+      "tests/test_v06_g1_offline_preview_r1_decimal_and_ports.py": "7a0fef994f1548ebe0813836b41340519f49dcefbe46a5d5850b23392ee731e2",
+      "tests/test_v06_g1_offline_preview_r1_exit_safety.py": "8efc412469fa5be183bca05dacd7ba255e7ad1f20f93e39706698e8bc4cd71f0",
+      "tests/test_v06_g1_offline_preview_r1_process_recovery.py": "d6c99ea559f9c4a8c384568af52ed6aa556ecca896d9add58ca9aa5c07f04249",
+      "tests/test_v06_g1_offline_preview_r1_wal.py": "41d53a583502b4d28da92dfa9f8c9e2dde73522509009739418d9dfff42c8585"
+    },
+    "verified_count": 13
+  },
+  "g1g3_sidecar_and_test_files": {
+    "scripts/g1g3_offline_ports_r1/__init__.py": {
+      "bytes": 444,
+      "sha256": "95eb8fdb131e11431bdc9569033767dbe0d98dcb215b1d024535a33602c3af61"
+    },
+    "scripts/g1g3_offline_ports_r1/__main__.py": {
+      "bytes": 3924,
+      "sha256": "2a975efa578f127567c4acab448aa1d787a4d327a53829bd0650fac9b6e9eea6"
+    },
+    "scripts/g1g3_offline_ports_r1/authenticated_human_port.py": {
+      "bytes": 22158,
+      "sha256": "e38e02a546555f6214cde9f0a03db6440e671899b16191972079ce43e3c3472e"
+    },
+    "scripts/g1g3_offline_ports_r1/bounded_llm_port.py": {
+      "bytes": 21859,
+      "sha256": "c5f2806c4bf8cbaaedb09afaa4431499868bcd7f7670d9cffccf467a041b7041"
+    },
+    "scripts/g1g3_offline_ports_r1/crypto_ed25519.py": {
+      "bytes": 6828,
+      "sha256": "6e73528e1a8ad6068b33ba7cbafed5b121714074c9db90f795c586725bbe1e41"
+    },
+    "scripts/g1g3_offline_ports_r1/durable_supervisor.py": {
+      "bytes": 28519,
+      "sha256": "ebe4e41d7dc4f2a0359181865cd4e6ea42a881bb5c4944406aa457badfebec1b"
+    },
+    "scripts/g1g3_offline_ports_r1/feishu_outbox_port.py": {
+      "bytes": 16236,
+      "sha256": "7dbb690cc36b8697301aa00bce229629dcf16724495b25271d1e41d7a64925e0"
+    },
+    "scripts/g1g3_offline_ports_r1/loopback_servers.py": {
+      "bytes": 14956,
+      "sha256": "15a2b9f1a2bf62b150838dd5f1ef009806c688fdd81c94bdfcca8e4a243a3f50"
+    },
+    "scripts/g1g3_offline_ports_r1/market_pit_port.py": {
+      "bytes": 19440,
+      "sha256": "e57e3319f14547a8031adebae0aab61ee041751c1f949f152410959c7454b9c9"
+    },
+    "scripts/g1g3_offline_ports_r1/no_order_port.py": {
+      "bytes": 16828,
+      "sha256": "80d895fb7ad56594e219b6416f76f52549611bd47ba6485128d1ba4e78a1ffcf"
+    },
+    "tests/test_v06_g1g3_offline_ports_r1_bounded_llm.py": {
+      "bytes": 7788,
+      "sha256": "128c25395552b4d3fb14a84cdfd4dc1b99f44b4864d060593631bec74890e744"
+    },
+    "tests/test_v06_g1g3_offline_ports_r1_core_integration.py": {
+      "bytes": 18218,
+      "sha256": "f012a1c7b5bec69e4c64dce08cfb1cff9380f6d9c4450fa31198941876e4b387"
+    },
+    "tests/test_v06_g1g3_offline_ports_r1_feishu_outbox.py": {
+      "bytes": 13998,
+      "sha256": "cdfb97d0875930d51c4056b3333f06d9be7c846f0232b57b17a6e60626d8ae12"
+    },
+    "tests/test_v06_g1g3_offline_ports_r1_operator_auth.py": {
+      "bytes": 22981,
+      "sha256": "a2e0927b966534c91e68732943980611210cba96cb728bd9e523b958a1c6972e"
+    },
+    "tests/test_v06_g1g3_offline_ports_r1_recovery_and_guards.py": {
+      "bytes": 11969,
+      "sha256": "c23075a70fe96b1da02575068ef5dbda973860e8972b596450ac71a5a3287ca4"
+    }
+  },
+  "schema_version": 1,
+  "static_ast_verification": {
+    "forbidden_calls_found": 0,
+    "forbidden_imports_found": 0,
+    "production_src_imported": false,
+    "sidecar_files_scanned": [
+      "scripts/g1g3_offline_ports_r1/__init__.py",
+      "scripts/g1g3_offline_ports_r1/__main__.py",
+      "scripts/g1g3_offline_ports_r1/authenticated_human_port.py",
+      "scripts/g1g3_offline_ports_r1/bounded_llm_port.py",
+      "scripts/g1g3_offline_ports_r1/crypto_ed25519.py",
+      "scripts/g1g3_offline_ports_r1/durable_supervisor.py",
+      "scripts/g1g3_offline_ports_r1/feishu_outbox_port.py",
+      "scripts/g1g3_offline_ports_r1/loopback_servers.py",
+      "scripts/g1g3_offline_ports_r1/market_pit_port.py",
+      "scripts/g1g3_offline_ports_r1/no_order_port.py"
+    ]
+  },
+  "task_id": "V06_GEMINI_GOAL_C_G1G3_OFFLINE_PORTS_R1"
+}
