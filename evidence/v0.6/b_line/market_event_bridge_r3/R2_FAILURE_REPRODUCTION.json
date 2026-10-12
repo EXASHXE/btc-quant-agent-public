@@ -1,0 +1,82 @@
+{
+  "schema_version": "market-event-bridge-r3-reproduction-v1",
+  "task_id": "V06_GEMINI_R3_CI_PIT_SOURCE_QUALIFICATION",
+  "timestamp_utc": "2026-10-12T13:51:00Z",
+  "git_context": {
+    "repository": "EXASHXE/btc-quant-agent-public",
+    "branch": "feature/v06-bline-gemini-r3-portable-ci-funding-pit-source-qualification",
+    "exact_start_sha": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+    "controller_l2_review_sha": "5cb218255578e87771042491decb11afd2d493a9",
+    "upstream_b_pinned_sha": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+    "upstream_c_pinned_sha": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+    "original_g1_pinned_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+    "a_base_pinned_sha": "df00997f344eba82f7cca0d03ee1617948abee44"
+  },
+  "original_r2_failures": {
+    "ci_run_id": "38252226915",
+    "ci_run_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38252226915",
+    "ci_verdict": "FAILURE",
+    "ci_failing_step": "Tests selected by risk/changed scope",
+    "root_causes": [
+      {
+        "id": "CAUSE_1_HARDCODED_DEV_PATHS_PERMISSION_ERROR",
+        "description": "Hardcoded development paths '/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1' and '...gemini-forward-shadow-research-r1' accessed via Path.exists() at module level in 5 test files.",
+        "impact": "Unprivileged runner user (uid 1001) encounters PermissionError: [Errno 13] on /root during pytest test collection.",
+        "affected_files": [
+          "tests/test_v06_market_event_bridge_r2_c_composite_g1.py",
+          "tests/test_v06_market_event_bridge_r2_depth_ladder_l2.py",
+          "tests/test_v06_market_event_bridge_r2_pit_clock_mark_last.py",
+          "tests/test_v06_market_event_bridge_r2_settled_funding_ledger.py",
+          "tests/test_v06_market_event_bridge_r2_stress_and_security.py"
+        ]
+      },
+      {
+        "id": "CAUSE_2_MISSING_ROOT_IN_PYTHONPATH",
+        "description": "Standard pytest runner invocation without PYTHONPATH=. fails with ModuleNotFoundError: No module named 'scripts' or 'scripts.integration' because repository root is not added to sys.path by tests.",
+        "impact": "Test collection aborts immediately with exit code 2 on clean environments."
+      },
+      {
+        "id": "CAUSE_3_C_FUNDING_PIT_BACKDATING",
+        "description": "In bridge_engine.py lines 331-335, C's funding envelope sets observed_wall_utc_ms and available_at_ms to entry.funding_time_ms rather than actual receiver arrival time.",
+        "impact": "Severe PIT violation allowing forward information backdating when funding records arrive after settlement time."
+      },
+      {
+        "id": "CAUSE_4_MARK_PRICE_PROVENANCE_ABSENCE",
+        "description": "In bridge_engine.py lines 71, 162, 286, self.last_mark_tick_price is a raw float without ingress time, freshness, quality, source SHA, or route epoch verification.",
+        "impact": "Stale or unverified Mark price could be used to calculate realized cash flow and declare COST_COMPLETE."
+      },
+      {
+        "id": "CAUSE_5_CONNECTOR_SMOKE_OVERSTATEMENT",
+        "description": "In connector.py line 430, PUBLIC_SMOKE_VERIFIED is assigned purely based on events_received > 0 (even if REST snapshot only and both WebSocket tasks failed).",
+        "impact": "False sense of source qualification without >=2 closed 1m bars, >=120s Mark stream, or depth continuity."
+      },
+      {
+        "id": "CAUSE_6_NETWORK_CONFIGURATION_LEAK",
+        "description": "In evidence/v0.6/b_line/market_event_bridge_r2/NETWORK_ROUTE_DIAGNOSTIC.json, ambient proxy URLs, full NO_PROXY pattern, and local gateway IP 192.168.31.1 were committed.",
+        "impact": "Exposure of private network configuration details in a public git repository."
+      }
+    ]
+  },
+  "independent_reproduction_results": {
+    "reproduction_permission_error": {
+      "simulated_user": "nobody",
+      "command": "su -s /bin/bash nobody -c \"python3 -c \\\"from pathlib import Path; Path('/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1').exists()\\\"\"",
+      "exit_code": 1,
+      "traceback_tail": "PermissionError: [Errno 13] Permission denied: '/root/workspace/project/quant-v0.6/gemini-g1g3-offline-ports-r1'",
+      "status": "REPRODUCED_CONFIRMED"
+    },
+    "reproduction_collection_error": {
+      "command": "pytest -q tests/test_v06_market_event_bridge_r2_*.py",
+      "exit_code": 2,
+      "collection_errors": 5,
+      "status": "REPRODUCED_CONFIRMED"
+    },
+    "reproduction_c_funding_pit": {
+      "inspected_file": "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+      "lines": "331-335",
+      "observed_code": "observed_wall_utc_ms: entry.funding_time_ms, available_at_ms: entry.funding_time_ms",
+      "status": "CONFIRMED_CODE_AUDIT_MATCH"
+    }
+  },
+  "reproduction_gate_verdict": "R2_FAILURE_REPRODUCED_INDEPENDENTLY_READY_FOR_R3_REPAIR"
+}
