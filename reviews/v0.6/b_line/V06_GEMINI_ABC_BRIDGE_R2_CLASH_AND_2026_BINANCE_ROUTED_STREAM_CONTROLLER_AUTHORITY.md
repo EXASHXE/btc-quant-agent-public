@@ -1,0 +1,36 @@
+# quant-agent v0.6 B-line Controller — R2 Authority Amendment: 2026 Binance WS Route + Authorized Clash/Mihomo Proxy + A/B/C Synthetic Bridge
+
+Date 2026-10-12 Asia/Shanghai. Controller: ChatGPT-0 Primary Controller. This authority **SUPERSEDES** the execution instruction in [R1 bridge prompt](https://github.com/EXASHXE/btc-quant-agent-public/blob/96fbec9ea8da64c9accc3ea89f137016f23c096c/prompts/v0.6/b_line/V06_GEMINI_ABC_MARKET_EVENT_WIRE_BRIDGE_AND_CAUSAL_FINANCIAL_INVARIANTS_GOAL_R1.md) when running this new R2; R1 historical immutable and its **unused** R1 branch remains untouched. R2 does not change any prior G1/G2/G3/G4 release permissions.
+
+## Why R2 is necessary: exact upstream factual change
+
+Verified Binance official [USDⓈ-M Connect](https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/websocket-market-streams/Connect) and [2026 April migration notice](https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/websocket-market-streams/Important-WebSocket-Change-Notice). After 2026-04-23, **unrouted** `wss://fstream.binance.com/stream?streams=...` no longer distributes Market channels such as `@markPrice`, `@kline_1m`, `@aggTrade`. Correct high-frequency depth `@depth` uses `wss://fstream.binance.com/public/stream?streams=btcusdt@depth@100ms`; market data `@kline_1m`, `@markPrice@1s`, `@aggTrade` uses `wss://fstream.binance.com/market/stream?streams=...`. All historical A final `@markPrice` and kline subscription behavior require route migration. **No /private** ever. This is a software endpoint error in addition to network route faults, not synonymous with Binance geographic restriction.
+
+Prior A live public smoke had SSL `UNEXPECTED_EOF_WHILE_READING` at REST depth and `events_received=0`; current raw A technical quality is **offline verified** with exact remote `df00997f344eba82f7cca0d03ee1617948abee44` final full Python3.12 CI 3194 passed/2 skipped, but real-source access remains unverified.
+
+## Clash / Mihomo local proxy explicit permission and controls
+
+The user explicitly requested that public data access account for their **locally available, user-authorized Clash nodes**. R2 permits bounded, **PUBLIC-only** Binance USDⓈ-M reads via an **already owned, user-configured** local Clash/Mihomo proxy, as an alternative explicit network route to direct; it does NOT authorize scanning, reading subscription secrets, changing node provider subscription, manipulating nodes, modifying Windows firewall/proxy routing/allow-lan/TUN, or bypassing a clear Binance legal/account/IP territorial access restriction. No private endpoints or credentials. User-selected route only, no automated geo-hopping/rotation, never disable TLS certificate validation. Any HTTP 403/451, explicit region block or exchange policy prohibition remains **SOURCE_BLOCKED_BY_PROVIDER_POLICY**, not a challenge to evade. A local connection EOF, proxy 407, DNS, TLS and WS routing mismatch must be diagnosed independently.
+
+Official [mihomo proxy ports](https://wiki.metacubex.one/en/config/inbound/port/) documents HTTP(S), SOCKS and mixed ports, **config-dependent** (7890 etc examples, not guarantees). Official [mihomo general config](https://wiki.metacubex.one/en/config/general/) documents `allow-lan`, `bind-address`, `external-controller` and credentials; do NOT set `allow-lan=true` or `bind-address=*` as an auto-repair. Python [websockets 16.0 proxy guide](https://websockets.readthedocs.io/en/16.0/topics/proxies.html) states environment proxy auto-detection can be overridden with `connect(..., proxy=explicit_url)` or `proxy=None`; `socks5h` requires `python-socks[asyncio]`. REST and WS must share one **explicitly pinned** egress route; no silent direct fallback, no mix-and-match routes across snapshot + deltas, no mutation/retro-backfill of received event timestamps. Windows host/WSL2/Docker namespace location and localhost visibility must be tested, not assumed.
+
+## Exactly granted work
+
+New independent branch `feature/v06-bline-gemini-abc-clash-routed-feed-bridge-r2`, exact start `df00997f344eba82f7cca0d03ee1617948abee44` (A final). Runtime worktree `/root/workspace/project/quant-v0.6/gemini-abc-clash-bridge-r2`; scratch `/tmp/btc-abc_clash_bridge_r2`.
+Writable:
+- R2-only: `scripts/integration/market_event_bridge_r2/**`, `tests/test_v06_market_event_bridge_r2_*.py`, `docs/integration/market_event_bridge_r2/**`, `evidence/v0.6/b_line/market_event_bridge_r2/**`.
+- Minimum A connector/proxy/CLI route corrections only: `scripts/market_data/forward_public_feed_r1/connector.py`, `cli.py`, optionally new `proxy_route.py` under same A package and only `tests/test_v06_forward_public_feed_r1_*.py` added/edited for updated connectivity behavior. A's WAL/contracts/book/old raw receipts are read-only; must not mutate `contracts.py`, `durability.py`, `order_book.py`, etc.
+- B exact `51cdd4e17503fbd18ad22aaeeaba3580f5efacf8` and C exact `91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b` are **READ-ONLY** reference repos (detached checkouts if necessary) and immutable; original G1 C4 `861a9d148f72db00e6079e53af78220bdd7e84ce` and all protected sources unchanged.
+
+Network modes: all imports and CI run `NETWORK_DISABLED`; optional bounded `network=public-direct` or `network=public-clash-explicit` only after all synthetic tests green, only source GET `/fapi/v1/depth`, `/fapi/v1/fundingRate` and the routed `/public/...`, `/market/...` WS streams. No signed/private account endpoints, no POST/PUT/DELETE, real trading, real Feishu, real LLM, TESTNET or LIVE order authority. `live-public` refers to public market *observation only*, not live trading. No reading/stat/listing user's `Quant-agent/data`, `Quant-agent-sanitized`, 2024–25 heldout, historical 2026 protected or H39-H41/Forward.
+
+## Controller acceptance gates
+
+- Source routing verified via current official documentation and a unit test rejecting unrouted Market channels.
+- Safe explicit proxy REST/WS route, no credentials in reports, healthy DNS/TLS handshake, node choice user-controlled. Distinguish **proxy port vs controller port**; do not treat 9090 controller as egress proxy.
+- Public WS and snapshot positive **real event** acceptance requires provider-consistent PnL-free Mark and Last, aggTrade and continuous depth, no unresolved staleness; if source blocked, terminal `NETWORK_UNVERIFIED_OFFLINE_ACCEPT`, no fabricated data.
+- Exactly as R1: prove A Mark tick vs B bar, A book vs B 10-level, funding field mismatch, C synthetic BAR transformation, and causal **fail-closed** bridge with source SHA/known-at. No new Alpha science runs or after-outcome code tuning on B.
+- Full Python3.12 tests on final code SHA including A existing suite and ≥120 new negative cases, CI actual pytest; no re-run protected historical outcomes for signals.
+- Up to 6 coherent commits, nonforce push, exact immutable SHA manifests, independent Controller L2 before merges or a continuous recorder. No websocket or public-only autonomous recorder left running after task.
+
+**Terminal:** `R2_ABCCONTRACT_OFFLINE_VERIFIED_NETWORK_SOURCE_UNAVAILABLE`, `R2_ABCCONTRACT_PUBLIC_SMOKE_VERIFIED`, or `R2_CAUSAL_FINANCIAL_OR_NETWORK_SECURITY_BLOCKED`; none signifies strategy Alpha or trade authority.
