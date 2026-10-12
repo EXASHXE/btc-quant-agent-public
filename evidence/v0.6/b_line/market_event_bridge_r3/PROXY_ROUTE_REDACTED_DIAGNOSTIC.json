@@ -1,0 +1,39 @@
+{
+  "receipt_version": "proxy-route-redacted-diagnostic-v1",
+  "task_id": "V06_GEMINI_R3_CI_PIT_SOURCE_QUALIFICATION",
+  "timestamp_utc": "2026-10-12T14:47:16Z",
+  "redaction_rules_enforced": {
+    "host_ip_redacted": true,
+    "proxy_port_redacted": true,
+    "lan_gateway_ip_redacted": true,
+    "ambient_no_proxy_redacted": true,
+    "cryptographic_route_hash_retained": true
+  },
+  "redacted_diagnostic": {
+    "proxy_enabled": true,
+    "proxy_kind": "http",
+    "loopback_or_host": "loopback",
+    "route_hash": "5a437149d2377466",
+    "session_id": "diag-732b0e3264e7",
+    "diagnostic_code": "DIAGNOSTIC_OK",
+    "layers": {
+      "layer_1_local_tcp": {
+        "status": "SUCCESS"
+      },
+      "layer_2_proxy_negotiation": {
+        "status": "SUCCESS"
+      },
+      "layer_3_tls_rest_verify": {
+        "status": "SUCCESS",
+        "status_code": 200,
+        "bytes": 295
+      },
+      "layer_4_ws_connect_verify": {
+        "status": "SUCCESS",
+        "frame_bytes": 3773,
+        "stream": "btcusdt@depth@100ms"
+      }
+    },
+    "error_detail": null
+  }
+}

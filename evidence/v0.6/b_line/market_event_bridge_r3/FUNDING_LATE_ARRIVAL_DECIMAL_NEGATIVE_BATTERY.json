@@ -1,0 +1,43 @@
+{
+  "receipt_version": "funding-late-arrival-decimal-negative-battery-v1",
+  "task_id": "V06_GEMINI_R3_CI_PIT_SOURCE_QUALIFICATION",
+  "timestamp_utc": "2026-10-12T14:37:30Z",
+  "pit_arrival_clock_preservation": {
+    "backdating_to_funding_time_prohibited": true,
+    "observed_wall_utc_ms_preserved": true,
+    "available_at_ms_preserved": true,
+    "tested_late_arrival_delta_ms": 500
+  },
+  "c_immutable_contract_handling": {
+    "c_safety_violation_caught_fail_closed": true,
+    "c_consumer_status": "C_CONSUMER_CONTRACT_BLOCKED",
+    "c_upstream_code_modified": false,
+    "safety_boundary_maintained": true
+  },
+  "decimal_conservation_battery": [
+    {
+      "case": "standard_positive_rate",
+      "funding_rate": "0.00010000",
+      "mark_price": "64000.00",
+      "long_1btc_cash_flow": "-6.40000000",
+      "short_1btc_cash_flow": "6.40000000",
+      "net_zero_position_cash_flow": "0E-8",
+      "conservation_sum": "0E-8"
+    },
+    {
+      "case": "negative_rate_long_receives_short_pays",
+      "funding_rate": "-0.00015000",
+      "mark_price": "60000.00",
+      "long_1btc_cash_flow": "9.00000000",
+      "short_1btc_cash_flow": "-9.00000000",
+      "conservation_sum": "0E-8"
+    }
+  ],
+  "mark_price_witness_provenance": {
+    "provenance_enforced": true,
+    "max_freshness_age_seconds": 60,
+    "clock_uncertain_rejection": true,
+    "route_epoch_validation": true,
+    "stale_witness_rejection": true
+  }
+}

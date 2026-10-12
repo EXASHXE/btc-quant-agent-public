@@ -534,7 +534,7 @@ class BinancePublicFeedClient:
         elif stats["aggTrade"] == 0 or stats["raw_public_depth_update"] == 0:
             stats["status"] = "PUBLIC_SOURCE_PARTIAL"
         else:
-            book_ok = self.book_engine.book_continuous and not self.book_engine.needs_rebootstrap and stats["book_continuous"]
+            book_ok = self.book_engine.continuous and self.book_engine.is_bootstrapped and not self.book_engine.needs_rebootstrap and stats["book_continuous"]
             if book_ok:
                 stats["status"] = "L2_CONTINUOUS_WINDOW_VERIFIED"
             else:

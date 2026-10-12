@@ -1,0 +1,48 @@
+{
+  "receipt_version": "exact-dependency-sha-and-consumer-witnesses-v1",
+  "task_id": "V06_GEMINI_R3_CI_PIT_SOURCE_QUALIFICATION",
+  "timestamp_utc": "2026-10-12T14:37:00Z",
+  "pinned_dependencies": {
+    "upstream_b": {
+      "name": "forward-shadow-research-r1",
+      "exact_sha": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+      "verified_files": {
+        "scripts/strategy_research/forward_shadow_research_r1/contract.py": "ecc809f8922cb20283305993b3e54307777f121f5e59bea0fa1bb04af9389d0a",
+        "scripts/strategy_research/forward_shadow_research_r1/adapter.py": "fa31bc3fe2ee5bdadd8b5554d0f01e53986c8a304caa53005f357963d6bba9a3",
+        "scripts/strategy_research/forward_shadow_research_r1/signals.py": "ae340ac4e5d5aa3bc67b2276bad684715b0b1c03e32f9b748b4376a48f594006"
+      },
+      "extraction_witness": {
+        "method": "git archive HEAD:<path> -> tar -x",
+        "isolation_path": "/tmp/btc-r3-ci-pit-source/materialized_pinned/upstream_b_51cdd4e17503",
+        "host_root_independent": true
+      }
+    },
+    "upstream_c": {
+      "name": "g1g3-offline-ports-r1",
+      "exact_sha": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+      "verified_files": {
+        "scripts/g1g3_offline_ports_r1/market_pit_port.py": "e57e3319f14547a8031adebae0aab61ee041751c1f949f152410959c7454b9c9",
+        "scripts/g1_offline_preview_r1/model.py": "086d6ec8747f82d59b6f8f42bfefd2d9c61e5f962707b4f9119f784741dd206e"
+      },
+      "extraction_witness": {
+        "method": "git archive HEAD:<path> -> tar -x",
+        "isolation_path": "/tmp/btc-r3-ci-pit-source/materialized_pinned/upstream_c_91495e5b8c17",
+        "host_root_independent": true
+      }
+    },
+    "upstream_g1": {
+      "name": "g1_core_read_only",
+      "exact_sha": "861a9d148f72db00e6079e53af78220bdd7e84ce"
+    },
+    "upstream_a_base": {
+      "name": "a_base_foundation",
+      "exact_sha": "df00997f344eba82f7cca0d03ee1617948abee44"
+    }
+  },
+  "ci_external_portability_witness": {
+    "hardcoded_root_paths_eliminated": true,
+    "unprivileged_runner_compatible": true,
+    "standard_pytest_without_pythonpath_compatible": true,
+    "verified_under_nobody_uid": true
+  }
+}
