@@ -1,0 +1,104 @@
+{
+  "schema_version": "V06_P1A_R2_SYNTHETIC_TEST_RECEIPT_V1",
+  "dispatch_id": "V06_P1A_R2_SYNTHETIC_PER_FILL_COST_ENGINE",
+  "dispatch_sha": "68def8fed3fd290ffbddf00a8f86e4184a8b036f",
+  "execution_base_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+  "accepted_design_sha": "a68eeef973a178a68005f7eca247ec15bc9bf2a2",
+  "controller_l2_sha": "efa2df62c02d21b20ce07846c7ca30901716e773",
+  "branch": "feature/v06-p1a-r2-btc-synthetic-per-fill-cost-engine",
+  "source_commit_parent_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+  "tested_code_sha": null,
+  "allowed_paths": [
+    "scripts/strategy_research/g2_btc_exit_aware_r3/cost_contract_synthetic_r2.py",
+    "tests/test_v06_btc_cost_contract_synthetic_r2.py",
+    "reviews/v0.6/b_line/V06_P1A_R2_SYNTHETIC_COST_CONTRACT_REPORT.md",
+    "evidence/v0.6/b_line/p1a_r2_synthetic_cost_contract/SYNTHETIC_TEST_RECEIPT.json"
+  ],
+  "source_sha256": {
+    "scripts/strategy_research/g2_btc_exit_aware_r3/cost_contract_synthetic_r2.py": "f5e74301262d4e8641463cc285945c53f92ea7f49fa3bfee9ea3012cffa2363b",
+    "tests/test_v06_btc_cost_contract_synthetic_r2.py": "5942df581962af350c943ba8ffe54848c3f6abe60c346ca3604b4afc63b79803"
+  },
+  "local_validation": {
+    "python": "3.13.13",
+    "pytest": "8.4.2",
+    "ruff": "0.16.9",
+    "targeted_pytest": {
+      "passed": 24,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "command": "pytest -q tests/test_v06_btc_cost_contract_synthetic_r2.py",
+      "junit_sha256": "9251312b1ef2324a0b8fead3740b98a3c649b07f7611c5439a390690212fe4ff"
+    },
+    "targeted_ruff": "PASS",
+    "targeted_format": "PASS",
+    "isolated_module_compile": "PASS",
+    "project_lint_gate": "PASS",
+    "unchanged_ci_planner_mode": "full",
+    "local_full_suite": "NOT_RUN; remote unchanged CI full gate required"
+  },
+  "finite_case_names": [
+    "test_01_long_actual_notionals",
+    "test_02_short_positive_funding_credit",
+    "test_03_signed_funding_symmetry",
+    "test_04_fee_only_reference_identities",
+    "test_05_marketable_limit_is_taker",
+    "test_06_mixed_roles_per_filled_leg",
+    "test_07_maker_nonfill_no_completed_return",
+    "test_08_half_spread_no_double_deduction",
+    "test_09_adverse_direction_and_distinct_impact",
+    "test_10_partial_long_one_entry_fee",
+    "test_11_partial_short_settlement_exposure",
+    "test_12_residual_realized_unrealized_separated",
+    "test_13_tick_step_and_cash_quantization",
+    "test_14_invalid_grid_overclose_and_filters",
+    "test_15_nonfinite_float_and_quote_provenance",
+    "test_16_duplicate_fill_idempotence_and_conflict",
+    "test_17_duplicate_settlement_idempotence_and_conflict",
+    "test_18_stop_market_gap_actual_fill_and_fee",
+    "test_19_stop_limit_nonfill_preserves_inventory",
+    "test_20_ack_delayed_break_even_and_equal_clock",
+    "test_21_delayed_funding_economic_before_after_partial",
+    "test_22_missing_and_ambiguous_funding_fail_closed",
+    "test_23_identical_fills_quote_attribution_not_cash",
+    "test_24_notional_leverage_and_decimal_context_invariance"
+  ],
+  "expected_invented_net_usdt": {
+    "LONG": "8.834600",
+    "SHORT": "9.044600",
+    "partial LONG": "6.875760",
+    "partial SHORT": "7.003760",
+    "flat-mid crossed spread": "-1.040000",
+    "adverse LONG": "8.694600",
+    "stop gap LONG": "-11.055000",
+    "mixed-role": "9.067006"
+  },
+  "frozen_git_blobs": {
+    "engine.py": "bf187ace012619eb3f6aee5d9051999459967100",
+    "portfolio.py": "33528e62084feba7c657a657204ccbf41a82cf54"
+  },
+  "independent_review": {
+    "reviewer": "/root/independent_cost_review",
+    "recommendation": "ACCEPT_SYNTHETIC_CONTRACT",
+    "independent_eight_ledger_recomputation": "PASS",
+    "reviewer_targeted_pytest_passed": 24,
+    "fixed_findings": [
+      "inclusive +/-15000ms funding quarantine",
+      "bounded receiver-known-at funding coverage and settlement identity witness"
+    ],
+    "controller_release_permission": false
+  },
+  "scope": {
+    "input_grade": "INVENTED_SYNTHETIC_ONLY_NOT_CALIBRATED",
+    "real_market_data_accessed": false,
+    "historical_results_modified": false,
+    "scoring_integration": false,
+    "account_access": false,
+    "exchange_orders": false
+  },
+  "ci": {
+    "status": "PENDING_PUBLICATION",
+    "runs": []
+  },
+  "terminal_decision": "PENDING_REMOTE_CI; independent synthetic contract review accepted; no release permission"
+}
