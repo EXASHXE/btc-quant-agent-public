@@ -1,0 +1,617 @@
+{
+  "crosswalk_metadata": {
+    "dispatch_id": "V06_P1C_H18_ERRATUM_R2",
+    "dispatch_sha": "68def8fed3fd290ffbddf00a8f86e4184a8b036f",
+    "execution_base_sha": "efa2df62c02d21b20ce07846c7ca30901716e773",
+    "executor": "Gemini NORMAL (bounded, doc-only)",
+    "reviewer_route": "Independent ChatGPT-1 or Codex Sol read-only review",
+    "reviewer_status": "REVIEW_PENDING",
+    "terminal_decision": "REPORT_ERRATUM_READY",
+    "alpha_promotion_verdict": "RETAIN_ALPHA_NO_GO",
+    "historical_replay_executed": false,
+    "cost_model": "STRESS",
+    "frozen_source_identities": {
+      "h18_report": {
+        "sha": "397a62c1a0fbd6ad14a569a5be0058b1f684f08e",
+        "path": "docs/strategy_research/g2_goal_h18_mechanism_r1/H18_MECHANISM_EMPIRICAL_REPORT.md",
+        "section": "Table 4: Annual and Structural Breakdown (STRESS44)"
+      },
+      "h18_machine": {
+        "sha": "397a62c1a0fbd6ad14a569a5be0058b1f684f08e",
+        "path": "evidence/v0.6/b_line/g2_goal_h18_mechanism_r1/H18_MECHANISM_DIAGNOSTIC_RESULTS.json"
+      },
+      "canonical_upstream_report": {
+        "sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+        "path": "docs/strategy_research/g2_exit_horizon_r1/EXIT_R1_EMPIRICAL_REPORT.md"
+      },
+      "canonical_upstream_machine": {
+        "sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+        "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_RESULTS.json"
+      }
+    }
+  },
+  "reconciliation_summary": {
+    "ledger_integrity": "CANONICAL_AND_DIAGNOSTIC_MACHINE_LEDGERS_INTACT_AND_CONSISTENT",
+    "narrative_erratum_root_cause": "MANUAL_NARRATIVE_TABLE_CONSTRUCTION_AND_ARITHMETIC_COMPOUNDING",
+    "ledger_defect_inferred": false,
+    "known_conflicts": {
+      "w1_2021_h1": {
+        "narrative": 128.53,
+        "canonical": 107.52059351475836,
+        "classification": "MECHANICAL_ARITHMETIC_DERIVATION_ERROR",
+        "explanation": "Mechanical addition of copied delta +23.95 bps to published E0 +104.58 bps (104.58 + 23.95 = 128.53) instead of reporting canonical H1 mean (+107.5206 bps)."
+      },
+      "w1_2021_h1_minus_e0_delta": {
+        "narrative": 23.95,
+        "canonical": 2.9442729515021124,
+        "h18_machine": 2.9442729515021124,
+        "classification": "MECHANICAL_COPY_TRANSCRIPTION_ERROR",
+        "explanation": "Unrelated scalar 23.95 bps (observed in EXIT_R1 E2 short mean_net_bps 23.9506 bps) copied into Table 4 delta column instead of canonical/machine delta +2.9443 bps."
+      },
+      "w2_2021_event_n": {
+        "narrative": 14,
+        "canonical": 10,
+        "h18_machine": 10,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "explanation": "Partition boundary shift: Table 4 reported N=14 in 2021 and N=17 in 2022 (sum 31), whereas canonical machine partitions UTC calendar years as N=10 in 2021 and N=21 in 2022 (sum 31). Total events across 2021-2023 is exactly 55 in both."
+      }
+    }
+  },
+  "ex_post_right_tail_concentration": {
+    "W1_target_winners_pct": 98.06425062826763,
+    "W1_target_winners_count": 4,
+    "W2_target_winners_pct": 74.63624800688082,
+    "W2_target_winners_count": 3,
+    "nature_of_evidence": "EX_POST_RIGHT_TAIL_ATTRIBUTION_ONLY",
+    "actionable_ex_ante_classifier": false,
+    "continuation_12to18h": {
+      "total_continuation_events": 56,
+      "adverse_reversal_count": 26,
+      "adverse_reversal_pct": 46.42857142857143,
+      "favorable_continuation_count": 30,
+      "favorable_continuation_pct": 53.57142857142857,
+      "coin_flip_characterization": true,
+      "w1_adverse_count": 11,
+      "w1_time_cap_events": 20,
+      "w2_adverse_count": 15,
+      "w2_time_cap_events": 36
+    },
+    "governance_implication": "Retain 26/56 adverse continuation and no Alpha promotion; H1 extension is an unhedged right-tail gamble with near 50/50 adverse continuation."
+  },
+  "table4_crosswalk_records": [
+    {
+      "candidate_id": "W1_C04",
+      "candidate_full_key": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "year": "2021",
+      "event_count": {
+        "unit": "events",
+        "narrative": 8,
+        "canonical": 8,
+        "h18_machine": 8,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.E0.yearly_breakdown.2021.n_trades",
+        "h18_field_path": "regime_stratification.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.year.2021.event_count",
+        "match_status": "MATCH_EXACT",
+        "delta": 0,
+        "classification": "NONE",
+        "notes": "Exact match."
+      },
+      "E0_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 104.58,
+        "canonical": 104.57632056325625,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.E0.yearly_breakdown.2021.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": 0.003679,
+        "classification": "NONE",
+        "notes": "Matches canonical 104.576321 bps rounded."
+      },
+      "H1_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 128.53,
+        "canonical": 107.52059351475836,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.H1.yearly_breakdown.2021.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": 21.009406,
+        "classification": "MECHANICAL_ARITHMETIC_DERIVATION_ERROR",
+        "notes": "Mechanically derived by adding published Delta (23.95) to published E0 (104.58) = 128.53 bps instead of canonical 107.520594 bps."
+      },
+      "H2_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 91.56,
+        "canonical": 91.55767554684012,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.H2.yearly_breakdown.2021.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": 0.002324,
+        "classification": "NONE",
+        "notes": "Matches canonical 91.557676 bps rounded."
+      },
+      "delta_H1_E0_net_bps": {
+        "unit": "basis_points",
+        "narrative": 23.95,
+        "canonical": 2.944272951502114,
+        "h18_machine": 2.9442729515021124,
+        "canonical_field_path": "calc: candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.H1.yearly_breakdown.2021.mean_net_bps - candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.E0.yearly_breakdown.2021.mean_net_bps",
+        "h18_field_path": "regime_stratification.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.year.2021.mean_delta_net_bps",
+        "match_status": "MISMATCH",
+        "delta": 21.005727,
+        "classification": "MECHANICAL_COPY_TRANSCRIPTION_ERROR",
+        "notes": "Copied unrelated scalar 23.95 bps instead of canonical delta 2.944273 bps."
+      },
+      "account_E0_return_pct": {
+        "unit": "percentage",
+        "narrative": 4.95,
+        "canonical": 7.497365278238832,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.account.E0.metrics.yearly_breakdown.2021.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": -2.547365,
+        "classification": "UNKNOWN",
+        "notes": "Published 4.95% vs canonical 7.497365%."
+      },
+      "account_H1_return_pct": {
+        "unit": "percentage",
+        "narrative": 5.72,
+        "canonical": 7.718306737199776,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.account.H1.metrics.yearly_breakdown.2021.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": -1.998307,
+        "classification": "UNKNOWN",
+        "notes": "Published 5.72% vs canonical 7.718307%."
+      }
+    },
+    {
+      "candidate_id": "W1_C04",
+      "candidate_full_key": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "year": "2022",
+      "event_count": {
+        "unit": "events",
+        "narrative": 10,
+        "canonical": 10,
+        "h18_machine": 10,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.E0.yearly_breakdown.2022.n_trades",
+        "h18_field_path": "regime_stratification.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.year.2022.event_count",
+        "match_status": "MATCH_EXACT",
+        "delta": 0,
+        "classification": "NONE",
+        "notes": "Exact match."
+      },
+      "E0_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": -11.92,
+        "canonical": -11.923554118576757,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.E0.yearly_breakdown.2022.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": 0.003554,
+        "classification": "NONE",
+        "notes": "Matches canonical -11.923554 bps rounded."
+      },
+      "H1_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 20.25,
+        "canonical": 21.68189180075,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.H1.yearly_breakdown.2022.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": -1.431892,
+        "classification": "MECHANICAL_ARITHMETIC_DERIVATION_ERROR",
+        "notes": "Mechanically derived by adding published Delta (32.17) to published E0 (-11.92) = 20.25 bps instead of canonical 21.681892 bps."
+      },
+      "H2_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 48.83,
+        "canonical": 48.832740030142716,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.H2.yearly_breakdown.2022.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": -0.00274,
+        "classification": "NONE",
+        "notes": "Matches canonical 48.832740 bps rounded."
+      },
+      "delta_H1_E0_net_bps": {
+        "unit": "basis_points",
+        "narrative": 32.17,
+        "canonical": 33.605445919326755,
+        "h18_machine": 33.605445919326755,
+        "canonical_field_path": "calc: candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.H1.yearly_breakdown.2022.mean_net_bps - candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.E0.yearly_breakdown.2022.mean_net_bps",
+        "h18_field_path": "regime_stratification.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.year.2022.mean_delta_net_bps",
+        "match_status": "MISMATCH",
+        "delta": -1.435446,
+        "classification": "UNKNOWN",
+        "notes": "Published 32.17 bps vs canonical 33.605446 bps."
+      },
+      "account_E0_return_pct": {
+        "unit": "percentage",
+        "narrative": 1.37,
+        "canonical": -1.045076872857842,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.account.E0.metrics.yearly_breakdown.2022.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": 2.415077,
+        "classification": "UNKNOWN",
+        "notes": "Published 1.37% vs canonical -1.045077%."
+      },
+      "account_H1_return_pct": {
+        "unit": "percentage",
+        "narrative": 3.85,
+        "canonical": 1.8308635063711387,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.account.H1.metrics.yearly_breakdown.2022.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": 2.019136,
+        "classification": "UNKNOWN",
+        "notes": "Published 3.85% vs canonical 1.830864%."
+      }
+    },
+    {
+      "candidate_id": "W1_C04",
+      "candidate_full_key": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "year": "2023",
+      "event_count": {
+        "unit": "events",
+        "narrative": 16,
+        "canonical": 16,
+        "h18_machine": 16,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.E0.yearly_breakdown.2023.n_trades",
+        "h18_field_path": "regime_stratification.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.year.2023.event_count",
+        "match_status": "MATCH_EXACT",
+        "delta": 0,
+        "classification": "NONE",
+        "notes": "Exact match."
+      },
+      "E0_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": -21.03,
+        "canonical": -21.02600023916617,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.E0.yearly_breakdown.2023.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": -0.004,
+        "classification": "NONE",
+        "notes": "Matches canonical -21.026000 bps rounded."
+      },
+      "H1_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 35.86,
+        "canonical": 35.857119288799325,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.H1.yearly_breakdown.2023.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": 0.002881,
+        "classification": "NONE",
+        "notes": "Matches canonical 35.857119 bps rounded."
+      },
+      "H2_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 17.36,
+        "canonical": 17.35878486298958,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.H2.yearly_breakdown.2023.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": 0.001215,
+        "classification": "NONE",
+        "notes": "Matches canonical 17.358785 bps rounded."
+      },
+      "delta_H1_E0_net_bps": {
+        "unit": "basis_points",
+        "narrative": 56.89,
+        "canonical": 56.88311952796549,
+        "h18_machine": 56.88311952796548,
+        "canonical_field_path": "calc: candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.H1.yearly_breakdown.2023.mean_net_bps - candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.paired.E0.yearly_breakdown.2023.mean_net_bps",
+        "h18_field_path": "regime_stratification.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.year.2023.mean_delta_net_bps",
+        "match_status": "MISMATCH",
+        "delta": 0.00688,
+        "classification": "MECHANICAL_ARITHMETIC_DERIVATION_ERROR",
+        "notes": "Published 56.89 bps vs canonical 56.883120 bps."
+      },
+      "account_E0_return_pct": {
+        "unit": "percentage",
+        "narrative": -2.93,
+        "canonical": -2.934049700779928,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.account.E0.metrics.yearly_breakdown.2023.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": 0.00405,
+        "classification": "NONE",
+        "notes": "Matches canonical -2.934050% rounded."
+      },
+      "account_H1_return_pct": {
+        "unit": "percentage",
+        "narrative": 4.75,
+        "canonical": 4.754756972073126,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H.STRESS.account.H1.metrics.yearly_breakdown.2023.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": -0.004757,
+        "classification": "NONE",
+        "notes": "Matches canonical 4.754757% rounded."
+      }
+    },
+    {
+      "candidate_id": "W2_C05",
+      "candidate_full_key": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "year": "2021",
+      "event_count": {
+        "unit": "events",
+        "narrative": 14,
+        "canonical": 10,
+        "h18_machine": 10,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.E0.yearly_breakdown.2021.n_trades",
+        "h18_field_path": "regime_stratification.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.year.2021.event_count",
+        "match_status": "MISMATCH",
+        "delta": 4,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Partition boundary shift: published N=14 vs canonical N=10."
+      },
+      "E0_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 92.42,
+        "canonical": 131.21681427727543,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.E0.yearly_breakdown.2021.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": -38.796814,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Non-canonical cohort mismatch: published 92.42 bps vs canonical 131.216814 bps."
+      },
+      "H1_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 117.43,
+        "canonical": 130.95916668721807,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.H1.yearly_breakdown.2021.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": -13.529167,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Non-canonical cohort mismatch: published 117.43 bps vs canonical 130.959167 bps."
+      },
+      "H2_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 104.53,
+        "canonical": 182.1442991690486,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.H2.yearly_breakdown.2021.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": -77.614299,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Non-canonical cohort mismatch: published 104.53 bps vs canonical 182.144299 bps."
+      },
+      "delta_H1_E0_net_bps": {
+        "unit": "basis_points",
+        "narrative": 25.01,
+        "canonical": -0.2576475900573598,
+        "h18_machine": -0.25764759005734367,
+        "canonical_field_path": "calc: candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.H1.yearly_breakdown.2021.mean_net_bps - candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.E0.yearly_breakdown.2021.mean_net_bps",
+        "h18_field_path": "regime_stratification.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.year.2021.mean_delta_net_bps",
+        "match_status": "MISMATCH",
+        "delta": 25.267648,
+        "classification": "MECHANICAL_ARITHMETIC_DERIVATION_ERROR",
+        "notes": "Mechanically derived as published H1 (117.43) - published E0 (92.42) = 25.01 bps on non-canonical cohort."
+      },
+      "account_E0_return_pct": {
+        "unit": "percentage",
+        "narrative": 8.23,
+        "canonical": 12.176616001282259,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.account.E0.metrics.yearly_breakdown.2021.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": -3.946616,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Published 8.23% vs canonical 12.176616%."
+      },
+      "account_H1_return_pct": {
+        "unit": "percentage",
+        "narrative": 10.15,
+        "canonical": 12.135737496407195,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.account.H1.metrics.yearly_breakdown.2021.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": -1.985737,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Published 10.15% vs canonical 12.135737%."
+      }
+    },
+    {
+      "candidate_id": "W2_C05",
+      "candidate_full_key": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "year": "2022",
+      "event_count": {
+        "unit": "events",
+        "narrative": 17,
+        "canonical": 21,
+        "h18_machine": 21,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.E0.yearly_breakdown.2022.n_trades",
+        "h18_field_path": "regime_stratification.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.year.2022.event_count",
+        "match_status": "MISMATCH",
+        "delta": -4,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Partition boundary shift: published N=17 vs canonical N=21."
+      },
+      "E0_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 35.84,
+        "canonical": 39.30549291352028,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.E0.yearly_breakdown.2022.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": -3.465493,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Non-canonical cohort mismatch: published 35.84 bps vs canonical 39.305493 bps."
+      },
+      "H1_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 56.59,
+        "canonical": 66.88515991881047,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.H1.yearly_breakdown.2022.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": -10.29516,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Non-canonical cohort mismatch: published 56.59 bps vs canonical 66.885160 bps."
+      },
+      "H2_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": 44.52,
+        "canonical": 28.30297280164809,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.H2.yearly_breakdown.2022.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": 16.217027,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Non-canonical cohort mismatch: published 44.52 bps vs canonical 28.302973 bps."
+      },
+      "delta_H1_E0_net_bps": {
+        "unit": "basis_points",
+        "narrative": 20.75,
+        "canonical": 27.57966700529019,
+        "h18_machine": 27.57966700529018,
+        "canonical_field_path": "calc: candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.H1.yearly_breakdown.2022.mean_net_bps - candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.E0.yearly_breakdown.2022.mean_net_bps",
+        "h18_field_path": "regime_stratification.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.year.2022.mean_delta_net_bps",
+        "match_status": "MISMATCH",
+        "delta": -6.829667,
+        "classification": "MECHANICAL_ARITHMETIC_DERIVATION_ERROR",
+        "notes": "Mechanically derived as published H1 (56.59) - published E0 (35.84) = 20.75 bps on non-canonical cohort."
+      },
+      "account_E0_return_pct": {
+        "unit": "percentage",
+        "narrative": 10.98,
+        "canonical": 6.744434690694101,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.account.E0.metrics.yearly_breakdown.2022.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": 4.235565,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Published 10.98% vs canonical 6.744435%."
+      },
+      "account_H1_return_pct": {
+        "unit": "percentage",
+        "narrative": 14.37,
+        "canonical": 11.43878754663723,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.account.H1.metrics.yearly_breakdown.2022.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MISMATCH",
+        "delta": 2.931212,
+        "classification": "COHORT_ESTIMAND_IDENTITY_MISMATCH",
+        "notes": "Published 14.37% vs canonical 11.438788%."
+      }
+    },
+    {
+      "candidate_id": "W2_C05",
+      "candidate_full_key": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "year": "2023",
+      "event_count": {
+        "unit": "events",
+        "narrative": 24,
+        "canonical": 24,
+        "h18_machine": 24,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.E0.yearly_breakdown.2023.n_trades",
+        "h18_field_path": "regime_stratification.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.year.2023.event_count",
+        "match_status": "MATCH_EXACT",
+        "delta": 0,
+        "classification": "NONE",
+        "notes": "Exact match."
+      },
+      "E0_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": -45.49,
+        "canonical": -45.493320037239755,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.E0.yearly_breakdown.2023.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": 0.00332,
+        "classification": "NONE",
+        "notes": "Matches canonical -45.493320 bps rounded."
+      },
+      "H1_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": -18.11,
+        "canonical": -18.106408069634544,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.H1.yearly_breakdown.2023.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": -0.003592,
+        "classification": "NONE",
+        "notes": "Matches canonical -18.106408 bps rounded."
+      },
+      "H2_mean_net_bps": {
+        "unit": "basis_points",
+        "narrative": -24.98,
+        "canonical": -24.984238981419306,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.H2.yearly_breakdown.2023.mean_net_bps",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": 0.004239,
+        "classification": "NONE",
+        "notes": "Matches canonical -24.984239 bps rounded."
+      },
+      "delta_H1_E0_net_bps": {
+        "unit": "basis_points",
+        "narrative": 27.38,
+        "canonical": 27.38691196760521,
+        "h18_machine": 27.38691196760521,
+        "canonical_field_path": "calc: candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.H1.yearly_breakdown.2023.mean_net_bps - candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.paired.E0.yearly_breakdown.2023.mean_net_bps",
+        "h18_field_path": "regime_stratification.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.year.2023.mean_delta_net_bps",
+        "match_status": "MISMATCH",
+        "delta": -0.006912,
+        "classification": "MECHANICAL_ARITHMETIC_DERIVATION_ERROR",
+        "notes": "Mechanically derived as published H1 (-18.11) - published E0 (-45.49) = 27.38 bps on non-canonical cohort."
+      },
+      "account_E0_return_pct": {
+        "unit": "percentage",
+        "narrative": -8.4,
+        "canonical": -8.400669701657094,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.account.E0.metrics.yearly_breakdown.2023.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": 0.00067,
+        "classification": "NONE",
+        "notes": "Matches canonical -8.400670% rounded."
+      },
+      "account_H1_return_pct": {
+        "unit": "percentage",
+        "narrative": -3.23,
+        "canonical": -3.2307444515703665,
+        "h18_machine": null,
+        "canonical_field_path": "candidates.W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H.STRESS.account.H1.metrics.yearly_breakdown.2023.cash_return_pct",
+        "h18_field_path": null,
+        "match_status": "MATCH_ROUNDED",
+        "delta": 0.000744,
+        "classification": "NONE",
+        "notes": "Matches canonical -3.230744% rounded."
+      }
+    }
+  ]
+}
