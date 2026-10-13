@@ -9,6 +9,7 @@ funding rates. Deduplicates idempotently while recording observable counters.
 from __future__ import annotations
 
 import copy
+from decimal import Decimal
 from typing import Any
 
 from scripts.g1_offline_preview_r1.fixtures import bar as g1_synthetic_bar
@@ -104,10 +105,14 @@ class MarketPitPort:
         self.last_bar_open_ms: int | None = None
         self.last_book_final_update_id: int | None = None
         self.seen_dedupe_keys: dict[str, str] = {}
+        self.seen_funding_settlements: dict[str, dict[str, Any]] = {}
+        self.seen_funding_clocks: dict[int, str] = {}
+        self.duplicate_funding_count: int = 0
         self.duplicate_envelope_count: int = 0
         self.accepted_envelope_count: int = 0
         self.rejected_envelope_count: int = 0
         self.max_feature_known_at_ms: int = -1
+        self.last_connection_epoch: int | None = None
 
     def validate_book_integrity(self, book: Any) -> dict[str, Any]:
         """Validate BookIntegrityV1 optional sub-envelope."""
@@ -219,6 +224,8 @@ class MarketPitPort:
             epoch = envelope["connection_epoch"]
             if type(epoch) is not int or epoch < 1:
                 raise SafetyViolation("CONNECTION_EPOCH_INVALID")
+            if self.last_connection_epoch is not None and epoch < self.last_connection_epoch:
+                raise SafetyViolation("CONNECTION_EPOCH_REGRESSION")
             seq = envelope["source_sequence"]
             if seq is not None and (type(seq) is not int or seq < 0):
                 raise SafetyViolation("SOURCE_SEQUENCE_INVALID")
@@ -268,9 +275,18 @@ class MarketPitPort:
                 g1_event = self._translate_bar(payload, avail_ms=avail_ms, seq=seq)
             elif channel == "funding_settled":
                 g1_event = self._translate_funding(payload, avail_ms=avail_ms, wall_ms=wall_ms)
+                if g1_event is None:
+                    self.duplicate_envelope_count += 1
+                    return {
+                        "status": "DUPLICATE_IGNORED",
+                        "dedupe_key": dedupe_key,
+                        "duplicate_count": self.duplicate_envelope_count,
+                        "g1_event": None,
+                    }
 
             self.last_wall_utc_ms = wall_ms
             self.last_monotonic_ns = mono_ns
+            self.last_connection_epoch = epoch
             self.max_feature_known_at_ms = max(self.max_feature_known_at_ms, avail_ms)
             self.seen_dedupe_keys[dedupe_key] = envelope["payload_sha256"]
             self.accepted_envelope_count += 1
@@ -343,33 +359,69 @@ class MarketPitPort:
 
     def _translate_funding(
         self, payload: dict[str, Any], *, avail_ms: int, wall_ms: int
-    ) -> dict[str, Any]:
-        exact(
-            payload,
-            {
-                "event_id",
-                "settlement_id",
-                "settlement_at_ms",
-                "rate_fraction",
-                "settled",
-                "rate_type",
-            },
-            "FUNDING_PAYLOAD_SCHEMA_INVALID",
-        )
+    ) -> dict[str, Any] | None:
+        FUNDING_REQUIRED_KEYS = {
+            "event_id",
+            "settlement_id",
+            "settlement_at_ms",
+            "rate_fraction",
+            "settled",
+            "rate_type",
+        }
+        FUNDING_OPTIONAL_KEYS = {"mark_price", "mark_close"}
+        payload_keys = set(payload.keys())
+        if not (FUNDING_REQUIRED_KEYS <= payload_keys <= (FUNDING_REQUIRED_KEYS | FUNDING_OPTIONAL_KEYS)):
+            raise SafetyViolation("FUNDING_PAYLOAD_SCHEMA_INVALID")
         if payload["settled"] is not True or payload["rate_type"] != "SETTLED_REALIZED":
             raise SafetyViolation("FUNDING_ESTIMATED_NOT_SETTLED")
+        settlement_id = payload["settlement_id"]
+        if not isinstance(settlement_id, str) or not settlement_id:
+            raise SafetyViolation("FUNDING_PAYLOAD_SCHEMA_INVALID")
+        event_id = payload["event_id"]
+        if not isinstance(event_id, str) or not event_id:
+            raise SafetyViolation("FUNDING_PAYLOAD_SCHEMA_INVALID")
         settlement_at = timestamp(payload["settlement_at_ms"])
-        if wall_ms < settlement_at or avail_ms != settlement_at:
+        if wall_ms < settlement_at or avail_ms < settlement_at:
             raise SafetyViolation("FUNDING_PIT_INVALID")
         rate = decimal(payload["rate_fraction"])
         if abs(rate) > decimal("0.1"):
             raise SafetyViolation("FUNDING_RATE_BOUNDS")
+
+        mark: Decimal | None = None
+        if "mark_price" in payload and payload["mark_price"] is not None:
+            mark = decimal(payload["mark_price"], positive=True)
+        elif "mark_close" in payload and payload["mark_close"] is not None:
+            mark = decimal(payload["mark_close"], positive=True)
+
+        if settlement_id in self.seen_funding_settlements:
+            prev = self.seen_funding_settlements[settlement_id]
+            if (
+                prev["settlement_at"] != settlement_at
+                or prev["rate"] != rate
+                or (mark is not None and prev["mark"] is not None and prev["mark"] != mark)
+            ):
+                raise SafetyViolation("FUNDING_SETTLEMENT_CONFLICT")
+            return None
+
+        if settlement_at in self.seen_funding_clocks:
+            prev_id = self.seen_funding_clocks[settlement_at]
+            if prev_id != settlement_id:
+                raise SafetyViolation("FUNDING_SETTLEMENT_COLLISION")
+
+        self.seen_funding_settlements[settlement_id] = {
+            "settlement_at": settlement_at,
+            "rate": rate,
+            "rate_fraction": payload["rate_fraction"],
+            "mark": mark,
+            "event_id": event_id,
+        }
+        self.seen_funding_clocks[settlement_at] = settlement_id
         return {
-            "id": payload["event_id"],
+            "id": event_id,
             "kind": "FUNDING",
             "at": settlement_at,
             "payload": {
-                "settlement_id": payload["settlement_id"],
+                "settlement_id": settlement_id,
                 "settlement_at": settlement_at,
                 "rate_fraction": payload["rate_fraction"],
             },
@@ -431,14 +483,21 @@ def make_synthetic_market_event_v1_from_g1_funding(
     *,
     sequence: int,
     monotonic_ns: int,
+    available_at_ms: int | None = None,
+    observed_wall_utc_ms: int | None = None,
+    provider_event_ms: int | None = None,
+    provider_transaction_ms: int | None = None,
     connection_epoch: int = 1,
     stream_id: str = PINNED_SYNTHETIC_STREAM_ID,
     manifest_sha256: str = PINNED_RAW_MANIFEST_SHA256,
+    mark_price: str | None = None,
+    quality: str = "VERIFIED",
+    reason_codes: list[str] | None = None,
 ) -> dict[str, Any]:
     """Wrap a synthetic G1 FUNDING event into a canonical MarketEventV1 envelope."""
     f = g1_funding_event["payload"]
     at = g1_funding_event["at"]
-    payload = {
+    payload: dict[str, Any] = {
         "event_id": g1_funding_event["id"],
         "settlement_id": f["settlement_id"],
         "settlement_at_ms": f["settlement_at"],
@@ -446,25 +505,218 @@ def make_synthetic_market_event_v1_from_g1_funding(
         "settled": True,
         "rate_type": "SETTLED_REALIZED",
     }
+    if mark_price is not None:
+        payload["mark_price"] = mark_price
+
+    wall_ms = at if observed_wall_utc_ms is None else observed_wall_utc_ms
+    avail_ms = wall_ms if available_at_ms is None else available_at_ms
+    prov_e = at if provider_event_ms is None else provider_event_ms
+    prov_t = at if provider_transaction_ms is None else provider_transaction_ms
     return {
         "schema_version": "market-event-v1",
         "symbol": "BTCUSDT",
         "product": "BINANCE_USDT_M_PERP",
         "channel": "funding_settled",
-        "provider_event_ms": at,
-        "provider_transaction_ms": at,
-        "observed_wall_utc_ms": at,
+        "provider_event_ms": prov_e,
+        "provider_transaction_ms": prov_t,
+        "observed_wall_utc_ms": wall_ms,
         "observed_monotonic_ns": monotonic_ns,
-        "available_at_ms": at,
+        "available_at_ms": avail_ms,
         "source_stream_id": stream_id,
         "connection_epoch": connection_epoch,
         "source_sequence": sequence,
         "payload_sha256": digest(payload),
         "payload": payload,
-        "quality": "VERIFIED",
-        "reason_codes": [],
+        "quality": quality,
+        "reason_codes": reason_codes if reason_codes is not None else [],
         "raw_source_manifest_sha256": manifest_sha256,
     }
+
+
+def make_synthetic_funding_envelope(
+    *,
+    settlement_id: str = "fund-0",
+    settlement_at_ms: int = 480_000,
+    rate_fraction: str = "0.0001",
+    available_at_ms: int | None = None,
+    observed_wall_utc_ms: int | None = None,
+    provider_event_ms: int | None = None,
+    provider_transaction_ms: int | None = None,
+    sequence: int = 0,
+    monotonic_ns: int = 1_000_000,
+    connection_epoch: int = 1,
+    stream_id: str = PINNED_SYNTHETIC_STREAM_ID,
+    manifest_sha256: str = PINNED_RAW_MANIFEST_SHA256,
+    mark_price: str | None = None,
+    event_id: str | None = None,
+    settled: bool = True,
+    rate_type: str = "SETTLED_REALIZED",
+    quality: str = "VERIFIED",
+    reason_codes: list[str] | None = None,
+) -> dict[str, Any]:
+    """Build a standalone synthetic MarketEventV1 funding envelope for unit tests."""
+    eid = event_id if event_id is not None else f"FUNDING-{settlement_at_ms}"
+    g1_funding_event = {
+        "id": eid,
+        "kind": "FUNDING",
+        "at": settlement_at_ms,
+        "payload": {
+            "settlement_id": settlement_id,
+            "settlement_at": settlement_at_ms,
+            "rate_fraction": rate_fraction,
+        },
+    }
+    env = make_synthetic_market_event_v1_from_g1_funding(
+        g1_funding_event,
+        sequence=sequence,
+        monotonic_ns=monotonic_ns,
+        available_at_ms=available_at_ms,
+        observed_wall_utc_ms=observed_wall_utc_ms,
+        provider_event_ms=provider_event_ms,
+        provider_transaction_ms=provider_transaction_ms,
+        connection_epoch=connection_epoch,
+        stream_id=stream_id,
+        manifest_sha256=manifest_sha256,
+        mark_price=mark_price,
+        quality=quality,
+        reason_codes=reason_codes,
+    )
+    if not settled or rate_type != "SETTLED_REALIZED":
+        env["payload"]["settled"] = settled
+        env["payload"]["rate_type"] = rate_type
+        env["payload_sha256"] = digest(env["payload"])
+    return env
+
+
+def calculate_settled_funding_cash_flow(
+    *,
+    side: str,
+    quantity: Decimal | str | float,
+    mark_price: Decimal | str | float | None,
+    rate_fraction: Decimal | str | float | None,
+    funding_coverage_complete: bool = True,
+) -> dict[str, Any]:
+    """Strict Decimal cash flow evaluation for settled funding with PIT causal conservation.
+
+    Invariants:
+    - Side symmetry: LONG pays positive rate (- cash), SHORT receives positive rate (+ cash).
+    - Formula: cash_flow = -1 * signed_exposure * mark_price * rate_fraction.
+    - Missing mark_price or rate_fraction => COST_INCOMPLETE (cash_flow is None, never 0.0).
+    - Zero rate requires complete witnessed coverage (funding_coverage_complete=True and valid mark).
+      Otherwise status is COST_INCOMPLETE.
+    - Non-finite or out-of-bounds inputs fail closed with SafetyViolation.
+    """
+    if side not in ("LONG", "SHORT"):
+        raise SafetyViolation("POSITION_SIDE_INVALID")
+
+    if not funding_coverage_complete:
+        return {
+            "status": "COST_INCOMPLETE",
+            "cash_flow": None,
+            "side": side,
+            "quantity": None,
+            "signed_exposure": None,
+            "mark_price": None,
+            "rate_fraction": None,
+            "reason": "FUNDING_COVERAGE_INCOMPLETE",
+        }
+
+    if mark_price is None or rate_fraction is None:
+        return {
+            "status": "COST_INCOMPLETE",
+            "cash_flow": None,
+            "side": side,
+            "quantity": None,
+            "signed_exposure": None,
+            "mark_price": None,
+            "rate_fraction": None,
+            "reason": "MISSING_MARK_OR_RATE",
+        }
+
+    try:
+        qty_dec = decimal(str(quantity), positive=True)
+    except SafetyViolation:
+        raise
+    except Exception as exc:
+        raise SafetyViolation("DECIMAL_INVALID") from exc
+
+    try:
+        mark_dec = decimal(str(mark_price), positive=True)
+    except SafetyViolation:
+        return {
+            "status": "COST_INCOMPLETE",
+            "cash_flow": None,
+            "side": side,
+            "quantity": qty_dec,
+            "signed_exposure": None,
+            "mark_price": None,
+            "rate_fraction": None,
+            "reason": "MARK_PRICE_INVALID",
+        }
+
+    try:
+        rate_dec = decimal(str(rate_fraction))
+        if abs(rate_dec) > Decimal("0.1"):
+            raise SafetyViolation("FUNDING_RATE_BOUNDS")
+    except SafetyViolation:
+        raise
+    except Exception as exc:
+        raise SafetyViolation("DECIMAL_INVALID") from exc
+
+    signed_mult = Decimal(1) if side == "LONG" else Decimal(-1)
+    signed_exposure = signed_mult * qty_dec
+    cash_flow = -signed_exposure * mark_dec * rate_dec
+
+    return {
+        "status": "COST_COMPLETE",
+        "cash_flow": cash_flow,
+        "side": side,
+        "quantity": qty_dec,
+        "signed_exposure": signed_exposure,
+        "mark_price": mark_dec,
+        "rate_fraction": rate_dec,
+        "reason": "OK",
+    }
+
+
+def compute_settlement_exposure(
+    fills: list[dict[str, Any]],
+    settlement_at_ms: int,
+    *,
+    side: str = "LONG",
+) -> Decimal:
+    """Compute signed quantity exposure AT SETTLEMENT (not delayed receipt).
+
+    Rules:
+    - Only fills executed strictly before settlement_at_ms (executed_at < settlement_at_ms) count.
+    - If any fill has executed_at == settlement_at_ms, the boundary is ambiguous => SafetyViolation("AMBIGUOUS_SETTLEMENT_BOUNDARY").
+    - Fills executed after settlement_at_ms (executed_at > settlement_at_ms) are NOT included in settlement exposure.
+    - Preserves side: LONG is positive, SHORT is negative.
+    """
+    timestamp(settlement_at_ms)
+    if side not in ("LONG", "SHORT"):
+        raise SafetyViolation("POSITION_SIDE_INVALID")
+
+    net_qty = Decimal(0)
+    for f in fills:
+        exec_at = timestamp(f["executed_at"])
+        if exec_at == settlement_at_ms:
+            raise SafetyViolation("AMBIGUOUS_SETTLEMENT_BOUNDARY")
+        if exec_at < settlement_at_ms:
+            q = decimal(str(f["quantity"]), positive=True)
+            action = f["action"]
+            if action == "ENTRY":
+                net_qty += q
+            elif action == "EXIT":
+                net_qty -= q
+            else:
+                raise SafetyViolation("FILL_ACTION_INVALID")
+
+    if net_qty < Decimal(0):
+        raise SafetyViolation("POSITION_EXPOSURE_NEGATIVE")
+
+    signed_mult = Decimal(1) if side == "LONG" else Decimal(-1)
+    return signed_mult * net_qty
 
 
 def make_synthetic_bar_envelope(

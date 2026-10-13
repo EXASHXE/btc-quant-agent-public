@@ -1,0 +1,107 @@
+{
+  "schema_version": "v06_p1d_consumer_c_late_funding_r2_receipt_v1",
+  "task_id": "V06_P1D_CONSUMER_C_LATE_FUNDING_PIT_R2",
+  "dispatch_id": "V06_P1D_CONSUMER_C_LATE_FUNDING_PIT_R2",
+  "dispatch_sha": "68def8fed3fd290ffbddf00a8f86e4184a8b036f",
+  "dispatch_url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/68def8fed3fd290ffbddf00a8f86e4184a8b036f/prompts/v0.6/b_line/V06_P1D_CONSUMER_C_FUNDING_PIT_CONTRACT_REPAIR_EXECUTION_R2.md",
+  "frozen_codebase_sha": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+  "branch": "feature/v06-p1d-consumer-c-late-funding-pit-r2",
+  "executor": "Gemini BOOST",
+  "review_authority": "Codex Sol High independent financial/causal review",
+  "terminal_decision": "PASS_CONSUMER_PIT_CONTRACT_PENDING_INTEGRATION",
+  "scope_adherence": {
+    "narrow_write_allowlist": [
+      "scripts/g1g3_offline_ports_r1/market_pit_port.py",
+      "tests/test_v06_g1g3_offline_ports_r1_core_integration.py",
+      "tests/test_v06_g1g3_offline_ports_r1_recovery_and_guards.py",
+      "reviews/v0.6/b_line/V06_P1D_CONSUMER_C_LATE_FUNDING_R2_IMPLEMENTATION_AND_EVIDENCE.md",
+      "evidence/v0.6/b_line/p1d_consumer_c_late_funding_r2/SYNTHETIC_CASE_RECEIPT.json"
+    ],
+    "unauthorized_files_modified": 0,
+    "generic_ledger_untouched": true,
+    "feed_bridge_untouched": true,
+    "source_adapters_untouched": true,
+    "exchange_orders_untouched": true,
+    "cross_branch_merges": 0
+  },
+  "observed_defect_remediation": {
+    "defect": "scripts/g1g3_offline_ports_r1/market_pit_port.py _translate_funding checked wall_ms >= settlement_at and avail_ms == settlement_at, rejecting legitimate settlement REST records arriving after the economic charge.",
+    "repair": "Replaced avail_ms == settlement_at with avail_ms >= settlement_at and wall_ms >= settlement_at. Preserved immutable economic settlement_at on output g1_event['at'] while advancing feature_known_at_ms to receiver available_at_ms strictly without backdating. Implemented duplicate replay idempotence, same-settlement-id conflicting rate/mark hard fail, and receipt-before-settlement fail closed."
+  },
+  "synthetic_acceptance_matrix": {
+    "1_on_time_settled_funding": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_on_time_settled",
+      "evidence": "available_at_ms == settlement_at_ms accepted; g1_event emitted at economic settlement timestamp."
+    },
+    "2_3s_and_multi_minute_late_receipt": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_3s_and_multi_minute_late_receipt_with_known_at",
+      "evidence": "3s late (t+3s) and 5m late (t+300s) REST receipts accepted; available_at_ms reflects receiver known-at; economic event clock remains pinned to settlement_at_ms."
+    },
+    "3_unchanged_earlier_decision_feature_view": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_unchanged_earlier_decision_feature_view",
+      "evidence": "Earlier decision at t=60_000 valid prior to receipt; after late funding arrival at t=120_000, decision at t=60_000 fails DECISION_BEFORE_FEATURE_KNOWN_AT, proving no retroactive leakage."
+    },
+    "4_duplicate_replay_idempotence": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_duplicate_replay_idempotence",
+      "evidence": "Exact and re-keyed duplicate settlement replays return DUPLICATE_IGNORED with g1_event=None, preserving exactly-once ledger semantics without downstream double-charge."
+    },
+    "5_same_settlement_id_conflicting_rate_mark_hard_fail": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_same_settlement_id_conflicting_rate_or_mark_hard_fail",
+      "evidence": "Same settlement ID with conflicting rate or conflicting Mark price hard fails with SafetyViolation('FUNDING_SETTLEMENT_CONFLICT')."
+    },
+    "6_receipt_before_settlement_reject": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_receipt_before_settlement_rejected",
+      "evidence": "wall_ms < settlement_at or avail_ms < settlement_at fails closed with SafetyViolation('FUNDING_PIT_INVALID'); future reference fails MARKET_EVENT_FUTURE_KNOWN."
+    },
+    "7_missing_mark_rate_cost_incomplete": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_missing_mark_or_rate_cost_incomplete",
+      "evidence": "Missing mark_price or rate_fraction yields status COST_INCOMPLETE with cash_flow=None; never silently assumed zero."
+    },
+    "8_funding_credit_debit_side_symmetry": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_credit_debit_side_symmetry",
+      "evidence": "LONG pays positive rate (cash < 0); SHORT receives positive rate (cash > 0); cash flows sum to exactly Decimal(0) conservation."
+    },
+    "9_exposure_before_vs_after_partial_fill_settlement": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_exposure_before_vs_after_partial_fill_and_settlement",
+      "evidence": "Partial exit before settlement reduces economic exposure at settlement; partial exit after settlement does not alter economic exposure at settlement regardless of delayed receipt time."
+    },
+    "10_ambiguous_fill_vs_settlement_boundary": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_ambiguous_fill_vs_settlement_boundary",
+      "evidence": "Fill executed at exact settlement millisecond raises SafetyViolation('AMBIGUOUS_SETTLEMENT_BOUNDARY')."
+    },
+    "11_reconnect_or_clock_regression_fail_closed": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_reconnect_and_clock_regression_fail_closed",
+      "evidence": "Monotonic regression raises MONOTONIC_REGRESSION; wall regression raises CLOCK_UNCERTAIN; epoch regression raises CONNECTION_EPOCH_REGRESSION; CLOCK_UNCERTAIN reason code fails closed."
+    },
+    "12_zero_real_funding_complete_witnessed_coverage": {
+      "status": "PASS",
+      "test": "test_market_pit_funding_zero_real_funding_complete_witnessed_coverage",
+      "evidence": "Rate 0.0 with incomplete coverage or missing mark yields COST_INCOMPLETE; exact 0.0 cash flow realized only under complete verified coverage."
+    }
+  },
+  "test_execution_record": {
+    "environment": {
+      "python": "3.13.13",
+      "pytest": "8.4.2",
+      "ruff": "0.15.10",
+      "os": "Linux x86_64"
+    },
+    "total_suite_collected": 155,
+    "total_suite_passed": 155,
+    "total_suite_failed": 0,
+    "total_suite_skipped": 0,
+    "focused_funding_tests_count": 13,
+    "focused_funding_tests_passed": 13
+  }
+}

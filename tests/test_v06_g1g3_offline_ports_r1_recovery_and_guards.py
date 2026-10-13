@@ -24,6 +24,10 @@ from scripts.g1g3_offline_ports_r1.durable_supervisor import (
 from scripts.g1g3_offline_ports_r1.loopback_servers import (
     FakeLoopbackLLMServer,
 )
+from scripts.g1g3_offline_ports_r1.market_pit_port import (
+    MarketPitPort,
+    make_synthetic_funding_envelope,
+)
 from scripts.g1g3_offline_ports_r1.no_order_port import (
     OWN_SCRATCH,
     LoopbackSocketGuard,
@@ -307,3 +311,109 @@ def test_cli_invalid_argument_never_echoes_secret_and_valid_cli_runs_cleanly(
     finally:
         if run_dir.exists():
             shutil.rmtree(run_dir)
+
+
+def test_market_pit_funding_reconnect_and_clock_regression_fail_closed() -> None:
+    port = MarketPitPort()
+    env1 = make_synthetic_funding_envelope(
+        settlement_id="s-regress-1",
+        settlement_at_ms=480_000,
+        rate_fraction="0.0001",
+        observed_wall_utc_ms=481_000,
+        available_at_ms=481_000,
+        sequence=1,
+        monotonic_ns=10_000_000,
+        connection_epoch=2,
+    )
+    res = port.ingest_envelope(env1, reference_at_ms=481_000)
+    assert res["status"] == "ACCEPTED"
+
+    # 1. Monotonic clock regression on funding channel
+    env_mono_regress = make_synthetic_funding_envelope(
+        settlement_id="s-regress-2",
+        settlement_at_ms=480_000,
+        rate_fraction="0.0001",
+        observed_wall_utc_ms=482_000,
+        available_at_ms=482_000,
+        sequence=2,
+        monotonic_ns=9_000_000,
+        connection_epoch=2,
+    )
+    with pytest.raises(SafetyViolation) as exc_mono:
+        port.ingest_envelope(env_mono_regress, reference_at_ms=482_000)
+    assert exc_mono.value.code == "MONOTONIC_REGRESSION"
+
+    # 2. Wall clock regression on funding channel
+    env_wall_regress = make_synthetic_funding_envelope(
+        settlement_id="s-regress-3",
+        settlement_at_ms=480_000,
+        rate_fraction="0.0001",
+        observed_wall_utc_ms=480_500,
+        available_at_ms=481_500,
+        sequence=3,
+        monotonic_ns=20_000_000,
+        connection_epoch=2,
+    )
+    with pytest.raises(SafetyViolation) as exc_wall:
+        port.ingest_envelope(env_wall_regress, reference_at_ms=482_000)
+    assert exc_wall.value.code == "CLOCK_UNCERTAIN"
+
+    # 3. Connection epoch regression
+    env_epoch_regress = make_synthetic_funding_envelope(
+        settlement_id="s-regress-4",
+        settlement_at_ms=480_000,
+        rate_fraction="0.0001",
+        observed_wall_utc_ms=483_000,
+        available_at_ms=483_000,
+        sequence=4,
+        monotonic_ns=30_000_000,
+        connection_epoch=1,
+    )
+    with pytest.raises(SafetyViolation) as exc_epoch:
+        port.ingest_envelope(env_epoch_regress, reference_at_ms=483_000)
+    assert exc_epoch.value.code == "CONNECTION_EPOCH_REGRESSION"
+
+    # 4. Reason codes include CLOCK_UNCERTAIN
+    env_clock_uncertain = make_synthetic_funding_envelope(
+        settlement_id="s-regress-5",
+        settlement_at_ms=480_000,
+        rate_fraction="0.0001",
+        observed_wall_utc_ms=484_000,
+        available_at_ms=484_000,
+        sequence=5,
+        monotonic_ns=40_000_000,
+        connection_epoch=2,
+        reason_codes=["CLOCK_UNCERTAIN"],
+    )
+    with pytest.raises(SafetyViolation) as exc_cu:
+        port.ingest_envelope(env_clock_uncertain, reference_at_ms=484_000)
+    assert exc_cu.value.code == "CLOCK_UNCERTAIN"
+
+
+def test_market_pit_funding_same_clock_different_id_collision_fail_closed() -> None:
+    port = MarketPitPort()
+    env_a = make_synthetic_funding_envelope(
+        settlement_id="settlement-primary-alpha",
+        settlement_at_ms=720_000,
+        rate_fraction="0.0001",
+        observed_wall_utc_ms=721_000,
+        available_at_ms=721_000,
+        sequence=1,
+        monotonic_ns=1_000_000,
+    )
+    res = port.ingest_envelope(env_a, reference_at_ms=721_000)
+    assert res["status"] == "ACCEPTED"
+
+    # Same settlement timestamp (720_000) with DIFFERENT settlement ID => hard collision
+    env_b = make_synthetic_funding_envelope(
+        settlement_id="settlement-secondary-beta",
+        settlement_at_ms=720_000,
+        rate_fraction="0.0001",
+        observed_wall_utc_ms=722_000,
+        available_at_ms=722_000,
+        sequence=2,
+        monotonic_ns=2_000_000,
+    )
+    with pytest.raises(SafetyViolation) as exc:
+        port.ingest_envelope(env_b, reference_at_ms=722_000)
+    assert exc.value.code == "FUNDING_SETTLEMENT_COLLISION"
