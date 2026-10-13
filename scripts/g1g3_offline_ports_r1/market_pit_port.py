@@ -251,6 +251,8 @@ class MarketPitPort:
                 if self.seen_dedupe_keys[dedupe_key] != envelope["payload_sha256"]:
                     raise SafetyViolation("MARKET_EVENT_PROVENANCE_DRIFT")
                 self.duplicate_envelope_count += 1
+                if channel == "funding_settled":
+                    self.duplicate_funding_count += 1
                 return {
                     "status": "DUPLICATE_IGNORED",
                     "dedupe_key": dedupe_key,
@@ -277,6 +279,11 @@ class MarketPitPort:
                 g1_event = self._translate_funding(payload, avail_ms=avail_ms, wall_ms=wall_ms)
                 if g1_event is None:
                     self.duplicate_envelope_count += 1
+                    self.duplicate_funding_count += 1
+                    self.last_wall_utc_ms = wall_ms
+                    self.last_monotonic_ns = mono_ns
+                    self.last_connection_epoch = epoch
+                    self.seen_dedupe_keys[dedupe_key] = envelope["payload_sha256"]
                     return {
                         "status": "DUPLICATE_IGNORED",
                         "dedupe_key": dedupe_key,
@@ -398,7 +405,8 @@ class MarketPitPort:
             if (
                 prev["settlement_at"] != settlement_at
                 or prev["rate"] != rate
-                or (mark is not None and prev["mark"] is not None and prev["mark"] != mark)
+                or prev["event_id"] != event_id
+                or prev["mark"] != mark
             ):
                 raise SafetyViolation("FUNDING_SETTLEMENT_CONFLICT")
             return None
@@ -634,7 +642,8 @@ def calculate_settled_funding_cash_flow(
         }
 
     try:
-        qty_dec = decimal(str(quantity), positive=True)
+        raw_qty = Decimal(str(quantity))
+        qty_dec = decimal(str(abs(raw_qty)), positive=False, zero_ok=True)
     except SafetyViolation:
         raise
     except Exception as exc:

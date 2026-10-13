@@ -374,12 +374,46 @@ def test_market_pit_funding_duplicate_replay_idempotence() -> None:
     assert res3["g1_event"] is None
     assert port.accepted_envelope_count == 1
     assert port.duplicate_envelope_count == 2
+    assert port.duplicate_funding_count == 2
+
+    # Port clocks advanced correctly through the duplicate funding envelope
+    assert port.last_monotonic_ns == 2_000_000
+    assert port.last_wall_utc_ms == 482_000
+
+    # Clock regression after duplicate funding must fail closed
+    env_mono_regress = make_synthetic_funding_envelope(
+        settlement_id="s-replay-next",
+        settlement_at_ms=483_000,
+        rate_fraction="0.00010000",
+        observed_wall_utc_ms=483_000,
+        available_at_ms=483_000,
+        sequence=3,
+        monotonic_ns=1_500_000,
+    )
+    with pytest.raises(SafetyViolation) as exc_mono:
+        port.ingest_envelope(env_mono_regress, reference_at_ms=483_000)
+    assert exc_mono.value.code == "MONOTONIC_REGRESSION"
+
+    # Provenance drift on sequence 2 dedupe key must be detected
+    env_tampered_seq2 = make_synthetic_funding_envelope(
+        settlement_id="s-other-tampered",
+        settlement_at_ms=482_000,
+        rate_fraction="0.00010000",
+        observed_wall_utc_ms=482_000,
+        available_at_ms=482_000,
+        sequence=2,
+        monotonic_ns=2_000_000,
+    )
+    with pytest.raises(SafetyViolation) as exc_drift:
+        port.ingest_envelope(env_tampered_seq2, reference_at_ms=482_000)
+    assert exc_drift.value.code == "MARKET_EVENT_PROVENANCE_DRIFT"
 
 
 def test_market_pit_funding_same_settlement_id_conflicting_rate_or_mark_hard_fail() -> None:
     port = MarketPitPort()
     env1 = make_synthetic_funding_envelope(
         settlement_id="s-conflict-rate",
+        event_id="FUNDING-EVT-1",
         settlement_at_ms=480_000,
         rate_fraction="0.00010000",
         mark_price="64000.00",
@@ -394,6 +428,7 @@ def test_market_pit_funding_same_settlement_id_conflicting_rate_or_mark_hard_fai
     # Same settlement ID with conflicting rate must hard fail
     env_bad_rate = make_synthetic_funding_envelope(
         settlement_id="s-conflict-rate",
+        event_id="FUNDING-EVT-1",
         settlement_at_ms=480_000,
         rate_fraction="0.00020000",
         mark_price="64000.00",
@@ -406,9 +441,10 @@ def test_market_pit_funding_same_settlement_id_conflicting_rate_or_mark_hard_fai
         port.ingest_envelope(env_bad_rate, reference_at_ms=482_000)
     assert exc_rate.value.code == "FUNDING_SETTLEMENT_CONFLICT"
 
-    # Same settlement ID with conflicting Mark must hard fail
+    # Same settlement ID with conflicting Mark value must hard fail
     env_bad_mark = make_synthetic_funding_envelope(
         settlement_id="s-conflict-rate",
+        event_id="FUNDING-EVT-1",
         settlement_at_ms=480_000,
         rate_fraction="0.00010000",
         mark_price="65000.00",
@@ -420,6 +456,38 @@ def test_market_pit_funding_same_settlement_id_conflicting_rate_or_mark_hard_fai
     with pytest.raises(SafetyViolation) as exc_mark:
         port.ingest_envelope(env_bad_mark, reference_at_ms=483_000)
     assert exc_mark.value.code == "FUNDING_SETTLEMENT_CONFLICT"
+
+    # Same settlement ID with missing Mark when previously witnessed must hard fail
+    env_missing_mark = make_synthetic_funding_envelope(
+        settlement_id="s-conflict-rate",
+        event_id="FUNDING-EVT-1",
+        settlement_at_ms=480_000,
+        rate_fraction="0.00010000",
+        mark_price=None,
+        observed_wall_utc_ms=484_000,
+        available_at_ms=484_000,
+        sequence=4,
+        monotonic_ns=4_000_000,
+    )
+    with pytest.raises(SafetyViolation) as exc_no_mark:
+        port.ingest_envelope(env_missing_mark, reference_at_ms=484_000)
+    assert exc_no_mark.value.code == "FUNDING_SETTLEMENT_CONFLICT"
+
+    # Same settlement ID with conflicting event ID must hard fail
+    env_diff_eid = make_synthetic_funding_envelope(
+        settlement_id="s-conflict-rate",
+        event_id="FUNDING-EVT-FORGED",
+        settlement_at_ms=480_000,
+        rate_fraction="0.00010000",
+        mark_price="64000.00",
+        observed_wall_utc_ms=485_000,
+        available_at_ms=485_000,
+        sequence=5,
+        monotonic_ns=5_000_000,
+    )
+    with pytest.raises(SafetyViolation) as exc_eid:
+        port.ingest_envelope(env_diff_eid, reference_at_ms=485_000)
+    assert exc_eid.value.code == "FUNDING_SETTLEMENT_CONFLICT"
 
 
 def test_market_pit_funding_receipt_before_settlement_rejected() -> None:
@@ -498,6 +566,31 @@ def test_market_pit_funding_missing_mark_or_rate_cost_incomplete() -> None:
     assert r3["status"] == "COST_INCOMPLETE"
     assert r3["cash_flow"] is None
 
+    # Zero mark price with negative rate fails closed to COST_INCOMPLETE (never assumes 0.0)
+    r4 = calculate_settled_funding_cash_flow(
+        side="LONG",
+        quantity="1.5",
+        mark_price="0.00",
+        rate_fraction="-0.0001",
+    )
+    assert r4["status"] == "COST_INCOMPLETE"
+    assert r4["reason"] == "MARK_PRICE_INVALID"
+    assert r4["cash_flow"] is None
+
+    # Zero mark price in synthetic envelope fails closed with DECIMAL_BOUNDS
+    port = MarketPitPort()
+    env_zero_mark = make_synthetic_funding_envelope(
+        settlement_id="s-zero-mark",
+        settlement_at_ms=480_000,
+        rate_fraction="-0.0001",
+        mark_price="0.00",
+        observed_wall_utc_ms=481_000,
+        available_at_ms=481_000,
+    )
+    with pytest.raises(SafetyViolation) as exc_zero_mark:
+        port.ingest_envelope(env_zero_mark, reference_at_ms=481_000)
+    assert exc_zero_mark.value.code == "DECIMAL_BOUNDS"
+
 
 def test_market_pit_funding_credit_debit_side_symmetry() -> None:
     qty = Decimal("2.0")
@@ -561,6 +654,18 @@ def test_market_pit_funding_exposure_before_vs_after_partial_fill_and_settlement
     )
     assert cf_b["cash_flow"] == -Decimal("0.010") * Decimal("60000.00") * Decimal("0.0001")
 
+    # Case C: SHORT exposure with partial fill before vs after settlement
+    exp_c = compute_settlement_exposure(fills_a, 500_000, side="SHORT")
+    assert exp_c == Decimal("-0.006")
+    # Piped directly into cash flow calculation with signed SHORT exposure
+    cf_c = calculate_settled_funding_cash_flow(
+        side="SHORT", quantity=exp_c, mark_price="60000.00", rate_fraction="0.0001"
+    )
+    assert cf_c["status"] == "COST_COMPLETE"
+    assert cf_c["signed_exposure"] == Decimal("-0.006")
+    # SHORT receives positive funding cash flow:
+    assert cf_c["cash_flow"] == Decimal("0.006") * Decimal("60000.00") * Decimal("0.0001")
+
 
 def test_market_pit_funding_ambiguous_fill_vs_settlement_boundary() -> None:
     # A fill executed at the exact millisecond of funding settlement is ambiguous
@@ -606,6 +711,29 @@ def test_market_pit_funding_zero_real_funding_complete_witnessed_coverage() -> N
     )
     assert r_complete["status"] == "COST_COMPLETE"
     assert r_complete["cash_flow"] == Decimal(0)
+
+    # Flat position (quantity=0) with complete coverage realizes exact 0.0 cash flow
+    r_zero_qty = calculate_settled_funding_cash_flow(
+        side="LONG",
+        quantity=Decimal(0),
+        mark_price="60000.00",
+        rate_fraction="0.0001",
+        funding_coverage_complete=True,
+    )
+    assert r_zero_qty["status"] == "COST_COMPLETE"
+    assert r_zero_qty["cash_flow"] == Decimal(0)
+    assert r_zero_qty["signed_exposure"] == Decimal(0)
+
+    # Flat position with incomplete coverage fails closed to COST_INCOMPLETE
+    r_zero_qty_incomplete = calculate_settled_funding_cash_flow(
+        side="LONG",
+        quantity=Decimal(0),
+        mark_price="60000.00",
+        rate_fraction="0.0001",
+        funding_coverage_complete=False,
+    )
+    assert r_zero_qty_incomplete["status"] == "COST_INCOMPLETE"
+    assert r_zero_qty_incomplete["cash_flow"] is None
 
 
 def test_market_pit_decision_pit_guard() -> None:

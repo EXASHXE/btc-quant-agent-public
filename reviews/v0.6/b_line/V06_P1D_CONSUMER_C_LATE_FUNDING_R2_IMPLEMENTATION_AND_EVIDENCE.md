@@ -55,14 +55,14 @@ All modifications were strictly constrained to the 5 authorized paths in the dis
   - Added support for optional `mark_price` and `mark_close` payload fields with strict decimal validation.
   - Implemented journal tracking `seen_funding_settlements` and `seen_funding_clocks`.
   - Added duplicate replay detection returning `None` (resulting in `DUPLICATE_IGNORED` at the envelope level).
-  - Added conflict detection for revised rates or Mark prices on the same `settlement_id`, raising `SafetyViolation("FUNDING_SETTLEMENT_CONFLICT")`.
+  - Added comprehensive conflict detection for revised rates, modified event IDs, missing Mark when previously witnessed, or conflicting Mark prices on the same `settlement_id`, raising `SafetyViolation("FUNDING_SETTLEMENT_CONFLICT")`.
   - Added collision detection for distinct settlement IDs on the same settlement timestamp, raising `SafetyViolation("FUNDING_SETTLEMENT_COLLISION")`.
 - Enhanced `ingest_envelope`:
   - Added connection epoch regression guard (`CONNECTION_EPOCH_REGRESSION`).
-  - Integrated duplicate funding handling (`DUPLICATE_IGNORED`, `g1_event: None`).
+  - Integrated duplicate funding handling (`DUPLICATE_IGNORED`, `g1_event: None`), properly advancing port monotonic and wall clocks, recording envelope dedupe keys against post-replay provenance drift, and incrementing `duplicate_funding_count`.
 - Enhanced `make_synthetic_market_event_v1_from_g1_funding` and added `make_synthetic_funding_envelope` to allow arbitrary late receipt offsets, provider timestamps, and Mark witnesses in synthetic testing.
 - Added pure financial helper functions:
-  - `calculate_settled_funding_cash_flow`: Exact Decimal cash flow evaluation enforcing side symmetry, non-zero assumption, and complete witnessed coverage.
+  - `calculate_settled_funding_cash_flow`: Exact Decimal cash flow evaluation enforcing side symmetry, non-zero assumption, zero-quantity flat position support with complete coverage, signed short exposure piping, and fail-closed validation on zero Mark price with negative rates.
   - `compute_settlement_exposure`: Computes signed exposure strictly at settlement timestamp (`executed_at < settlement_at_ms`), failing closed on ambiguous boundaries (`executed_at == settlement_at_ms`).
 
 ---
@@ -74,15 +74,15 @@ All modifications were strictly constrained to the 5 authorized paths in the dis
 | 1 | On-time settled funding | `test_market_pit_funding_on_time_settled` | **PASS** | `avail_ms == settlement_at_ms` accepted, emitted at economic settlement clock |
 | 2 | 3-second & multi-minute late receipt | `test_market_pit_funding_3s_and_multi_minute_late_receipt_with_known_at` | **PASS** | REST receipt at T+3s and T+300s accepted with receiver known-at; economic event clock remains T |
 | 3 | Unchanged earlier decision feature view | `test_market_pit_funding_unchanged_earlier_decision_feature_view` | **PASS** | Earlier decision at T valid before receipt; after late receipt at T+60s, earlier decision fails closed |
-| 4 | Duplicate replay idempotence | `test_market_pit_funding_duplicate_replay_idempotence` | **PASS** | Exact and re-keyed duplicates return `DUPLICATE_IGNORED` with `g1_event=None`, no double-posting |
-| 5 | Same settlement ID conflicting rate/Mark hard fail | `test_market_pit_funding_same_settlement_id_conflicting_rate_or_mark_hard_fail` | **PASS** | Conflicting rate or Mark raises `FUNDING_SETTLEMENT_CONFLICT` |
+| 4 | Duplicate replay idempotence | `test_market_pit_funding_duplicate_replay_idempotence` | **PASS** | Exact and re-keyed duplicates return `DUPLICATE_IGNORED` with `g1_event=None`, advancing clocks to block post-replay regression attacks |
+| 5 | Same settlement ID conflicting rate/Mark hard fail | `test_market_pit_funding_same_settlement_id_conflicting_rate_or_mark_hard_fail` | **PASS** | Conflicting rate, conflicting Mark, missing Mark, or conflicting event ID raises `FUNDING_SETTLEMENT_CONFLICT` |
 | 6 | Receipt-before-settlement reject | `test_market_pit_funding_receipt_before_settlement_rejected` | **PASS** | `wall_ms < settlement_at` or `avail_ms < settlement_at` raises `FUNDING_PIT_INVALID` |
-| 7 | Missing Mark/rate => COST_INCOMPLETE | `test_market_pit_funding_missing_mark_or_rate_cost_incomplete` | **PASS** | Missing mark or rate returns `COST_INCOMPLETE` with `cash_flow=None`; never assumed 0.0 |
+| 7 | Missing Mark/rate => COST_INCOMPLETE | `test_market_pit_funding_missing_mark_or_rate_cost_incomplete` | **PASS** | Missing mark, rate, or zero mark price with negative rates yields `COST_INCOMPLETE` with `cash_flow=None`; never assumed 0.0 |
 | 8 | Funding credit/debit side symmetry | `test_market_pit_funding_credit_debit_side_symmetry` | **PASS** | LONG pays positive rate, SHORT receives positive rate; exact sum to `Decimal(0)` |
-| 9 | Exposure before vs after partial fill/settlement | `test_market_pit_funding_exposure_before_vs_after_partial_fill_and_settlement` | **PASS** | Partial fill before settlement reduces settlement exposure; partial fill after settlement does not alter settlement exposure |
+| 9 | Exposure before vs after partial fill/settlement | `test_market_pit_funding_exposure_before_vs_after_partial_fill_and_settlement` | **PASS** | Partial fill before settlement reduces settlement exposure; signed SHORT exposure pipes cleanly into cash flow calculation |
 | 10 | Ambiguous fill-vs-settlement boundary | `test_market_pit_funding_ambiguous_fill_vs_settlement_boundary` | **PASS** | Fill at exact settlement timestamp raises `AMBIGUOUS_SETTLEMENT_BOUNDARY` |
 | 11 | Reconnect or clock-regression fail closed | `test_market_pit_funding_reconnect_and_clock_regression_fail_closed` | **PASS** | Monotonic, wall clock, and connection epoch regressions fail closed immediately |
-| 12 | Zero-real-funding complete witnessed coverage | `test_market_pit_funding_zero_real_funding_complete_witnessed_coverage` | **PASS** | Rate 0.0 requires complete coverage; unverified/incomplete coverage yields `COST_INCOMPLETE` |
+| 12 | Zero-real-funding complete witnessed coverage | `test_market_pit_funding_zero_real_funding_complete_witnessed_coverage` | **PASS** | Rate 0.0 or flat portfolio (quantity=0) requires complete coverage; unverified/incomplete coverage yields `COST_INCOMPLETE` |
 
 ---
 

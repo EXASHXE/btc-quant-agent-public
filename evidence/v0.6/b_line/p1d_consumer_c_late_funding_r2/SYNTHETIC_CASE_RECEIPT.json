@@ -48,12 +48,12 @@
     "4_duplicate_replay_idempotence": {
       "status": "PASS",
       "test": "test_market_pit_funding_duplicate_replay_idempotence",
-      "evidence": "Exact and re-keyed duplicate settlement replays return DUPLICATE_IGNORED with g1_event=None, preserving exactly-once ledger semantics without downstream double-charge."
+      "evidence": "Exact and re-keyed duplicate settlement replays return DUPLICATE_IGNORED with g1_event=None, preserving exactly-once ledger semantics without downstream double-charge. Advances monotonic and wall transport clocks to prevent post-replay clock regression attacks, registers dedupe_key against provenance drift, and increments duplicate_funding_count."
     },
     "5_same_settlement_id_conflicting_rate_mark_hard_fail": {
       "status": "PASS",
       "test": "test_market_pit_funding_same_settlement_id_conflicting_rate_or_mark_hard_fail",
-      "evidence": "Same settlement ID with conflicting rate or conflicting Mark price hard fails with SafetyViolation('FUNDING_SETTLEMENT_CONFLICT')."
+      "evidence": "Same settlement ID with conflicting rate, conflicting Mark price, missing Mark when previously witnessed, or conflicting event ID hard fails with SafetyViolation('FUNDING_SETTLEMENT_CONFLICT')."
     },
     "6_receipt_before_settlement_reject": {
       "status": "PASS",
@@ -63,7 +63,7 @@
     "7_missing_mark_rate_cost_incomplete": {
       "status": "PASS",
       "test": "test_market_pit_funding_missing_mark_or_rate_cost_incomplete",
-      "evidence": "Missing mark_price or rate_fraction yields status COST_INCOMPLETE with cash_flow=None; never silently assumed zero."
+      "evidence": "Missing mark_price or rate_fraction yields status COST_INCOMPLETE with cash_flow=None; zero mark price with negative rates fails closed to COST_INCOMPLETE (reason: MARK_PRICE_INVALID) and DECIMAL_BOUNDS in envelope ingestion; never silently assumed zero."
     },
     "8_funding_credit_debit_side_symmetry": {
       "status": "PASS",
@@ -73,7 +73,7 @@
     "9_exposure_before_vs_after_partial_fill_settlement": {
       "status": "PASS",
       "test": "test_market_pit_funding_exposure_before_vs_after_partial_fill_and_settlement",
-      "evidence": "Partial exit before settlement reduces economic exposure at settlement; partial exit after settlement does not alter economic exposure at settlement regardless of delayed receipt time."
+      "evidence": "Partial exit before settlement reduces economic exposure at settlement; partial exit after settlement does not alter economic exposure at settlement regardless of delayed receipt time. Signed SHORT exposure from compute_settlement_exposure pipes seamlessly into cash flow calculation with positive cash flow."
     },
     "10_ambiguous_fill_vs_settlement_boundary": {
       "status": "PASS",
@@ -88,7 +88,7 @@
     "12_zero_real_funding_complete_witnessed_coverage": {
       "status": "PASS",
       "test": "test_market_pit_funding_zero_real_funding_complete_witnessed_coverage",
-      "evidence": "Rate 0.0 with incomplete coverage or missing mark yields COST_INCOMPLETE; exact 0.0 cash flow realized only under complete verified coverage."
+      "evidence": "Rate 0.0 or flat portfolio (quantity=0) with incomplete coverage or missing mark yields COST_INCOMPLETE; exact 0.0 cash flow realized only under complete verified coverage."
     }
   },
   "local_test_execution_record": {
