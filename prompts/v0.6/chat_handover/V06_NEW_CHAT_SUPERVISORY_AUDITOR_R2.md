@@ -33,6 +33,8 @@ Use available GitHub connector to verify immutable commits/blob contents, releva
 - **NORMAL/BOOST:** separate delivery SHAs `b760a5e43e6bedc44ecec81284b8db094f50c902` and `fdec02d5d7cf9d80ae45fc36c56af5008df003d6`; code/CI readiness does not equal completed integrated source/finance acceptance.
 - **Phase:** G0 technical foundation, G1/G3 mock-only, G2 independently validated Alpha = NONE, G4 TESTNET/LIVE/REAL_FUNDS = NONE, autonomous trading prohibited.
 
+**Latest Controller L2 delta `2c99c8f64368a02dfeca05ac1886ed2280faf3ba`:** P1C R3 numeric scope is accepted but its Markdown says `REVIEW_PENDING` while JSON asserts `REVIEW_PASS`; independent attributable second-review evidence is unresolved. P1D full GitHub CI actually produced **3357 pass / 3 fail / 2 skip**, failures due `reviews/` placement conflict, and its third-party causal audit is unverified. P1A code CI had 2975 pass /4 fail/2 skip including protected H40 digest; report-only green is NOT executable acceptance. Controller's proposed code/docs segregation repair and separate H40 owner review are not yet new execution authority.
+
 ## How to audit
 
 At a concrete requested decision boundary:
