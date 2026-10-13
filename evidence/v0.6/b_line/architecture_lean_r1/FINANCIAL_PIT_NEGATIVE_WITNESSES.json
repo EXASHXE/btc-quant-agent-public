@@ -9,8 +9,8 @@
     "authority_l2_sha": "23a5e3ca99e4224550dfd04d44c908e4e38adaf1"
   },
   "summary": {
-    "total_negative_cases_executed": 38,
-    "total_passed": 38,
+    "total_negative_cases_executed": 40,
+    "total_passed": 40,
     "total_failed": 0,
     "verdict": "FAIL_CLOSED_FINANCIAL_PIT_INVARIANTS_ENFORCED"
   },
@@ -18,9 +18,9 @@
     {
       "risk_id": "RISK-01",
       "name": "Settlement vs Receipt Time Mark Witness Conflation",
-      "reproduction_witness": "When REST funding record arrives 3 hours late (T+3h), passing a receipt-time mark tick previously verified freshness against receipt time, erroneously claiming verified settlement price.",
-      "remedy": "MarkPriceWitness.is_valid_for_settlement now enforces contemporaneousness with settlement_time_ms. Late receipt without historical settlement mark is classified COST_INCOMPLETE with mark_price=None, preventing false PnL realization.",
-      "tested_in": "test_contemporaneous_receipt_vs_late_receipt_at_3h, test_mark_at_receipt_cannot_masquerade_as_settlement_price",
+      "reproduction_witness": "When REST funding record arrives 3 hours late (T+3h), passing a receipt-time mark tick previously verified freshness against receipt time, erroneously claiming verified settlement price; conversely, an authentic historical mark witness recorded at settlement time was erroneously rejected as stale relative to receipt wall time.",
+      "remedy": "MarkPriceWitness.is_valid_for_settlement now enforces contemporaneousness directly with settlement_time_ms. Authentic historical mark witnesses from settlement time are verified COST_COMPLETE on late funding arrival; receipt-time marks without settlement contemporaneousness are classified COST_INCOMPLETE with mark_price=None, preventing false PnL realization.",
+      "tested_in": "test_contemporaneous_receipt_vs_late_receipt_at_3h, test_mark_at_receipt_cannot_masquerade_as_settlement_price, test_historical_settlement_mark_witness_accepted_on_late_funding_receipt, test_mark_witness_future_relative_to_receipt_rejected",
       "status": "RESOLVED_FAIL_CLOSED"
     },
     {

@@ -1,9 +1,9 @@
 {
-  "total_test_files": 205,
-  "total_collected_test_instances": 3385,
-  "total_parameterized_decorations": 187,
+  "total_test_files": 207,
+  "total_collected_test_instances": 3446,
+  "total_parameterized_decorations": 194,
   "tests_by_category": {
-    "UNKNOWN_NEEDS_REVIEW": 1444,
+    "UNKNOWN_NEEDS_REVIEW": 1505,
     "SCIENCE_AUTHORITY_IMMUTABLE": 1547,
     "SAME_METHOD_DIFFERENT_INVARIANT": 394
   },
@@ -237,6 +237,19 @@
         "invalid_val",
         "payload",
         "tmp_path"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
+    },
+    {
+      "path": "tests/test_v06_architecture_lean_r1_financial_pit.py",
+      "test_functions_count": 40,
+      "parameterized_decorations": 5,
+      "fixtures_used": [
+        "bad_ft",
+        "bad_mark",
+        "bad_pos",
+        "bad_rate",
+        "blank_fr"
       ],
       "category": "UNKNOWN_NEEDS_REVIEW"
     },
@@ -689,6 +702,16 @@
         "tmp_path"
       ],
       "category": "SCIENCE_AUTHORITY_IMMUTABLE"
+    },
+    {
+      "path": "tests/test_v06_architecture_lean_r1_mutation_sensitivity.py",
+      "test_functions_count": 21,
+      "parameterized_decorations": 2,
+      "fixtures_used": [
+        "bad_rate",
+        "bad_val"
+      ],
+      "category": "UNKNOWN_NEEDS_REVIEW"
     },
     {
       "path": "tests/test_mechanism.py",

@@ -266,6 +266,47 @@ def test_mutant_09_orderbook_negative_quantity_rejected() -> None:
     assert engine.is_bootstrapped is False
 
 
+# Mutant 9b: Order book non-finite price or quantity mutant in snapshot and delta
+@pytest.mark.parametrize("bad_val", ["NaN", "Infinity", "-Infinity"])
+def test_mutant_09b_orderbook_nonfinite_values_rejected(bad_val: str) -> None:
+    # 1. Snapshot with non-finite value rejected
+    engine = OrderBookIntegrityEngine(symbol="BTCUSDT")
+    snap = {
+        "lastUpdateId": 100,
+        "bids": [[bad_val, "1.000"]],
+        "asks": [["64005.00", "1.000"]],
+    }
+    receipt = engine.apply_snapshot(snap, 1728720000000)
+    assert receipt.quality == "INVALID"
+    assert engine.is_bootstrapped is False
+
+    # 2. Delta with non-finite quantity resets continuous book
+    engine2 = OrderBookIntegrityEngine(symbol="BTCUSDT")
+    valid_snap = {
+        "lastUpdateId": 100,
+        "bids": [["64000.00", "1.000"]],
+        "asks": [["64005.00", "1.000"]],
+    }
+    engine2.apply_snapshot(valid_snap, 1728720000000)
+    assert engine2.is_bootstrapped is True
+    assert engine2.continuous is True
+
+    bad_delta = {
+        "e": "depthUpdate",
+        "E": 1728720000100,
+        "s": "BTCUSDT",
+        "U": 101,
+        "u": 102,
+        "pu": 100,
+        "b": [["64000.00", bad_val]],
+        "a": [],
+    }
+    receipt2 = engine2.apply_delta(bad_delta, 1728720000100)
+    assert receipt2.quality == "INVALID"
+    assert engine2.continuous is False
+    assert engine2.needs_rebootstrap is True
+
+
 # Mutant 10: Late funding receipt blocked by C consumer contract (FUNDING_PIT_INVALID)
 def test_mutant_10_c_consumer_late_funding_rejected_by_pit_contract() -> None:
     port = MarketPitPort(expected_stream_id="btcusdt@composite_1m", expected_manifest_sha256="msha")

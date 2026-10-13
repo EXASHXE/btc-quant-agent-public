@@ -58,9 +58,10 @@ class MarkPriceWitness:
             age_from_settlement = abs(self.provider_event_ms - settlement_time_ms)
             if age_from_settlement > max_staleness_ms:
                 return False, f"MARK_NOT_CONTEMPORANEOUS_WITH_SETTLEMENT_{age_from_settlement}MS"
-        age = self.measured_age_ms(reference_time_ms)
-        if age > max_staleness_ms:
-            return False, f"MARK_STALE_AGE_{age}MS"
+        else:
+            age = self.measured_age_ms(reference_time_ms)
+            if age > max_staleness_ms:
+                return False, f"MARK_STALE_AGE_{age}MS"
         return True, "OK"
 
     def to_dict(self) -> dict[str, Any]:

@@ -100,8 +100,8 @@ class OrderBookIntegrityEngine:
                 if p in seen_snapshot_bids:
                     raise ContractValidationError(f"Duplicate bid price level in snapshot: {p}")
                 seen_snapshot_bids.add(p)
-                if p <= 0 or q < 0:
-                    raise ContractValidationError("Negative price or quantity in snapshot bids")
+                if not p.is_finite() or not q.is_finite() or p <= 0 or q < 0:
+                    raise ContractValidationError("Non-finite or negative price or quantity in snapshot bids")
                 if q > 0:
                     new_bids[p] = q
 
@@ -111,8 +111,8 @@ class OrderBookIntegrityEngine:
                 if p in seen_snapshot_asks:
                     raise ContractValidationError(f"Duplicate ask price level in snapshot: {p}")
                 seen_snapshot_asks.add(p)
-                if p <= 0 or q < 0:
-                    raise ContractValidationError("Negative price or quantity in snapshot asks")
+                if not p.is_finite() or not q.is_finite() or p <= 0 or q < 0:
+                    raise ContractValidationError("Non-finite or negative price or quantity in snapshot asks")
                 if q > 0:
                     new_asks[p] = q
         except (decimal.InvalidOperation, ContractValidationError, TypeError) as exc:
@@ -226,8 +226,8 @@ class OrderBookIntegrityEngine:
                     self.reset(f"DEPTH_MUTATION_CONTRADICTION: duplicate bid price level {p}")
                     return self.get_integrity_receipt(observed_wall_ms)
                 seen_bids.add(p)
-                if p <= 0 or q < 0:
-                    self.reset("NEGATIVE_PRICE_OR_QUANTITY")
+                if not p.is_finite() or not q.is_finite() or p <= 0 or q < 0:
+                    self.reset("NON_FINITE_OR_NEGATIVE_PRICE_OR_QUANTITY")
                     return self.get_integrity_receipt(observed_wall_ms)
                 if q == Decimal(0):
                     self.bids.pop(p, None)
@@ -242,8 +242,8 @@ class OrderBookIntegrityEngine:
                     self.reset(f"DEPTH_MUTATION_CONTRADICTION: duplicate ask price level {p}")
                     return self.get_integrity_receipt(observed_wall_ms)
                 seen_asks.add(p)
-                if p <= 0 or q < 0:
-                    self.reset("NEGATIVE_PRICE_OR_QUANTITY")
+                if not p.is_finite() or not q.is_finite() or p <= 0 or q < 0:
+                    self.reset("NON_FINITE_OR_NEGATIVE_PRICE_OR_QUANTITY")
                     return self.get_integrity_receipt(observed_wall_ms)
                 if q == Decimal(0):
                     self.asks.pop(p, None)

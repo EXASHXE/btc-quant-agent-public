@@ -192,9 +192,9 @@ def analyze_tests(repo_root: Path) -> dict[str, Any]:
                             # Rough estimation of param expansion
                             if len(dec.args) >= 2 and isinstance(dec.args[1], (ast.List, ast.Tuple)):
                                 test_fn_count += max(0, len(dec.args[1].elts) - 1)
-                        for arg in node.args.args:
-                            if arg.arg not in ("self", "cls"):
-                                fixtures_used.add(arg.arg)
+                    for arg in node.args.args:
+                        if arg.arg not in ("self", "cls"):
+                            fixtures_used.add(arg.arg)
         except SyntaxError:
             pass
 

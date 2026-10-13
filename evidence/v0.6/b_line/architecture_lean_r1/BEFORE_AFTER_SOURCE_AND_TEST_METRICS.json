@@ -35,21 +35,27 @@
       "post_refactor_loc": 225,
       "loc_delta": 13,
       "changes": "Added process-level caches for git root, commit availability, and tar archive bytes; added safe tarfile data filter."
+    },
+    "scripts/market_data/forward_public_feed_r1/order_book.py": {
+      "baseline_loc": 325,
+      "post_refactor_loc": 329,
+      "loc_delta": 4,
+      "changes": "Enforced non-finite (NaN, Infinity, -Infinity) and non-negative validation on prices and quantities across snapshots and deltas."
     }
   },
   "test_metrics": {
     "focused_feed_bridge_suite": {
       "baseline_test_count": 394,
       "baseline_duration_seconds": 15.98,
-      "stage1_financial_pit_tests": 38,
-      "stage2_mutation_tests": 18,
-      "post_refactor_test_count": 450,
-      "post_refactor_duration_seconds": 10.45,
-      "wall_clock_improvement_percent": 34.6,
+      "stage1_financial_pit_tests": 40,
+      "stage2_mutation_tests": 21,
+      "post_refactor_test_count": 455,
+      "post_refactor_duration_seconds": 10.29,
+      "wall_clock_improvement_percent": 35.6,
       "status": "ALL_PASSED"
     },
     "full_repository_collection": {
-      "collected_tests": 3439,
+      "collected_tests": 3517,
       "errors": 0,
       "skipped": 2,
       "deleted_tests": 0

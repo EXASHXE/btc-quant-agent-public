@@ -526,3 +526,66 @@ def test_strict_provenance_rejects_provisional_scalar() -> None:
     assert entry is not None
     assert entry.calculate_cash_flow(Decimal("1.0"), strict_provenance=False) == Decimal("-6.40000000")
     assert entry.calculate_cash_flow(Decimal("1.0"), strict_provenance=True) is None
+
+
+# 25. Historical mark witness contemporaneous with settlement accepted on late funding receipt
+def test_historical_settlement_mark_witness_accepted_on_late_funding_receipt() -> None:
+    ledger = SettledFundingLedger(symbol="BTCUSDT")
+    t_settlement = 1728720000000
+    t_receipt_3h = t_settlement + 3 * 3600 * 1000
+
+    # Authentic mark witness captured at settlement time T
+    witness_at_settlement = MarkPriceWitness(
+        price=Decimal("64000.00"),
+        observed_wall_utc_ms=t_settlement,
+        available_at_ms=t_settlement,
+        provider_event_ms=t_settlement,
+        source_sha="auth_historical_settlement_mark_sha",
+        route_epoch="route-epoch-0",
+        connection_epoch=1,
+        quality="VERIFIED",
+        reason_codes=("OK",),
+    )
+
+    rec = {"symbol": "BTCUSDT", "fundingRate": "0.00010000", "fundingTime": t_settlement}
+    entry = ledger.ingest_settled_funding(
+        raw_record=rec,
+        contemporaneous_mark_price=witness_at_settlement,
+        observed_wall_utc_ms=t_receipt_3h,
+    )
+    assert entry is not None
+    assert entry.cash_realization_status == "COST_COMPLETE"
+    assert entry.mark_price == Decimal("64000.00")
+    assert entry.quality == "VERIFIED"
+    assert entry.reason_codes == ("OK",)
+    assert entry.calculate_cash_flow(Decimal("1.0"), strict_provenance=True) == Decimal("-6.40000000")
+
+
+# 26. Historical mark witness from future relative to receipt rejected
+def test_mark_witness_future_relative_to_receipt_rejected() -> None:
+    ledger = SettledFundingLedger(symbol="BTCUSDT")
+    t_settlement = 1728720000000
+    t_receipt = t_settlement + 1000
+
+    # Witness with available_at in the future relative to observation wall
+    witness_future = MarkPriceWitness(
+        price=Decimal("64000.00"),
+        observed_wall_utc_ms=t_receipt + 5000,
+        available_at_ms=t_receipt + 5000,
+        provider_event_ms=t_settlement,
+        source_sha="future_mark_sha",
+        route_epoch="route-epoch-0",
+        connection_epoch=1,
+        quality="VERIFIED",
+        reason_codes=("OK",),
+    )
+
+    rec = {"symbol": "BTCUSDT", "fundingRate": "0.00010000", "fundingTime": t_settlement}
+    entry = ledger.ingest_settled_funding(
+        raw_record=rec,
+        contemporaneous_mark_price=witness_future,
+        observed_wall_utc_ms=t_receipt,
+    )
+    assert entry is None
+    assert ledger.rejected_count == 1
+

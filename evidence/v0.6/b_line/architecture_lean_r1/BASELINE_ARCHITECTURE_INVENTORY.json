@@ -1,5 +1,5 @@
 {
-  "repository_files_count": 436,
+  "repository_files_count": 439,
   "package_loc_summary": {
     "evidence": {
       "total_lines": 78,
@@ -15,18 +15,25 @@
       "blank_lines": 48,
       "file_count": 1
     },
+    "scripts/engineering": {
+      "total_lines": 318,
+      "code_lines": 271,
+      "comment_lines": 9,
+      "blank_lines": 38,
+      "file_count": 1
+    },
     "scripts/integration": {
-      "total_lines": 2696,
-      "code_lines": 2320,
-      "comment_lines": 56,
-      "blank_lines": 320,
+      "total_lines": 2754,
+      "code_lines": 2368,
+      "comment_lines": 64,
+      "blank_lines": 322,
       "file_count": 12
     },
     "scripts/market_data": {
-      "total_lines": 3748,
-      "code_lines": 3180,
+      "total_lines": 3795,
+      "code_lines": 3224,
       "comment_lines": 79,
-      "blank_lines": 489,
+      "blank_lines": 492,
       "file_count": 11
     },
     "scripts/ops_g3": {
@@ -58,11 +65,11 @@
       "file_count": 161
     },
     "tests": {
-      "total_lines": 81830,
-      "code_lines": 67296,
-      "comment_lines": 2940,
-      "blank_lines": 11594,
-      "file_count": 205
+      "total_lines": 82796,
+      "code_lines": 68074,
+      "comment_lines": 3004,
+      "blank_lines": 11718,
+      "file_count": 207
     },
     "tools": {
       "total_lines": 774,
@@ -285,6 +292,7 @@
     ],
     "fn:main": [
       "scripts/ci/test_plan.py",
+      "scripts/engineering/architecture_lean_r1/inventory_analyzer.py",
       "scripts/integration/market_event_bridge_r2/cli.py",
       "scripts/integration/market_event_bridge_r2/generate_r3_evidence.py",
       "scripts/market_data/forward_public_feed_r1/cli.py",
@@ -412,12 +420,6 @@
       "src/btc_quant_agent/research_contract/models.py",
       "src/btc_quant_agent/research_contract/models.py",
       "src/btc_quant_agent/research_contract/registry.py"
-    ],
-    "fn:_sha256": [
-      "scripts/integration/market_event_bridge_r2/bridge_engine.py",
-      "src/btc_quant_agent/data/binance_archive.py",
-      "src/btc_quant_agent/mechanism_research.py",
-      "tests/test_v050_r05a_ag04_health_read_only_inspection.py"
     ],
     "fn:build_parser": [
       "scripts/integration/market_event_bridge_r2/cli.py",
@@ -584,6 +586,10 @@
       "scripts/strategy_research/g2_btc_two_lead_funding_mark_r3/run.py",
       "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/run.py",
       "scripts/strategy_research/g2_exit_horizon_r1/run.py"
+    ],
+    "fn:digest": [
+      "scripts/strategy_research/g2_btc_empirical_fast_r1/run.py",
+      "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_run.py"
     ]
   },
   "circular_imports_detected": [],

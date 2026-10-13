@@ -27,7 +27,7 @@
       "target_file": "scripts/integration/market_event_bridge_r2/funding_adapter.py",
       "parity_status": "HARDENED_INVARIANT_PRESERVED",
       "verification_method": "Enforced settlement time contemporaneousness check (60s tolerance), nonfinite rate/price fail-closed gating, and normalized Decimal rate deduplication.",
-      "test_coverage": "tests/test_v06_architecture_lean_r1_financial_pit.py (38 tests)"
+      "test_coverage": "tests/test_v06_architecture_lean_r1_financial_pit.py (40 tests)"
     },
     {
       "subsystem": "bridge_engine_dispatch",
@@ -54,8 +54,8 @@
       "subsystem": "mutation_sensitivity_battery",
       "target_file": "tests/test_v06_architecture_lean_r1_mutation_sensitivity.py",
       "parity_status": "PROVEN_SENSITIVE",
-      "verification_method": "18 test cases across 12 deliberate mutants (time shift, nonfinite rate, conflicting revision, mark timestamp skew, route epoch drift, hash corruption, crossed book, sequence gap, negative depth, consumer C PIT invalidation, epoch type invalidation, late arrival cash basis) all successfully caught.",
-      "test_coverage": "tests/test_v06_architecture_lean_r1_mutation_sensitivity.py (18 tests)"
+      "verification_method": "21 test cases across deliberate mutants (time shift, nonfinite rate, conflicting revision, mark timestamp skew, route epoch drift, hash corruption, crossed book, sequence gap, negative depth, nonfinite book values, consumer C PIT invalidation, epoch type invalidation, late arrival cash basis) all successfully caught.",
+      "test_coverage": "tests/test_v06_architecture_lean_r1_mutation_sensitivity.py (21 tests)"
     }
   ],
   "ci_guardrail_compliance": {
