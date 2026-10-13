@@ -1,0 +1,928 @@
+{
+  "schema": "G2_R4_INDEPENDENT_SCIENTIFIC_AUDIT_V1",
+  "scientific_status": "AUDIT_COMPLETE_WITH_PRIMARY_RECOMMENDATION",
+  "primary_recommendation": "NO_ADMISSIBLE_NEXT_STRATEGY_TRIAL",
+  "G2_ALPHA": "NO_GO",
+  "trading_authority": {
+    "TESTNET": "UNAUTHORIZED",
+    "LIVE": "UNAUTHORIZED",
+    "REAL_FUNDS": "UNAUTHORIZED"
+  },
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "branch": "feature/v06-bline-g2-independent-science-pivot-r4",
+  "authority": {
+    "dispatch_sha": "5d5ac07440d8a8474fff95f2a2f0f99103ec736e",
+    "parent_sha": "f721b4bbe3fb45f575b292a3718e13e64a01dc69",
+    "path": "reviews/v0.6/b_line/V06_G2_R4_INDEPENDENT_SCIENCE_PIVOT_CONTROLLER_DISPATCH.md",
+    "git_blob_sha1": "397ee7e140cc7bf8782bdfacf089a507ef6d3773",
+    "sha256": "ad0fb79c3b305c83b4018bb52cacff5ec1e6b9bb270af4a0371fc9b40e348a04",
+    "bytes": 7724,
+    "parent_path_absent_http_status": 404,
+    "byte_identity_independently_verified_before_results": true
+  },
+  "start_sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+  "initial_remote_head": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+  "parent_chain": [
+    "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+    "3af438490da4497132a5c32c786752ca527e0d99",
+    "45bf7cc72eb9a870323c5da056fc9287d42b7b22",
+    "3df7a9a490a06c398d20da57bf19fc48d3b1c74e"
+  ],
+  "execution": {
+    "mode": "INDEPENDENT_READ_ONLY_SCIENTIFIC_FORENSICS",
+    "parent_actual_model": "UNKNOWN",
+    "parent_actual_effort": "UNKNOWN",
+    "scientific_reviewer_tool_selected_model": "gpt-6-astra",
+    "scientific_reviewer_tool_selected_effort": "high",
+    "provider_runtime_attestation": "UNKNOWN",
+    "reviewer_task": "/root/astra_scientific_engine_review",
+    "external_postpublication_review_still_required": true,
+    "independent_within_team_review": "Astra High reviewed simulator and final methodology; power/null, finite enrollment cap, tail budget, weights, latency and reproducibility corrected. Sparse-month inference calibration explicitly remains unresolved; no usable precision estimator or trial claimed."
+  },
+  "sources": [
+    {
+      "id": "EXIT_CONTRACT",
+      "snapshot": "exit",
+      "commit_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_FROZEN_CONTRACT.json",
+      "git_blob_sha1": "b78084a5f9ef8bbc8154ede76574106993f88aab",
+      "sha256": "1dd61c6f58c39f9cba144ecf266323c1166f2e167fa1215df1e3f559d5265c67",
+      "bytes": 23022,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/55ac4c631c69f6edbd275462ad23e4486b9782ed/evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_FROZEN_CONTRACT.json"
+    },
+    {
+      "id": "EXIT_RESULTS",
+      "snapshot": "exit",
+      "commit_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_RESULTS.json",
+      "git_blob_sha1": "c264831f44ae3e93df498eae8ea55f4b9cb631ff",
+      "sha256": "3d4663ad697a496305321bdb7ed5ab437365e4c7d7c9c0a6eced08b8774b6e27",
+      "bytes": 1046791,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/55ac4c631c69f6edbd275462ad23e4486b9782ed/evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_RESULTS.json"
+    },
+    {
+      "id": "R31_RESULTS",
+      "snapshot": "r31",
+      "commit_sha": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_ECONOMIC_RESULTS.json",
+      "git_blob_sha1": "9be2919fd12ca09a074aadd920bc76032b2c5c74",
+      "sha256": "85226f1905b6dae115582f84cb4d154f2e52e2f107e4f103e22781dd1c0d587c",
+      "bytes": 337766,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/990c02b5479b3b14996f90fdbf677cb672ada81e/evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_ECONOMIC_RESULTS.json"
+    },
+    {
+      "id": "R3_RESULTS",
+      "snapshot": "r3",
+      "commit_sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+      "path": "evidence/v0.6/b_line/g2_btc_exit_aware_r3/DEVELOPMENT_RESULTS_BASE_STRESS.json",
+      "git_blob_sha1": "b75cc0ada075d0cc24340ddb87ce1cf71c4ea26d",
+      "sha256": "1f90af414e4f833071180a26007072de81a9eccf17cffbfcefae5519afab6167",
+      "bytes": 3970895,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/a69ccfdfd578bd0b7d3aa43d75959a659f969782/evidence/v0.6/b_line/g2_btc_exit_aware_r3/DEVELOPMENT_RESULTS_BASE_STRESS.json"
+    },
+    {
+      "id": "BOOST_WITNESSES",
+      "snapshot": "boost",
+      "commit_sha": "fdec02d5d7cf9d80ae45fc36c56af5008df003d6",
+      "path": "evidence/v0.6/b_line/architecture_lean_r1/FINANCIAL_PIT_NEGATIVE_WITNESSES.json",
+      "git_blob_sha1": "efea02f8f3fc8e2bcd7bdca638ef2ee782b62208",
+      "sha256": "a3577f758e0c92d99ccfdfc3e0ecc9d9a9f68c1da4978efb44b044f0b06ca752",
+      "bytes": 5057,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fdec02d5d7cf9d80ae45fc36c56af5008df003d6/evidence/v0.6/b_line/architecture_lean_r1/FINANCIAL_PIT_NEGATIVE_WITNESSES.json"
+    },
+    {
+      "id": "W_SIGNALS",
+      "snapshot": "r31",
+      "commit_sha": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/signals.py",
+      "git_blob_sha1": "27489d7fb1f731010c365555e71fd07e2a55bb12",
+      "sha256": "ea4f0d13c60b22cf69d9467804a96e4665e23d9471f86db322c0636ba7d082da",
+      "bytes": 30033,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/990c02b5479b3b14996f90fdbf677cb672ada81e/scripts/strategy_research/g2_gemini_goal_trend_flow_r1/signals.py"
+    },
+    {
+      "id": "W_PROTOCOL",
+      "snapshot": "r31",
+      "commit_sha": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+      "path": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_EXECUTABLE_PROTOCOL.json",
+      "git_blob_sha1": "0613f5dccd971e9d96d6d1bb0abbd2354bd5e89b",
+      "sha256": "d5a930bd98983df9813bcddd7899baa90ecb4bebee8e06f82324f1b2fcf200a9",
+      "bytes": 33647,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/990c02b5479b3b14996f90fdbf677cb672ada81e/evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/REANALYSIS_R2_EXECUTABLE_PROTOCOL.json"
+    },
+    {
+      "id": "W_RUN",
+      "snapshot": "r31",
+      "commit_sha": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_run.py",
+      "git_blob_sha1": "2421183f18c0f55b579bac6b62dfbdddfd3638df",
+      "sha256": "c7f391f1a931e714967c9d602c771ae7d9085fd9c2e273cbc7cb2c1c307b5b50",
+      "bytes": 23427,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/990c02b5479b3b14996f90fdbf677cb672ada81e/scripts/strategy_research/g2_gemini_goal_trend_flow_r1/reanalysis_r2_run.py"
+    },
+    {
+      "id": "W_REPLAY",
+      "snapshot": "r31",
+      "commit_sha": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+      "path": "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "git_blob_sha1": "4a3d23f070a05eba92d159a95402f7986f701f96",
+      "sha256": "eac5bad4afa9280d781da2b0df820d81f21daf868fc7362ea587a1bebabcc4d5",
+      "bytes": 24404,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/990c02b5479b3b14996f90fdbf677cb672ada81e/scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py"
+    },
+    {
+      "id": "BOOST_TEST",
+      "snapshot": "boost",
+      "commit_sha": "fdec02d5d7cf9d80ae45fc36c56af5008df003d6",
+      "path": "tests/test_v06_architecture_lean_r1_financial_pit.py",
+      "git_blob_sha1": "520b89468fb0b577f83cc6a9675fafd209849566",
+      "sha256": "35aaac5598e94482179abe8eb5283f30c0a67f2ceb9c07d3dc9c7f347bbe3a1a",
+      "bytes": 22196,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fdec02d5d7cf9d80ae45fc36c56af5008df003d6/tests/test_v06_architecture_lean_r1_financial_pit.py"
+    },
+    {
+      "id": "BOOST_FUNDING",
+      "snapshot": "boost",
+      "commit_sha": "fdec02d5d7cf9d80ae45fc36c56af5008df003d6",
+      "path": "scripts/integration/market_event_bridge_r2/funding_adapter.py",
+      "git_blob_sha1": "ccd0435ba3d8c00db3093440552ae0ab8f972d6d",
+      "sha256": "66975e4569633efe059e924977fc78f83574fb5cee2f560476e8de715892f2a3",
+      "bytes": 16296,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fdec02d5d7cf9d80ae45fc36c56af5008df003d6/scripts/integration/market_event_bridge_r2/funding_adapter.py"
+    },
+    {
+      "id": "EXIT_TABLES",
+      "snapshot": "exit",
+      "commit_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_COMPLETE_ANALYSIS_TABLES.json",
+      "git_blob_sha1": "ba6af24171dde4a5549b0cf25681347754b9227c",
+      "sha256": "c5c6e5a88b0074da83a60369e48d12c2a7cf32e310663a81428c4dffa084a857",
+      "bytes": 645645,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/55ac4c631c69f6edbd275462ad23e4486b9782ed/evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_COMPLETE_ANALYSIS_TABLES.json"
+    },
+    {
+      "id": "EXIT_W1_PAIRED",
+      "snapshot": "exit",
+      "commit_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_paired.jsonl",
+      "git_blob_sha1": "ad0c1aae3a03e5d176dd59fc13079dabee5bc4a6",
+      "sha256": "f8d10f8a8e7d16046c2d207bf12250d63f3cc1c1ec0b3d26a692c4317f8d2d8a",
+      "bytes": 630197,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/55ac4c631c69f6edbd275462ad23e4486b9782ed/evidence/v0.6/b_line/g2_exit_horizon_r1/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_paired.jsonl"
+    },
+    {
+      "id": "EXIT_BOOK",
+      "snapshot": "exit",
+      "commit_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+      "path": "scripts/strategy_research/g2_exit_horizon_r1/book.py",
+      "git_blob_sha1": "3bcbdc5097120b9c252d192645c6a8d810a6930d",
+      "sha256": "89c44d7b40c7a3c4a109f0b64355e4b942ab011e6021fb73dabc98d4526ac69a",
+      "bytes": 19162,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/55ac4c631c69f6edbd275462ad23e4486b9782ed/scripts/strategy_research/g2_exit_horizon_r1/book.py"
+    },
+    {
+      "id": "W_ACTUAL_REPLAY",
+      "snapshot": "r31",
+      "commit_sha": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+      "path": "scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py",
+      "git_blob_sha1": "84859ab5578c2bb6ac1b5b8641f3b1b1b79fe2c8",
+      "sha256": "ca4822b742bb11b0e8a9712af7a15ea258d2478d88cb44c8b3ae1a8f6b71cf16",
+      "bytes": 13939,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/990c02b5479b3b14996f90fdbf677cb672ada81e/scripts/strategy_research/g2_gemini_goal_trend_flow_r1/replay.py"
+    },
+    {
+      "id": "C_PORT",
+      "snapshot": "consumer_c",
+      "commit_sha": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+      "path": "scripts/g1g3_offline_ports_r1/market_pit_port.py",
+      "git_blob_sha1": "cbaac1dce36174d70aecbd18d202a4ce715a1b8b",
+      "sha256": "e57e3319f14547a8031adebae0aab61ee041751c1f949f152410959c7454b9c9",
+      "bytes": 19440,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b/scripts/g1g3_offline_ports_r1/market_pit_port.py"
+    },
+    {
+      "id": "BOOST_PINNED",
+      "snapshot": "boost",
+      "commit_sha": "fdec02d5d7cf9d80ae45fc36c56af5008df003d6",
+      "path": "scripts/integration/market_event_bridge_r2/portable_ci_refs.py",
+      "git_blob_sha1": "924dcd589e644d1104ed5520691cb248612ef21a",
+      "sha256": "87e18c990fc3e68a720bcba81c755bb514d0cc1a1b9712a93408adae8be5c363",
+      "bytes": 13325,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fdec02d5d7cf9d80ae45fc36c56af5008df003d6/scripts/integration/market_event_bridge_r2/portable_ci_refs.py"
+    },
+    {
+      "id": "BOOST_BRIDGE",
+      "snapshot": "boost",
+      "commit_sha": "fdec02d5d7cf9d80ae45fc36c56af5008df003d6",
+      "path": "scripts/integration/market_event_bridge_r2/bridge_engine.py",
+      "git_blob_sha1": "2abe5b3053aa2835311f391760587c6acdae96c3",
+      "sha256": "61e1d4196211d15eb49161657cda20a81a3486d1615a1864bf131b239e8c10fe",
+      "bytes": 18035,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fdec02d5d7cf9d80ae45fc36c56af5008df003d6/scripts/integration/market_event_bridge_r2/bridge_engine.py"
+    },
+    {
+      "id": "R3_PROTOCOL",
+      "snapshot": "r3",
+      "commit_sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+      "path": "docs/strategy_research/g2_r3/exit_aware_r3/EXPERIMENT_FROZEN_PROTOCOL.md",
+      "git_blob_sha1": "c60c7a0a77f84db790b581bc7ebc4b0cdf16ab07",
+      "sha256": "93c3bdf0d8c9ef65482d1eb9fc3d7cdfb187ed59603fc87e31efb2fa58340bdc",
+      "bytes": 11698,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/a69ccfdfd578bd0b7d3aa43d75959a659f969782/docs/strategy_research/g2_r3/exit_aware_r3/EXPERIMENT_FROZEN_PROTOCOL.md"
+    },
+    {
+      "id": "R3_REPORT",
+      "snapshot": "r3",
+      "commit_sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+      "path": "docs/strategy_research/g2_r3/exit_aware_r3/DEVELOPMENT_27_CELL_RESULTS.md",
+      "git_blob_sha1": "dbcce8fb6ee125b7807d26b8398174ca70cac555",
+      "sha256": "9b7759986a93c8dd37f86713bbb8102c91ad50de995fa6bc12d47dbdcbde477a",
+      "bytes": 10962,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/a69ccfdfd578bd0b7d3aa43d75959a659f969782/docs/strategy_research/g2_r3/exit_aware_r3/DEVELOPMENT_27_CELL_RESULTS.md"
+    },
+    {
+      "id": "R31_REPORT",
+      "snapshot": "r31",
+      "commit_sha": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+      "path": "docs/strategy_research/g2_r3/two_lead_mark_gap_r31/R31_TWO_LEAD_OBSERVED_FUNDING_MARK_REPORT.md",
+      "git_blob_sha1": "01c638484f150adede2a4043be2b29fe785d75df",
+      "sha256": "63aa4121932a2e9d5d7025cf177767c22471c6d5e3d18e5ed31a22e236f32fec",
+      "bytes": 31450,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/990c02b5479b3b14996f90fdbf677cb672ada81e/docs/strategy_research/g2_r3/two_lead_mark_gap_r31/R31_TWO_LEAD_OBSERVED_FUNDING_MARK_REPORT.md"
+    },
+    {
+      "id": "EXIT_REPORT",
+      "snapshot": "exit",
+      "commit_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+      "path": "docs/strategy_research/g2_exit_horizon_r1/EXIT_R1_EMPIRICAL_REPORT.md",
+      "git_blob_sha1": "772b4cb5e6eeb19778849305dc3398b1e1de5ecb",
+      "sha256": "31fca261da6caf860a69cd6ab16e118e550d8abf0bce46fd4f19f32497c7eecc",
+      "bytes": 42407,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/55ac4c631c69f6edbd275462ad23e4486b9782ed/docs/strategy_research/g2_exit_horizon_r1/EXIT_R1_EMPIRICAL_REPORT.md"
+    },
+    {
+      "id": "R3_CI_RECEIPT",
+      "snapshot": "r3",
+      "commit_sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+      "path": "evidence/v0.6/b_line/g2_btc_exit_aware_r3/CI_TEST_EXECUTION_EXACT_SHA.json",
+      "git_blob_sha1": "d10e60b03e5797fbe99b25e188c07936b62ccf88",
+      "sha256": "a19aac50fdca50172a0c9dce756b1ba29e0bf2a3380c609b3b4c650f2fafece4",
+      "bytes": 12072,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/a69ccfdfd578bd0b7d3aa43d75959a659f969782/evidence/v0.6/b_line/g2_btc_exit_aware_r3/CI_TEST_EXECUTION_EXACT_SHA.json"
+    },
+    {
+      "id": "R3_MANUAL",
+      "snapshot": "r3",
+      "commit_sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+      "path": "evidence/v0.6/b_line/g2_btc_exit_aware_r3/MANUAL_DECIMAL_EXIT_LEG_AUDITS.json",
+      "git_blob_sha1": "5a528680e15c8d0df28863b27c7b8e6fb3b2f1a7",
+      "sha256": "d390aff979bb9c9f91724e699444f9c98ba122356243250529fa566ed3e4a146",
+      "bytes": 20824,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/a69ccfdfd578bd0b7d3aa43d75959a659f969782/evidence/v0.6/b_line/g2_btc_exit_aware_r3/MANUAL_DECIMAL_EXIT_LEG_AUDITS.json"
+    },
+    {
+      "id": "R3_PAIRS",
+      "snapshot": "r3",
+      "commit_sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+      "path": "evidence/v0.6/b_line/g2_btc_exit_aware_r3/PAIRED_EXIT_DELTA_VS_X0.json",
+      "git_blob_sha1": "bcd95a2a4f852aa45a69194423bbcb5c8a5f4f45",
+      "sha256": "30bbaf83d22799aebad2d0d881293c5dfb4d5a2f72d762c07400df1f81a65cbc",
+      "bytes": 58049,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/a69ccfdfd578bd0b7d3aa43d75959a659f969782/evidence/v0.6/b_line/g2_btc_exit_aware_r3/PAIRED_EXIT_DELTA_VS_X0.json"
+    },
+    {
+      "id": "R3_FREEZE",
+      "snapshot": "r3",
+      "commit_sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+      "path": "evidence/v0.6/b_line/g2_btc_exit_aware_r3/FREEZE_AND_SOURCE_IDENTITY.json",
+      "git_blob_sha1": "7e6131b6abd9fb391946815fca4f86b317559de9",
+      "sha256": "ab15d7003303c85d2d571b4cebdbbfa9f7a798ad99e5f21b1528725940b40ea1",
+      "bytes": 2487,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/a69ccfdfd578bd0b7d3aa43d75959a659f969782/evidence/v0.6/b_line/g2_btc_exit_aware_r3/FREEZE_AND_SOURCE_IDENTITY.json"
+    },
+    {
+      "id": "R3_ENGINE",
+      "snapshot": "r3code",
+      "commit_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "path": "scripts/strategy_research/g2_btc_exit_aware_r3/engine.py",
+      "git_blob_sha1": "bf187ace012619eb3f6aee5d9051999459967100",
+      "sha256": "4c3c1c1859a61f138cc45fb7a608fbd55687f69b15c8e1d41a3c9cbddf51a381",
+      "bytes": 17199,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3af438490da4497132a5c32c786752ca527e0d99/scripts/strategy_research/g2_btc_exit_aware_r3/engine.py"
+    },
+    {
+      "id": "R3_SIGNALS",
+      "snapshot": "r3code",
+      "commit_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "path": "scripts/strategy_research/g2_btc_exit_aware_r3/signals.py",
+      "git_blob_sha1": "0d3e2f02ad826fb7b6503d44665ad28c5f5ced37",
+      "sha256": "91c2ae0a20d1f4e7bb990d50563307f15626dbdaa51a38ab4af0921504106a29",
+      "bytes": 6596,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3af438490da4497132a5c32c786752ca527e0d99/scripts/strategy_research/g2_btc_exit_aware_r3/signals.py"
+    },
+    {
+      "id": "R3_PORTFOLIO",
+      "snapshot": "r3code",
+      "commit_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "path": "scripts/strategy_research/g2_btc_exit_aware_r3/portfolio.py",
+      "git_blob_sha1": "33528e62084feba7c657a657204ccbf41a82cf54",
+      "sha256": "a5b451569c7ed0d79d2b030c3ce294abd6fd2a10bb1bf5b8bfa1d2d3eab40533",
+      "bytes": 6530,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3af438490da4497132a5c32c786752ca527e0d99/scripts/strategy_research/g2_btc_exit_aware_r3/portfolio.py"
+    },
+    {
+      "id": "R3_METRICS",
+      "snapshot": "r3code",
+      "commit_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "path": "scripts/strategy_research/g2_btc_exit_aware_r3/metrics.py",
+      "git_blob_sha1": "d8352ab74cb1aecbaa92d4a480c014af6ff3aba9",
+      "sha256": "7bc87466c7415bcdfc57fa8150421c7035cf05619acb8cc1efe6faf43a788ddc",
+      "bytes": 8935,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3af438490da4497132a5c32c786752ca527e0d99/scripts/strategy_research/g2_btc_exit_aware_r3/metrics.py"
+    },
+    {
+      "id": "R3_SOURCES",
+      "snapshot": "r3code",
+      "commit_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "path": "scripts/strategy_research/g2_btc_exit_aware_r3/sources.py",
+      "git_blob_sha1": "cdd8ae219c77ac4bb87f7cdbac91ed6d952b9ebe",
+      "sha256": "b9bd116af06891c9664c531b2ce196348c0a6e0c6328770af697f2cfa8d047d1",
+      "bytes": 8222,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3af438490da4497132a5c32c786752ca527e0d99/scripts/strategy_research/g2_btc_exit_aware_r3/sources.py"
+    },
+    {
+      "id": "R3_RUN",
+      "snapshot": "r3code",
+      "commit_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "path": "scripts/strategy_research/g2_btc_exit_aware_r3/run.py",
+      "git_blob_sha1": "3699c57ba703eb8190c4177407797a63004662fb",
+      "sha256": "775a6b17afd2c9436c2ff5819e273a7faa91c4413fb3b8af873349a72f4f5d35",
+      "bytes": 20758,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3af438490da4497132a5c32c786752ca527e0d99/scripts/strategy_research/g2_btc_exit_aware_r3/run.py"
+    },
+    {
+      "id": "R3_REPORT_CODE",
+      "snapshot": "r3code",
+      "commit_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "path": "scripts/strategy_research/g2_btc_exit_aware_r3/report.py",
+      "git_blob_sha1": "e38d6135c113f9ec4969effc8dee5ea77dc11fd0",
+      "sha256": "a75f3351aa740005227f20ffa21744a2f94abf3dac7fbbbce582c8151bc08dc8",
+      "bytes": 12450,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3af438490da4497132a5c32c786752ca527e0d99/scripts/strategy_research/g2_btc_exit_aware_r3/report.py"
+    },
+    {
+      "id": "R3_TEST",
+      "snapshot": "r3code",
+      "commit_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "path": "tests/test_v06_g2_btc_exit_aware_r3_engine.py",
+      "git_blob_sha1": "d7125cad4e1f9ccfc6dd3bc3d7263b89e978c822",
+      "sha256": "79c70986e79a3c4a0e8225aa07cb095df0e947ee257560c7906f758e630940d2",
+      "bytes": 19818,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3af438490da4497132a5c32c786752ca527e0d99/tests/test_v06_g2_btc_exit_aware_r3_engine.py"
+    },
+    {
+      "id": "R1_SIGNALS",
+      "snapshot": "r2",
+      "commit_sha": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
+      "path": "scripts/strategy_research/g2_btc_empirical_fast_r1/signals.py",
+      "git_blob_sha1": "968755fae3833b56382fb64a975f60ebd3d72ea8",
+      "sha256": "451f11e9cda64d5d6b48a2c17a270dabf811760e7016f6c6972f26f64d2bc307",
+      "bytes": 15134,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3df7a9a490a06c398d20da57bf19fc48d3b1c74e/scripts/strategy_research/g2_btc_empirical_fast_r1/signals.py"
+    },
+    {
+      "id": "R1_REPLAY",
+      "snapshot": "r2",
+      "commit_sha": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
+      "path": "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py",
+      "git_blob_sha1": "4a3d23f070a05eba92d159a95402f7986f701f96",
+      "sha256": "eac5bad4afa9280d781da2b0df820d81f21daf868fc7362ea587a1bebabcc4d5",
+      "bytes": 24404,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3df7a9a490a06c398d20da57bf19fc48d3b1c74e/scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py"
+    },
+    {
+      "id": "R2_SIGNALS",
+      "snapshot": "r2",
+      "commit_sha": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
+      "path": "scripts/strategy_research/g2_btc_flow_regime_r2/signals.py",
+      "git_blob_sha1": "0c746c0041a6caad25ad8b1f42e17dab7321c498",
+      "sha256": "1548042fb478f56ffa8fceffe15c3fe250267a5087f5e59e81c6942a74105cdf",
+      "bytes": 15060,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3df7a9a490a06c398d20da57bf19fc48d3b1c74e/scripts/strategy_research/g2_btc_flow_regime_r2/signals.py"
+    },
+    {
+      "id": "R2_SOURCES",
+      "snapshot": "r2",
+      "commit_sha": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
+      "path": "scripts/strategy_research/g2_btc_flow_regime_r2/sources.py",
+      "git_blob_sha1": "f374b46f2edf901346d821b3133d6a1bfb2619ac",
+      "sha256": "71ba269deb7514912b045c1c56d4d73b4cb8678b358b5734f2fd475b2a717ae5",
+      "bytes": 17603,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/3df7a9a490a06c398d20da57bf19fc48d3b1c74e/scripts/strategy_research/g2_btc_flow_regime_r2/sources.py"
+    },
+    {
+      "id": "R3_MULTIPLICITY",
+      "snapshot": "r3",
+      "commit_sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+      "path": "evidence/v0.6/b_line/g2_btc_exit_aware_r3/MULTIPLICITY_SUPPORT_NEGATIVE_REPORT.json",
+      "git_blob_sha1": "d7ac8822052ca15bbe0b4fa8badb1f09569db4ce",
+      "sha256": "c8a7b94ac40d378d32b78fc341988bf71f7a3a8f6434c17b766a9b4e80698bbf",
+      "bytes": 9653,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/a69ccfdfd578bd0b7d3aa43d75959a659f969782/evidence/v0.6/b_line/g2_btc_exit_aware_r3/MULTIPLICITY_SUPPORT_NEGATIVE_REPORT.json"
+    },
+    {
+      "id": "R3_ROSTER",
+      "snapshot": "freeze",
+      "commit_sha": "45bf7cc72eb9a870323c5da056fc9287d42b7b22",
+      "path": "evidence/v0.6/b_line/g2_btc_exit_aware_r3/FROZEN_ROSTER_27_CELLS.json",
+      "git_blob_sha1": "3a17d1fd5845b0a98dd253006751ac28d401688a",
+      "sha256": "07ded62808cb61a1ed9efac7b8d8c45482b74d98619d2594ae6c8e4309bfaa6b",
+      "bytes": 19217,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/45bf7cc72eb9a870323c5da056fc9287d42b7b22/evidence/v0.6/b_line/g2_btc_exit_aware_r3/FROZEN_ROSTER_27_CELLS.json"
+    },
+    {
+      "id": "R3_SOURCE_MANIFEST",
+      "snapshot": "r3",
+      "commit_sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+      "path": "evidence/v0.6/b_line/g2_btc_exit_aware_r3/PUBLIC_DEVELOPMENT_SOURCE_MANIFEST.json",
+      "git_blob_sha1": "782bf8bc5aa669ffbf258661c1d1c8d18103a322",
+      "sha256": "688f6a7ae3a7d5c492b3f6b3b567c03d13f957f4ed952c787056c4f281be797d",
+      "bytes": 59977,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/a69ccfdfd578bd0b7d3aa43d75959a659f969782/evidence/v0.6/b_line/g2_btc_exit_aware_r3/PUBLIC_DEVELOPMENT_SOURCE_MANIFEST.json"
+    },
+    {
+      "id": "EXIT_E0_IDENTITY",
+      "snapshot": "exit",
+      "commit_sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+      "path": "evidence/v0.6/b_line/g2_exit_horizon_r1/E0_EXACT_IDENTITY_RECEIPT.json",
+      "git_blob_sha1": "e04670de0a0a868e4313ff9a769f82083fa5952b",
+      "sha256": "6c997552ab41e2c05537100e9ffc7e8ee848abc36253610b155a0bdc829edba0",
+      "bytes": 2475,
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/55ac4c631c69f6edbd275462ad23e4486b9782ed/evidence/v0.6/b_line/g2_exit_horizon_r1/E0_EXACT_IDENTITY_RECEIPT.json"
+    }
+  ],
+  "remote_source_commit_verification": [
+    {
+      "snapshot": "r3",
+      "sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+      "tree_sha": "c72caa212b01e3db541ed9cd739b6ab2f71edaa9",
+      "parents": [
+        "3af438490da4497132a5c32c786752ca527e0d99"
+      ],
+      "local_commit_object_hash_verified": true,
+      "remote_tree_matches": true
+    },
+    {
+      "snapshot": "r3code",
+      "sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "tree_sha": "bc2cb297413363284fe3a4532999715f78f03134",
+      "parents": [
+        "45bf7cc72eb9a870323c5da056fc9287d42b7b22"
+      ],
+      "local_commit_object_hash_verified": true,
+      "remote_tree_matches": true
+    },
+    {
+      "snapshot": "freeze",
+      "sha": "45bf7cc72eb9a870323c5da056fc9287d42b7b22",
+      "tree_sha": "d9b02e20cf0ffdd5da36ddba84bcf05717e5c32e",
+      "parents": [
+        "3df7a9a490a06c398d20da57bf19fc48d3b1c74e"
+      ],
+      "local_commit_object_hash_verified": true,
+      "remote_tree_matches": true
+    },
+    {
+      "snapshot": "r2",
+      "sha": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
+      "tree_sha": "5ea54cc38c0c9248f04dc3adb51fc7a61e3d62f5",
+      "parents": [
+        "644f573c3d982ef97fc4317018eaa349fa403796"
+      ],
+      "local_commit_object_hash_verified": true,
+      "remote_tree_matches": true
+    },
+    {
+      "snapshot": "r31",
+      "sha": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+      "tree_sha": "6ac2f71d940c6419fd875cb289a7e4628f151387",
+      "parents": [
+        "c36df02a438dd0b46a02168d910479853c294dd4"
+      ],
+      "local_commit_object_hash_verified": true,
+      "remote_tree_matches": true
+    },
+    {
+      "snapshot": "exit",
+      "sha": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+      "tree_sha": "45caa0e5d113cc090ee759d4eb8361e2300d8776",
+      "parents": [
+        "de2c1fb222970a93ca797868b91b8544261ebaad"
+      ],
+      "local_commit_object_hash_verified": true,
+      "remote_tree_matches": true
+    },
+    {
+      "snapshot": "boost",
+      "sha": "fdec02d5d7cf9d80ae45fc36c56af5008df003d6",
+      "tree_sha": "ecf90b1ce969ba9969ffea024f233b13eee28192",
+      "parents": [
+        "187cbf66c8231bf9618b632e766d0181634d3f16"
+      ],
+      "local_commit_object_hash_verified": true,
+      "remote_tree_matches": true
+    },
+    {
+      "snapshot": "normal",
+      "sha": "b760a5e43e6bedc44ecec81284b8db094f50c902",
+      "tree_sha": "8c6c4bbaa6265456f551d20d8bf32126d290b8b1",
+      "parents": [
+        "1e5eb35afef0c20ad0e45585c3648024919cda76"
+      ],
+      "local_commit_object_hash_verified": true,
+      "remote_tree_matches": true
+    },
+    {
+      "snapshot": "consumer_c",
+      "sha": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+      "tree_sha": "fd05a74e0e7197796479510d459d51f19e0a3734",
+      "parents": [
+        "ca01e422c6e6abf79bfda7350859f05e356093d9"
+      ],
+      "local_commit_object_hash_verified": true,
+      "remote_tree_matches": true
+    }
+  ],
+  "statistical_method_background": [
+    {
+      "url": "https://arxiv.org/abs/1306.3930v4",
+      "title": "A dependent multiplier bootstrap for the sequential empirical copula process under strong mixing",
+      "authors": [
+        "Axel B\u00fccher",
+        "Ivan Kojadinovic"
+      ],
+      "read_level": "PRIMARY_SOURCE_ABSTRACT",
+      "use": "Stationarity/mixing caveat only; not validation of proposed fixed-month BTC estimator."
+    }
+  ],
+  "r3_observations": {
+    "cost_primary": "STRESS",
+    "pnl_label": "NET_EX_FUNDING_PROXY",
+    "cells": 27,
+    "account_rows_all_costs": 54,
+    "completed_trade_counts": [
+      5,
+      34,
+      35
+    ],
+    "common_eligible_unique_events": {
+      "A": 43,
+      "B": 6,
+      "C": 51
+    },
+    "generated_events": {
+      "A": 81,
+      "B": 16,
+      "C": 104
+    },
+    "feasible_paired_events": {
+      "A": 35,
+      "B": 5,
+      "C": 37
+    },
+    "all_stress_pooled_and_equalyear_net_negative": true,
+    "all_account_collision_minutes": 0,
+    "weekly_bonferroni27_net_p_values": [
+      1
+    ],
+    "full_ledger_replication": "NOT_PERFORMED_FULL_ENTRY_LEG_PAIRED_CURVES_SCRATCH_ONLY"
+  },
+  "cross_study_economic_deltas_computed": 0,
+  "comparability": {
+    "direct": [
+      "R31_W1_E0_vs_EXIT_W1_E0_identity",
+      "R31_W2_E0_vs_EXIT_W2_E0_identity",
+      "EXIT_fixed_Q_H1_H2_vs_E0_within_lead",
+      "R3_fixed_entry_Q_X1_X2_vs_X0_within_proxy",
+      "R2_A_vs_R3_A_raw_event_identity_only"
+    ],
+    "conditional": [
+      "EXIT_H1_H2_full_account_vs_E0",
+      "EXIT_E1_E2_vs_E0_strict_fill_confound",
+      "R2_A_account_vs_R3_A_account",
+      "R3_alternate_vs_X0_portfolios"
+    ],
+    "not_comparable": [
+      "all_W1_W2_R31_R1_vs_R3_entry_exit_cap_economic_pairs",
+      "W1_strategy_means_vs_W2_strategy_means"
+    ],
+    "matrix_document": "docs/strategy_research/g2_r4_independent_science/W1_W2_VS_R3_COMPARABILITY_MATRIX.md"
+  },
+  "validation": {
+    "focused_engine_suite": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python -m pytest -q --noconftest tests/test_v06_g2_btc_exit_aware_r3_engine.py --tb=short -p no:cacheprovider",
+      "python": "3.13.13",
+      "os": "Linux",
+      "pytest": "8.4.2",
+      "numpy": "2.4.6",
+      "passed": 61,
+      "failed": 0,
+      "skipped": 0,
+      "runtime_seconds": 0.46,
+      "tested_source_sha": "3af438490da4497132a5c32c786752ca527e0d99"
+    },
+    "independent_published_synthetic_decimal_recalculations": [
+      {
+        "case": "HAND1",
+        "policy": "X0",
+        "side": 1,
+        "legs": 1,
+        "quantity": "0.127",
+        "recomputed_net_usdt": "-6.60171400",
+        "pass": true
+      },
+      {
+        "case": "HAND2",
+        "policy": "X1",
+        "side": 1,
+        "legs": 3,
+        "quantity": "0.127",
+        "recomputed_net_usdt": "6.06198322",
+        "pass": true
+      },
+      {
+        "case": "HAND3",
+        "policy": "X1",
+        "side": 1,
+        "legs": 2,
+        "quantity": "0.127",
+        "recomputed_net_usdt": "0.90048198",
+        "pass": true
+      },
+      {
+        "case": "HAND4",
+        "policy": "X2",
+        "side": 1,
+        "legs": 2,
+        "quantity": "0.128",
+        "recomputed_net_usdt": "7.88477568",
+        "pass": true
+      },
+      {
+        "case": "HAND5",
+        "policy": "X1",
+        "side": -1,
+        "legs": 3,
+        "quantity": "0.127",
+        "recomputed_net_usdt": "6.08532440",
+        "pass": true
+      }
+    ],
+    "new_synthetic_engine_boundary_probes": {
+      "cases": 2,
+      "assertions_passed": true,
+      "historical_data_used": false,
+      "reproduction_command": "PYTHONDONTWRITEBYTECODE=1 python - <<'PY'\nfrom decimal import Decimal\nimport numpy as np\nfrom scripts.strategy_research.g2_btc_exit_aware_r3 import engine as e\nD=Decimal\nbase=np.tile([0,10000,10005,9995,10000,10.0],(600,1));base[:,0]=np.arange(600)*e.MINUTE\nev=dict(event_id='SYNTHETIC_ONLY:R4_BOUNDARY',side=1,event_time=0,decision_at=60000,entry_at=120000,stop=9970,decision_close=10000,atr_hour=50)\nc=e.Cost(D(0),D(0),D(0))\na=base.copy();a[3,1:5]=[10070,10080,9960,10000]\nr=e.episode(a,ev,'X1',8,c,D('.127'))\nassert r['exit_reason']=='STOP' and len(r['legs'])==1 and r['legs'][0]['quantity']==D('.127')\nprint('SYNTHETIC_OPEN_CROSSED_TP_THEN_STOP',{'engine_reason':r['exit_reason'],'engine_raw':str(r['legs'][0]['raw_price']),'net_usdt':str(r['net_usdt']),'collision_count':r['collision_minutes']})\na=base.copy();a[482,1:5]=[10080,10085,10075,10080]\nr=e.episode(a,ev,'X1',8,c,D('.127'))\noracle=D('.050')*D(30)+D('.038')*D(54)+D('.039')*D(80)\nassert r['exit_reason']=='TIME_CAP' and r['net_usdt']==D('10.16000000') and oracle==D('6.672')\nprint('SYNTHETIC_CAP_OPEN_CROSSED_TP',{'engine_net':str(r['net_usdt']),'standing_TP_before_cap_oracle_net':str(oracle),'engine_minus_oracle':str(r['net_usdt']-oracle)})\nPY\n",
+      "open_targets_then_stop": {
+        "net_usdt": "-3.81000000",
+        "collision_minutes": 1
+      },
+      "cap_before_earlier_standing_targets": {
+        "model_net_usdt": "10.16000000",
+        "conditional_standing_target_first_oracle_net_usdt": "6.672",
+        "model_minus_conditional_oracle_usdt": "3.48800000"
+      },
+      "status": "FROZEN_MODEL_ASSUMPTION_LIMITATIONS_NOT_HISTORICAL_PNL_CORRECTION"
+    },
+    "r3_code_remote_ci": {
+      "run_id": 38285054954,
+      "job_id": 114931312900,
+      "bounded_log_lines": [
+        "2026-10-12T17:34:41.3378480Z PROFILE full CMD ['pytest', '-q', '--durations=20', '--junitxml=ci-junit.xml']",
+        "2026-10-12T17:49:27.2871084Z 2955 passed, 2 skipped, 9 warnings in 884.00s (0:14:44)"
+      ],
+      "jobs": [
+        {
+          "id": 114931312900,
+          "name": "Risk-based quality (Python 3.12)",
+          "status": "completed",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Fetch v0.6 immutable base for merge-base resolution",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Ensure cache directory exists for docs-only/zero-pip FAST paths",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Build fail-closed test plan",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Classify impact before heavy dependency installation",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install tiny CI-planner dependencies",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Install production/research validation dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Ruff with bounded historical EXE001 debt",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Type-check production package on production changes",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Compile Python",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Validate changed JSON artifacts",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Tests selected by risk/changed scope",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Retain scoped test evidence",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114931314964,
+          "name": "Compatibility manual full suite",
+          "status": "completed",
+          "conclusion": "skipped"
+        }
+      ],
+      "independently_fetched_utc_date": "2026-10-13"
+    },
+    "r3_code_remote_run": {
+      "id": 38285054954,
+      "head_sha": "3af438490da4497132a5c32c786752ca527e0d99",
+      "head_branch": "feature/v06-bline-g2-codex-btc-exit-aware-research-r3",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38285054954",
+      "verified_utc": "2026-10-13T02:54:49.801648+00:00"
+    },
+    "new_full_repository_tests": "NOT_EXECUTED_NOT_REQUIRED_FOR_DOCUMENTATION_AUDIT",
+    "static_json_links_sha_path_checks": {
+      "status": "PASS",
+      "exact_allowlisted_new_files": 7,
+      "markdown_links_verified": 92,
+      "source_line_anchors_verified": 47,
+      "source_records": 42,
+      "probe_python_syntax": "VALID"
+    }
+  },
+  "prospective_design": {
+    "status": "DESIGN_ONLY_NOT_EXECUTED",
+    "mechanisms_max": 3,
+    "horizons_hours": [
+      1,
+      2,
+      4,
+      8,
+      12,
+      18,
+      24
+    ],
+    "comparison_endpoints": 21,
+    "directional_decision_budget": 42,
+    "familywise_alpha": 0.05,
+    "power_target": 0.8,
+    "smallest_useful_effect_net_control_bps": 20,
+    "planning_alternative_control_bps": 40,
+    "planning_null_alternative_separation_bps": 20,
+    "assumed_sd_grid_bps": [
+      100,
+      150,
+      250
+    ],
+    "ideal_effective_n_grid": [
+      377,
+      847,
+      2352
+    ],
+    "illustrative_design_effect": 2,
+    "required_nominal_count_at_sd150": 1694,
+    "nominal_finite_cap_per_mechanism": 729,
+    "minimum_inter_event_hours": 24,
+    "maximum_days": 730,
+    "active_weekly_clusters_min": 60,
+    "source_and_power_readiness": "FAILED_STRUCTURAL_COUNT_CAP_AND_UNPROVEN_SOURCES",
+    "candidate_inference_calibration": "UNRESOLVED_SPARSE_MONTH_NUISANCE_CENTERING_REQUIRES_PREEXPOSURE_COVERAGE_AND_JOINT_POWER_CALIBRATION"
+  },
+  "open_risks": [
+    "historical_ingress_known_at_UNKNOWN",
+    "actual_R3_Mark_funding_L2_capacity_UNKNOWN",
+    "full_R3_ledger_NOT_PUBLISHED",
+    "pooled_vs_equalyear_paired_estimand_difference",
+    "cap_open_standing_target_ordering_not_uniformly_conservative",
+    "W_registry_prose_vs_executable_threshold_discrepancy",
+    "C_CONSUMER_REQUIRES_NEW_AUTHORITY_late_funding",
+    "candidate_future_multiplier_covariance_sparse_month_calibration_UNRESOLVED",
+    "new_mechanism_PIT_identity_and_finite_power_NOT_DEMONSTRATED"
+  ],
+  "prohibited_operation_counts": {
+    "protected_reserved_reads_including_metadata": 0,
+    "owner_data_reads": 0,
+    "new_historical_strategy_outcome_trials": 0,
+    "protected_forward_reads": 0,
+    "private_exchange_account_calls": 0,
+    "orders": 0,
+    "funds_financial_writes": 0,
+    "prior_source_or_results_modified": 0,
+    "other_branches_modified": 0,
+    "merges": 0,
+    "force_pushes": 0
+  },
+  "deliverables": [
+    {
+      "path": "docs/strategy_research/g2_r4_independent_science/G2_R3_INDEPENDENT_SCIENTIFIC_AUDIT.md",
+      "sha256": "7423ba7eb242bf8c1a37db12c486372d756c764e30af92dedd6451123e452d6a"
+    },
+    {
+      "path": "docs/strategy_research/g2_r4_independent_science/W1_W2_VS_R3_COMPARABILITY_MATRIX.md",
+      "sha256": "02631a459afb30fd0d8cffe9431d573c75d713f1e1547fdcb8fa2e20f6f39d52"
+    },
+    {
+      "path": "docs/strategy_research/g2_r4_independent_science/ENTRY_EDGE_FAILURE_MODE_ANALYSIS.md",
+      "sha256": "9b8d268feef9674e7ace84e3856afeaf1158b38886092d48c2e3669802519d21"
+    },
+    {
+      "path": "docs/strategy_research/g2_r4_independent_science/BTC_STRATEGY_MECHANISM_PIVOT_DECISION.md",
+      "sha256": "4b7f3a0989743b0580ddabd0acd3c471c53d15e38f242f4c8a26da33a18ce484"
+    },
+    {
+      "path": "docs/strategy_research/g2_r4_independent_science/NEXT_PROSPECTIVE_EXPERIMENT_DESIGN.md",
+      "sha256": "a101d94a06274a84b95e5ac2d39b90d6964a9be8f107dccc9b1536e3dbeb0c8b"
+    },
+    {
+      "path": "docs/strategy_research/g2_r4_independent_science/FINANCIAL_PIT_INTEGRATION_OPEN_RISKS.md",
+      "sha256": "7527f4d4b71c3b6215218d21572172ad051d8e7df45fdac21098ddfb410bfc15"
+    }
+  ],
+  "evidence_index_path": "evidence/v0.6/b_line/g2_r4_independent_science/SOURCE_AND_AUDIT_EVIDENCE_INDEX.json",
+  "publication": {
+    "state": "READY_FOR_AUTHORIZED_NONFORCE_PUBLICATION",
+    "max_commits": 3,
+    "force": false,
+    "self_reference_policy": "Final publishing commit cannot contain its own SHA; final remote HEAD/CI independently verified after push and reported separately. Earlier verified commits may be recorded here."
+  },
+  "recorded_utc": "2026-10-13T03:27:59.923834+00:00"
+}
