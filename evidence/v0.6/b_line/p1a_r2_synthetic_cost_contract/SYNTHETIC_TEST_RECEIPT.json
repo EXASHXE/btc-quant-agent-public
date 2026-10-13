@@ -7,7 +7,7 @@
   "controller_l2_sha": "efa2df62c02d21b20ce07846c7ca30901716e773",
   "branch": "feature/v06-p1a-r2-btc-synthetic-per-fill-cost-engine",
   "source_commit_parent_sha": "3af438490da4497132a5c32c786752ca527e0d99",
-  "tested_code_sha": null,
+  "tested_code_sha": "a535fde2aa24e6e0d65a3e353d4a51e532e1abf6",
   "allowed_paths": [
     "scripts/strategy_research/g2_btc_exit_aware_r3/cost_contract_synthetic_r2.py",
     "tests/test_v06_btc_cost_contract_synthetic_r2.py",
@@ -93,12 +93,149 @@
     "real_market_data_accessed": false,
     "historical_results_modified": false,
     "scoring_integration": false,
-    "account_access": false,
-    "exchange_orders": false
+    "exchange_orders": false,
+    "exchange_account_access": false
   },
   "ci": {
-    "status": "PENDING_PUBLICATION",
-    "runs": []
+    "status": "COMPLETED_FAILURE",
+    "runs": [
+      {
+        "run_id": 38382220675,
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38382220675",
+        "head_sha": "a535fde2aa24e6e0d65a3e353d4a51e532e1abf6",
+        "planner_mode": "full",
+        "conclusion": "failure",
+        "counts": {
+          "total": 2981,
+          "passed": 2975,
+          "failed": 4,
+          "errors": 0,
+          "skipped": 2
+        },
+        "new_synthetic_cases": {
+          "passed": 24,
+          "failed": 0,
+          "skipped": 0
+        },
+        "failed_tests": [
+          "tests.test_v050_r01_surface_reduction::test_catalog_reports_actual_paths_and_parser_without_service",
+          "tests.test_v050_r01_surface_reduction::test_catalog_default_stdout_never_recreates_reviews",
+          "tests.test_v050_r01_surface_reduction::test_catalog_refuses_agent_documents_on_code_branch",
+          "tests.test_v051_h40_m3a_production_discovery_producer::test_p09_through_p18_exact_scientific_graph"
+        ],
+        "actual_job_steps": [
+          {
+            "job": "Risk-based quality (Python 3.12)",
+            "status": "completed",
+            "conclusion": "failure",
+            "steps": [
+              {
+                "name": "Set up job",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Run actions/checkout@v4",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Fetch v0.6 immutable base for merge-base resolution",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Ensure cache directory exists for docs-only/zero-pip FAST paths",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Run actions/setup-python@v5",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Build fail-closed test plan",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Classify impact before heavy dependency installation",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Install tiny CI-planner dependencies",
+                "status": "completed",
+                "conclusion": "skipped"
+              },
+              {
+                "name": "Install production/research validation dependencies",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Ruff with bounded historical EXE001 debt",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Type-check production package on production changes",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Compile Python",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Validate changed JSON artifacts",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Tests selected by risk/changed scope",
+                "status": "completed",
+                "conclusion": "failure"
+              },
+              {
+                "name": "Retain scoped test evidence",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Post Run actions/setup-python@v5",
+                "status": "completed",
+                "conclusion": "skipped"
+              },
+              {
+                "name": "Post Run actions/checkout@v4",
+                "status": "completed",
+                "conclusion": "success"
+              },
+              {
+                "name": "Complete job",
+                "status": "completed",
+                "conclusion": "success"
+              }
+            ]
+          },
+          {
+            "job": "Compatibility manual full suite",
+            "status": "completed",
+            "conclusion": "skipped",
+            "steps": []
+          }
+        ],
+        "plan_sha256": "a59b186c31f352a0f4233f604d361af758c047f1e799ea227c79e47b6637d5de",
+        "junit_sha256": "44168c5bb3cfb6f327143c4bd0a7a03582786dd2a6568ba6fc00b01c2e79204b"
+      }
+    ],
+    "following_receipt_commit": "Documentation-only; its docs-scoped CI does not replace the failed implementation full-suite gate."
   },
-  "terminal_decision": "PENDING_REMOTE_CI; independent synthetic contract review accepted; no release permission"
+  "terminal_decision": "CONTRACT_BLOCKED",
+  "receipt_update_parent_sha": "a535fde2aa24e6e0d65a3e353d4a51e532e1abf6",
+  "terminal_reason": "Three existing catalog tests require reviews/ to be absent, conflicting with the Controller-required report path; a fourth existing scientific fixture golden hash assertion also fails. Repair requires paths outside the exact allowlist. No test, golden, CI, dependency, frozen engine or historical outcome was altered.",
+  "publication_identity_note": "This receipt records the immutable tested source HEAD and the receipt commit parent. A commit cannot embed its own SHA; final remote publication SHA is reported separately."
 }

@@ -64,7 +64,7 @@ The cases contain finite negative subcases for duplicate/conflicting fill and se
 
 ## Validation and independent review
 
-Targeted pytest: **24 passed, 0 failed, 0 skipped** on Python3.13.13 / pytest8.4.2. Targeted Ruff and format checks passed. Isolated source compilation passed. The repository's existing project lint gate passed without suppressing any rule or changing its historical allowlist. Its unmodified risk classifier selects **full** for this new executable; remote CI must retain that selection. A local full suite was not substituted for remote CI.
+Targeted pytest: **24 passed, 0 failed, 0 skipped** on Python3.13.13 / pytest8.4.2. Targeted Ruff and format checks passed. Isolated source compilation passed. The repository's existing project lint gate passed using the unchanged bounded EXE001 policy, with no new suppression or allowlist change. Its unmodified risk classifier selects **full** for this new executable; remote CI must retain that selection. A local full suite was not substituted for remote CI.
 
 Frozen source blobs were independently compared to the exact execution base: engine `bf187ace012619eb3f6aee5d9051999459967100`; portfolio `33528e62084feba7c657a657204ccbf41a82cf54`. Module AST imports only dataclasses, decimal, functools and future annotations. Tests run under the repository's existing hermetic guards.
 
@@ -72,6 +72,34 @@ Independent reviewer `/root/independent_cost_review` separately inspected source
 
 ## Remote CI and terminal
 
-PENDING_PUBLICATION. The receipt will be updated with the exact tested source commit, actual CI step outcomes, and documentation-only receipt parent after the run concludes. Existing H41 lint debt, if observed, will be reported without changes or suppression. No green full suite is claimed before execution.
+Tested implementation HEAD: `a535fde2aa24e6e0d65a3e353d4a51e532e1abf6`; exact source parent: `3af438490da4497132a5c32c786752ca527e0d99`. This reporting update has that tested implementation commit as its parent and changes only the allowed report and receipt. Source/test hashes are unchanged. The final publication SHA is reported externally because a commit cannot embed its own identity.
 
-Synthetic-contract source review is accepted; final dispatch terminal remains pending remote validation. No measured-source acceptance, real execution calibration, historical repricing, Alpha promotion, TESTNET/LIVE or self-issued release permission.
+[Implementation CI run 38382220675](https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38382220675) concluded **FAILURE**. The unchanged CI plan selected **full**, with 2,981 tests: **2,975 passed, 4 failed, 2 skipped, 0 errors**. All 24 new synthetic tests passed in the same full CI run. Full pytest elapsed approximately 780.6 seconds on Python3.12.
+
+| CI step/job | Actual outcome |
+| --- | --- |
+| Setup, checkout, immutable-base fetch, Python setup, fail-closed plan/classification | PASS |
+| Tiny CI-planner dependency install | SKIPPED (normal production/research path used) |
+| Production/research dependency install | PASS |
+| Ruff with unchanged bounded EXE001 policy | PASS |
+| Production package mypy | PASS |
+| Compile Python | PASS |
+| Changed JSON validation | PASS |
+| Full risk-selected pytest | FAIL: 2,975 passed, 4 failed, 2 skipped |
+| Scoped evidence artifact retention | PASS |
+| Python post-step cleanup | SKIPPED after failure |
+| Checkout post-step cleanup | PASS |
+| Manual full compatibility job | SKIPPED (push event; not manually requested) |
+
+Exact failing tests:
+
+- `tests.test_v050_r01_surface_reduction::test_catalog_reports_actual_paths_and_parser_without_service`
+- `tests.test_v050_r01_surface_reduction::test_catalog_default_stdout_never_recreates_reviews`
+- `tests.test_v050_r01_surface_reduction::test_catalog_refuses_agent_documents_on_code_branch`
+- `tests.test_v051_h40_m3a_production_discovery_producer::test_p09_through_p18_exact_scientific_graph`
+
+The three catalog tests assert the entire repository `reviews/` directory is absent. This dispatch expressly requires a new report at `reviews/v0.6/b_line/V06_P1A_R2_SYNTHETIC_COST_CONTRACT_REPORT.md`; satisfying that path requirement creates the directory and therefore conflicts with those existing assertions. Moving/deleting the required report or editing those tests is not authorized. The fourth failure compares an existing scientific synthetic-row golden digest: expected `d5a962cd9c9556b573a890b6af8cbeb09d7201187511f477d727c8670bf0b2e0`, observed `ee185f1fce50bdf710295a23506a5c29d83a70c361aff72e2b6be9e54526643d`. No baseline rerun or historical/scientific scoring trial was performed to attribute that mismatch; it remains unresolved outside the new contract. Its test and production scientific source are unchanged. No golden was rewritten.
+
+No H41 lint failure appeared in this run. No failing test was suppressed, CI policy was not changed, and no dependency/configuration/extra path was patched. A documentation-only follow-up CI result cannot clear this failed full implementation gate. The published JSON receipt records actual steps, counts, reviewed code hashes and exact tested SHA.
+
+**TERMINAL: CONTRACT_BLOCKED.** The isolated synthetic cash contract and independent review pass, but complete repository validation is blocked by these four failures. Controller must resolve the required-report/catalog contract conflict and separately adjudicate the scientific golden failure under a new exact-SHA/path dispatch before accepting the implementation gate. No Controller release permission, measured-source acceptance, actual execution calibration, historical repricing, Alpha promotion, TESTNET or LIVE is issued.
