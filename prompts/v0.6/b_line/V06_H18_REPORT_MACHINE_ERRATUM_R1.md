@@ -1,0 +1,6 @@
+# H18 Report-to-Machine Immutable Reconciliation R1
+
+ROLE: Gemini NORMAL bounded source/document crosswalk; independently reviewed by ChatGPT-1. STATUS: READ_ONLY_READY; a sidecar publication needs a separate exact-SHA docs branch grant.
+REPO: EXASHXE/btc-quant-agent-public. PINNED: H18 397a62c1a0fbd6ad14a569a5be0058b1f684f08e and Exit R1 55ac4c631c69f6edbd275462ad23e4486b9782ed. Compare H18 narrative Table4 with H18 machine regime_stratification and Exit R1 yearly STRESS.
+MUST RECONCILE: W1 2021 H1 report +128.53bp vs upstream +107.5206bp, H1−E0 +23.95 vs +2.9443bp; W2 2021 reported N14 vs canonical N10; identify every inconsistent row/field with source SHA and UNKNOWN where unable. Preserve 4/3 target winner concentration as retrospective, not forecasting classifier.
+FORBIDDEN: rewriting historical reports/data, repricing, new historical return access, protected/reserved/private/owner paths and trades. OUTPUT: non-destructive erratum sidecar proposal, exact row/field identity, independent check, terminal ERRATUM_READY or LEDGER_IDENTITY_BLOCKED.

@@ -1,0 +1,6 @@
+# F1–F3 Sparse-Event Max-T Inference Method Review R1
+
+ROLE: Codex Sol High with separate ChatGPT-1/Challenger review. STATUS: SYNTHETIC DESIGN ONLY; source modifications need new exact-SHA authorization, branch and allowlist.
+REPO: EXASHXE/btc-quant-agent-public. FROZEN SOURCE: f25954b45577cebb7624fae86cd91df9071a87ab statistics.py compute_block_bootstrap_max_t; six historical results immutable. Read Controller R1 debate adjudication and Issue #1 all six comments.
+TASK: Reproduce with invented block counts the b_se=max(sd/sqrt(n),1e-6) zero-variance resample failure, differentiate calendar-block-sum estimand from trade mean; propose a valid familywise method or refuse calibration. Prespecify no-event, constant-sample, heavy-tail, temporal dependence, undefined SE, coverage, type-I, power and effective-n synthetic tests; preserve prior multiple-comparison family, no retrospective winner retuning.
+NO historical outcomes/replay/rescoring, protected/reserved/private/owner access, original ledger edits, trading. COMPLETE: a bounded audit and synthetic test/calibration contract with PASS_METHOD_READY or METHOD_BLOCKED; F1–F3 published simultaneous intervals remain SIMULTANEOUS_INFERENCE_UNCALIBRATED until separate verified correction.

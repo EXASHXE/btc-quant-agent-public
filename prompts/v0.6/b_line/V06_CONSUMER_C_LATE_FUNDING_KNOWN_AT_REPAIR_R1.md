@@ -1,0 +1,6 @@
+# Consumer C Late-Settlement Funding PIT Contract R1
+
+ROLE: Gemini BOOST architecture/implementation; Codex Sol High independent financial auditor. Status: DESIGN_ONLY. Code repair requires separate exact-SHA Controller authorization, isolated implementation branch and write/test allowlist.
+REPO: EXASHXE/btc-quant-agent-public. PINNED C consumer source 91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b, BOOST adapter fdec02d5d7cf9d80ae45fc36c56af5008df003d6, no implicit merge.
+BUG: Consumer C insists available_at_ms == settlement_at; genuine settled Funding REST receipt may arrive hours after economic settlement. Design to retain provider settlement/publication, receiver known-at, settlement Mark witness and economic exposure/Q, exactly-once Decimal signed journal and fail-closed missing source. No backdating, no cash cost silently zeroed. Synthetic tests: late REST, duplicate normalized rates, conflicts, missing historical Mark, reconnect epochs, same-clock entry/exit/partials, true decision known-at, nonfinite/bounds.
+CURRENT PERMISSION: published code read-only and synthetic contract design. FORBIDDEN: code changes until separate exact grant, private/protected/owner/reserved data, source capture, testnet/live/orders/funds, merging BOOST/NORMAL. Deliver minimal diff plan, independent negative-case acceptance, terminal DESIGN_READY_FOR_DISPATCH or BLOCKED.

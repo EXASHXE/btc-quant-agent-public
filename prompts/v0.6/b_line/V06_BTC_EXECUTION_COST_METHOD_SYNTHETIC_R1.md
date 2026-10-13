@@ -1,0 +1,7 @@
+# BTCUSDT Execution-Cost Method and Synthetic Calibration R1
+
+ROLE: Codex Sol High or Astra scientific method; Gemini NORMAL for narrowly granted fixtures. STATUS: DESIGN_ONLY_READY, NOT CODE_AUTHORITY.
+REPO: EXASHXE/btc-quant-agent-public; Controller planning SHA 198d0a931cfd610e86553c1f427c57ae60608a65; source R3 code 3af438490da4497132a5c32c786752ca527e0d99. Before writing code, demand a separate exact-SHA Controller dispatch, isolated branch/worktree and path allowlist.
+OBJECTIVE: Independently evaluate four FEE_ONLY/NORMAL/ADVERSE/EXTREME regimes in V06_BTC_EXECUTION_COST_RECALIBRATION_PLAN.md. Verify Binance ordinary USDT-M reference maker2bp/taker5bp and distinguish public reference from user fee. Prove signed long/short Decimal ledger, actual entry/exit notional fees, half-spread no-double-count at bid/ask, maker nonfill and marketable LIMIT taker, adverse impact, stops, partial positions and funding at settlement Mark with delayed receiver known-at.
+ALLOWED NOW: read-only public source/method and invented synthetic examples. FORBIDDEN absent new separate grant: source edits, tests committed, public quote collection, historical repricing/return labels, reserved/owner/protected/private data, exchange actions.
+ACCEPTANCE: explain formulas/units, four scenario input provenance and p50/p75/p95 measurement need, finite synthetic negative-case plan, exact next authorized code/data scope. HARD STOP unknown complete execution distributions; no Alpha promotion.
