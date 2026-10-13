@@ -542,6 +542,7 @@ def test_market_pit_funding_missing_mark_or_rate_cost_incomplete() -> None:
         quantity="1.5",
         mark_price=None,
         rate_fraction="0.0001",
+        funding_coverage_complete=True,
     )
     assert r1["status"] == "COST_INCOMPLETE"
     assert r1["cash_flow"] is None
@@ -552,6 +553,7 @@ def test_market_pit_funding_missing_mark_or_rate_cost_incomplete() -> None:
         quantity="1.5",
         mark_price="64000.00",
         rate_fraction=None,
+        funding_coverage_complete=True,
     )
     assert r2["status"] == "COST_INCOMPLETE"
     assert r2["cash_flow"] is None
@@ -562,6 +564,7 @@ def test_market_pit_funding_missing_mark_or_rate_cost_incomplete() -> None:
         quantity="1.5",
         mark_price="-100.00",
         rate_fraction="0.0001",
+        funding_coverage_complete=True,
     )
     assert r3["status"] == "COST_INCOMPLETE"
     assert r3["cash_flow"] is None
@@ -572,6 +575,7 @@ def test_market_pit_funding_missing_mark_or_rate_cost_incomplete() -> None:
         quantity="1.5",
         mark_price="0.00",
         rate_fraction="-0.0001",
+        funding_coverage_complete=True,
     )
     assert r4["status"] == "COST_INCOMPLETE"
     assert r4["reason"] == "MARK_PRICE_INVALID"
@@ -600,10 +604,18 @@ def test_market_pit_funding_credit_debit_side_symmetry() -> None:
 
     # Positive rate: LONG pays, SHORT receives
     long_pos = calculate_settled_funding_cash_flow(
-        side="LONG", quantity=qty, mark_price=mark, rate_fraction=rate_pos
+        side="LONG",
+        quantity=qty,
+        mark_price=mark,
+        rate_fraction=rate_pos,
+        funding_coverage_complete=True,
     )
     short_pos = calculate_settled_funding_cash_flow(
-        side="SHORT", quantity=qty, mark_price=mark, rate_fraction=rate_pos
+        side="SHORT",
+        quantity=qty,
+        mark_price=mark,
+        rate_fraction=rate_pos,
+        funding_coverage_complete=True,
     )
     assert long_pos["status"] == "COST_COMPLETE"
     assert short_pos["status"] == "COST_COMPLETE"
@@ -613,10 +625,18 @@ def test_market_pit_funding_credit_debit_side_symmetry() -> None:
 
     # Negative rate: LONG receives, SHORT pays
     long_neg = calculate_settled_funding_cash_flow(
-        side="LONG", quantity=qty, mark_price=mark, rate_fraction=rate_neg
+        side="LONG",
+        quantity=qty,
+        mark_price=mark,
+        rate_fraction=rate_neg,
+        funding_coverage_complete=True,
     )
     short_neg = calculate_settled_funding_cash_flow(
-        side="SHORT", quantity=qty, mark_price=mark, rate_fraction=rate_neg
+        side="SHORT",
+        quantity=qty,
+        mark_price=mark,
+        rate_fraction=rate_neg,
+        funding_coverage_complete=True,
     )
     assert long_neg["status"] == "COST_COMPLETE"
     assert short_neg["status"] == "COST_COMPLETE"
@@ -636,7 +656,11 @@ def test_market_pit_funding_exposure_before_vs_after_partial_fill_and_settlement
     # Residual exposure at settlement was 0.010 - 0.004 = 0.006
     assert exp_a == Decimal("0.006")
     cf_a = calculate_settled_funding_cash_flow(
-        side="LONG", quantity=exp_a, mark_price="60000.00", rate_fraction="0.0001"
+        side="LONG",
+        quantity=exp_a,
+        mark_price="60000.00",
+        rate_fraction="0.0001",
+        funding_coverage_complete=True,
     )
     assert cf_a["cash_flow"] == -Decimal("0.006") * Decimal("60000.00") * Decimal("0.0001")
 
@@ -650,7 +674,11 @@ def test_market_pit_funding_exposure_before_vs_after_partial_fill_and_settlement
     # Full exposure was intact at settlement time (0.010)
     assert exp_b == Decimal("0.010")
     cf_b = calculate_settled_funding_cash_flow(
-        side="LONG", quantity=exp_b, mark_price="60000.00", rate_fraction="0.0001"
+        side="LONG",
+        quantity=exp_b,
+        mark_price="60000.00",
+        rate_fraction="0.0001",
+        funding_coverage_complete=True,
     )
     assert cf_b["cash_flow"] == -Decimal("0.010") * Decimal("60000.00") * Decimal("0.0001")
 
@@ -659,7 +687,11 @@ def test_market_pit_funding_exposure_before_vs_after_partial_fill_and_settlement
     assert exp_c == Decimal("-0.006")
     # Piped directly into cash flow calculation with signed SHORT exposure
     cf_c = calculate_settled_funding_cash_flow(
-        side="SHORT", quantity=exp_c, mark_price="60000.00", rate_fraction="0.0001"
+        side="SHORT",
+        quantity=exp_c,
+        mark_price="60000.00",
+        rate_fraction="0.0001",
+        funding_coverage_complete=True,
     )
     assert cf_c["status"] == "COST_COMPLETE"
     assert cf_c["signed_exposure"] == Decimal("-0.006")

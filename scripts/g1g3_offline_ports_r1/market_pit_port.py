@@ -9,11 +9,18 @@ funding rates. Deduplicates idempotently while recording observable counters.
 from __future__ import annotations
 
 import copy
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from typing import Any
 
 from scripts.g1_offline_preview_r1.fixtures import bar as g1_synthetic_bar
-from scripts.g1_offline_preview_r1.model import SafetyViolation, decimal, digest, exact, timestamp
+from scripts.g1_offline_preview_r1.model import (
+    SafetyViolation,
+    decimal,
+    digest,
+    exact,
+    funding_receipt_fingerprint,
+    timestamp,
+)
 
 VALID_CHANNELS = {
     "last_kline_1m",
@@ -194,6 +201,14 @@ class MarketPitPort:
             if type(mono_ns) is not int or mono_ns < 0:
                 raise SafetyViolation("MONOTONIC_NS_INVALID")
             avail_ms = timestamp(envelope["available_at_ms"])
+            causal_funding = (
+                channel == "funding_settled"
+                and envelope.get("payload", {}).get("contract_version") == "SYNTHETIC_CAUSAL_R4"
+                if isinstance(envelope.get("payload"), dict)
+                else False
+            )
+            if causal_funding and prov_t is not None and prov_t > avail_ms:
+                raise SafetyViolation("FUNDING_PIT_INVALID")
 
             # available_at_ms is the no-earlier-than receiver ingress wall time of record
             if avail_ms < wall_ms:
@@ -250,6 +265,22 @@ class MarketPitPort:
             if dedupe_key in self.seen_dedupe_keys:
                 if self.seen_dedupe_keys[dedupe_key] != envelope["payload_sha256"]:
                     raise SafetyViolation("MARKET_EVENT_PROVENANCE_DRIFT")
+                if causal_funding:
+                    # Port acceptance is not a cash ACK. Retry the same
+                    # transport record at the durable ledger even if the
+                    # previous delivery died before Engine WAL append.
+                    if mono_ns < self.last_monotonic_ns or wall_ms < self.last_wall_utc_ms:
+                        raise SafetyViolation("CLOCK_UNCERTAIN")
+                    event = self._translate_funding(payload, avail_ms=avail_ms, wall_ms=wall_ms)
+                    self.last_monotonic_ns = mono_ns
+                    self.last_wall_utc_ms = wall_ms
+                    self.max_feature_known_at_ms = max(self.max_feature_known_at_ms, avail_ms)
+                    return {
+                        "status": "REPLAY_TO_LEDGER",
+                        "g1_event": event,
+                        "available_at_ms": avail_ms,
+                        "feature_known_at_ms": self.max_feature_known_at_ms,
+                    }
                 self.duplicate_envelope_count += 1
                 if channel == "funding_settled":
                     self.duplicate_funding_count += 1
@@ -367,6 +398,48 @@ class MarketPitPort:
     def _translate_funding(
         self, payload: dict[str, Any], *, avail_ms: int, wall_ms: int
     ) -> dict[str, Any] | None:
+        if "contract_version" in payload:
+            exact(
+                payload,
+                {
+                    "contract_version",
+                    "event_id",
+                    "settlement_id",
+                    "settlement_at_ms",
+                    "rate_fraction",
+                    "settled",
+                    "rate_type",
+                    "mark_price",
+                    "mark_witness",
+                    "rate_witness",
+                    "fill_coverage",
+                },
+                "COST_INCOMPLETE",
+            )
+            if payload["settled"] is not True or payload["rate_type"] != "SETTLED_REALIZED":
+                raise SafetyViolation("FUNDING_ESTIMATED_NOT_SETTLED")
+            if wall_ms < timestamp(payload["settlement_at_ms"]):
+                raise SafetyViolation("FUNDING_PIT_INVALID")
+            event = {
+                "id": payload["event_id"],
+                "kind": "FUNDING_RECEIPT",
+                "at": avail_ms,
+                "payload": {
+                    k: payload[k]
+                    for k in (
+                        "contract_version",
+                        "settlement_id",
+                        "rate_fraction",
+                        "mark_price",
+                        "mark_witness",
+                        "rate_witness",
+                        "fill_coverage",
+                    )
+                },
+            }
+            event["payload"]["settlement_at"] = payload["settlement_at_ms"]
+            funding_receipt_fingerprint(event)
+            return event
         FUNDING_REQUIRED_KEYS = {
             "event_id",
             "settlement_id",
@@ -377,7 +450,9 @@ class MarketPitPort:
         }
         FUNDING_OPTIONAL_KEYS = {"mark_price", "mark_close"}
         payload_keys = set(payload.keys())
-        if not (FUNDING_REQUIRED_KEYS <= payload_keys <= (FUNDING_REQUIRED_KEYS | FUNDING_OPTIONAL_KEYS)):
+        if not (
+            FUNDING_REQUIRED_KEYS <= payload_keys <= (FUNDING_REQUIRED_KEYS | FUNDING_OPTIONAL_KEYS)
+        ):
             raise SafetyViolation("FUNDING_PAYLOAD_SCHEMA_INVALID")
         if payload["settled"] is not True or payload["rate_type"] != "SETTLED_REALIZED":
             raise SafetyViolation("FUNDING_ESTIMATED_NOT_SETTLED")
@@ -602,7 +677,7 @@ def calculate_settled_funding_cash_flow(
     quantity: Decimal | str | float,
     mark_price: Decimal | str | float | None,
     rate_fraction: Decimal | str | float | None,
-    funding_coverage_complete: bool = True,
+    funding_coverage_complete: bool = False,
 ) -> dict[str, Any]:
     """Strict Decimal cash flow evaluation for settled funding with PIT causal conservation.
 
@@ -617,7 +692,7 @@ def calculate_settled_funding_cash_flow(
     if side not in ("LONG", "SHORT"):
         raise SafetyViolation("POSITION_SIDE_INVALID")
 
-    if not funding_coverage_complete:
+    if funding_coverage_complete is not True:
         return {
             "status": "COST_INCOMPLETE",
             "cash_flow": None,
@@ -643,7 +718,9 @@ def calculate_settled_funding_cash_flow(
 
     try:
         raw_qty = Decimal(str(quantity))
-        qty_dec = decimal(str(abs(raw_qty)), positive=False, zero_ok=True)
+        if raw_qty < 0 and side == "LONG":
+            raise SafetyViolation("POSITION_SIDE_QUANTITY_CONTRADICTION")
+        qty_dec = decimal(str(raw_qty.copy_abs()), positive=False, zero_ok=True)
     except SafetyViolation:
         raise
     except Exception as exc:
@@ -672,9 +749,10 @@ def calculate_settled_funding_cash_flow(
     except Exception as exc:
         raise SafetyViolation("DECIMAL_INVALID") from exc
 
-    signed_mult = Decimal(1) if side == "LONG" else Decimal(-1)
-    signed_exposure = signed_mult * qty_dec
-    cash_flow = -signed_exposure * mark_dec * rate_dec
+    signed_exposure = qty_dec if side == "LONG" else qty_dec.copy_negate()
+    with localcontext() as context:
+        context.prec = 128
+        cash_flow = -signed_exposure * mark_dec * rate_dec
 
     return {
         "status": "COST_COMPLETE",

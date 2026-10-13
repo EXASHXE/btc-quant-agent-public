@@ -11,7 +11,14 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from .model import SafetyViolation, canonical, decimal, digest, redact_text
+from .model import (
+    SafetyViolation,
+    canonical,
+    decimal,
+    digest,
+    funding_receipt_fingerprint,
+    redact_text,
+)
 from .reducer import transition
 
 OWN_SCRATCH = Path("/tmp/btc-g1_offline_preview_r1")
@@ -261,6 +268,14 @@ class Engine:
         ):
             e["payload"]["summary"] = redact_text(e["payload"]["summary"])
         h = digest(e)
+        if isinstance(e, dict) and e.get("kind") == "FUNDING_RECEIPT":
+            fingerprint = funding_receipt_fingerprint(e)
+            key = "funding:" + e["payload"]["settlement_id"]
+            previous = next((r for r in self.state["journal"] if r["key"] == key), None)
+            if previous is not None:
+                if previous.get("funding_fingerprint") != fingerprint:
+                    raise SafetyViolation("FUNDING_SETTLEMENT_CONFLICT")
+                return "IDEMPOTENT_DUPLICATE"
         if isinstance(e, dict) and isinstance(e.get("id"), str) and e["id"] in self.seen:
             if self.seen[e["id"]] != h:
                 raise SafetyViolation("EVENT_REUSE_DRIFT")
@@ -297,6 +312,7 @@ class Engine:
         self.seq += 1
         self.chain = record["record_hash"]
         self.seen[e["id"]] = h
+        edge("before_snapshot")
         if e["kind"] != "BAR" or self.seq % 120 == 0:
             self.checkpoint()
         edge("after_snapshot")

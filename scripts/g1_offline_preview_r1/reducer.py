@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import copy
-from decimal import ROUND_CEILING, ROUND_FLOOR, Decimal
+from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_EVEN, Decimal, getcontext, localcontext
 from typing import Any
 
-from .model import SafetyViolation, decimal, digest, exact, timestamp
+from .model import SafetyViolation, decimal, digest, exact, funding_receipt_fingerprint, timestamp
 
 LOT = Decimal("0.001")
 TICK = Decimal("0.1")
@@ -72,6 +72,46 @@ def _fill_price(last: Decimal, side: str, *, entry: bool) -> Decimal:
     return raw.quantize(TICK, rounding=ROUND_CEILING if adverse_up else ROUND_FLOOR)
 
 
+def _record_funding_fill(state, event, quantity, action):
+    if state.get("funding_contract") == "SYNTHETIC_CAUSAL_R4":
+        state["fill_history"].append(
+            {
+                "fill_id": event["payload"]["fill_id"],
+                "executed_at": event["at"],
+                "action": action,
+                "side": state["proposal"]["side"],
+                "quantity": _d(quantity),
+            }
+        )
+
+
+def _settlement_exposure(state, settlement_at):
+    if state.get("funding_contract") != "SYNTHETIC_CAUSAL_R4":
+        raise SafetyViolation("COST_INCOMPLETE")
+    fills = state["fill_history"]
+    if [f["fill_id"] for f in fills] != state["used_fill_ids"]:
+        raise SafetyViolation("COST_INCOMPLETE")
+    current = exposure = Decimal(0)
+    for fill in fills:
+        exact(fill, {"fill_id", "executed_at", "action", "side", "quantity"}, "COST_INCOMPLETE")
+        executed_at = timestamp(fill["executed_at"])
+        if abs(executed_at - settlement_at) <= 15000:
+            raise SafetyViolation("AMBIGUOUS_SETTLEMENT_BOUNDARY")
+        if fill["side"] not in ("LONG", "SHORT") or fill["action"] not in ("ENTRY", "EXIT"):
+            raise SafetyViolation("COST_INCOMPLETE")
+        change = decimal(fill["quantity"], positive=True)
+        change *= (1 if fill["side"] == "LONG" else -1) * (1 if fill["action"] == "ENTRY" else -1)
+        current += change
+        if executed_at < settlement_at:
+            exposure += change
+    expected = decimal(state["remaining_qty"])
+    if expected:
+        expected *= _position_side(state)
+    if current != expected:
+        raise SafetyViolation("COST_INCOMPLETE")
+    return exposure
+
+
 def _available(state: dict[str, Any]) -> Decimal:
     return decimal(state["cash"]) - decimal(state["reserved_notional"])
 
@@ -119,7 +159,14 @@ def _exit(
     state: dict[str, Any], event: dict[str, Any], kind: str, price: Decimal, quantity: Decimal
 ) -> None:
     payload = event["payload"]
-    exact(payload, {"fill_id"})
+    keys = {"fill_id"}
+    if (
+        kind == "TP1"
+        and state.get("funding_contract") == "SYNTHETIC_CAUSAL_R4"
+        and "executed_quantity" in payload
+    ):
+        keys.add("executed_quantity")
+    exact(payload, keys)
     fill_id = _text(payload["fill_id"], "FILL_ID_INVALID")
     if fill_id in state["used_fill_ids"]:
         raise SafetyViolation("FILL_DUPLICATE")
@@ -132,6 +179,7 @@ def _exit(
     if quantity <= 0 or quantity > decimal(state["remaining_qty"]):
         raise SafetyViolation("INVENTORY_INVALID")
     state["remaining_qty"] = _d(decimal(state["remaining_qty"]) - quantity)
+    _record_funding_fill(state, event, quantity, "EXIT")
     state["pending_cash"][fill_id] = _d(cash)
     state["pending_release"][fill_id] = _d(quantity * entry)
     state["pending_kind"][fill_id] = kind
@@ -209,6 +257,14 @@ def _check_portfolio(state: dict[str, Any]) -> None:
 
 def transition(state: dict[str, Any], event: dict[str, Any]) -> dict[str, Any]:
     """Apply one trusted fixture event, returning a fresh JSON-compatible state."""
+    if (
+        isinstance(state, dict)
+        and state.get("funding_contract") == "SYNTHETIC_CAUSAL_R4"
+        and getcontext().prec != 128
+    ):
+        with localcontext() as context:
+            context.prec = 128
+            return transition(state, event)
     exact(event, {"id", "kind", "at", "payload"}, "EVENT_SCHEMA")
     event_id = _text(event["id"], "EVENT_ID_INVALID")
     kind = _text(event["kind"], "EVENT_KIND_INVALID")
@@ -448,6 +504,7 @@ def transition(state: dict[str, Any], event: dict[str, Any]) -> dict[str, Any]:
         s["entry_price"] = _d(price)
         s["entry_qty"] = _d(qty)
         s["remaining_qty"] = _d(qty)
+        _record_funding_fill(s, event, qty, "ENTRY")
         s["reserved_notional"] = _d(notional)
         _journal(s, "entry-fee:" + fill_id, "ENTRY_FEE", at, -fee, qty)
         s["phase"] = "WAIT_ENTRY_ACK"
@@ -505,7 +562,36 @@ def transition(state: dict[str, Any], event: dict[str, Any]) -> dict[str, Any]:
             s["phase"] = "OPEN_RESIDUAL" if s["tp1_filled"] else "OPEN"
         s["used_ack_ids"].append(ack_id)
 
+    elif kind == "FUNDING_RECEIPT":
+        fingerprint = funding_receipt_fingerprint(event)
+        settlement = p["settlement_id"]
+        economic_at = p["settlement_at"]
+        if settlement in s["used_settlements"] or economic_at in s["used_settlement_clocks"]:
+            raise SafetyViolation("FUNDING_SETTLEMENT_CONFLICT")
+        # This precision/rounding contract applies only to the new event kind;
+        # legacy ledger calculations and old WAL/state identities stay intact.
+        with localcontext() as context:
+            context.prec = 128
+            exposure = _settlement_exposure(s, economic_at)
+            cash = (
+                -exposure * decimal(p["mark_price"], positive=True) * decimal(p["rate_fraction"])
+            ).quantize(Decimal("0.00000001"), rounding=ROUND_HALF_EVEN)
+            _journal(s, "funding:" + settlement, kind, at, cash, abs(exposure))
+            s["journal"][-1].update(
+                settlement_at=economic_at,
+                receipt_at=at,
+                signed_exposure=_d(exposure),
+                funding_fingerprint=fingerprint,
+                source_hash=fingerprint,
+                fill_history_hash=digest(s["fill_history"]),
+                witnesses=copy.deepcopy(p),
+            )
+        s["used_settlements"].append(settlement)
+        s["used_settlement_clocks"].append(economic_at)
+
     elif kind == "FUNDING":
+        if s.get("funding_contract") == "SYNTHETIC_CAUSAL_R4":
+            raise SafetyViolation("LEGACY_FUNDING_REQUIRES_LEGACY_GENESIS")
         _phase(s, "WAIT_ENTRY_ACK", "OPEN", "OPEN_RESIDUAL", "WAIT_TP1_ACK")
         exact(p, {"settlement_id", "settlement_at", "rate_fraction"})
         settlement = _text(p["settlement_id"], "SETTLEMENT_ID_INVALID")
@@ -537,6 +623,11 @@ def transition(state: dict[str, Any], event: dict[str, Any]) -> dict[str, Any]:
         bar = _bar(s, at)
         qty = decimal(s["entry_qty"], positive=True)
         tier = ((qty * Decimal("0.5")) / LOT).to_integral_value(rounding=ROUND_FLOOR) * LOT
+        if s.get("funding_contract") == "SYNTHETIC_CAUSAL_R4" and "executed_quantity" in p:
+            executed = decimal(p["executed_quantity"], positive=True)
+            if executed > tier or executed % LOT:
+                raise SafetyViolation("PARTIAL_LOT_OR_MIN_NOTIONAL")
+            tier = executed
         if (
             tier <= 0
             or qty - tier <= 0

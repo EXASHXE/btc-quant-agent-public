@@ -191,7 +191,37 @@ class DurableSidecarSupervisor:
         self.records: list[dict[str, Any]] = []
         self.settled_intents: dict[str, dict[str, Any]] = {}
         self.recovered_llm_results: dict[str, dict[str, Any]] = {}
+        self.funding_port = MarketPitPort()
         self._init_or_recover_sidecar_wal()
+
+    def apply_funding_envelope(self, engine: G1Engine, envelope: dict[str, Any], *, hook=None):
+        """Synthetic R4 delivery: the G1 cash WAL, never port memory, owns ACK.
+
+        No wallet/source admission or external dispatch occurs here. A crash
+        before ACK requires retry; the reconstructed settlement journal makes
+        that retry financially idempotent, even on a fresh supervisor/port.
+        """
+        if hook:
+            hook("before_receipt", envelope)
+        ingested = self.funding_port.ingest_envelope(envelope)
+        event = ingested["g1_event"]
+        if event is None or event["kind"] != "FUNDING_RECEIPT":
+            raise SafetyViolation("FUNDING_CONTRACT_INVALID")
+        if hook:
+            hook("after_receipt", event)
+        result = engine.apply(event, hook=hook)
+        if hook:
+            hook("before_receipt_ack", event)
+        ack = {
+            "status": result,
+            "settlement_id": event["payload"]["settlement_id"],
+            "g1_seq": engine.seq,
+            "g1_chain": engine.chain,
+            "scope": "SYNTHETIC_INTEGRATION_ONLY",
+        }
+        if hook:
+            hook("after_receipt_ack", event)
+        return ack
 
     def _quarantine_sidecar(self, code: str) -> None:
         qdir = self.root / "quarantine"

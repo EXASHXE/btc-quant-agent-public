@@ -48,7 +48,7 @@ def decimal(value: Any, *, positive: bool = False, zero_ok: bool = True) -> Deci
         raise SafetyViolation("DECIMAL_INVALID") from exc
     if not number.is_finite() or (positive and number <= 0) or (not zero_ok and number == 0):
         raise SafetyViolation("DECIMAL_BOUNDS")
-    if abs(number) > Decimal(1000000000):
+    if number.copy_abs() > Decimal(1000000000):
         raise SafetyViolation("DECIMAL_BOUNDS")
     return number
 
@@ -64,8 +64,12 @@ def timestamp(value: Any) -> int:
     return value
 
 
-def initial_state(trusted_approvals: list[dict[str, Any]]) -> dict[str, Any]:
+def initial_state(
+    trusted_approvals: list[dict[str, Any]], *, causal_funding: bool = False
+) -> dict[str, Any]:
     """The fixture's explicit human tokens are trusted input, never model output."""
+    if type(causal_funding) is not bool:
+        raise SafetyViolation("FUNDING_CONTRACT_INVALID")
     if not isinstance(trusted_approvals, list):
         raise SafetyViolation("APPROVAL_FIXTURE_INVALID")
     token_keys = {
@@ -94,7 +98,7 @@ def initial_state(trusted_approvals: list[dict[str, Any]]) -> dict[str, Any]:
         if not isinstance(raw["signal_id"], str) or not isinstance(raw["proposal_hash"], str):
             raise SafetyViolation("APPROVAL_FIXTURE_INVALID")
         tokens[raw["token_id"]] = dict(raw)
-    return {
+    state = {
         "schema_version": 1,
         "safety_status": "DRY_RUN_NO_NETWORK_NO_ORDERING",
         "phase": "READY",
@@ -150,3 +154,86 @@ def initial_state(trusted_approvals: list[dict[str, Any]]) -> dict[str, Any]:
             "phantom_spendable_ack": 0,
         },
     }
+    if causal_funding:
+        state.update(funding_contract="SYNTHETIC_CAUSAL_R4", fill_history=[])
+    return state
+
+
+def funding_receipt_fingerprint(event: dict[str, Any]) -> str:
+    """Validate the explicit synthetic R4 contract, excluding transport retry clocks.
+
+    Legacy FUNDING/WAL/genesis remain unchanged. These source witnesses are
+    invented synthetic records, never evidence of venue or wallet admission.
+    """
+    exact(event, {"id", "kind", "at", "payload"}, "EVENT_SCHEMA")
+    if event["kind"] != "FUNDING_RECEIPT":
+        raise SafetyViolation("FUNDING_CONTRACT_INVALID")
+    receipt_at = timestamp(event["at"])
+    p = event["payload"]
+    exact(
+        p,
+        {
+            "contract_version",
+            "settlement_id",
+            "settlement_at",
+            "mark_price",
+            "rate_fraction",
+            "mark_witness",
+            "rate_witness",
+            "fill_coverage",
+        },
+        "COST_INCOMPLETE",
+    )
+    if p["contract_version"] != "SYNTHETIC_CAUSAL_R4":
+        raise SafetyViolation("FUNDING_CONTRACT_INVALID")
+    for value in (event["id"], p["settlement_id"]):
+        if not isinstance(value, str) or not value or len(value) > 128:
+            raise SafetyViolation("FUNDING_ID_INVALID")
+    settlement_at = timestamp(p["settlement_at"])
+    if settlement_at > receipt_at:
+        raise SafetyViolation("FUNDING_PIT_INVALID")
+    mark = decimal(p["mark_price"], positive=True)
+    rate = decimal(p["rate_fraction"])
+    if rate.copy_abs() > Decimal("0.1"):
+        raise SafetyViolation("FUNDING_RATE_BOUNDS")
+    witnesses = {}
+    for key, source in (
+        ("mark_witness", "SYNTHETIC_SETTLEMENT_MARK"),
+        ("rate_witness", "SYNTHETIC_SETTLED_RATE"),
+    ):
+        w = p[key]
+        exact(w, {"at", "known_at", "source"}, "COST_INCOMPLETE")
+        if (
+            timestamp(w["at"]) != settlement_at
+            or w["source"] != source
+            or not settlement_at <= timestamp(w["known_at"]) <= receipt_at
+        ):
+            raise SafetyViolation("COST_INCOMPLETE")
+        witnesses[key] = {"at": w["at"], "source": w["source"]}
+    coverage = p["fill_coverage"]
+    exact(coverage, {"from_at", "through_at", "known_at", "source"}, "COST_INCOMPLETE")
+    if (
+        timestamp(coverage["from_at"]) != 0
+        or timestamp(coverage["through_at"]) != settlement_at
+        or not settlement_at <= timestamp(coverage["known_at"]) <= receipt_at
+        or coverage["source"] != "G1_SYNTHETIC_WAL"
+    ):
+        raise SafetyViolation("COST_INCOMPLETE")
+
+    # Formatting-only decimal changes are the same economics. No ambient
+    # Decimal.normalize() rounding participates in identity.
+    def normalized(number):
+        value = format(number, "f")
+        return value.rstrip("0").rstrip(".") if "." in value else value
+
+    return digest(
+        {
+            "event_id": event["id"],
+            "settlement_id": p["settlement_id"],
+            "settlement_at": settlement_at,
+            "mark_price": normalized(mark),
+            "rate_fraction": "0" if rate == 0 else normalized(rate),
+            **witnesses,
+            "fill_coverage": {k: coverage[k] for k in ("from_at", "through_at", "source")},
+        }
+    )
