@@ -88,6 +88,7 @@ All modifications were strictly constrained to the 5 authorized paths in the dis
 
 ## 5. Verification Record & Test Suite Results
 
+### Local Scoped Integration Suite
 ```text
 ============================= test session starts ==============================
 platform linux -- Python 3.13.13, pytest-8.4.2, pluggy-1.6.0
@@ -109,12 +110,33 @@ tests/test_v06_g1g3_offline_ports_r1_recovery_and_guards.py .................. [
 ```
 
 - **Ruff linter**: 0 errors across all modified files.
-- **Total tests**: 155 passed, 0 failed, 0 skipped.
+- **Local total tests**: 155 passed, 0 failed, 0 skipped.
+
+### Remote CI Execution (GitHub Actions Run `38383966460`)
+- **Workflow**: `CI` (Job `115251012796`)
+- **Plan Mode**: `full` (triggered by executable change to `scripts/g1g3_offline_ports_r1/market_pit_port.py`)
+- **Total Tests Selected**: 3,362
+- **Passed**: 3,357
+- **Skipped**: 2
+- **Failed**: 3 (in 1293.36s)
+- **Failing Tests**:
+  - `tests/test_v050_r01_surface_reduction.py::test_catalog_reports_actual_paths_and_parser_without_service`
+  - `tests/test_v050_r01_surface_reduction.py::test_catalog_default_stdout_never_recreates_reviews`
+  - `tests/test_v050_r01_surface_reduction.py::test_catalog_refuses_agent_documents_on_code_branch`
+
+**Root Cause of CI Failure**:
+The 3 failing tests assert that `assert not (ROOT / "reviews").exists()` on the code branch (historical policy: "agent documents belong on v0.5-refactor-docs, not the code branch"). The Controller dispatch explicitly required creating `reviews/v0.6/b_line/V06_P1D_CONSUMER_C_LATE_FUNDING_R2_IMPLEMENTATION_AND_EVIDENCE.md` under the narrow write allowlist, creating `reviews/` and triggering these 3 pre-existing catalog assertion failures. All 13 new synthetic tests and all existing core/recovery tests passed cleanly in remote CI.
 
 ---
 
-## 6. Terminal Decision
+## 6. Terminal Decision & Minimal Scope Change Proposal
 
-`PASS_CONSUMER_PIT_CONTRACT_PENDING_INTEGRATION`
+- **Synthetic Contract Decision**: `PASS_CONSUMER_PIT_CONTRACT_PENDING_INTEGRATION`
+- **Execution / CI Gate Terminal**: `CONTRACT_BLOCKED_REQUIRED_SCOPE`
+- **G2 Alpha / TESTNET / LIVE**: Remain **NO_GO**.
 
-G2 Alpha / TESTNET / LIVE remain **NO_GO**.
+### Minimal Change Proposal for Controller
+The required report path `reviews/v0.6/b_line/...` conflicts with the code-branch catalog test in `tests/test_v050_r01_surface_reduction.py`. Modifying `tests/test_v050_r01_surface_reduction.py` or `tools/catalog_surfaces.py` is outside the narrow write allowlist.
+1. **Option A (Recommended)**: Dispatch an update allowing `reviews/v0.6/` in `tests/test_v050_r01_surface_reduction.py` and `tools/catalog_surfaces.py` for active v0.6 controller dispatches.
+2. **Option B**: Relocate the review file to `docs/engineering/g1g3_offline_ports_r1/` or to the dedicated documentation branch `origin/v0.6-docs`.
+

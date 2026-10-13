@@ -8,7 +8,8 @@
   "branch": "feature/v06-p1d-consumer-c-late-funding-pit-r2",
   "executor": "Gemini BOOST",
   "review_authority": "Codex Sol High independent financial/causal review",
-  "terminal_decision": "PASS_CONSUMER_PIT_CONTRACT_PENDING_INTEGRATION",
+  "terminal_decision": "CONTRACT_BLOCKED_REQUIRED_SCOPE",
+  "synthetic_contract_decision": "PASS_CONSUMER_PIT_CONTRACT_PENDING_INTEGRATION",
   "scope_adherence": {
     "narrow_write_allowlist": [
       "scripts/g1g3_offline_ports_r1/market_pit_port.py",
@@ -90,7 +91,7 @@
       "evidence": "Rate 0.0 with incomplete coverage or missing mark yields COST_INCOMPLETE; exact 0.0 cash flow realized only under complete verified coverage."
     }
   },
-  "test_execution_record": {
+  "local_test_execution_record": {
     "environment": {
       "python": "3.13.13",
       "pytest": "8.4.2",
@@ -103,5 +104,29 @@
     "total_suite_skipped": 0,
     "focused_funding_tests_count": 13,
     "focused_funding_tests_passed": 13
+  },
+  "remote_ci_execution_record": {
+    "github_actions_run_id": "38383966460",
+    "github_actions_job_id": "115251012796",
+    "commit_sha": "2b90195e439d91911541bdfaeca669ac8fcc5e2c",
+    "status": "completed",
+    "conclusion": "failure",
+    "total_tests_collected": 3362,
+    "passed": 3357,
+    "failed": 3,
+    "skipped": 2,
+    "duration_seconds": 1293.36,
+    "failing_tests": [
+      "tests/test_v050_r01_surface_reduction.py::test_catalog_reports_actual_paths_and_parser_without_service",
+      "tests/test_v050_r01_surface_reduction.py::test_catalog_default_stdout_never_recreates_reviews",
+      "tests/test_v050_r01_surface_reduction.py::test_catalog_refuses_agent_documents_on_code_branch"
+    ],
+    "failure_root_cause": "The 3 failing tests assert that ROOT / 'reviews' does not exist on the code branch (enforced since v0.5.0 surface reduction: 'agent documents belong on v0.5-refactor-docs, not the code branch'). The Controller dispatch explicitly mandated creating 'reviews/v0.6/b_line/V06_P1D_CONSUMER_C_LATE_FUNDING_R2_IMPLEMENTATION_AND_EVIDENCE.md' in the write allowlist, directly creating the 'reviews/' directory and causing these 3 pre-existing catalog assertion failures.",
+    "all_core_and_recovery_tests_passed": true,
+    "all_13_new_funding_tests_passed_in_ci": true
+  },
+  "scope_blocker_and_minimal_change_proposal": {
+    "blocker_statement": "CONTRACT_BLOCKED_REQUIRED_SCOPE: The narrow write allowlist mandates placing the review markdown at 'reviews/v0.6/b_line/...'. However, existing catalog tests in 'tests/test_v050_r01_surface_reduction.py' fail closed whenever 'reviews/' exists on a code branch. Modifying 'tests/test_v050_r01_surface_reduction.py' or 'tools/catalog_surfaces.py' is outside the narrow write allowlist.",
+    "minimal_change_proposal": "Option A (recommended): Allow 'reviews/v0.6/' in 'tests/test_v050_r01_surface_reduction.py' and 'tools/catalog_surfaces.py' for active controller dispatch reviews on code branches. Option B: Relocate the required review file to 'docs/engineering/g1g3_offline_ports_r1/' or to the 'v0.6-docs' branch where agent documents are maintained."
   }
 }
