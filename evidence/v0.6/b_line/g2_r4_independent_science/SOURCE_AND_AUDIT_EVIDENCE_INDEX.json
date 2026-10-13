@@ -919,10 +919,227 @@
   ],
   "evidence_index_path": "evidence/v0.6/b_line/g2_r4_independent_science/SOURCE_AND_AUDIT_EVIDENCE_INDEX.json",
   "publication": {
-    "state": "READY_FOR_AUTHORIZED_NONFORCE_PUBLICATION",
+    "state": "AUDIT_CONTENT_PUBLISHED_AND_INDEPENDENTLY_VERIFIED",
+    "verified_audit_content_commit_sha": "bc3317a0667665e917b83ef22be173ef7ef6c45b",
+    "verified_remote_head_at_this_receipt": "bc3317a0667665e917b83ef22be173ef7ef6c45b",
+    "content_commit_receipt": {
+      "phase": "first",
+      "verified_utc": "2026-10-13T03:32:34.976052+00:00",
+      "remote_head": "bc3317a0667665e917b83ef22be173ef7ef6c45b",
+      "remote_head_matches": true,
+      "tree_sha": "6c114235023efd5734edeb66267be07d2eb3d671",
+      "parents": [
+        "a69ccfdfd578bd0b7d3aa43d75959a659f969782"
+      ],
+      "base_sha": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+      "total_commits_after_base": 1,
+      "commits_after_base": [
+        "bc3317a0667665e917b83ef22be173ef7ef6c45b"
+      ],
+      "changed_path_allowlist": "PASS",
+      "all7_remote_blob_bytes_match": true,
+      "changed_files": [
+        {
+          "path": "docs/strategy_research/g2_r4_independent_science/BTC_STRATEGY_MECHANISM_PIVOT_DECISION.md",
+          "status": "added",
+          "git_blob_sha1": "f58f47e4f7d79af2cf23393b48cfcf8ab42fec75",
+          "sha256": "4b7f3a0989743b0580ddabd0acd3c471c53d15e38f242f4c8a26da33a18ce484"
+        },
+        {
+          "path": "docs/strategy_research/g2_r4_independent_science/ENTRY_EDGE_FAILURE_MODE_ANALYSIS.md",
+          "status": "added",
+          "git_blob_sha1": "ed289ded646284a6b14914e081f2aa67ed8880ce",
+          "sha256": "9b8d268feef9674e7ace84e3856afeaf1158b38886092d48c2e3669802519d21"
+        },
+        {
+          "path": "docs/strategy_research/g2_r4_independent_science/FINANCIAL_PIT_INTEGRATION_OPEN_RISKS.md",
+          "status": "added",
+          "git_blob_sha1": "4f035e8a9905b140e10bb7bc7c7a1c289b4889cc",
+          "sha256": "7527f4d4b71c3b6215218d21572172ad051d8e7df45fdac21098ddfb410bfc15"
+        },
+        {
+          "path": "docs/strategy_research/g2_r4_independent_science/G2_R3_INDEPENDENT_SCIENTIFIC_AUDIT.md",
+          "status": "added",
+          "git_blob_sha1": "0d07215993e74c020e5ef98190601b668fd1d24d",
+          "sha256": "7423ba7eb242bf8c1a37db12c486372d756c764e30af92dedd6451123e452d6a"
+        },
+        {
+          "path": "docs/strategy_research/g2_r4_independent_science/NEXT_PROSPECTIVE_EXPERIMENT_DESIGN.md",
+          "status": "added",
+          "git_blob_sha1": "5369124d0f10429872e816519acbc6ab243180df",
+          "sha256": "a101d94a06274a84b95e5ac2d39b90d6964a9be8f107dccc9b1536e3dbeb0c8b"
+        },
+        {
+          "path": "docs/strategy_research/g2_r4_independent_science/W1_W2_VS_R3_COMPARABILITY_MATRIX.md",
+          "status": "added",
+          "git_blob_sha1": "b4456c58ce35ba0f480492ba71ff78be238549d5",
+          "sha256": "02631a459afb30fd0d8cffe9431d573c75d713f1e1547fdcb8fa2e20f6f39d52"
+        },
+        {
+          "path": "evidence/v0.6/b_line/g2_r4_independent_science/SOURCE_AND_AUDIT_EVIDENCE_INDEX.json",
+          "status": "added",
+          "git_blob_sha1": "80bd80d447dab3ca5f765ce86eccde6b203e1884",
+          "sha256": "2a1aeb769fb8383ae6c7bdf5c2621d6d965e8d9abea92d30a502b7b23b177583"
+        }
+      ],
+      "ci_runs": [
+        {
+          "id": 38342085189,
+          "name": "CI",
+          "head_sha": "bc3317a0667665e917b83ef22be173ef7ef6c45b",
+          "head_branch": "feature/v06-bline-g2-independent-science-pivot-r4",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38342085189",
+          "jobs": [
+            {
+              "id": 115115110091,
+              "name": "Risk-based quality (Python 3.12)",
+              "status": "completed",
+              "conclusion": "success",
+              "html_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38342085189/job/115115110091",
+              "steps": [
+                {
+                  "name": "Set up job",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/checkout@v4",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Fetch v0.6 immutable base for merge-base resolution",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Ensure cache directory exists for docs-only/zero-pip FAST paths",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/setup-python@v5",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Build fail-closed test plan",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Classify impact before heavy dependency installation",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Install tiny CI-planner dependencies",
+                  "status": "completed",
+                  "conclusion": "skipped"
+                },
+                {
+                  "name": "Install production/research validation dependencies",
+                  "status": "completed",
+                  "conclusion": "skipped"
+                },
+                {
+                  "name": "Ruff with bounded historical EXE001 debt",
+                  "status": "completed",
+                  "conclusion": "skipped"
+                },
+                {
+                  "name": "Type-check production package on production changes",
+                  "status": "completed",
+                  "conclusion": "skipped"
+                },
+                {
+                  "name": "Compile Python",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Validate changed JSON artifacts",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Tests selected by risk/changed scope",
+                  "status": "completed",
+                  "conclusion": "skipped"
+                },
+                {
+                  "name": "Retain scoped test evidence",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/setup-python@v5",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/checkout@v4",
+                  "status": "completed",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Complete job",
+                  "status": "completed",
+                  "conclusion": "success"
+                }
+              ]
+            },
+            {
+              "id": 115115111429,
+              "name": "Compatibility manual full suite",
+              "status": "completed",
+              "conclusion": "skipped",
+              "html_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38342085189/job/115115111429",
+              "steps": []
+            }
+          ]
+        }
+      ],
+      "source_files_changed": 0,
+      "force_push": false
+    },
+    "actual_ci_execution": {
+      "test_plan": {
+        "schema_version": "B_LINE_CI_PLAN_V1",
+        "code_sha": "bc3317a0667665e917b83ef22be173ef7ef6c45b",
+        "event": "push",
+        "before": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+        "base_ref": "",
+        "pr_base_sha": "",
+        "mode": "none",
+        "tests": [],
+        "changed": [
+          "docs/strategy_research/g2_r4_independent_science/BTC_STRATEGY_MECHANISM_PIVOT_DECISION.md",
+          "docs/strategy_research/g2_r4_independent_science/ENTRY_EDGE_FAILURE_MODE_ANALYSIS.md",
+          "docs/strategy_research/g2_r4_independent_science/FINANCIAL_PIT_INTEGRATION_OPEN_RISKS.md",
+          "docs/strategy_research/g2_r4_independent_science/G2_R3_INDEPENDENT_SCIENTIFIC_AUDIT.md",
+          "docs/strategy_research/g2_r4_independent_science/NEXT_PROSPECTIVE_EXPERIMENT_DESIGN.md",
+          "docs/strategy_research/g2_r4_independent_science/W1_W2_VS_R3_COMPARABILITY_MATRIX.md",
+          "evidence/v0.6/b_line/g2_r4_independent_science/SOURCE_AND_AUDIT_EVIDENCE_INDEX.json"
+        ],
+        "reason": "risk-mapped"
+      },
+      "pytest_executed": false,
+      "test_step_conclusion": "skipped",
+      "compatibility_job_conclusion": "skipped",
+      "changed_json_validation": "success",
+      "scope": "DOCUMENTATION_AND_EVIDENCE_ONLY",
+      "bounded_log_lines": [
+        "2026-10-13T03:31:12.9761835Z {\"schema_version\": \"B_LINE_CI_PLAN_V1\", \"code_sha\": \"bc3317a0667665e917b83ef22be173ef7ef6c45b\", \"event\": \"push\", \"before\": \"a69ccfdfd578bd0b7d3aa43d75959a659f969782\", \"base_ref\": \"\", \"pr_base_sha\": \"\", \"mode\": \"none\", \"tests\": [], \"changed\": [\"docs/strategy_research/g2_r4_independent_science/BTC_STRATEGY_MECHANISM_PIVOT_DECISION.md\", \"docs/strategy_research/g2_r4_independent_science/ENTRY_EDGE_FAILURE_MODE_ANALYSIS.md\", \"docs/strategy_research/g2_r4_independent_science/FINANCIAL_PIT_INTEGRATION_OPEN_RISKS.md\", \"docs/strategy_research/g2_r4_independent_science/G2_R3_INDEPENDENT_SCIENTIFIC_AUDIT.md\", \"docs/strategy_research/g2_r4_independent_science/NEXT_PROSPECTIVE_EXPERIMENT_DESIGN.md\", \"docs/strategy_research/g2_r4_independent_science/W1_W2_VS_R3_COMPARABILITY_MATRIX.md\", \"evidence/v0.6/b_line/g2_r4_independent_science/SOURCE_AND_AUDIT_EVIDENCE_INDEX.json\"], \"reason\": \"risk-mapped\"}"
+      ]
+    },
+    "receipt_commit_scope": "Only this evidence index; six scientific documents and all prior source/results unchanged.",
     "max_commits": 3,
     "force": false,
-    "self_reference_policy": "Final publishing commit cannot contain its own SHA; final remote HEAD/CI independently verified after push and reported separately. Earlier verified commits may be recorded here."
+    "self_reference_policy": "Final receipt commit cannot contain its own SHA; final remote HEAD, ancestry, paths, source identities and CI are independently checked after publication and reported in the final response."
   },
-  "recorded_utc": "2026-10-13T03:27:59.923834+00:00"
+  "recorded_utc": "2026-10-13T03:34:24.162618+00:00"
 }
