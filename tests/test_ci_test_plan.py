@@ -10,7 +10,6 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts.ci.test_plan import (
-    BLINE_H40_BASE_SHA,
     H40_QUARANTINED_NODE,
     IMMUTABLE_V06_BASE_SHA,
     KNOWN_EXE001,
@@ -313,8 +312,10 @@ def test_14_immutable_git_diff_ownership_with_synthetic_status(tmp_path: Path) -
 
 
 def test_15_plan_integrity_rejects_stale_sha_and_spoofed_metadata() -> None:
-    from scripts.ci import test_plan as planner
     import pytest
+
+    from scripts.ci import test_plan as planner
+
     fake_plan = {
         "schema_version": "B_LINE_CI_PLAN_V1",
         "code_sha": "a" * 40,
@@ -324,13 +325,13 @@ def test_15_plan_integrity_rejects_stale_sha_and_spoofed_metadata() -> None:
     }
     with patch.object(planner, "git", return_value=subprocess.CompletedProcess(
         ["git"], 0, "c" * 40 + "\n", ""
-    )):
-        with pytest.raises(RuntimeError, match="CI_PLAN_SHA_IDENTITY_MISMATCH"):
-            checked_plan_paths(fake_plan)
+    )), pytest.raises(RuntimeError, match="CI_PLAN_SHA_IDENTITY_MISMATCH"):
+        checked_plan_paths(fake_plan)
     good_head = subprocess.CompletedProcess(["git"], 0, "a" * 40 + "\n", "")
-    with patch.object(planner, "git", return_value=good_head):
-        with pytest.raises(RuntimeError, match="CI_PLAN_EVENT_IDENTITY_MISMATCH"):
-            checked_plan_paths(fake_plan)
+    with patch.object(planner, "git", return_value=good_head), pytest.raises(
+        RuntimeError, match="CI_PLAN_EVENT_IDENTITY_MISMATCH"
+    ):
+        checked_plan_paths(fake_plan)
     environ = {
         "CI_EVENT_NAME": "push",
         "CI_BEFORE_SHA": "b" * 40,
@@ -339,9 +340,10 @@ def test_15_plan_integrity_rejects_stale_sha_and_spoofed_metadata() -> None:
     }
     with patch.object(planner, "git", return_value=good_head), patch.dict(
         planner.os.environ, environ
-    ), patch.object(planner, "changed_paths", return_value=["tests/conftest.py"]):
-        with pytest.raises(RuntimeError, match="CI_PLAN_CHANGED_PATHS_MISMATCH"):
-            checked_plan_paths(fake_plan)
+    ), patch.object(
+        planner, "changed_paths", return_value=["tests/conftest.py"]
+    ), pytest.raises(RuntimeError, match="CI_PLAN_CHANGED_PATHS_MISMATCH"):
+        checked_plan_paths(fake_plan)
 
 
 def test_16_exact_node_only_and_full_command_does_not_deselect() -> None:
