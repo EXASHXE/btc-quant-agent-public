@@ -1,0 +1,17 @@
+# ChatGPT-1 — Independent consequential OI R3 causal and source-witness audit
+
+**Owner:** ChatGPT-0 B-line Controller, five sessions 0/1/2-R/2-C/2-E. Authority is the exact immutable Git commit and file blob which publishes this prompt. Check exact Git SHA before acting. Start an isolated branch from the specified base; verify parent, diff, real test evidence, pushed HEAD. No self-independent audit, force-push, merge or branch-policy switch.
+
+**Forbidden:** protected H39/H40/H41/Forward/Final Holdout content, reserved outcomes, owner private data roots, historical strategy-return replays, new market REST/WS source collection, production/testnet orders, credentials, funds, and changing historical frozen results or safety/CI goldens. SOURCE_NOT_ADMITTED / G2_ALPHA_NO_GO / TESTNET_NO_GO / LIVE_NO_GO / REAL_FUNDS_WRITE_NONE.
+
+**Freeze:** 2-R source 35c269aecf0f1b756575af2ac5e355f2cf53757c, docs/project/V06_NEXT_OI_C01_C03_CAUSAL_METHOD_AND_RECEIVER_DESIGN_R3.md, blob 56482b2ce305071d5a5fb3b3e19468fb1b33a828. Separate 2-C challenge a1e9632a30f330041bcffb22c2ba3d3d656963bc, reviews/v0.6/b_line/V06_NEXT_OI_C01_C03_R3_2C_INDEPENDENT_CHALLENGE.md, blob 2d4878df19c08b72ae1572c6cbbd0d7647ef57e3. Prior 1 source R2 review 8781a8e5439f6ed92d24ed69e2f9e0422b664745 PASS_WITH_LIMITS. Neither author's ready claim nor 2-C challenge is your own review.
+
+**Required adversarial analysis:**
+- C01: source-neutral scheduled clock, X-source-blackout slots, observable parent economic episodes E_X, timely source C_Z, executable cohort C_EXE and explicit UNKNOWN/no-event distinction; partial/missing-not-at-random and joint zero-positivity under side, session, volatility, receiver epoch. Evaluate proper cluster-level finite support/interval methods; 20 weeks is a proposed support floor, not proven statistical power, and 72h QC cannot establish one event/48h.
+- C02: separate theta_A (matched common delayed decision X versus X+numeric-OI, identical quotes/clocks and no latency/source-health feature smuggling) from theta_B (naturally early X-only versus precommitted OI wait/no-action over E_X). Demand a fixed account wealth/terminal mark, fills/nonfills/fees/slippage/settled funding, overlapping occupancy, fallback arm multiplicity and no retrospective changes. A positive conditional OI-information effect alone cannot establish economic policy benefit.
+- C03: raw response/source digest versus independently authenticated raw bytes, UTC monotonic-to-wall upper-known-at, clock offset/drift/steps, durable fsync receipt/ACK, revisions/duplicate versions, 15m period end versus published/received, missing intervals/rights/unit/contract mapping. All R3 witness contracts are design proposals; no real receiver, first-seen receipt or license has been proven. Test invented negative counterexamples only.
+- History: frozen v0.3.12 H32 INCONCLUSIVE, H33/H34 FALSIFIED, Goal-B/R3/F3 overlaps and inherited multiplicity. Fakeout stays NOVELTY_CANDIDATE_SOURCE_BLOCKED. Aggregate OI cannot establish long-only liquidation.
+
+**Write ONLY** new reviews/v0.6/b_line/V06_R4_1_OI_C01_C03_R3_CONSEQUENTIAL_AUDIT.md on isolated docs/v06-r4-1-oi-r3-science-audit branch rooted at this dispatch commit. Include exact reviewed blobs, line citations, separated design pass/fail, C01–C03 risk matrix, remaining source+rights+statistical gates; no data or executable changes.
+
+**Terminal:** R3_CAUSAL_DESIGN_PASS_WITH_LIMITS / R3_CAUSAL_DESIGN_FAIL / INCOMPLETE_TARGET_UNFROZEN. No SOURCE_ADMITTED, prospective QC collection permit, prereg/outcome grant or G2 Alpha.

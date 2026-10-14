@@ -1,0 +1,11 @@
+# ChatGPT-1 — Conditional H40 R2 real one-node operational proof audit
+
+**Owner:** ChatGPT-0 B-line Controller, five sessions 0/1/2-R/2-C/2-E. Authority is the exact immutable Git commit and file blob which publishes this prompt. Check exact Git SHA before acting. Start an isolated branch from the specified base; verify parent, diff, real test evidence, pushed HEAD. No self-independent audit, force-push, merge or branch-policy switch.
+
+**Forbidden:** protected H39/H40/H41/Forward/Final Holdout content, reserved outcomes, owner private data roots, historical strategy-return replays, new market REST/WS source collection, production/testnet orders, credentials, funds, and changing historical frozen results or safety/CI goldens. SOURCE_NOT_ADMITTED / G2_ALPHA_NO_GO / TESTNET_NO_GO / LIVE_NO_GO / REAL_FUNDS_WRITE_NONE.
+
+**Dependency:** ChatGPT-2-E proof branch must publish exact full SHA, direct parent 31e71342ad165189bfbf920e8da81bbeabb76708, and EXACT two ADD blobs (module 5208f25268ec7e4efe854b7f5e13c55deb8e0d04 and tests 50eca94c86f73837a3842d6202b1b3eb9600ce0e). No proof commit -> INCOMPLETE_TARGET_UNFROZEN. Re-verify immutable Git first-parent, CI corrective prefix identity, no other path/rename/harness/H40/golden edit, actual push event before/base metadata, and exact head-equal Actions jobs.
+
+Accept H02 only if real PROFILE B_LINE_ENGINEERING with one literal H40 --deselect, successful collect-only, actual 1 deselected count with other tests passing and exact SHA-bound nonempty JUnit/machine receipt. Do not substitute previous real FULL_REPO_PASS 38546972770 which ran zero deselections, or fake fixtures. Evaluate H01 immutable-correction-content trust separately: current planner matches path topology, not a Controller-owned external trust root. Even if H02 proof passes, clearly mark H01 OPEN absent separately governed SHA pin. No branch-protection changes, no merge, no H40 scientific acceptance or release permission.
+
+**ONLY ADD** reviews/v0.6/b_line/V06_R4_1_H40_REAL_SINGLE_NODE_PROOF_AUDIT.md on docs/v06-r4-1-h40-proof-review rooted in this dispatch SHA. Verdict H02_PROOF_PASS_H01_UNRESOLVED / H02_PROOF_FAIL / INCOMPLETE. Exact Git SHA/CI and separate full vs engineering statuses required.
