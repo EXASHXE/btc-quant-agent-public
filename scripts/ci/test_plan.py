@@ -26,6 +26,21 @@ HISTORICAL_EXE001 = {
 KNOWN_EXE001 = {p for p in HISTORICAL_EXE001 if (ROOT / p).is_file()}
 
 IMMUTABLE_V06_BASE_SHA = "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
+BLINE_H40_BASE_SHA = "13e3a710b137efeec2e21e3002f748834ec0cc22"
+H40_QUARANTINED_NODE = (
+    "tests/test_v051_h40_m3a_production_discovery_producer.py"
+    "::test_p09_through_p18_exact_scientific_graph"
+)
+# Strict finite allowlist: independently verifiable B-line source and its unit suite.
+# Never infer H40 isolation from a branch name, filename prefix or directory glob.
+BLINE_H40_OWNED_FILES = frozenset({
+    "scripts/strategy_research/g2_sparse_inference_synthetic_calibration_r1.py",
+    "tests/test_v06_g2_sparse_inference_synthetic_calibration_r1.py",
+})
+H40_CONTROLLER_AUTHORITY = "c9b3663bbac6f5d5d5d7ece718d4974ec4888791"
+H40_UNRESOLVED_FAILURE = (
+    "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38513033356"
+)
 
 
 def git(*args: str) -> subprocess.CompletedProcess[str]:
@@ -200,6 +215,115 @@ def classify(changed: list[str] | None) -> dict[str, object]:
     }
 
 
+
+def eligible_bline_h40_quarantine(paths: list[str] | None) -> bool:
+    """Only the two listed, nonempty B-line paths qualify; unknown is unsafe."""
+    return bool(paths) and all(
+        isinstance(path, str) and path in BLINE_H40_OWNED_FILES
+        for path in paths
+    )
+
+
+def verified_bline_delta(changed: list[str] | None) -> list[str] | None:
+    """Proof of complete changes since the controlled, fetched v0.6 integration base.
+
+    Current CI self-patch must fail this gate; eligible descendant branches only
+    become possible after Controller integration of the independently reviewed patch.
+    """
+    if not eligible_bline_h40_quarantine(changed):
+        return None
+    baseline = git("rev-parse", "--verify", "refs/remotes/origin/v0.6")
+    if baseline.returncode != 0 or not re.fullmatch(r"[a-f0-9]{40}", baseline.stdout.strip()):
+        return None
+    base_sha = baseline.stdout.strip()
+    if git("merge-base", "--is-ancestor", base_sha, "HEAD").returncode != 0:
+        return None
+    result = git("diff", "--no-renames", "--name-status", base_sha, "HEAD")
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+    paths: list[str] = []
+    for line in result.stdout.splitlines():
+        parts = line.split("\t")
+        if len(parts) != 2 or parts[0] not in ("A", "M"):
+            return None
+        paths.append(parts[1])
+    if sorted(paths) != sorted(changed or []):
+        return None
+    if not all(
+        (ROOT / path).is_file() and not (ROOT / path).is_symlink()
+        for path in paths
+    ):
+        return None
+    return paths
+
+
+def engineering_mode(changed: list[str] | None) -> str:
+    """Preserve docs fast path; only verified full-tree owner diffs quarantine."""
+    if changed is not None and classify(changed)["mode"] == "none":
+        return "none"
+    if not changed:
+        return "full"
+    return "B_LINE_ENGINEERING" if verified_bline_delta(changed) is not None else "full"
+
+
+def checked_plan_paths(plan: dict[str, object]) -> list[str] | None:
+    """Require GitHub-provided event identity and recomputed Git-diff equality."""
+    if plan.get("schema_version") != "B_LINE_CI_PLAN_V1":
+        raise RuntimeError("CI_PLAN_SCHEMA_UNVERIFIED")
+    sha = git("rev-parse", "HEAD")
+    if (
+        sha.returncode != 0 or
+        not re.fullmatch(r"[a-f0-9]{40}", sha.stdout.strip()) or
+        plan.get("code_sha") != sha.stdout.strip()
+    ):
+        raise RuntimeError("CI_PLAN_SHA_IDENTITY_MISMATCH")
+    git_env = {
+        "event": "CI_EVENT_NAME",
+        "before": "CI_BEFORE_SHA",
+        "base_ref": "CI_BASE_REF",
+        "pr_base_sha": "CI_PR_BASE_SHA",
+    }
+    for key, env_name in git_env.items():
+        authoritative = os.environ.get(env_name)
+        if authoritative is None or plan.get(key) != authoritative:
+            raise RuntimeError("CI_PLAN_EVENT_IDENTITY_MISMATCH")
+    if plan["event"] not in ("push", "pull_request"):
+        return None
+    changed = changed_paths(
+        before=str(plan["before"]), event=str(plan["event"]),
+        base_ref=str(plan["base_ref"]) or None,
+        pr_base_sha=str(plan["pr_base_sha"]) or None,
+    )
+    expected = classify(changed)
+    if any(plan.get(key) != expected[key] for key in ("mode", "tests", "changed", "reason")):
+        raise RuntimeError("CI_PLAN_CHANGED_PATHS_MISMATCH")
+    return changed
+
+
+def deselection_count(output: str) -> int | None:
+    """One and only one pytest terminal deselection summary is required."""
+    counts = re.findall(r"(?<![A-Za-z0-9])(\d+) deselected\b", output)
+    return int(counts[0]) if len(counts) == 1 else None
+
+
+def exact_h40_collectible(env: dict[str, str]) -> bool:
+    """Fail closed if the exact H40 node was renamed or no longer collects."""
+    result = subprocess.run(
+        ["pytest", "--collect-only", "-q", H40_QUARANTINED_NODE],
+        cwd=ROOT, env=env, text=True, capture_output=True, check=False,
+    )
+    exact = [line.strip() for line in result.stdout.splitlines()
+             if line.strip() == H40_QUARANTINED_NODE]
+    return result.returncode == 0 and exact == [H40_QUARANTINED_NODE]
+
+
+def pytest_command(mode: str, junit: Path, chosen: list[str]) -> list[str]:
+    command = ["pytest", "-q", "--durations=20", f"--junitxml={junit.name}", *chosen]
+    if mode == "B_LINE_ENGINEERING":
+        command.append(f"--deselect={H40_QUARANTINED_NODE}")
+    return command
+
+
 def lint_baseline(changed: list[str]) -> None:
     # Every non-EXE001 rule stays enabled. EXE001 has a strictly bounded legacy debt list.
     subprocess.run(["ruff", "check", ".", "--ignore", "EXE001"], cwd=ROOT, check=True)
@@ -289,7 +413,7 @@ def main() -> None:
     p.add_argument("--event", default="push")
     p.add_argument("--base-ref", default="")
     p.add_argument("--pr-base-sha", default="")
-    p.add_argument("--profile", choices=["focused", "integration", "full"], default="focused")
+    p.add_argument("--profile", choices=["focused", "integration", "full", "B_LINE_ENGINEERING"], default="focused")
     args = p.parse_args()
 
     plan_path = ROOT / "ci-test-plan.json"
@@ -328,7 +452,10 @@ def main() -> None:
         return
 
     # Action: run
-    mode = args.profile if args.profile != "focused" else plan["mode"]
+    if args.profile == "B_LINE_ENGINEERING":
+        mode = engineering_mode(checked_plan_paths(plan))
+    else:
+        mode = args.profile if args.profile != "focused" else plan["mode"]
     if mode == "none":
         print("Docs/CI-only: tests not required; static checks enforced.")
         return
@@ -350,10 +477,10 @@ def main() -> None:
     else:
         chosen = []
 
-    if mode != "full" and not chosen:
+    if mode not in ("full", "B_LINE_ENGINEERING") and not chosen:
         raise RuntimeError("EMPTY_RISK_SELECTED_SUITE_FAIL_CLOSED")
 
-    cmd = ["pytest", "-q", "--durations=20", f"--junitxml={junit_path.name}", *chosen]
+    cmd = pytest_command(mode, junit_path, chosen)
 
     # CI planner self-tests alone have no operational IO and do not need the
     # repository-wide application fixture/import graph. All application tests
@@ -368,11 +495,36 @@ def main() -> None:
         "PYTHONPATH": str(ROOT / "src"),
     }
 
+    if mode == "B_LINE_ENGINEERING" and not exact_h40_collectible(test_env):
+        raise RuntimeError("H40_EXACT_NODE_NOT_COLLECTIBLE")
+    junit_path.unlink(missing_ok=True)
     start_time = time.time()
-    proc = subprocess.run(cmd, cwd=ROOT, env=test_env, check=False)
+    proc = subprocess.run(
+        cmd, cwd=ROOT, env=test_env, check=False,
+        text=True, capture_output=True,
+    )
     elapsed = time.time() - start_time
+    sys.stdout.write(proc.stdout)
+    sys.stderr.write(proc.stderr)
 
     junit_summary = parse_junit_xml(junit_path)
+    deselected = (
+        deselection_count(proc.stdout + "\n" + proc.stderr)
+        if mode == "B_LINE_ENGINEERING" else 0
+    )
+    evidence_ok = junit_path.is_file() and int(junit_summary["total"]) > 0
+    if mode == "B_LINE_ENGINEERING":
+        evidence_ok = evidence_ok and deselected == 1
+    passed = proc.returncode == 0 and evidence_ok
+    if mode == "B_LINE_ENGINEERING":
+        status = (
+            "B_LINE_ENGINEERING_PASS_H40_QUARANTINED"
+            if passed else "B_LINE_ENGINEERING_FAIL"
+        )
+    elif mode == "full":
+        status = "FULL_REPO_PASS" if passed else "FULL_REPO_FAIL"
+    else:
+        status = f"{mode.upper()}_PASS" if passed else f"{mode.upper()}_FAIL"
 
     ci_run_url = None
     gh_repo = os.getenv("GITHUB_REPOSITORY")
@@ -393,11 +545,27 @@ def main() -> None:
         "protected_reads": 0,
         "ci_run_url": ci_run_url,
         "junit_summary": junit_summary,
+        "status": status,
+        "deselected_count": deselected,
+        "quarantine": {
+            "node_id": H40_QUARANTINED_NODE,
+            "deselected_count": deselected,
+            "code_sha": git("rev-parse", "HEAD").stdout.strip(),
+            "authority_sha": H40_CONTROLLER_AUTHORITY,
+            "unresolved_a_line_failure": H40_UNRESOLVED_FAILURE,
+            "owner": "A-line H40",
+            "reason": "Finite B-line code-diff ownership; one exact node only",
+            "verified_owned_changes": verified_bline_delta(checked_plan_paths(plan)),
+        } if mode == "B_LINE_ENGINEERING" else None,
     }
     plan_path.write_text(json.dumps(durable_receipt, indent=2) + "\n", encoding="utf-8")
+    print("CI_STATUS", status, "DESELECTED", deselected, flush=True)
 
-    if proc.returncode != 0:
-        raise subprocess.CalledProcessError(proc.returncode, cmd)
+    if not passed:
+        raise RuntimeError(
+            f"CI_FAIL_CLOSED: {status}; pytest_rc={proc.returncode}; "
+            f"junit_ok={evidence_ok}; deselected={deselected}"
+        )
 
 
 if __name__ == "__main__":

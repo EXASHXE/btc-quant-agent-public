@@ -10,11 +10,20 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts.ci.test_plan import (
+    BLINE_H40_BASE_SHA,
+    H40_QUARANTINED_NODE,
     IMMUTABLE_V06_BASE_SHA,
     KNOWN_EXE001,
     changed_paths,
+    checked_plan_paths,
     classify,
+    deselection_count,
+    eligible_bline_h40_quarantine,
+    engineering_mode,
+    exact_h40_collectible,
     lint_baseline,
+    pytest_command,
+    verified_bline_delta,
 )
 
 
@@ -232,3 +241,145 @@ def test_12_git_rename_from_source_to_docs_must_not_skip_original_path(tmp_path:
         assert "docs/safety.md" in changed
         assert "src/btc_quant_agent/safety.py" in changed
         assert planner.classify(changed)["mode"] == "full"
+
+
+def test_13_exact_finite_bline_ownership_and_full_fallbacks() -> None:
+    source = "scripts/strategy_research/g2_sparse_inference_synthetic_calibration_r1.py"
+    own_test = "tests/test_v06_g2_sparse_inference_synthetic_calibration_r1.py"
+    assert eligible_bline_h40_quarantine([source])
+    assert eligible_bline_h40_quarantine([source, own_test])
+    for paths in (None, [], ["docs/project/notes.md"],
+                  [source, ".github/workflows/ci.yml"],
+                  [own_test, "tests/conftest.py"],
+                  [source, "scripts/g1_offline_preview_r1/model.py"],
+                  [source, "tests/test_v051_h40_m3a_production_discovery_producer.py"],
+                  ["src/btc_quant_agent/data/binance.py"],
+                  ["scripts/strategy_research/g2_unknown.py"],
+                  ["tests/test_v06_arbitrary_safety.py"],
+                  ["tests/test_v051_h41_probe.py"]):
+        assert not eligible_bline_h40_quarantine(paths)
+    assert engineering_mode(None) == "full"
+    assert engineering_mode([]) == "full"
+    assert engineering_mode(["docs/project/readme.md"]) == "none"
+
+
+def test_14_immutable_git_diff_ownership_with_synthetic_status(tmp_path: Path) -> None:
+    from scripts.ci import test_plan as planner
+    source = "scripts/strategy_research/g2_sparse_inference_synthetic_calibration_r1.py"
+    own_test = "tests/test_v06_g2_sparse_inference_synthetic_calibration_r1.py"
+    for name in (source, own_test):
+        location = tmp_path / name
+        location.parent.mkdir(parents=True, exist_ok=True)
+        location.write_text("# invented fixture\n", encoding="utf-8")
+    cases = (
+        ("A\t" + source + "\n", [source]),
+        ("A\t" + source + "\nA\t" + own_test + "\n", [source, own_test]),
+        ("D\t" + source + "\n", None),
+        ("A\t" + source + "\nA\tdocs/moved.md\n", None),
+        ("A\t" + source + "\nM\t.github/workflows/ci.yml\n", None),
+        ("M\ttests/conftest.py\n", None),
+        ("A\t" + source + "\nD\ttests/test_security.py\n", None),
+        ("R100\ttests/test_security.py\tdocs/moved.md\n", None),
+        ("", None),
+    )
+    def make_git(diff_output: str):
+        def fake_git(*args: str):
+            if args[0] == "rev-parse":
+                assert args == ("rev-parse", "--verify", "refs/remotes/origin/v0.6")
+                return subprocess.CompletedProcess(["git"], 0, "a" * 40 + "\n", "")
+            if args[0] == "merge-base":
+                assert args == ("merge-base", "--is-ancestor", "a" * 40, "HEAD")
+                return subprocess.CompletedProcess(["git"], 0, "", "")
+            assert args[:3] == ("diff", "--no-renames", "--name-status")
+            return subprocess.CompletedProcess(["git"], 0, diff_output, "")
+        return fake_git
+    for diff, expected in cases:
+        changed = expected or [line.split("\t")[-1] for line in diff.splitlines() if line]
+        with patch.object(planner, "git", side_effect=make_git(diff)), patch.object(
+            planner, "ROOT", tmp_path
+        ):
+            assert verified_bline_delta(changed) == expected
+            if expected:
+                assert engineering_mode(changed) == "B_LINE_ENGINEERING"
+    with patch.object(planner, "git", return_value=subprocess.CompletedProcess(
+        ["git"], 128, "", "missing base"
+    )):
+        assert verified_bline_delta([source]) is None
+    (tmp_path / source).unlink()
+    with patch.object(planner, "git", side_effect=make_git("A\t" + source + "\n")), patch.object(
+        planner, "ROOT", tmp_path
+    ):
+        assert verified_bline_delta([source]) is None
+
+
+def test_15_plan_integrity_rejects_stale_sha_and_spoofed_metadata() -> None:
+    from scripts.ci import test_plan as planner
+    import pytest
+    fake_plan = {
+        "schema_version": "B_LINE_CI_PLAN_V1",
+        "code_sha": "a" * 40,
+        "event": "push", "before": "b" * 40,
+        "base_ref": "", "pr_base_sha": "",
+        **classify(["scripts/strategy_research/g2_sparse_inference_synthetic_calibration_r1.py"]),
+    }
+    with patch.object(planner, "git", return_value=subprocess.CompletedProcess(
+        ["git"], 0, "c" * 40 + "\n", ""
+    )):
+        with pytest.raises(RuntimeError, match="CI_PLAN_SHA_IDENTITY_MISMATCH"):
+            checked_plan_paths(fake_plan)
+    good_head = subprocess.CompletedProcess(["git"], 0, "a" * 40 + "\n", "")
+    with patch.object(planner, "git", return_value=good_head):
+        with pytest.raises(RuntimeError, match="CI_PLAN_EVENT_IDENTITY_MISMATCH"):
+            checked_plan_paths(fake_plan)
+    environ = {
+        "CI_EVENT_NAME": "push",
+        "CI_BEFORE_SHA": "b" * 40,
+        "CI_BASE_REF": "",
+        "CI_PR_BASE_SHA": "",
+    }
+    with patch.object(planner, "git", return_value=good_head), patch.dict(
+        planner.os.environ, environ
+    ), patch.object(planner, "changed_paths", return_value=["tests/conftest.py"]):
+        with pytest.raises(RuntimeError, match="CI_PLAN_CHANGED_PATHS_MISMATCH"):
+            checked_plan_paths(fake_plan)
+
+
+def test_16_exact_node_only_and_full_command_does_not_deselect() -> None:
+    from pathlib import Path
+    engineering = pytest_command("B_LINE_ENGINEERING", Path("ci-junit.xml"), [])
+    full = pytest_command("full", Path("ci-junit.xml"), [])
+    integration = pytest_command("integration", Path("ci-junit.xml"), ["tests/test_notify.py"])
+    assert engineering == full + ["--deselect=" + H40_QUARANTINED_NODE]
+    assert not any(x.startswith("--deselect") for x in full + integration)
+    assert deselection_count("3006 passed, 2 skipped, 1 deselected in 42s") == 1
+    assert deselection_count("3006 passed in 42s") is None
+    assert deselection_count("3006 passed, 2 deselected in 42s") == 2
+    assert deselection_count("1 deselected\n1 deselected") is None
+    assert H40_QUARANTINED_NODE.count("::") == 1
+
+
+def test_17_uncollectible_h40_node_fails_closed() -> None:
+    from scripts.ci import test_plan as planner
+    ok = subprocess.CompletedProcess(
+        ["pytest"], 0, H40_QUARANTINED_NODE + "\n1 test collected\n", ""
+    )
+    with patch.object(planner.subprocess, "run", return_value=ok):
+        assert exact_h40_collectible({})
+    other = subprocess.CompletedProcess(
+        ["pytest"], 0, H40_QUARANTINED_NODE + "_renamed\n1 test collected\n", ""
+    )
+    with patch.object(planner.subprocess, "run", return_value=other):
+        assert not exact_h40_collectible({})
+    missing = subprocess.CompletedProcess(["pytest"], 4, "", "no tests")
+    with patch.object(planner.subprocess, "run", return_value=missing):
+        assert not exact_h40_collectible({})
+
+
+def test_18_full_schedule_and_compatibility_profiles_stay_unchanged() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert "github.event_name == 'schedule' && 'full'" in workflow
+    assert "inputs.profile == 'full'" in workflow
+    assert 'python-version: ["3.11", "3.13"]' in workflow
+    assert "continue-on-error" not in workflow
+    assert "pytest -q --durations=20" in workflow
+    assert "G1_CORE_MUTATED" not in workflow

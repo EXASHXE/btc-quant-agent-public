@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       profile:
-        description: "focused/integration/full (manual exact SHA gates)"
+        description: "focused/integration/full (manual exact SHA gates; automatic B-line engineering is separate)"
         required: true
         default: focused
         type: choice
@@ -29,7 +29,7 @@ jobs:
           fetch-depth: 0
       - name: Fetch v0.6 immutable base for merge-base resolution
         run: |
-          git fetch --no-tags origin v0.6 || true
+          git fetch --no-tags origin +refs/heads/v0.6:refs/remotes/origin/v0.6 || true
       - name: Ensure cache directory exists for docs-only/zero-pip FAST paths
         run: mkdir -p "$HOME/.cache/pip"
       - uses: actions/setup-python@v5
@@ -47,13 +47,13 @@ jobs:
       - name: Classify impact before heavy dependency installation
         id: impact
         env:
-          PROFILE: "${{ github.event_name == 'workflow_dispatch' && inputs.profile || (github.event_name == 'schedule' && 'full' || 'focused') }}"
+          PROFILE: "${{ github.event_name == 'workflow_dispatch' && inputs.profile || (github.event_name == 'schedule' && 'full' || 'B_LINE_ENGINEERING') }}"
         run: |
           python - <<'PY' >> "$GITHUB_OUTPUT"
           import json, os
           p=json.load(open("ci-test-plan.json",encoding="utf-8"))
           changed=p.get("changed", [])
-          docs_only=(p.get("mode")=="none" and os.environ["PROFILE"]=="focused")
+          docs_only=(p.get("mode")=="none" and os.environ["PROFILE"] in {"focused", "B_LINE_ENGINEERING"})
           ci_only=(os.environ["PROFILE"]=="focused" and bool(changed) and
                    all(x.startswith((".github/workflows/","scripts/ci/")) or
                        x=="tests/test_ci_test_plan.py" for x in changed))
@@ -66,6 +66,9 @@ jobs:
       - name: Install production/research validation dependencies
         if: steps.impact.outputs.ci_only != 'true' && steps.impact.outputs.docs_only != 'true'
         run: python -m pip install -e '.[dev,research]'
+      - name: CI planner synthetic positive/negative tests
+        if: steps.impact.outputs.docs_only != 'true'
+        run: python -m pytest -q --noconftest tests/test_ci_test_plan.py
       - name: Ruff with bounded historical EXE001 debt
         if: steps.impact.outputs.docs_only != 'true'
         run: python scripts/ci/test_plan.py lint
@@ -86,7 +89,11 @@ jobs:
       - name: Tests selected by risk/changed scope
         if: steps.impact.outputs.docs_only != 'true'
         env:
-          PROFILE: "${{ github.event_name == 'workflow_dispatch' && inputs.profile || (github.event_name == 'schedule' && 'full' || 'focused') }}"
+          CI_EVENT_NAME: "${{ github.event_name }}"
+          CI_BEFORE_SHA: "${{ github.event.before }}"
+          CI_BASE_REF: "${{ github.base_ref }}"
+          CI_PR_BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+          PROFILE: "${{ github.event_name == 'workflow_dispatch' && inputs.profile || (github.event_name == 'schedule' && 'full' || 'B_LINE_ENGINEERING') }}"
         run: python scripts/ci/test_plan.py run --profile "$PROFILE"
       - name: Retain scoped test evidence
         if: always()
