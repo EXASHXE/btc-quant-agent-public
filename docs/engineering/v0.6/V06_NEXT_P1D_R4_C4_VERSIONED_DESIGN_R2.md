@@ -178,11 +178,11 @@ The contract enforces strict bidirectional version negotiation across all engine
 #### 1.1 Genesis Initial State Specification
 - **Legacy C4 (V1) Genesis**:
   - `schema_version`: `1`
-  - `funding_contract`: `None` (or `"LEGACY_C4_V1"`)
+  - `funding_contract`: `None` (omitted from `initial_state()` in frozen V1)
   - Permitted funding event: `FUNDING` only.
-  - Rejects `FUNDING_RECEIPT` with `SafetyViolation("EVENT_KIND_INVALID")`.
+  - Rejects `FUNDING_RECEIPT` with `SafetyViolation("EVENT_KIND_UNKNOWN")` (the frozen V1 `transition()` dispatcher raises `EVENT_KIND_UNKNOWN` for any unrecognized event kind).
 - **R4 Causal (V2) Genesis**:
-  - `schema_version`: `2` (or `schema_version: 1` with explicit opt-in)
+  - `schema_version`: `1` (with explicit causal opt-in `causal_funding=True`) or `2`
   - `funding_contract`: `"SYNTHETIC_CAUSAL_R4"`
   - `fill_history`: `[]` (chronological list of executed fills)
   - `used_settlements`: `[]` (set/list of settled settlement IDs)
@@ -190,33 +190,65 @@ The contract enforces strict bidirectional version negotiation across all engine
   - Permitted funding event: `FUNDING_RECEIPT` only.
   - Rejects legacy `FUNDING` with `SafetyViolation("LEGACY_FUNDING_REQUIRES_LEGACY_GENESIS")`.
 
-#### 1.2 WAL Record Envelope & Version Tagging
-Every WAL record appended to disk must contain an immutable version header:
-```json
-{
-  "seq": 42,
-  "prev_hash": "a1b2c3d4...",
-  "record_hash": "e5f60718...",
-  "contract_version": "SYNTHETIC_CAUSAL_R4",
-  "event": {
-    "id": "mkt-fund-rec-20261014-080000",
-    "kind": "FUNDING_RECEIPT",
-    "at": 1776153675000,
-    "payload": { ... }
-  }
-}
-```
-- **Replay Invariant**: When an `Engine` initializes from an existing WAL file, it inspects the initial record and all subsequent entries. If an engine initialized under `"SYNTHETIC_CAUSAL_R4"` encounters a record tagged with a mismatched contract version (or an unversioned legacy record in an R4 directory), it aborts startup with `SafetyViolation("WAL_VERSION_MISMATCH")`.
+#### 1.2 WAL Header, Record Envelope & Version Tagging
+WAL storage enforces bit-for-bit integrity and strict schema validation:
+
+1. **WAL Header (Line 0)**:
+   In G1 `storage.py`, `_init_wal()` writes line 0 as:
+   `{"format": "G1_OFFLINE_WAL_V1", "genesis_hash": digest(self.initial)}` (or `"format": "G1_OFFLINE_WAL_R4"`).
+   Because `initial_state(causal_funding=True)` contains `"funding_contract": "SYNTHETIC_CAUSAL_R4"` and `"fill_history": []`, its `digest(self.initial)` is cryptographically distinct from the legacy V1 genesis.
+   - **Cross-Version Replay Invariant**: When an `Engine` initializes from an existing WAL file, line 38 of `storage.py` verifies `strict_json(lines[0]) == {"format": ..., "genesis_hash": digest(self.initial)}`. Replaying an R4 WAL into a legacy V1 engine (or a legacy V1 WAL into an R4 engine without an explicit migration adapter) immediately raises `SafetyViolation("WAL_GENESIS_MISMATCH")`.
+
+2. **WAL Record Envelope (Lines 1+)**:
+   Every record appended to disk strictly adheres to the 6-key canonical schema required by `storage.py:_recover()` (`set(rec) == {"seq", "previous", "event", "event_hash", "state_hash", "record_hash"}`):
+   ```json
+   {
+     "seq": 42,
+     "previous": "a1b2c3d4e5f6...",
+     "event": {
+       "id": "mkt-fund-rec-20261014-080000",
+       "kind": "FUNDING_RECEIPT",
+       "at": 1776153675000,
+       "payload": {
+         "contract_version": "SYNTHETIC_CAUSAL_R4",
+         "settlement_id": "BTC-PERP-20261014-080000",
+         "settlement_at": 1776153600000,
+         "mark_price": "60000.0",
+         "rate_fraction": "0.0001",
+         "mark_witness": {
+           "at": 1776153600000,
+           "known_at": 1776153600100,
+           "source": "SYNTHETIC_SETTLEMENT_MARK"
+         },
+         "rate_witness": {
+           "at": 1776153600000,
+           "known_at": 1776153600100,
+           "source": "SYNTHETIC_SETTLED_RATE"
+         },
+         "fill_coverage": {
+           "from_at": 0,
+           "through_at": 1776153600000,
+           "known_at": 1776153600100,
+           "source": "G1_SYNTHETIC_WAL"
+         }
+       }
+     },
+     "event_hash": "b2c3d4e5f607...",
+     "state_hash": "c3d4e5f60718...",
+     "record_hash": "d4e5f6071829..."
+   }
+   ```
+   Where `record_hash = digest(body)` with `body = {k: v for k, v in record.items() if k != "record_hash"}`. The contract version is explicitly carried within `event["payload"]["contract_version"]` and verified by `funding_receipt_fingerprint()`.
 
 #### 1.3 Durable Supervisor ACK Envelope
-The supervisor issues an ACK only after successful G1 WAL fsync:
+The supervisor issues an ACK only after successful G1 WAL fsync (`engine.apply()` returning `"COMMITTED"` or `"IDEMPOTENT_DUPLICATE"`):
 ```json
 {
-  "status": "APPLIED",
+  "status": "COMMITTED",
   "contract_version": "SYNTHETIC_CAUSAL_R4",
   "settlement_id": "BTC-PERP-20261014-080000",
   "g1_seq": 42,
-  "g1_chain": "e5f60718...",
+  "g1_chain": "d4e5f6071829...",
   "scope": "SYNTHETIC_INTEGRATION_ONLY",
   "ack_at_ms": 1776153675050
 }
@@ -228,7 +260,7 @@ If the settlement was already processed, the supervisor returns:
   "contract_version": "SYNTHETIC_CAUSAL_R4",
   "settlement_id": "BTC-PERP-20261014-080000",
   "g1_seq": 42,
-  "g1_chain": "e5f60718...",
+  "g1_chain": "d4e5f6071829...",
   "scope": "SYNTHETIC_INTEGRATION_ONLY",
   "ack_at_ms": 1776153675050
 }
@@ -240,19 +272,26 @@ If the settlement was already processed, the supervisor returns:
 
 #### 2.1 Historical Fill Exposure Snapshot Formulation
 To prevent causal leakage and ensure economic accuracy, exposure is computed strictly from pre-settlement executed fills:
-$$\text{exposure}(t_{\text{settle}}) = \sum_{\substack{f \in \text{fill\_history} \\ t(f) < t_{\text{settle}}}} \text{direction}(f) \cdot \text{action}(f) \cdot \text{quantity}(f)$$
+$$\text{exposure}(t_{\text{settle}}) = \sum_{\substack{f \in \text{fill\_history} \\ t(f) < t_{\text{settle}}}} \text{side}(f) \cdot \text{action}(f) \cdot \text{quantity}(f)$$
 Where:
-- $\text{direction}(\text{"LONG"}) = +1$, $\text{direction}(\text{"SHORT"}) = -1$
-- $\text{action}(\text{"ENTRY"}) = +1$, $\text{action}(\text{"EXIT"}) = -1$
+- $\text{side}(f)$: $+1$ for $\text{"LONG"}$, $-1$ for $\text{"SHORT"}$
+- $\text{action}(f)$: $+1$ for $\text{"ENTRY"}$, $-1$ for $\text{"EXIT"}$
+- $\text{quantity}(f)$: Executed lot quantity ($\text{Decimal} > 0$)
+
+Before computing pre-settlement exposure, the engine validates internal consistency against active portfolio state:
+$$\text{current\_portfolio} = \sum_{f \in \text{fill\_history}} \text{side}(f) \cdot \text{action}(f) \cdot \text{quantity}(f)$$
+$$\text{expected\_portfolio} = \text{decimal}(\text{state}[\text{"remaining\_qty"}]) \cdot \text{position\_side}(\text{state})$$
+$$\text{assert } \text{current\_portfolio} == \text{expected\_portfolio} \quad (\text{else } \text{raise SafetyViolation("COST\_INCOMPLETE")})$$
 
 #### 2.2 Boundary Invariants & Partial Exit Handling
-1. **Partial Exits (TP1)**: Executed partial exit fills prior to $t_{\text{settle}}$ reduce the signed quantity. If an initial ENTRY was $0.020$ BTC LONG, and a TP1 EXIT of $0.010$ BTC occurred at $t_{\text{exit}} < t_{\text{settle}}$, the active exposure at $t_{\text{settle}}$ is exactly $+0.010$ BTC.
+1. **Partial Exits (TP1)**: Executed partial exit fills prior to $t_{\text{settle}}$ reduce the signed quantity. If an initial ENTRY was $0.020$ BTC LONG at $t_1 < t_{\text{settle}}$, and a TP1 EXIT of $0.010$ BTC occurred at $t_{\text{exit}} < t_{\text{settle}}$, the active exposure at $t_{\text{settle}}$ is exactly $+0.010$ BTC. If the TP1 EXIT occurred after $t_{\text{settle}}$, the exposure at $t_{\text{settle}}$ remains $+0.020$ BTC.
 2. **Flat Position**: If all positions closed prior to $t_{\text{settle}}$, $\text{exposure} = 0.000$. Cash delta is $0.00000000$, recorded in the journal with complete witness evidence.
-3. **Temporal Ambiguity Window ($\pm 15\,\text{s}$)**:
-   If any fill in `fill_history` has $|t(f) - t_{\text{settle}}| \le 15,000\,\text{ms}$, the engine raises:
+3. **Post-Settlement Position Exit & Operational Phases**: Unlike legacy `FUNDING` which strictly asserted `_phase(s, "WAIT_ENTRY_ACK", "OPEN", "OPEN_RESIDUAL", "WAIT_TP1_ACK")`, `FUNDING_RECEIPT` permits receipt and forward-cash posting across all operational phases, including `"CLOSED"` and `"EXIT_WAIT_ACK"`. If an active position closed after $t_{\text{settle}}$ but prior to $t_{\text{receipt}}$, the pre-settlement exposure remains economically valid and must be settled without raising `SafetyViolation("PHASE_INVALID")`.
+4. **Temporal Ambiguity Window ($\pm 15\,\text{s}$)**:
+   If any fill in `fill_history` satisfies $|t(f) - t_{\text{settle}}| \le 15,000\,\text{ms}$, the engine raises:
    `SafetyViolation("AMBIGUOUS_SETTLEMENT_BOUNDARY")`.
-   This guarantees that trade execution fills occurring right at the exchange settlement boundary cannot be ambiguously classified as pre- or post-settlement.
-4. **Fill Ledger Invariant**: The list of `fill_id`s in `fill_history` must match `used_fill_ids` in `state` exactly. Any discrepancy raises `SafetyViolation("COST_INCOMPLETE")`.
+   This is a closed interval: both $-15,000\,\text{ms}$ and $+15,000\,\text{ms}$ trigger the guard, guaranteeing that trade execution fills occurring anywhere near the boundary fail closed without ambiguous classification.
+5. **Fill Ledger Invariant**: The list of `fill_id`s in `fill_history` must match `used_fill_ids` in `state` exactly. Any discrepancy raises `SafetyViolation("COST_INCOMPLETE")`.
 
 #### 2.3 Cash Flow Precision & Quantization
 Cash delta is calculated within a `localcontext(prec=128)`:
@@ -274,7 +313,9 @@ Payload must contain three complete witnesses:
 
 **Validation Rules**:
 - $t_{\text{settle}} \le t_{\text{known}} \le t_{\text{receipt}}$ for all witnesses.
-- If $t_{\text{known}} < t_{\text{settle}}$: raises `SafetyViolation("FUNDING_PIT_INVALID")`.
+- If $t_{\text{settle}} > t_{\text{receipt}}$: raises `SafetyViolation("FUNDING_PIT_INVALID")`.
+- If $t_{\text{known}} < t_{\text{settle}}$ or $t_{\text{known}} > t_{\text{receipt}}$: raises `SafetyViolation("COST_INCOMPLETE")`.
+- If $|\text{rate\_fraction}| > 0.10$: raises `SafetyViolation("FUNDING_RATE_BOUNDS")`.
 - If any witness key is missing or source string drifts: raises `SafetyViolation("COST_INCOMPLETE")`.
 
 ---
@@ -344,35 +385,33 @@ def apply(self, event, hook=None):
 ### Pillar 5: Tamper, Restart & Fault Isolation
 
 #### 5.1 Process-Death Injection Lifecycle Edges
-The architecture guarantees atomic durability across 9 critical process-death injection edges:
+The architecture guarantees atomic durability across 9 critical process-death injection edges, matching the execution hooks exercised by `test_real_process_crash_replay_cash_exactly_once_with_chronological_ack`:
 
 ```
-[Ingress] ──> (1) after_receipt
-                 │
-                 ▼
-[WAL Prep] ─> (2) before_append ──> [Append Record] ──> (3) after_append
-                                                              │
-                                                              ▼
-[WAL Flush] ───────────────────────────────────────────> (4) after_fsync
-                                                              │
-                                                              ▼
-[State Transition] ────────────────────────────────────> (5) before_snapshot
-                                                              │
-                                                              ▼
-[Checkpoint Disk] ─────────────────────────────────────> (6) after_snapshot
-                                                              │
-                                                              ▼
-[ACK Construction] ─> (7) before_receipt_ack ─────────> (8) after_receipt_ack
-                                                              │
-                                                              ▼
-[Port Cycle] ──────────────────────────────────────────> (9) port_restart
+[Supervisor Ingress] ───────────────> (1) before_receipt
+                                          │
+[Supervisor Post-Ingest] ───────────> (2) after_receipt
+                                          │
+[Engine Pre-Append] ────────────────> (3) before_append
+                                          │
+[Engine Post-Append] ───────────────> (4) after_append
+                                          │
+[Engine Post-Fsync] ────────────────> (5) after_fsync
+                                          │
+[Engine Pre-Snapshot] ──────────────> (6) before_snapshot
+                                          │
+[Engine Post-Snapshot] ─────────────> (7) after_snapshot
+                                          │
+[Supervisor Pre-ACK] ───────────────> (8) before_receipt_ack
+                                          │
+[Supervisor Post-ACK] ──────────────> (9) after_receipt_ack
 ```
 
 #### 5.2 Crash Recovery Invariants
-1. **Crash before `after_fsync`**: The record was not committed to disk. Upon restart, the engine recovers to the pre-receipt state. The port retransmits the record; the engine applies it cleanly.
-2. **Crash after `after_fsync`**: The record is committed in WAL. Upon restart, WAL replay reconstructs the cash journal entry. A subsequent delivery of the same record triggers `"IDEMPOTENT_DUPLICATE"`. Exactly one cash entry exists.
-3. **Crash during snapshot**: Snapshots are written to a `.tmp` file and atomically renamed (`os.replace`). A crash leaves either the old valid snapshot or the new valid snapshot. Corrupted temp files are ignored.
-4. **WAL Corruption / Truncation**: A half-written trailing record caused by immediate power loss fails SHA-256 verification and is quarantined; recovery safely replays up to the last valid chain hash.
+1. **Crash before `after_append` (edges 1–3: `before_receipt`, `after_receipt`, `before_append`)**: The record was not committed to disk WAL. Upon supervisor/engine restart, the engine recovers to the clean pre-receipt state with 0 journal rows. Retransmitting the envelope commits cleanly, returning status `"COMMITTED"` with exactly one cash entry.
+2. **Crash after WAL Append & Fsync (edges 4–9: `after_append`, `after_fsync`, `before_snapshot`, `after_snapshot`, `before_receipt_ack`, `after_receipt_ack`)**: If the record was fsynced to WAL, engine restart reconstructs the cash journal entry via deterministic WAL replay. Retransmitting the envelope detects the existing `funding:<settlement_id>` key in `state["journal"]`, verifies fingerprint equality, and returns status `"IDEMPOTENT_DUPLICATE"`. Exactly one cash entry exists across arbitrary process deaths and restarts.
+3. **Crash during snapshot**: Snapshots are written to a temporary `.tmp` file and atomically renamed (`os.replace`). A crash leaves either the old valid snapshot or the new valid snapshot. Unfinalized temporary files are safely ignored.
+4. **WAL Corruption / Truncated Tail**: A trailing un-fsynced partial record from a sudden hard kill fails SHA-256 record verification or newline termination; recovery safely replays up to the last valid chain hash and quarantines corrupted bytes.
 
 ---
 
@@ -387,13 +426,13 @@ The test suite must validate fail-closed enforcement across all invalid inputs a
 | **NEG-03** | Missing Mark Witness | `mark_witness` omitted from payload | `COST_INCOMPLETE` | Schema key matching in `model.py` |
 | **NEG-04** | Missing Rate Witness | `rate_witness` omitted from payload | `COST_INCOMPLETE` | Schema key matching in `model.py` |
 | **NEG-05** | Contradictory Side/Qty | `side="LONG", quantity="-0.010"` | `POSITION_SIDE_QUANTITY_CONTRADICTION` | Guard in `calculate_settled_funding_cash_flow()` |
-| **NEG-06** | Ambiguous $\pm 15\,\text{s}$ Fill | Fill at $t_{\text{settle}} - 5000\,\text{ms}$ | `AMBIGUOUS_SETTLEMENT_BOUNDARY` | Temporal proximity check in `_settlement_exposure()` |
+| **NEG-06** | Ambiguous $\pm 15\,\text{s}$ Fill | Fill at $t_{\text{settle}} - 5000\,\text{ms}$ or $\pm 15,000\,\text{ms}$ | `AMBIGUOUS_SETTLEMENT_BOUNDARY` | Temporal proximity check in `_settlement_exposure()` |
 | **NEG-07** | Conflicting Mark Replay | Same `settlement_id`, Mark changed $65000 \to 66000$ | `FUNDING_SETTLEMENT_CONFLICT` | Fingerprint comparison in `Engine.apply()` |
 | **NEG-08** | Legacy Event on R4 | Event `kind="FUNDING"` dispatched to R4 engine | `LEGACY_FUNDING_REQUIRES_LEGACY_GENESIS` | Transition guard in `reducer.py` |
-| **NEG-09** | R4 Event on Legacy | Event `kind="FUNDING_RECEIPT"` on V1 engine | `EVENT_KIND_INVALID` | Transition guard in V1 `reducer.py` |
+| **NEG-09** | R4 Event on Legacy | Event `kind="FUNDING_RECEIPT"` on V1 engine | `EVENT_KIND_UNKNOWN` | Frozen V1 `reducer.py` unhandled kind dispatch |
 | **NEG-10** | C4 File Mutation | Modifying 1 byte of `g1_offline_preview_r1/model.py` | `G1_CORE_MUTATED` | Manifest SHA verification in `no_order_port.py` |
 | **NEG-11** | Forbidden AST Import | `import binance` inside G1 or sidecar | `FORBIDDEN_IMPORT` | Static AST walk in `verify_static_ast_and_core_immutability()` |
-| **NEG-12** | Cross-Version WAL | Replaying R4 WAL into V1 engine | `WAL_VERSION_MISMATCH` | WAL header verification on startup |
+| **NEG-12** | Cross-Version WAL | Replaying R4 WAL into V1 engine | `WAL_GENESIS_MISMATCH` | Frozen V1 `storage.py` line 0 genesis hash verification |
 
 ---
 
