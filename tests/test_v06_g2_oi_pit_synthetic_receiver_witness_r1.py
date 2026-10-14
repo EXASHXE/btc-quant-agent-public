@@ -22,7 +22,9 @@ from scripts.strategy_research.g2_oi_pit_synthetic_receiver_witness_r1 import (
     UNIT,
     Attempt,
     ClockWitness,
+    DecisionWindows,
     EvidenceSpan,
+    ObservationWindow,
     ReceiverState,
     append_attempt,
     evaluate_two_buckets,
@@ -68,15 +70,27 @@ def attempt(seq: int, end: int = END, *, qty: str = "20403.637",
     return replace(sample, **kwargs)
 
 
-def evidence(*, gap: str | None = None):
-    return tuple(EvidenceSpan(s, END - PERIOD_MS, END, missing=(s == gap))
-                 for s in ("X", "QUOTE", "OI"))
+def windows(decision=DECISION):
+    return DecisionWindows(ObservationWindow(END - PERIOD_MS, END),
+                           ObservationWindow(decision - 1000, decision - 1), 1000)
+
+
+def evidence(*, gap: str | None = None, decision=DECISION):
+    w = windows(decision)
+    masks = (EvidenceSpan("X", w.x_confirmation.start_ms, w.x_confirmation.end_ms,
+                          known_at_ms=END + 2),
+             EvidenceSpan("QUOTE", w.decision_quote.start_ms, w.decision_quote.end_ms,
+                          known_at_ms=decision - 1)) + tuple(
+        EvidenceSpan("OI", end - PERIOD_MS, end, period_end_ms=end, known_at_ms=end)
+        for end in (END - PERIOD_MS, END)
+    )
+    return tuple(replace(s, complete_observation=True, missing=(s.source == gap)) for s in masks)
 
 
 def check(state: ReceiverState, *, decision=DECISION, gap=None, **kwargs):
     return evaluate_two_buckets(
         state, newest_period_end_ms=END, decision_ms=decision,
-        evidence=evidence(gap=gap),
+        evidence=evidence(gap=gap, decision=decision), required_windows=windows(decision),
         rights_receipt="FABRICATED_RIGHTS", origin_receipt="FABRICATED_ORIGIN",
         **kwargs,
     )
@@ -313,3 +327,172 @@ def test_20_import_ast_forbids_network_clock_and_persistence():
     assert set(modules) <= allowed
     assert "SYNTHETIC_ONLY" in code and "SOURCE_NOT_ADMITTED" in code
     assert "socket" not in modules and "requests" not in modules
+
+
+@pytest.mark.parametrize("start,end", [(0, 1), (END - 1, END), (END, END),
+                                      (END - 2 * PERIOD_MS - 1, END - 1)])
+def test_w01_fabricated_short_zero_or_shifted_labels_are_not_coverage(start, end):
+    spans = tuple(EvidenceSpan(s, start, end) for s in ("X", "QUOTE", "OI"))
+    v = evaluate_two_buckets(pair(), newest_period_end_ms=END, decision_ms=DECISION,
+                             evidence=spans, rights_receipt="FAKE", origin_receipt="FAKE")
+    assert v.diagnostic in {"SOURCE_GAP", "SOURCE_EVIDENCE_UNKNOWN"}
+    assert not v.selected_versions
+    assert_unadmitted(v)
+
+
+@pytest.mark.parametrize("key", ["symbol", "period", "timestamp", "sumOpenInterest",
+                                "unit", "contractVersion"])
+@pytest.mark.parametrize("same_value", [True, False])
+def test_w02_duplicate_json_members_never_define_a_version(key, same_value):
+    row = json.loads(fake_body(END))
+    original = row[key]
+    row[key] = original if same_value else "CONFLICTING_FIRST_VALUE"
+    raw = json.dumps(row).encode()
+    raw = raw[:-1] + b", " + json.dumps(key).encode() + b": " + json.dumps(original).encode() + b"}"
+    r = replay((attempt(1, body=raw),)).receipts[0]
+    assert r.receipt_kind == "INVALID_CONTRACT_OR_DECODER"
+    assert r.version_id is None and r.first_known_at_ms is None
+
+
+@pytest.mark.parametrize("qty", ["NaN", "sNaN", "Infinity", "bad", "", " 1", "1 ",
+                                "1_0", "+1", "-0", "1e3", "1e999999", "9" * 100])
+def test_w02_nonnumeric_or_nonliteral_decimal_fails_closed(qty):
+    r = replay((attempt(1, qty=qty),)).receipts[0]
+    assert r.receipt_kind == "INVALID_CONTRACT_OR_DECODER"
+    assert r.version_id is None and r.first_known_at_ms is None
+
+
+@pytest.mark.parametrize("anchor", [END - 100, END - 6])
+def test_w03_receiver_or_ack_before_period_close_fails_closed(anchor):
+    r = replay((attempt(1, clock=clock(anchor_utc_upper_ms=anchor)),)).receipts[0]
+    assert r.receipt_kind in {"PERIOD_RECEIPT_ORDER_UNKNOWN", "CLOCK_UNKNOWN"}
+    assert r.version_id is None and r.first_known_at_ms is None
+
+
+def evaluate_masks(spans, *, contract=None):
+    return evaluate_two_buckets(
+        pair(), newest_period_end_ms=END, decision_ms=DECISION, evidence=spans,
+        required_windows=windows() if contract is None else contract,
+        rights_receipt="INVENTED_NOT_AUTHENTICATED", origin_receipt="INVENTED_NOT_AUTHENTICATED",
+    )
+
+
+@pytest.mark.parametrize("index", range(4))
+@pytest.mark.parametrize("attack", ["short", "zero", "shifted", "missing", "censored",
+                                  "unknown", "not_observed", "late", "no_receipt",
+                                  "receipt_before_end", "duplicate"])
+def test_w01_each_contractual_observation_mask_fails_closed(index, attack):
+    spans = list(evidence())
+    s = spans[index]
+    if attack == "missing":
+        del spans[index]
+    elif attack == "duplicate":
+        spans.append(s)
+    else:
+        changes = {
+            "short": {"start_ms": s.start_ms + 1},
+            "zero": {"start_ms": s.end_ms},
+            "shifted": {"start_ms": s.start_ms - 1, "end_ms": s.end_ms - 1},
+            "censored": {"censored": True},
+            "unknown": {"complete_observation": None},
+            "not_observed": {"complete_observation": False},
+            "late": {"known_at_ms": DECISION},
+            "no_receipt": {"known_at_ms": None},
+            "receipt_before_end": {"known_at_ms": s.end_ms - 1},
+        }
+        spans[index] = replace(s, **changes[attack])
+    v = evaluate_masks(tuple(spans))
+    assert v.diagnostic in {"SOURCE_GAP", "SOURCE_EVIDENCE_UNKNOWN"}
+    assert not v.selected_versions
+    assert_unadmitted(v)
+
+
+def test_w01_rest_bucket_labels_and_unknown_contract_never_prove_local_coverage():
+    for spans in (evidence(), tuple(replace(s, complete_observation=None) for s in evidence())):
+        v = evaluate_two_buckets(pair(), newest_period_end_ms=END, decision_ms=DECISION,
+                                 evidence=spans, rights_receipt="FAKE", origin_receipt="FAKE")
+        assert v.diagnostic == "SOURCE_EVIDENCE_UNKNOWN"
+        assert_unadmitted(v)
+    for end in (None, END, END + PERIOD_MS, float(END - PERIOD_MS)):
+        spans = list(evidence())
+        spans[2] = replace(spans[2], period_end_ms=end)
+        assert evaluate_masks(tuple(spans)).diagnostic == "SOURCE_GAP"
+
+
+@pytest.mark.parametrize("contract", [
+    DecisionWindows(ObservationWindow(END - PERIOD_MS + 1, END), windows().decision_quote, 1000),
+    DecisionWindows(ObservationWindow(END, END), windows().decision_quote, 1000),
+    DecisionWindows(ObservationWindow(0, END - 1), windows().decision_quote, 1000),
+    DecisionWindows(windows().x_confirmation, ObservationWindow(END - 1000, END), 1000),
+    DecisionWindows(windows().x_confirmation, windows().decision_quote, 999),
+    DecisionWindows(windows().x_confirmation, windows().decision_quote, True),
+    DecisionWindows(ObservationWindow(float(END - PERIOD_MS), END), windows().decision_quote, 1000),
+])
+def test_w01_mismatched_or_invalid_predeclared_window_contract(contract):
+    v = evaluate_masks(evidence(), contract=contract)
+    assert v.diagnostic == "SOURCE_GAP"
+    assert not v.selected_versions
+    assert_unadmitted(v)
+
+
+def test_w01_honest_segmented_invented_masks_cover_all_four_windows():
+    segments = []
+    for span in evidence():
+        mid = (span.start_ms + span.end_ms) // 2
+        segments.extend((replace(span, end_ms=mid), replace(span, start_ms=mid)))
+    v = evaluate_masks(tuple(reversed(segments)))
+    assert v.diagnostic == "SYNTHETIC_TIME_COHERENT_NOT_ADMITTED"
+    assert len(v.selected_versions) == 2
+    assert_unadmitted(v)
+    # One millisecond of unobserved exposure cannot be hidden by complete neighbours.
+    segments[1] = replace(segments[1], start_ms=segments[1].start_ms + 1)
+    assert evaluate_masks(tuple(segments)).diagnostic == "SOURCE_GAP"
+
+
+@pytest.mark.parametrize("value", [1, 1.0, True, None, [], {}, float("nan")])
+def test_w02_quantity_requires_literal_string_not_json_numeric_or_other_type(value):
+    row = json.loads(fake_body(END))
+    row["sumOpenInterest"] = value
+    r = replay((attempt(1, body=json.dumps(row).encode()),)).receipts[0]
+    assert r.receipt_kind == "INVALID_CONTRACT_OR_DECODER"
+    assert r.version_id is None
+
+
+def test_w02_nested_duplicates_escaped_member_and_ambiguous_raw_encoding():
+    raw = fake_body(END)
+    attacks = (
+        raw.replace(b'"sumOpenInterest":', b'"sumOpenInterest": "1", "sumOpen\\u0049nterest":'),
+        raw[:-1] + b', "extra": {"x": 1, "x": 1}}',
+        raw + raw,
+        b'\xff' + raw,
+        b'\xef\xbb\xbf' + raw,
+        raw.decode().encode("utf-16"),
+        raw.decode().encode("utf-32"),
+        b'"' + b'[' * 4100,
+        fake_body(END, "1." + "0" * 19),
+    )
+    for body in attacks:
+        r = replay((attempt(1, body=body),)).receipts[0]
+        assert r.receipt_kind == "INVALID_CONTRACT_OR_DECODER"
+        assert r.version_id is None
+
+
+def test_w02_literal_format_duplicates_preserve_original_known_time():
+    state = replay((attempt(1, qty="200.0"), attempt(2, qty="200.00", ack=50 * M)))
+    assert state.receipts[1].receipt_kind == "FORMAT_DUPLICATE"
+    assert state.receipts[1].first_known_at_ms == state.receipts[0].first_known_at_ms
+
+
+def test_w03_previous_later_receipt_cannot_hide_impossible_period_order():
+    state = replay((attempt(1, END - PERIOD_MS),
+                    attempt(2, clock=clock(anchor_utc_upper_ms=END - 100))))
+    assert state.receipts[1].receipt_kind == "PERIOD_RECEIPT_ORDER_UNKNOWN"
+    assert state.receipts[1].version_id is None
+    assert_unadmitted(check(state))
+
+
+def test_w03_receiver_at_period_close_and_durable_ack_after_close_is_coherent():
+    r = replay((attempt(1, clock=clock(anchor_utc_upper_ms=END - 5)),)).receipts[0]
+    assert r.receipt_kind == "NEW_VERSION"
+    assert r.first_known_at_ms == END + 2
+    assert r.first_safe_ms >= END

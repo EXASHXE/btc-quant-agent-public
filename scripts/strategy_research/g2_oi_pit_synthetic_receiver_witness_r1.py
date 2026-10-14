@@ -19,6 +19,9 @@ ENDPOINT = "/futures/data/openInterestHist"
 CONTRACT = "INVENTED_BTCUSDT_USDM_CONTRACT_V1"
 UNIT = "INVENTED_NATIVE_CONTRACTS"
 PARSER = "SYNTHETIC_OI15M_JSON_V1"
+MAX_RAW_BYTES = 4096
+MAX_QUANTITY_DIGITS = 32
+MAX_QUANTITY_SCALE = 18
 
 
 def _hash(raw: bytes) -> str:
@@ -121,11 +124,37 @@ class ReceiverState:
 
 @dataclass(frozen=True)
 class EvidenceSpan:
+    """Half-open local observation mask, not coverage inferred from a REST label.
+
+    Every field is invented. Unknown completeness fails closed; OI masks must
+    name their bucket end. known_at_ms is the mask's safe completion receipt.
+    """
     source: Literal["X", "QUOTE", "OI"]
     start_ms: int
     end_ms: int
     missing: bool = False
     censored: bool = False
+    complete_observation: bool | None = None
+    period_end_ms: int | None = None
+    known_at_ms: int | None = None
+
+
+@dataclass(frozen=True)
+class ObservationWindow:
+    start_ms: int
+    end_ms: int
+
+
+@dataclass(frozen=True)
+class DecisionWindows:
+    """Predeclared X confirmation and decision-quote contracts, never inferred.
+
+    quote_max_age_ms is an invented fixture limit, not a production threshold.
+    The two complete 15m OI windows are derived separately from bucket identity.
+    """
+    x_confirmation: ObservationWindow
+    decision_quote: ObservationWindow
+    quote_max_age_ms: int
 
 
 @dataclass(frozen=True)
@@ -137,14 +166,29 @@ class Verdict:
     synthetic_label: str = "SYNTHETIC_ONLY"
 
 
+def _unique_members(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    obj = {}
+    for key, value in pairs:
+        if key in obj:
+            raise ValueError("DUPLICATE_JSON_MEMBER")
+        obj[key] = value
+    return obj
+
+
+def _reject_constant(value: str) -> None:
+    raise ValueError("NON_JSON_NUMERIC_CONSTANT")
+
+
 def _decode(a: Attempt) -> tuple[tuple[str, str, str, str, str, int], Decimal] | None:
     if (
         a.contract_version != CONTRACT or a.unit != UNIT or a.parser_version != PARSER
         or a.venue != VENUE or a.endpoint != ENDPOINT or a.period != "15m"
+        or len(a.raw_body) > MAX_RAW_BYTES
     ):
         return None
     try:
-        obj = json.loads(a.raw_body)
+        obj = json.loads(a.raw_body.decode("utf-8"), object_pairs_hook=_unique_members,
+                         parse_constant=_reject_constant)
         if not isinstance(obj, dict) or set(obj) != {
             "symbol", "period", "timestamp", "sumOpenInterest", "unit", "contractVersion"
         }:
@@ -157,11 +201,20 @@ def _decode(a: Attempt) -> tuple[tuple[str, str, str, str, str, int], Decimal] |
         ):
             return None
         end = obj["timestamp"]
-        qty = Decimal(obj["sumOpenInterest"])
-        if end <= 0 or end % PERIOD_MS or not qty.is_finite() or qty < 0:
+        literal = obj["sumOpenInterest"]
+        parts = literal.split(".")
+        # Bounded ASCII fixed-point only: no signs, exponents, whitespace,
+        # underscores, nonfinite tokens or context-dependent rounding.
+        if (len(parts) > 2 or not all(p.isascii() and p.isdigit() for p in parts)
+                or sum(map(len, parts)) > MAX_QUANTITY_DIGITS
+                or (len(parts) == 2 and len(parts[1]) > MAX_QUANTITY_SCALE)):
+            return None
+        qty = Decimal(literal)
+        if end <= 0 or end > 2**63 - 1 or end % PERIOD_MS or not qty.is_finite() or qty < 0:
             return None
         return (a.venue, a.endpoint, "BTCUSDT", a.contract_version, a.unit, end), qty
-    except (UnicodeDecodeError, json.JSONDecodeError, InvalidOperation, TypeError, ValueError):
+    except (UnicodeDecodeError, json.JSONDecodeError, InvalidOperation, TypeError,
+            ValueError, RecursionError):
         return None
 
 
@@ -207,6 +260,11 @@ def append_attempt(state: ReceiverState, a: Attempt) -> ReceiverState:
         else:
             parsed = _decode(a)
             kind = "INVALID_CONTRACT_OR_DECODER" if parsed is None else "NEW_VERSION"
+            if parsed is not None:
+                body_safe = a.clock.safe_upper(a.body_last_byte_ns)
+                if body_safe is None or body_safe < parsed[0][-1] or safe < parsed[0][-1]:
+                    kind = "PERIOD_RECEIPT_ORDER_UNKNOWN"
+                    parsed = None  # Reject before clamping against any earlier ACK.
     if parsed is None:
         key, qty = None, None
         safe = None
@@ -258,6 +316,7 @@ def evaluate_two_buckets(
     state: ReceiverState, *, newest_period_end_ms: int, decision_ms: int,
     evidence: tuple[EvidenceSpan, ...], rights_receipt: str | None = None,
     origin_receipt: str | None = None,
+    required_windows: DecisionWindows | None = None,
 ) -> Verdict:
     """Internal time diagnostic only; NEVER source/PIT admission."""
     def stop(reason: str) -> Verdict:
@@ -265,14 +324,49 @@ def evaluate_two_buckets(
 
     if not rights_receipt or not origin_receipt:
         return stop("RIGHTS_OR_ORIGIN_UNVERIFIED")
-    if any(span.start_ms >= span.end_ms or span.end_ms > decision_ms
-           or span.missing or span.censored for span in evidence):
+    if type(newest_period_end_ms) is not int or type(decision_ms) is not int:
+        return stop("PERIOD_NOT_PIT")
+    if any(type(span.start_ms) is not int or type(span.end_ms) is not int
+           or span.start_ms < 0 or span.start_ms >= span.end_ms or span.end_ms > decision_ms
+           or span.missing is not False or span.censored is not False for span in evidence):
         return stop("SOURCE_GAP")
     if {"X", "QUOTE", "OI"} != {s.source for s in evidence}:
         return stop("SOURCE_GAP")
     ends = (newest_period_end_ms - PERIOD_MS, newest_period_end_ms)
-    if ends[0] < 0 or ends[1] >= decision_ms:
+    if ends[0] < PERIOD_MS or ends[1] % PERIOD_MS or ends[1] >= decision_ms:
         return stop("PERIOD_NOT_PIT")
+    if not isinstance(required_windows, DecisionWindows):
+        return stop("SOURCE_EVIDENCE_UNKNOWN")
+    x, quote = required_windows.x_confirmation, required_windows.decision_quote
+    if (not all(isinstance(w, ObservationWindow) for w in (x, quote))
+            or any(type(t) is not int for w in (x, quote) for t in (w.start_ms, w.end_ms))
+            or not 0 <= x.start_ms < x.end_ms < decision_ms
+            or newest_period_end_ms > x.end_ms
+            or not 0 <= quote.start_ms < quote.end_ms < decision_ms
+            or type(required_windows.quote_max_age_ms) is not int
+            or required_windows.quote_max_age_ms <= 0
+            or decision_ms - quote.start_ms > required_windows.quote_max_age_ms):
+        return stop("SOURCE_GAP")
+    required = {
+        ("X", None): x, ("QUOTE", None): quote,
+        **{("OI", end): ObservationWindow(end - PERIOD_MS, end) for end in ends},
+    }
+    if any((s.source, s.period_end_ms) not in required
+           or (s.source == "OI" and type(s.period_end_ms) is not int) for s in evidence):
+        return stop("SOURCE_GAP")
+    if any(s.complete_observation is not True or type(s.known_at_ms) is not int
+           or s.known_at_ms < s.end_ms or s.known_at_ms >= decision_ms for s in evidence):
+        return stop("SOURCE_EVIDENCE_UNKNOWN")
+    for identity, window in required.items():
+        masks = sorted((s for s in evidence if (s.source, s.period_end_ms) == identity),
+                       key=lambda s: s.start_ms)
+        cursor = window.start_ms
+        for mask in masks:
+            if mask.start_ms != cursor or mask.end_ms > window.end_ms:
+                return stop("SOURCE_GAP")
+            cursor = mask.end_ms
+        if cursor != window.end_ms:
+            return stop("SOURCE_GAP")
     selected = []
     for end in ends:
         choices = [r for r in state.receipts if r.logical_key is not None
