@@ -259,7 +259,7 @@ def verified_bline_delta(changed: list[str] | None) -> list[str] | None:
 
 def engineering_mode(changed: list[str] | None) -> str:
     """Preserve docs fast path; only verified full-tree owner diffs quarantine."""
-    if changed is not None and classify(changed)["mode"] == "none":
+    if changed and classify(changed)["mode"] == "none":
         return "none"
     if not changed:
         return "full"
