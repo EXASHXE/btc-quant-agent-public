@@ -1,5 +1,8 @@
 # Multi-Model Research Governance
 
+> **v0.6 role policy override, 2026-10-14:** The B-line now runs **five independent ChatGPT conversations** numbered **0 / 1 / 2 / 2 / 2**: Controller 0, Supervisory Auditor 1, Researcher 2-R, Adversarial Challenger 2-C and Direct Execution Operator 2-E. **ChatGPT-3 is not an active session role.** This dated v0.6 override refines older generic model naming below; [read full matrix](project/V06_CHATGPT_FIVE_SESSION_ROLE_MATRIX_R1.md). 2-E may execute directly in connected ChatGPT GitHub or **strictly path-authorized** local Desktop Commander, but cannot review its own consequential output or confer source/Alpha/release authority. Historical Issue #1 labels `[R3]` mean old Challenger thread label, not active ChatGPT-3.
+
+
 Purpose: keep a second-model audit for independent challenge without turning every stage into a two-round review ceremony. The default workflow is now: ChatGPT defines the stage, one implementation agent executes it, Gemini performs one independent audit, and ChatGPT makes the final review and writes the next-stage prompt.
 
 ## Roles
