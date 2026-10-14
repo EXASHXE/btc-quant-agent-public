@@ -385,3 +385,5 @@ def test_r2_e04_opaque_source_id_cannot_be_source_qualified() -> None:
     assert r.source_qualified == 0
     assert r.source_status == "SOURCE_IDENTITY_UNVERIFIED"
     assert r.rate_status == "RATE_NOT_ADMITTED"
+
+# CI focused evidence branch: RED synthetic-only exact-parent witness.
