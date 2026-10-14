@@ -359,7 +359,7 @@ def test_14b_bounded_ci_correction_prefix_and_source_only_suffix(tmp_path: Path)
             return subprocess.CompletedProcess(args, 0, candidate + "\n", "")
         if args[:2] == ("rev-list", "--first-parent"):
             return subprocess.CompletedProcess(
-                args, 0, "\n".join((first, repair, candidate)) + "\n", ""
+                args, 0, f"{first}\n{repair}\n{candidate}\n", ""
             )
         if args[:2] == ("rev-list", "--parents"):
             sha = args[-1]

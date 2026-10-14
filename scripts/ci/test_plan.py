@@ -290,12 +290,12 @@ def verified_bline_delta(changed: list[str] | None) -> list[str] | None:
             ):
                 return None
         elif (
-            not owner_started and ci_followup_count == 0 and
+            not owner_started and ci_followup_count < 2 and
             all(status == "M" and name in {
                 "scripts/ci/test_plan.py", "tests/test_ci_test_plan.py"
             } for status, name in records)
         ):
-            # A single bounded CI-only corrective followup is never accepted alone.
+            # At most two CI-only corrective commits, never accepted on their own.
             correction = sha
             ci_followup_count += 1
         else:
