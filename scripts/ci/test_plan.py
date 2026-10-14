@@ -273,6 +273,8 @@ def verified_bline_delta(changed: list[str] | None) -> list[str] | None:
     parent = BLINE_H40_ROOT_SHA
     correction = chain[0]
     touched: set[str] = set()
+    owner_started = False
+    ci_followup_count = 0
     for index, sha in enumerate(chain):
         if not re.fullmatch(r"[a-f0-9]{40}", sha):
             return None
@@ -287,10 +289,20 @@ def verified_bline_delta(changed: list[str] | None) -> list[str] | None:
                 ("M", name) for name in H40_R2_CORRECTION_PATHS
             ):
                 return None
+        elif (
+            not owner_started and ci_followup_count == 0 and
+            all(status == "M" and name in {
+                "scripts/ci/test_plan.py", "tests/test_ci_test_plan.py"
+            } for status, name in records)
+        ):
+            # A single bounded CI-only corrective followup is never accepted alone.
+            correction = sha
+            ci_followup_count += 1
         else:
             paths = [path for _, path in records]
             if not eligible_bline_h40_quarantine(paths):
                 return None
+            owner_started = True
             touched.update(paths)
         parent = sha
 

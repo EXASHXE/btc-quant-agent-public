@@ -275,9 +275,9 @@ def test_14_complete_first_parent_graph_and_immutable_correction(tmp_path: Path)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text("# invented fixture\n", encoding="utf-8")
 
-    patch = "".join("M\t" + x + "\n" for x in sorted(planner.H40_R2_CORRECTION_PATHS))
+    correction_delta = "".join("M\t" + x + "\n" for x in sorted(planner.H40_R2_CORRECTION_PATHS))
     trial = "A\t" + source + "\nA\t" + own_test + "\n"
-    def factory(*, patch_delta=patch, trial_delta=trial,
+    def factory(*, patch_delta=correction_delta, trial_delta=trial,
                 parent_ok=True, merge=False, root_ok=True, history_ok=True):
         def fake_git(*args: str):
             if args[0] == "merge-base":
@@ -309,7 +309,7 @@ def test_14_complete_first_parent_graph_and_immutable_correction(tmp_path: Path)
         assert engineering_mode(changed) == "B_LINE_ENGINEERING"
     negative = (
         {"patch_delta": "M\t.github/workflows/ci.yml\n"}, # incomplete corrective patch
-        {"patch_delta": patch + "M\ttests/conftest.py\n"},
+        {"patch_delta": correction_delta + "M\ttests/conftest.py\n"},
         {"trial_delta": trial + "M\ttests/conftest.py\n"},
         {"trial_delta": "D\t" + source + "\n"},
         {"trial_delta": "R100\t" + source + "\tdocs/renamed.md\n"},
@@ -335,6 +335,56 @@ def test_14_complete_first_parent_graph_and_immutable_correction(tmp_path: Path)
         planner, "ROOT", tmp_path
     ):
         assert verified_bline_delta(changed) is None
+
+
+def test_14b_bounded_ci_correction_prefix_and_source_only_suffix(tmp_path: Path) -> None:
+    from scripts.ci import test_plan as planner
+
+    root = planner.BLINE_H40_ROOT_SHA
+    first = "a" * 40
+    repair = "b" * 40
+    candidate = "c" * 40
+    source = "scripts/strategy_research/g2_sparse_inference_synthetic_calibration_r1.py"
+    fixture = tmp_path / source
+    fixture.parent.mkdir(parents=True)
+    fixture.write_text("# invented fixture\n", encoding="utf-8")
+    primary = "".join("M\t" + x + "\n" for x in sorted(planner.H40_R2_CORRECTION_PATHS))
+    followup = "M\tscripts/ci/test_plan.py\nM\ttests/test_ci_test_plan.py\n"
+    source_change = "A\t" + source + "\n"
+
+    def fake_git(*args: str):
+        if args[0] == "merge-base":
+            return subprocess.CompletedProcess(args, 0, "", "")
+        if args == ("rev-parse", "HEAD"):
+            return subprocess.CompletedProcess(args, 0, candidate + "\n", "")
+        if args[:2] == ("rev-list", "--first-parent"):
+            return subprocess.CompletedProcess(
+                args, 0, "\n".join((first, repair, candidate)) + "\n", ""
+            )
+        if args[:2] == ("rev-list", "--parents"):
+            sha = args[-1]
+            parent = {first: root, repair: first, candidate: repair}[sha]
+            return subprocess.CompletedProcess(args, 0, f"{sha} {parent}\n", "")
+        if args[0] == "diff":
+            parents = tuple(args[-2:])
+            output = {
+                (root, first): primary,
+                (first, repair): followup,
+                (repair, candidate): source_change,
+            }[parents]
+            return subprocess.CompletedProcess(args, 0, output, "")
+        raise AssertionError(args)
+
+    with patch.object(planner, "git", side_effect=fake_git), patch.object(
+        planner, "ROOT", tmp_path
+    ):
+        assert verified_bline_delta([source]) == [source]
+        assert engineering_mode([source]) == "B_LINE_ENGINEERING"
+    fixture.unlink()
+    with patch.object(planner, "git", side_effect=fake_git), patch.object(
+        planner, "ROOT", tmp_path
+    ):
+        assert verified_bline_delta([source]) is None
 
 
 def test_15_plan_integrity_rejects_stale_sha_and_spoofed_metadata() -> None:
