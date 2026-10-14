@@ -499,3 +499,5 @@ def test_r2_required_feature_window_cannot_precede_clock_coverage():
     r = count([a], clock=Clock(12 * HOUR, 3 * DAY, known_at=12 * HOUR))
     assert r.pit_qualified == 0
     assert r.decisions[0].reason == "SOURCE_EVIDENCE_UNKNOWN"
+
+# Exact-parent final R2 synthetic GREEN focused CI evidence trigger.
