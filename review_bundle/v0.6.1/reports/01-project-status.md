@@ -1,0 +1,108 @@
+# Quant-agent v0.6 — Current Verified Project Status and Roadmap
+
+**As-of:** 2026-10-13  
+**Scope:** B-line Controller snapshot with A-line and Performance treated as independently governed programs.  
+**Headline:** **G0 technical foundation established; G1/G3 bounded offline capability; G2 broad real-public-history research completed but zero independently validated Alpha; G4 TESTNET and LIVE not authorized.**  
+**Status owner:** ChatGPT-0 B-line Primary Controller.
+
+**Strategic Replanning R1 (2026-10-13, current Controller decision):** BTCUSDT USDT-M long/short only; typical 4–24h max hold; approximately one **portfolio-admitted opportunity per 48 hours on average**, never forced, requiring positive realistically cost-adjusted independently supportable expectancy. Reference [objective](https://github.com/EXASHXE/btc-quant-agent-public/blob/198d0a931cfd610e86553c1f427c57ae60608a65/docs/project/V06_BTC_INTRADAY_STRATEGY_OBJECTIVE_AND_PORTFOLIO_RESEARCH_PLAN.md), [execution-cost plan](https://github.com/EXASHXE/btc-quant-agent-public/blob/198d0a931cfd610e86553c1f427c57ae60608a65/docs/project/V06_BTC_EXECUTION_COST_RECALIBRATION_PLAN.md), [science/debate ruling](https://github.com/EXASHXE/btc-quant-agent-public/blob/198d0a931cfd610e86553c1f427c57ae60608a65/reviews/v0.6/b_line/V06_G2_SCIENTIFIC_FINDINGS_DEBATE_CONTROLLER_ADJUDICATION_R1.md), [indicator matrix](https://github.com/EXASHXE/btc-quant-agent-public/blob/198d0a931cfd610e86553c1f427c57ae60608a65/docs/project/V06_BTC_INTRADAY_INDICATOR_VALUE_AND_SOURCE_READINESS_MATRIX_R1.md), [phase/dispatch matrix](https://github.com/EXASHXE/btc-quant-agent-public/blob/198d0a931cfd610e86553c1f427c57ae60608a65/docs/project/V06_B_LINE_PHASED_ROADMAP_AND_TASK_DISPATCH_MATRIX_R1.md). The previously rejected R4 21-endpoint/two-year plan stays blocked under its own assumptions, not as a universal proof of impossible power. F1–F3 shared max-T simultaneous inferences are UNCALIBRATED; H18 yearly narrative needs a non-destructive erratum. No strategy trial, heldout or trading authority.
+
+The canonical detailed register of BTC trading research is [V0.6 B-line Strategy Validation Register](V0.6_B_LINE_STRATEGY_VALIDATION_REGISTER.md), first published at immutable [f34d0b95](https://github.com/EXASHXE/btc-quant-agent-public/blob/f34d0b95eedf7b70a27f54bc8c25ef990480d51b/docs/project/V0.6_B_LINE_STRATEGY_VALIDATION_REGISTER.md). The operational authority and prompt-language policy are [ChatGPT-0 Controller role](../roles/V0.6_CHATGPT_0_PRIMARY_CONTROLLER.md) and [Gemini NORMAL/BOOST and CI execution policy](V0.6_GEMINI_MODE_ROUTING_AND_CI_EXECUTION_EFFICIENCY_POLICY.md).
+
+**Historical note:** This file replaces a chronological 107 KB accumulation of updates. The full pre-consolidation document remains immutably accessible at [docs SHA c9b08bd](https://github.com/EXASHXE/btc-quant-agent-public/blob/c9b08bd10bc8295f036354dc7273b276031c3af3/docs/project/V0.6_PROJECT_STATUS_AND_ROADMAP.md). Older sections such as “R3.1 pending,” “A public recorder not pushed,” or “Gemini A original 24 no-go” can be out of date or methodologically superseded. Preserve them as historical events, not live instructions.
+
+## 1. Executive project status
+
+| Stream / gate | Actual evidenced progress | Acceptance / what remains |
+| --- | --- | --- |
+| A-line / protected science | Managed under a separate Controller; H39/H40/H41/Forward and historical protected outcomes retained in their own governance | No cross-line data, policy or execution authority; no B-line permission to inspect them |
+| B-line G0 engineering | Base Tactical/MarketWatch integration and CI foundation established; v0.6 code base and branches available | Technical completion does not establish strategy performance |
+| B-line G1 DRY_RUN preview | Codex offline simulated approval/execution/recovery sidecar and Gemini G1/G3 offline ports tested; original G1 861a9d14; offline C 91495e5b; own focused CI 142/142 passed | Local synthetic/loopback only; operator authority, external LLM, Feishu and exchange actions not certified |
+| B-line G2 discovery | R3 finite 27-cell measured NO_GO; R4 independent read-only scientific forensics published | Zero Alpha PASS; R4 recommends NO_ADMISSIBLE_NEXT_STRATEGY_TRIAL under current data/method/power readiness; no new G2 outcome authority |
+| Public feed and A/B/C interface | Binance /public depth and /market price routed source with opt-in explicit Clash; short real observation; Gemini R3 exact code 97f4040b GitHub full CI 3454 passed / 2 skipped | Three-minute input not a 24h reliable observation; book_continuous=false, one rebootstrap, funding settlement-price identity and dedup still need exact negative evidence |
+| B-line G3 stability | Offline mock LLM/Feishu and local state restoration/restart exercises | **Real external provider/Feishu contract not accepted** |
+| B-line G4 release / TESTNET | Design and simulated gating only | **TESTNET NOT AUTHORIZED, LIVE_APPROVAL_ONLY NOT AUTHORIZED, AUTONOMOUS_LIVE FORBIDDEN, REAL_FUNDS_WRITE NONE** |
+| P1 strategy/accounting engine | Original and replacement P1 designs reached terminal NO-GO under cross-module semantic invariants | Do not reopen a third engine by default; use isolated alternative research |
+| P2 owner historical data | Owner supplied a possible WSL data root; S3A native reader admission attempts failed independent syscall/FD accounting and were parked | Owner Quant-agent/data including metadata is **not authorized** for current G2/Gemini tasks; no automatic P3/P4 |
+| Performance / CI | Gemini NORMAL b760a5e actual 52-focused-test CI; BOOST fdec02d full 3515/2 CI, 61 additional scientific/source tests | Both branches delivered; integration L2 and coverage merge pending, preserve manual/full/unknown-path fail-closed gates |
+
+### Important concrete CI references
+
+- [Gemini R3 full CI 38270967488](https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38270967488): exact code 97f4040b9380f2069575a989c066d1daeef15194, Python3.12 true full pytest **3,454 passed, 2 skipped, 9 warnings in 904.17 seconds**.
+- User-reported R3 own scoped suite: **394 tests in ~15.28 seconds locally**, not the same host or environment as remote full CI; do not claim an actual GitHub 59x end-to-end speedup from this ratio.
+- [Independent Codex R3 audit](https://github.com/EXASHXE/btc-quant-agent-public/blob/a64a33caf3323447daa09b4e15214894007b8dfe/docs/audits/r3_codex_causal_audit_r1/FOCUSED_DATA_ACCOUNTING_REVIEW.md): 20 local deterministic checks, 13 R2 baseline defect reproductions and 7 invariant controls reported; [CI 38276598851](https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38276598851) failed Ruff I001 before pytest, so not an independent green CI result. Old R2 findings do not automatically establish the same defect in repaired R3.
+
+## 2. Strategy research — validated status rather than branch count
+
+Read the [full strategy register](V0.6_B_LINE_STRATEGY_VALIDATION_REGISTER.md) for all families, candidate names, source periods, statistical strength and exact reports. Principal completed work:
+
+| Research family | What was actually measured | Latest admissible conclusion |
+| --- | --- | --- |
+| Original tactical R2 long/short breakout and trend-pullback | Eight 4h/12h strategy configurations with cost stress | No credible net-R PASS |
+| Codex public 2021–2025 April exploratory R1 | 12 real BTC public 1m candidates, 439,200 1m rows | **NO-GO**; April 2024/2025 historically exposed (not pristine OOS) |
+| Codex multi-season flow/regime R2 | Six candidates across 12 development folds 2021–2023, official source SHA and cost sensitivity | **DEVELOPMENT_NO_GO**, 0 promoted; R2 reserved 2024–2025 Feb/Jun/Sep/Dec not opened |
+| Gemini trend/flow Goal-A four waves | 24 candidates originally scored over 35 months | Original economics/method report materially inconsistent; corrected **23 original code-as-executed methods** rerun on genuine BTC minute price; 3 stress-positive but none robust/promotion-eligible |
+| Gemini range/reversal Goal-B four waves | Separate 24 candidates, 35 month developments, BASE/STRESS | All 24 failed strict stress-cost economic promotion; no Alpha |
+| Two corrected 12h leads — BTC Mark/Funding R3/R3.1 | Real 2021–2023 Last/Mark 1m records and 3,285 historic Funding settlements; eight daily gaps restored | Two positive 44-bp stress means **development-only**, 34/+11.2047bp and 55/+19.0135bp after modeled funding; negative 2023 and failed multiplicity/support gates |
+| Exit/horizon R1 | Two previously chosen 12h leads with 18h and 24h extensions and partial TP/break-even policies | **EXIT_R1_DIAGNOSTIC_INSUFFICIENT_SUPPORT**, no policy promoted |
+| H18 mechanism audit | Tail concentration: 4 W1 winners explain 98.064% and 3 W2 74.636% of 18h uplift; 26/56 12h TIME_CAP adverse | Diagnostic completed, NO Alpha; yearly narrative Table4 conflicts with machine/Exit R1 and requires sidecar erratum |
+| Flow / Funding / Mark-dislocation entry R1 | F1/F2 negative or sparse; F3 n12 descriptive-positive proxy | No promotion; shared max-T bootstrap is uncalibrated, F3 basis incremental contribution/PIT unknown |
+| Prospective shadow B | Synthetic six-cell candidate/engine interface | Research freeze invalid; engineering prototype only |
+| Codex entry × dynamic exit × hold R3 and forensic R4 | [R3 completed report](https://github.com/EXASHXE/btc-quant-agent-public/blob/a69ccfdfd578bd0b7d3aa43d75959a659f969782/docs/strategy_research/g2_r3/exit_aware_r3/DEVELOPMENT_27_CELL_RESULTS.md); [R4 audit](https://github.com/EXASHXE/btc-quant-agent-public/blob/98c99ae2690c9e771f65e8ef9dc6a2124d8d6c3f/docs/strategy_research/g2_r4_independent_science/G2_R3_INDEPENDENT_SCIENTIFIC_AUDIT.md) | R3_DEV_NO_GO, all 27 STRESS cells fail; R4 NO_ADMISSIBLE_NEXT_STRATEGY_TRIAL under currently declared finite source/power program, no Alpha. |
+
+**Numerically positive does not imply validation.** W1_C04 12h, n34, funding-aware stress +11.2047bp per trade and 2023 −21.0260bp; W2_C05 12h, n55, stress +19.0135bp and 2023 −45.4933bp. These outcomes use already-exposed 2021–2023 data and source/execution proxies, no independent OOS and no trading authority. [Exact R3.1 economics](https://github.com/EXASHXE/btc-quant-agent-public/blob/990c02b5479b3b14996f90fdbf677cb672ada81e/evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_ECONOMIC_RESULTS.json).
+
+**Exit semantics:** Earlier historical engines already used initial structure/ATR stops, 2R TP, stop-first conservative ambiguity and max holding caps; they did not simply sell every position at 8h/12h/24h. The newer tasks test event-driven partial TP, execution-aware break-even, ATR trails and 18h caps, not an unmeasured fixed-N-hour sale formula. See [Exit R1 receipts](https://github.com/EXASHXE/btc-quant-agent-public/blob/55ac4c631c69f6edbd275462ad23e4486b9782ed/evidence/v0.6/b_line/g2_exit_horizon_r1/EXIT_R1_RESULTS.json).
+
+## 3. Verified delivered parallel task submissions
+
+**All three task branches have now pushed exact-SHA receipts:** NORMAL b760a5e, BOOST fdec02d, Codex G2 R3 a69ccfd. This confirms deliverables, NOT cross-branch L2 integration or scientific Alpha. R4 audit branch final 98c99ae is separately verified.
+
+| Owner / model | Task, branch and exact starting code | Minimum terminal evidence |
+| --- | --- | --- |
+| Gemini NORMAL | b760a5e exact push; full ownership-based CI scope inspected | Delivered; 52 focused CI passes, separate L2 needed to include BOOST-added finance/PIT suites. |
+| Gemini BOOST | fdec02d exact push; full [CI 38333064146](https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38333064146) | Delivered; 3515 passed/2 skipped; C late Funding still blocked. |
+| Codex R3 + R4 independent science | [R3 outcome](https://github.com/EXASHXE/btc-quant-agent-public/blob/a69ccfdfd578bd0b7d3aa43d75959a659f969782/docs/strategy_research/g2_r3/exit_aware_r3/DEVELOPMENT_27_CELL_RESULTS.md); [R4 audit](https://github.com/EXASHXE/btc-quant-agent-public/blob/98c99ae2690c9e771f65e8ef9dc6a2124d8d6c3f/docs/strategy_research/g2_r4_independent_science/G2_R3_INDEPENDENT_SCIENTIFIC_AUDIT.md) | Delivered; R3 27/27 NO_GO, R4 7 audit artifacts, no new historical trial. |
+
+**Task acceptance owner:** ChatGPT-0 Controller L2 at final exact SHA, with independent Codex/auditor where consequential. No automatic merge between disjoint CI, source architecture and strategy branches. A merge shall preserve data source/cost semantics and test selection dependencies.
+
+## 4. Critical remaining blockers and their ordering
+
+1. **G2 source and science:** R3 27/27 STRESS NO_GO and R4 audit complete. No admissible next strategy trial without novel PIT-ready source/mechanism, power/coverage calibration and new Controller authority.
+2. **Financial semantics:** BOOST improved historic settlement Mark witnesses, signed-rate deduplication and invalid scalar protection; Consumer C still requires economic settlement vs late receiver-known-at contract repair, without backdating available-at.
+3. **L2 data:** true R3 180-second collection observed 4,730 public messages, 3 closed Last 1m, ~177s Mark, but **book_continuous=false, rebootstrap=1**, so L2 continuous trading-quality source not accepted. Correct 2026 Binance /public and /market routing and explicit user-authorized Clash route remain necessary; no TLS disabling or provider restriction evasion.
+4. **CI scalability:** NORMAL/BOOST deliverables exist; before merging reconcile focused test ownership for BOOST-added 61 tests and preserve exact-sha/full safety fallback.
+5. **Engineering-to-release:** once a truly independently validated G2 hypothesis exists, a separate exact-SHA G1/3 runtime integration, genuine LLM/Feishu connector, recovery, signed operator approval, and independently audited G4 testnet order/fill/stop/funding/reconciliation are still required.
+
+## 5. Roadmap and unlock sequence
+
+| Phase | Deliverables | Unlock condition |
+| --- | --- | --- |
+| P0 — Current environment | Preserve code/role authority and protected storage, publish English task prompts and CI identity | Exact-SHA record and write scope verified; no account/protected source access |
+| P1 — CI and architecture efficiency | NORMAL/BOOST completed and published exact CI receipts on separate branches | Independent cross-branch L2 integration and retained full/H40/H41 regression safety required |
+| P2 — Strategy and source quality | R3 27-cell NO_GO and R4 independent forensic design audit completed | Current next-strategy trial STOP; prerequisite source/PIT readiness and calibrated prospective-method power study, without scoring |
+| P3 — Scientific independent validation | Frozen unique candidate/method/execution/data SHA, multiplicity accounted, new separately authorized unseen source and independent verifier | Prospective PASS with proper support, full costs, PIT and independent method identity; **not currently available** |
+| P4 — G1/G3 integrated DRY_RUN | Real external LLM/Feishu without exchange trade privilege; simulator + restarts, authorization/control and invariants | Full release source/identity tests and independent runtime audit |
+| P5 — G4 TESTNET | Small testnet canary, actual order/fills/cancel/protection/funding, durable accounting, failure recovery and rollback | Independent TESTNET safety decision, no Alpha shortcut |
+| P6 — Explicit manual live canary | New separate real-money approval, independent pre-live execution audit, explicit risk/capital limits and kill switch | **No current permission**. Autonomous live not implied by any previous phase |
+
+**No time estimate or automatic next step is warranted by all-green unit tests.** Source-grade, scientific validity and operational readiness are independent requirements. A-line and Performance remain governed separately.
+
+## 6. Research data access / holdout ledger
+
+The earlier Codex R1 publicly replayed April 2021–2025; April 2024/25 is exposed. The separate Codex R2 reserved the Feb/Jun/Sep/Dec **2024–2025** months for future potential evaluation and did not consume them after dev NO_GO. Do **not** call all 2024–2025 years untouched OOS. No task may stat, list, open or copy reserved periods, protected 2026 Final Holdout, H39/H40/H41/Forward or owner Quant-agent/data/Quant-agent-sanitized without separate explicit rights. Source entitlement is not given simply because path is known.
+
+All public Binance Vision source usage requires provider checksums, period/cadence/schema and non-commercial data-license awareness. A provider SHA and dense 1-minute archive do not reconstruct a historically trustworthy receiver-known-at time without a separately documented assumption. No private Binance balance, keys, execution, funds or account action is authorized.
+
+## 7. Role, documents, handoff and prompt language
+
+- [B-line Controller role](../roles/V0.6_CHATGPT_0_PRIMARY_CONTROLLER.md) is the current authority summary for new ChatGPT-0 sessions.
+- [Strategy validation register](V0.6_B_LINE_STRATEGY_VALIDATION_REGISTER.md) is the canonical evidence matrix for campaign status and exact source links.
+- [Gemini NORMAL/BOOST execution policy](V0.6_GEMINI_MODE_ROUTING_AND_CI_EXECUTION_EFFICIENCY_POLICY.md) governs future model allocation and full-CI economics.
+- [A-line Controller role](../roles/V0.6_CHATGPT_A_LINE_PRIMARY_CONTROLLER.md) and [Supervisory Auditor role](../roles/V0.6_CHATGPT_1_SUPERVISORY_AUDITOR.md) are separately owned.
+- [Handover index](V0.6_NEW_CHAT_HANDOVER_INDEX.md) and [B-line bootstrap](../../prompts/v0.6/chat_handover/V06_NEW_CHAT_B_LINE_CONTROLLER.md) are entrypoints, not dispatch or protected-data grants.
+- Historical [full original roadmap as of docs c9b08bd](https://github.com/EXASHXE/btc-quant-agent-public/blob/c9b08bd10bc8295f036354dc7273b276031c3af3/docs/project/V0.6_PROJECT_STATUS_AND_ROADMAP.md) retains chronological claims for audit.
+
+**Language contract effective 2026-10-13: all NEW and UPDATED project documentation, Controller authorities, task/Goal prompts, status reports and agent test instructions must be authored IN ENGLISH.** Do not silently rewrite immutable historical Chinese prompt SHAs; a new future prompt must be a new English file. Conversational status may follow the owner's preferred language.
+
+**Mandatory delivery contract:** every delegated implementation push is a terminal non-force fast-forward to its exact authorized branch, followed by remote verification of HEAD/parent/changed scope and actual CI (distinguish skipped vs true pytest). A reported task complete without committed remote work is NOT yet a deliverable. Executed development outcomes are not independent Alpha without a separately authorized verifier.
