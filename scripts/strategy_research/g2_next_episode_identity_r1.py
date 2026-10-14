@@ -1,7 +1,9 @@
 """Synthetic-only causal episode accounting; no feeds, outcomes, fills or rate inference.
 
 Times are integer seconds on an invented clock; zone coordinates are invented ticks.
-Intervals are half-open. Seed windows/zones, cooldown and holds are precommitted
+Intervals are half-open. R2 requires explicit invented receiver/closed-bar and
+feature-window evidence, never inferring confirmation from a state label.
+Legacy source_identity_hash is a SYNTHETIC_OPAQUE_ID, not a verified hash. Seed windows/zones, cooldown and holds are precommitted
 inputs, never inferred from confirmations. Replay a prefix with ``as_of`` to audit PIT.
 """
 
@@ -32,6 +34,7 @@ class Seed:
     cooldown_seconds: int = 0
     planned_hold_seconds: int = 4 * HOUR
     plan_known_at: int = 0
+    source_identity_kind: str = "SYNTHETIC_OPAQUE_ID"
 
     def __post_init__(self) -> None:
         if not 4 * HOUR <= self.planned_hold_seconds <= 24 * HOUR:
@@ -39,7 +42,9 @@ class Seed:
         if self.plan_known_at > self.first_known_at:
             raise ValueError("hold must be precommitted by seed first-known")
         if not self.structure_id or not self.source_identity_hash:
-            raise ValueError("original causal structure and source identity required")
+            raise ValueError("original causal structure and synthetic source ID required")
+        if self.source_identity_kind != "SYNTHETIC_OPAQUE_ID":
+            raise ValueError("source-qualified identity requires an external admitted contract")
         if not self.window_start <= self.first_known_at < self.window_end:
             raise ValueError("seed first-known must lie in its precommitted window")
         if self.zone_low >= self.zone_high or self.cooldown_seconds < 0:
@@ -68,6 +73,18 @@ class Alert:
     quote_known_at: int = 0
     hypothetical_admission_requested: bool = False
     admission_known_at: int = 0
+    # V2 explicit synthetic receipt witnesses; None is never positive evidence.
+    confirmation_bar_start: int | None = None
+    confirmation_bar_end: int | None = None
+    confirmation_received_at: int | None = None
+    confirmation_receiver_witnessed: bool = False
+    price_window_start: int | None = None
+    price_window_end: int | None = None
+    oi_source_status: str = "UNKNOWN"
+    oi_window_start: int | None = None
+    oi_window_end: int | None = None
+    quote_window_start: int | None = None
+    quote_window_end: int | None = None
 
     def __post_init__(self) -> None:
         if self.confirmation_minutes not in (5, 15, 30):
@@ -78,6 +95,9 @@ class Alert:
             raise ValueError("invalid state")
         if not self.connection_epoch:
             raise ValueError("connection epoch required")
+        if self.oi_source_status not in ("UNKNOWN", "COMPLETE"):
+            raise ValueError("OI source status must be explicit")
+
 
     @property
     def replay_key(self) -> str:
@@ -138,6 +158,71 @@ class Accounting:
     calendar_clock_hours: float
     eligible_clock_hours: float
     rate_status: str = "RATE_NOT_ADMITTED"
+    contract_version: str = "SYNTHETIC_EPISODE_CAUSAL_V2"
+    source_qualified: int = 0
+    source_status: str = "SOURCE_IDENTITY_UNVERIFIED"
+
+
+
+def _complete_span(start: int | None, end: int | None, *, latest: int) -> bool:
+    return start is not None and end is not None and start < end <= latest
+
+
+def _confirmed_bar_pit(a: Alert) -> bool:
+    duration = a.confirmation_minutes * 60
+    start, end, received = (
+        a.confirmation_bar_start, a.confirmation_bar_end, a.confirmation_received_at
+    )
+    return bool(
+        a.confirmation_receiver_witnessed
+        and start is not None
+        and end is not None
+        and received is not None
+        and end - start == duration
+        and start % duration == 0
+        and end <= received <= a.decision_at
+        and a.state_known_at >= received
+    )
+
+
+def _contributing_windows(a: Alert) -> tuple[tuple[int, int], ...] | None:
+    """Every required feature is a closed, bounded, predecision invented span."""
+    if not _complete_span(
+        a.price_window_start, a.price_window_end, latest=a.decision_at
+    ):
+        return None
+    if not _confirmed_bar_pit(a):
+        return None
+    assert a.confirmation_bar_start is not None
+    assert a.confirmation_bar_end is not None
+    assert a.price_window_start is not None
+    assert a.price_window_end is not None
+    spans = [
+        (a.price_window_start, a.price_window_end),
+        (a.confirmation_bar_start, a.confirmation_bar_end),
+    ]
+    # The price feature must include the entire confirmation bar.
+    if (
+        a.price_window_start > a.confirmation_bar_start
+        or a.price_window_end < a.confirmation_bar_end
+    ):
+        return None
+    if a.oi_source_status == "COMPLETE":
+        if (
+            not _complete_span(a.oi_window_start, a.oi_window_end, latest=a.decision_at)
+            or a.oi_window_end != a.oi_event_at
+        ):
+            return None
+        assert a.oi_window_start is not None and a.oi_window_end is not None
+        spans.append((a.oi_window_start, a.oi_window_end))
+    if a.quote_screen_passed:
+        if not _complete_span(
+            a.quote_window_start, a.quote_window_end, latest=a.decision_at
+        ):
+            return None
+        assert a.quote_window_start is not None and a.quote_window_end is not None
+        spans.append((a.quote_window_start, a.quote_window_end))
+    return tuple(spans)
 
 
 def count_episodes(
@@ -192,13 +277,13 @@ def count_episodes(
             assert eid is not None
             if eid in seeds and seeds[eid] != seed:
                 raise ValueError("same causal seed has conflicting precommitted definitions")
-            seeds[eid] = seed
             parent = seed.parent_episode_id
             family = (seed.source_identity_hash, seed.structure_id)
             previous = lineage.get(family)
-            lineage.setdefault(family, eid)
             if a.state_known_at > a.decision_at:
+                # Neither cohort nor lineage may be reserved by invalid future evidence.
                 reason = "FUTURE_STATE"
+                unknown += 1
             elif (previous is not None and previous != eid and parent != previous) or (
                 parent is not None
                 and (
@@ -207,37 +292,59 @@ def count_episodes(
                     or parent == eid
                 )
             ):
+                seeds[eid] = seed
+                lineage.setdefault(family, eid)
                 reason = "REARM_NOT_CAUSAL"
             elif a.state == "INVALIDATED":
+                seeds[eid] = seed
                 lineage[family] = eid
                 invalidated.setdefault(eid, a.decision_at)
                 reason = "INVALIDATED"
             elif eid in invalidated:
+                seeds[eid] = seed
                 reason = "INVALIDATED"
             elif a.state == "PROVISIONAL":
+                seeds[eid] = seed
                 lineage[family] = eid
                 reason = "PROVISIONAL"
             elif not (
                 seed.window_start <= a.decision_at < seed.window_end
                 and seed.zone_low <= a.zone_tick < seed.zone_high
             ):
+                seeds[eid] = seed
+                lineage.setdefault(family, eid)
                 reason = "OUTSIDE_PRECOMMITTED_EQUIVALENCE"
             elif len(simultaneous.get((eid, a.decision_at), set())) > 1 or (
                 eid in sides and sides[eid] != a.side
             ):
+                seeds[eid] = seed
+                lineage.setdefault(family, eid)
                 reason = "SIDE_CONFLICT"
             else:
+                seeds[eid] = seed
                 lineage[family] = eid
                 sides[eid] = a.side
-                if a.source_gap or _overlap(
-                    a.decision_at, a.decision_at + 1, clock.missing + clock.censored
-                ):
+                spans = _contributing_windows(a)
+                if a.source_gap:
                     reason = "SOURCE_GAP"
+                elif not _confirmed_bar_pit(a):
+                    reason = "CONFIRMATION_NOT_PIT"
+                elif not _complete_span(
+                    a.price_window_start, a.price_window_end, latest=a.decision_at
+                ):
+                    reason = "PRICE_EVIDENCE_UNKNOWN"
+                elif a.oi_source_status != "COMPLETE":
+                    reason = "OI_UNKNOWN"
                 elif not (
                     a.oi_event_at <= a.oi_received_at <= a.decision_at
                     and 0 <= a.decision_at - a.oi_event_at <= max_oi_age_seconds
                 ):
                     reason = "OI_NOT_PIT"
+                elif spans is None:
+                    reason = "SOURCE_EVIDENCE_UNKNOWN"
+                elif any(_overlap(start, end, clock.missing + clock.censored)
+                         for start, end in spans):
+                    reason = "SOURCE_GAP"
                 else:
                     pit.add(eid)
                     reason = "PIT_QUALIFIED"

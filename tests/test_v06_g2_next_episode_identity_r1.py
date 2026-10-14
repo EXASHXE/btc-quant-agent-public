@@ -25,20 +25,55 @@ def seed(name="structure-A", **changes):
     return replace(Seed(name, 12 * HOUR, "synthetic-source-hash", 0, 3 * DAY, 10, 20), **changes)
 
 
+def bar_witness(decision_at: int, minutes: int) -> dict:
+    duration = minutes * 60
+    bar_end = decision_at - decision_at % duration
+    bar_start = bar_end - duration
+    return {
+        "confirmation_bar_start": bar_start,
+        "confirmation_bar_end": bar_end,
+        "confirmation_received_at": bar_end,
+        "confirmation_receiver_witnessed": True,
+        "price_window_start": bar_start,
+        "price_window_end": bar_end,
+    }
+
+
 def alert(s=None, **changes):
+    decision = changes.pop("decision_at", 12 * HOUR + 5 * 60)
+    minutes = changes.pop("confirmation_minutes", 5)
+    oi_event = changes.pop("oi_event_at", 12 * HOUR)
+    oi_received = changes.pop("oi_received_at", 12 * HOUR + 60)
+    quote = changes.get("quote_screen_passed", False)
+    window = bar_witness(decision, minutes)
+    witness = {
+        **window,
+        "decision_at": decision,
+        "confirmation_minutes": minutes,
+        "oi_event_at": oi_event,
+        "oi_received_at": oi_received,
+        "oi_source_status": "COMPLETE",
+        "oi_window_start": oi_event - 60,
+        "oi_window_end": oi_event,
+        "state_known_at": window["confirmation_received_at"],
+    }
+    if quote:
+        witness.update({
+            "quote_window_start": decision - 60,
+            "quote_window_end": decision,
+            "quote_known_at": decision,
+        })
+    witness.update(changes)
     return replace(
         Alert(
             seed() if s is None else s,
-            12 * HOUR + 5 * 60,
-            5,
+            decision,
+            minutes,
             "LONG",
             15,
             "epoch-1",
-            state_known_at=12 * HOUR,
-            oi_event_at=12 * HOUR,
-            oi_received_at=12 * HOUR + 60,
         ),
-        **changes,
+        **witness,
     )
 
 
@@ -71,8 +106,10 @@ def test_1205_1215_1230_same_original_seed():
     a = alert(quote_screen_passed=True, hypothetical_admission_requested=True)
     rows = [
         a,
-        replace(a, decision_at=12 * HOUR + 15 * 60, confirmation_minutes=15),
-        replace(a, decision_at=12 * HOUR + 30 * 60, confirmation_minutes=30),
+        alert(a.seed, decision_at=12 * HOUR + 15 * 60, confirmation_minutes=15,
+              quote_screen_passed=True, hypothetical_admission_requested=True),
+        alert(a.seed, decision_at=12 * HOUR + 30 * 60, confirmation_minutes=30,
+              quote_screen_passed=True, hypothetical_admission_requested=True),
     ]
     r = count(rows)
     assert (
@@ -90,7 +127,7 @@ def test_reconnect_replay_permutation_and_stable_ids():
     rows = [
         a,
         replace(a, connection_epoch="epoch-2"),
-        replace(a, confirmation_minutes=15, decision_at=12 * HOUR + 900),
+        alert(a.seed, confirmation_minutes=15, decision_at=12 * HOUR + 900),
     ]
     expected = count(rows)
     for order in permutations(rows):
@@ -318,7 +355,8 @@ def test_simultaneous_invalidation_precedes_confirmation():
 def test_future_evidence_changes_never_change_canonical_seed_identity():
     a = alert(oi_received_at=14 * HOUR)
     b = replace(a, oi_received_at=20 * HOUR, state_known_at=18 * HOUR)
-    assert count([a]).episode_ids == count([b]).episode_ids
+    assert count([a]).episode_ids == (seed().episode_id,)
+    assert count([b]).episode_ids == ()  # FUTURE_STATE cannot reserve a cohort.
     assert count([a]).pit_qualified == count([b]).pit_qualified == 0
 
 
@@ -355,7 +393,7 @@ def test_r2_e02_future_state_must_not_poison_later_valid_seed() -> None:
     new = seed(first_known_at=12 * HOUR + 10 * 60)
     valid = alert(
         new, decision_at=12 * HOUR + 15 * 60,
-        state_known_at=12 * HOUR + 10 * 60,
+        state_known_at=12 * HOUR + 15 * 60,
         oi_event_at=12 * HOUR + 10 * 60,
         oi_received_at=12 * HOUR + 11 * 60,
     )
@@ -385,3 +423,64 @@ def test_r2_e04_opaque_source_id_cannot_be_source_qualified() -> None:
     assert r.source_qualified == 0
     assert r.source_status == "SOURCE_IDENTITY_UNVERIFIED"
     assert r.rate_status == "RATE_NOT_ADMITTED"
+
+
+def test_r2_e01_prior_closed_30m_witness_qualifies_at_1205():
+    a = alert(
+        confirmation_minutes=30,
+        confirmation_bar_start=11 * HOUR + 30 * 60,
+        confirmation_bar_end=12 * HOUR,
+        confirmation_received_at=12 * HOUR + 2 * 60,
+        confirmation_receiver_witnessed=True,
+        state_known_at=12 * HOUR + 2 * 60,
+        price_window_start=11 * HOUR + 30 * 60,
+        price_window_end=12 * HOUR,
+    )
+    assert count([a]).pit_qualified == 1
+
+
+def test_r2_e01_missing_bar_or_receiver_proof_stays_unqualified():
+    a = alert()
+    for changed in (
+        {"confirmation_receiver_witnessed": False},
+        {"confirmation_received_at": None},
+        {"confirmation_bar_end": None},
+        {"confirmation_bar_start": None},
+    ):
+        assert count([replace(a, **changed)]).pit_qualified == 0
+
+
+def test_r2_e02_authentic_provisional_reservation_is_not_lost():
+    original = seed()
+    other = seed(first_known_at=13 * HOUR)
+    rows = [alert(original, state="PROVISIONAL"), alert(other, decision_at=13 * HOUR)]
+    r = count(rows)
+    assert r.decisions[-1].reason == "REARM_NOT_CAUSAL"
+    assert r.pit_qualified == 0
+
+
+@pytest.mark.parametrize("stage", ["price", "confirmation", "quote", "oi"])
+def test_r2_e03_each_required_window_gap_blocks(stage):
+    a = alert(quote_screen_passed=True, hypothetical_admission_requested=True)
+    intervals = {
+        "price": (a.price_window_start, a.price_window_end),
+        "confirmation": (a.confirmation_bar_start, a.confirmation_bar_end),
+        "quote": (a.quote_window_start, a.quote_window_end),
+        "oi": (a.oi_window_start, a.oi_window_end),
+    }
+    start, end = intervals[stage]
+    assert start is not None and end is not None
+    assert count([a], clock=replace(CLOCK, censored=((start, end),))).pit_qualified == 0
+
+
+def test_r2_e03_unknown_oi_is_not_complete_oi():
+    a = alert(oi_source_status="UNKNOWN")
+    r = count([a])
+    assert r.pit_qualified == 0 and r.decisions[0].reason == "OI_UNKNOWN"
+
+
+def test_r2_e04_source_qualified_identity_cannot_be_forged_by_string():
+    s = seed(source_identity_hash="a" * 64)
+    assert count([alert(s)]).source_qualified == 0
+    with pytest.raises(ValueError, match="external admitted contract"):
+        seed(source_identity_kind="SHA256_VERIFIED")
