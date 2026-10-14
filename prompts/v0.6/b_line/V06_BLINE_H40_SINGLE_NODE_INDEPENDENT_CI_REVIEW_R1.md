@@ -1,0 +1,10 @@
+# Independent CI Governance Audit — Single H40 Node Quarantine vs Full Gate
+
+**Reviewer:** independent Codex Sol / ChatGPT-1, not patch author. **Controller:** ChatGPT-0, authority exact SHA containing this prompt. Do not audit a moving branch head.
+**Target prerequisite:** Executor must publish exact full commit SHA and file blob identities for the three allowed paths on `repair/v06-bline-ci-single-h40-node-quarantine-r1`, base `13e3a710b137efeec2e21e3002f748834ec0cc22`. Missing target => `INCOMPLETE_TARGET_UNFROZEN`. Read exact Controller L2 memo in this same dispatch commit.
+
+Reproduce and adversarially challenge the eligibility predicate with invented Git diffs and targeted pytest/CI diagnostics. Verify that B-line status cannot pass with unknown/unfetched base, modified H40/H41/science/test harness, renamed/deleted protected file, changed CI scripts/workflow, or altered shared dependencies. Verify the exact node `tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph` alone may be deselected and is explicitly counted as deselected (not passed), that all other H40, Funding/PIT/C4, cost, safety and G1/G3 tests still fail when broken; that full and scheduled/manual/RC/integration workflows retain original tests and fail closed. Try bypass by changed branch name, tampered plan receipt, stale CI metadata, missing JUnit, and malformed Git test-node syntax. Reject broad test globs or `continue-on-error`/pytest global skip.
+
+Independent audit output must distinguish actual observed B-line engineering gate from the separate full gate. No protected H40 contents/golden read, historical PnL, external feeds, account data or trading. No auto branch-policy modification, merge or acceptance self-attestation.
+
+**Allowed write:** one NEW `reviews/v0.6/b_line/V06_BLINE_SINGLE_H40_NODE_QUARANTINE_INDEPENDENT_AUDIT_R1.md` on isolated docs branch from exact Controller dispatch commit. Terminal `REVIEW_PASS_LIMITED_BLINE_ENGINEERING`, `REVIEW_FAIL` or `INCOMPLETE`. The new scoped green remains documentation and engineering evidence only, NOT Alpha/TESTNET/RC/release acceptance.
