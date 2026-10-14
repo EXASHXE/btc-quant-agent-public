@@ -484,3 +484,18 @@ def test_r2_e04_source_qualified_identity_cannot_be_forged_by_string():
     assert count([alert(s)]).source_qualified == 0
     with pytest.raises(ValueError, match="external admitted contract"):
         seed(source_identity_kind="SHA256_VERIFIED")
+
+
+def test_r2_quote_receiver_clock_must_follow_quote_window():
+    a = alert(quote_screen_passed=True, quote_known_at=12 * HOUR)
+    r = count([a])
+    assert r.pit_qualified == 1
+    assert r.quote_screened_conditional == 0
+    assert r.decisions[0].reason == "QUOTE_NOT_PIT"
+
+
+def test_r2_required_feature_window_cannot_precede_clock_coverage():
+    a = alert()
+    r = count([a], clock=Clock(12 * HOUR, 3 * DAY, known_at=12 * HOUR))
+    assert r.pit_qualified == 0
+    assert r.decisions[0].reason == "SOURCE_EVIDENCE_UNKNOWN"

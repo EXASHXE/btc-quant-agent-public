@@ -340,7 +340,9 @@ def count_episodes(
                     and 0 <= a.decision_at - a.oi_event_at <= max_oi_age_seconds
                 ):
                     reason = "OI_NOT_PIT"
-                elif spans is None:
+                elif spans is None or any(
+                    start < clock.start or end > clock.end for start, end in spans
+                ):
                     reason = "SOURCE_EVIDENCE_UNKNOWN"
                 elif any(_overlap(start, end, clock.missing + clock.censored)
                          for start, end in spans):
@@ -348,7 +350,11 @@ def count_episodes(
                 else:
                     pit.add(eid)
                     reason = "PIT_QUALIFIED"
-                    if a.quote_screen_passed and a.quote_known_at > a.decision_at:
+                    if a.quote_screen_passed and (
+                        a.quote_known_at > a.decision_at
+                        or a.quote_window_end is None
+                        or a.quote_known_at < a.quote_window_end
+                    ):
                         reason = "QUOTE_NOT_PIT"
                     elif a.quote_screen_passed:
                         quotes.add(eid)
