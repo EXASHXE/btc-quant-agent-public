@@ -262,53 +262,79 @@ def test_13_exact_finite_bline_ownership_and_full_fallbacks() -> None:
     assert engineering_mode(["docs/project/readme.md"]) == "none"
 
 
-def test_14_immutable_git_diff_ownership_with_synthetic_status(tmp_path: Path) -> None:
+def test_14_complete_first_parent_graph_and_immutable_correction(tmp_path: Path) -> None:
     from scripts.ci import test_plan as planner
+
+    root = planner.BLINE_H40_ROOT_SHA
+    patch_sha = "a" * 40
+    trial_sha = "b" * 40
     source = "scripts/strategy_research/g2_sparse_inference_synthetic_calibration_r1.py"
     own_test = "tests/test_v06_g2_sparse_inference_synthetic_calibration_r1.py"
     for name in (source, own_test):
-        location = tmp_path / name
-        location.parent.mkdir(parents=True, exist_ok=True)
-        location.write_text("# invented fixture\n", encoding="utf-8")
-    cases = (
-        ("A\t" + source + "\n", [source]),
-        ("A\t" + source + "\nA\t" + own_test + "\n", [source, own_test]),
-        ("D\t" + source + "\n", None),
-        ("A\t" + source + "\nA\tdocs/moved.md\n", None),
-        ("A\t" + source + "\nM\t.github/workflows/ci.yml\n", None),
-        ("M\ttests/conftest.py\n", None),
-        ("A\t" + source + "\nD\ttests/test_security.py\n", None),
-        ("R100\ttests/test_security.py\tdocs/moved.md\n", None),
-        ("", None),
-    )
-    def make_git(diff_output: str):
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("# invented fixture\n", encoding="utf-8")
+
+    patch = "".join("M\t" + x + "\n" for x in sorted(planner.H40_R2_CORRECTION_PATHS))
+    trial = "A\t" + source + "\nA\t" + own_test + "\n"
+    def factory(*, patch_delta=patch, trial_delta=trial,
+                parent_ok=True, merge=False, root_ok=True, history_ok=True):
         def fake_git(*args: str):
-            if args[0] == "rev-parse":
-                assert args == ("rev-parse", "--verify", "refs/remotes/origin/v0.6")
-                return subprocess.CompletedProcess(["git"], 0, "a" * 40 + "\n", "")
             if args[0] == "merge-base":
-                assert args == ("merge-base", "--is-ancestor", "a" * 40, "HEAD")
-                return subprocess.CompletedProcess(["git"], 0, "", "")
-            assert args[:3] == ("diff", "--no-renames", "--name-status")
-            return subprocess.CompletedProcess(["git"], 0, diff_output, "")
+                return subprocess.CompletedProcess(args, 0 if root_ok else 1, "", "")
+            if args == ("rev-parse", "HEAD"):
+                return subprocess.CompletedProcess(args, 0, trial_sha + "\n", "")
+            if args[0] == "rev-list" and args[1] == "--first-parent":
+                chain = patch_sha + "\n" + trial_sha + "\n" if history_ok else patch_sha + "\n"
+                return subprocess.CompletedProcess(args, 0, chain, "")
+            if args[0] == "rev-list" and args[1] == "--parents":
+                at = args[-1]
+                p = root if at == patch_sha else patch_sha
+                return subprocess.CompletedProcess(
+                    args, 0, at + " " + p + (" " + root if merge else "") + "\n"
+                    if parent_ok else at + " " + root + "\n", "",
+                )
+            if args[0] == "diff":
+                prev, nxt = args[-2:]
+                body = patch_delta if (prev, nxt) == (root, patch_sha) else trial_delta
+                return subprocess.CompletedProcess(args, 0, body, "")
+            raise AssertionError(f"Unexpected fabricated Git operation: {args}")
         return fake_git
-    for diff, expected in cases:
-        changed = expected or [line.split("\t")[-1] for line in diff.splitlines() if line]
-        with patch.object(planner, "git", side_effect=make_git(diff)), patch.object(
-            planner, "ROOT", tmp_path
-        ):
-            assert verified_bline_delta(changed) == expected
-            if expected:
-                assert engineering_mode(changed) == "B_LINE_ENGINEERING"
-    with patch.object(planner, "git", return_value=subprocess.CompletedProcess(
-        ["git"], 128, "", "missing base"
-    )):
-        assert verified_bline_delta([source]) is None
-    (tmp_path / source).unlink()
-    with patch.object(planner, "git", side_effect=make_git("A\t" + source + "\n")), patch.object(
+
+    changed = [source, own_test]
+    with patch.object(planner, "git", side_effect=factory()), patch.object(
         planner, "ROOT", tmp_path
     ):
-        assert verified_bline_delta([source]) is None
+        assert verified_bline_delta(changed) == sorted(changed)
+        assert engineering_mode(changed) == "B_LINE_ENGINEERING"
+    negative = (
+        {"patch_delta": "M\t.github/workflows/ci.yml\n"}, # incomplete corrective patch
+        {"patch_delta": patch + "M\ttests/conftest.py\n"},
+        {"trial_delta": trial + "M\ttests/conftest.py\n"},
+        {"trial_delta": "D\t" + source + "\n"},
+        {"trial_delta": "R100\t" + source + "\tdocs/renamed.md\n"},
+        {"trial_delta": ""},
+        {"root_ok": False},
+        {"history_ok": False},
+        {"merge": True},
+        {"parent_ok": False},
+    )
+    for kwargs in negative:
+        with patch.object(planner, "git", side_effect=factory(**kwargs)), patch.object(
+            planner, "ROOT", tmp_path
+        ):
+            assert verified_bline_delta(changed) is None
+            assert engineering_mode(changed) == "full"
+    with patch.object(planner, "git", side_effect=factory()), patch.object(
+        planner, "ROOT", tmp_path
+    ):
+        assert verified_bline_delta(None) is None
+        assert verified_bline_delta([]) is None
+    (tmp_path / source).unlink()
+    with patch.object(planner, "git", side_effect=factory()), patch.object(
+        planner, "ROOT", tmp_path
+    ):
+        assert verified_bline_delta(changed) is None
 
 
 def test_15_plan_integrity_rejects_stale_sha_and_spoofed_metadata() -> None:

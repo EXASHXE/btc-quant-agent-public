@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Fetch v0.6 immutable base for merge-base resolution
+      - name: Fetch v0.6 for risk-plan base resolution (not H40 quarantine trust anchor)
         run: |
           git fetch --no-tags origin +refs/heads/v0.6:refs/remotes/origin/v0.6 || true
       - name: Ensure cache directory exists for docs-only/zero-pip FAST paths

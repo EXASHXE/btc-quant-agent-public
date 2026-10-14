@@ -26,7 +26,7 @@ HISTORICAL_EXE001 = {
 KNOWN_EXE001 = {p for p in HISTORICAL_EXE001 if (ROOT / p).is_file()}
 
 IMMUTABLE_V06_BASE_SHA = "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
-BLINE_H40_BASE_SHA = "13e3a710b137efeec2e21e3002f748834ec0cc22"
+BLINE_H40_ROOT_SHA = "99cc32a8de78538dcf7f8a131b9c3f65bad76863"
 H40_QUARANTINED_NODE = (
     "tests/test_v051_h40_m3a_production_discovery_producer.py"
     "::test_p09_through_p18_exact_scientific_graph"
@@ -224,45 +224,94 @@ def eligible_bline_h40_quarantine(paths: list[str] | None) -> bool:
     )
 
 
-def verified_bline_delta(changed: list[str] | None) -> list[str] | None:
-    """Proof of complete changes since the controlled, fetched v0.6 integration base.
+# R2: exact R1 code is the immutable genealogy root. The first descendant
+# is the isolated 3-file correction itself, never eligible on its own. Only
+# subsequent B-line-only commits may enter this engineering-only mode.
+H40_R2_CORRECTION_PATHS = frozenset({
+    ".github/workflows/ci.yml",
+    "scripts/ci/test_plan.py",
+    "tests/test_ci_test_plan.py",
+})
 
-    Current CI self-patch must fail this gate; eligible descendant branches only
-    become possible after Controller integration of the independently reviewed patch.
-    """
-    if not eligible_bline_h40_quarantine(changed):
+
+def _git_status_delta(parent: str, child: str) -> list[tuple[str, str]] | None:
+    """Parse every entry without rename detection, accepting only A/M records."""
+    result = git("diff", "--no-renames", "--name-status", parent, child)
+    if result.returncode != 0:
         return None
-    baseline = git("rev-parse", "--verify", "refs/remotes/origin/v0.6")
-    if baseline.returncode != 0 or not re.fullmatch(r"[a-f0-9]{40}", baseline.stdout.strip()):
-        return None
-    base_sha = baseline.stdout.strip()
-    if git("merge-base", "--is-ancestor", base_sha, "HEAD").returncode != 0:
-        return None
-    result = git("diff", "--no-renames", "--name-status", base_sha, "HEAD")
-    if result.returncode != 0 or not result.stdout.strip():
-        return None
-    paths: list[str] = []
+    entries: list[tuple[str, str]] = []
     for line in result.stdout.splitlines():
         parts = line.split("\t")
-        if len(parts) != 2 or parts[0] not in ("A", "M"):
+        if len(parts) != 2 or parts[0] not in ("A", "M") or not parts[1]:
             return None
-        paths.append(parts[1])
-    if sorted(paths) != sorted(changed or []):
+        entries.append((parts[0], parts[1]))
+    return entries
+
+
+def verified_bline_delta(changed: list[str] | None) -> list[str] | None:
+    """Validate all first-parent commits from immutable R1, including corrections.
+
+    First child: exactly three preauthorized CI modifications; no quarantine.
+    Later children: only exact B-line-owned add/modify paths, no merge,
+    delete, rename, change to CI or return to an earlier tree.
+    The R1 root and the later correction SHA are independently audit-frozen.
+    """
+    if changed is None or not changed:
         return None
-    if not all(
-        (ROOT / path).is_file() and not (ROOT / path).is_symlink()
-        for path in paths
-    ):
+    if git("merge-base", "--is-ancestor", BLINE_H40_ROOT_SHA, "HEAD").returncode:
         return None
-    return paths
+    head = git("rev-parse", "HEAD")
+    if head.returncode or not re.fullmatch(r"[a-f0-9]{40}", head.stdout.strip()):
+        return None
+    history = git("rev-list", "--first-parent", "--reverse", f"{BLINE_H40_ROOT_SHA}..HEAD")
+    if history.returncode:
+        return None
+    chain = history.stdout.splitlines()
+    if len(chain) < 2 or chain[-1] != head.stdout.strip():
+        return None
+
+    parent = BLINE_H40_ROOT_SHA
+    correction = chain[0]
+    touched: set[str] = set()
+    for index, sha in enumerate(chain):
+        if not re.fullmatch(r"[a-f0-9]{40}", sha):
+            return None
+        parents = git("rev-list", "--parents", "-n", "1", sha)
+        if parents.returncode or parents.stdout.split() != [sha, parent]:
+            return None  # includes all merge commits and ambiguous ancestry
+        records = _git_status_delta(parent, sha)
+        if not records:
+            return None
+        if index == 0:
+            if sorted(records) != sorted(
+                ("M", name) for name in H40_R2_CORRECTION_PATHS
+            ):
+                return None
+        else:
+            paths = [path for _, path in records]
+            if not eligible_bline_h40_quarantine(paths):
+                return None
+            touched.update(paths)
+        parent = sha
+
+    # Validate the cumulative delta against the frozen correction, not just
+    # the last push, and reject any change whose intermediate history was unsafe.
+    net = _git_status_delta(correction, head.stdout.strip())
+    if not net or not eligible_bline_h40_quarantine([path for _, path in net]):
+        return None
+    net_paths = sorted(path for _, path in net)
+    if net_paths != sorted(touched):
+        return None
+    if not all((ROOT / name).is_file() and not (ROOT / name).is_symlink()
+               for name in net_paths):
+        return None
+    return net_paths
 
 
 def engineering_mode(changed: list[str] | None) -> str:
-    """Preserve docs fast path; only verified full-tree owner diffs quarantine."""
+    """Default to unmodified full; docs-only keeps inherited fast path."""
     if changed and classify(changed)["mode"] == "none":
         return "none"
-    if not changed:
-        return "full"
     return "B_LINE_ENGINEERING" if verified_bline_delta(changed) is not None else "full"
 
 
