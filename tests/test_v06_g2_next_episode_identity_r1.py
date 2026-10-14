@@ -333,3 +333,55 @@ def test_downstream_stage_evidence_cannot_backfill_decision(stage):
     assert r.decisions[0].reason == f"{stage.upper()}_NOT_PIT"
     assert count([a], as_of=a.decision_at + HOUR).hypothetical_portfolio_admitted == 0
     conserve(r)
+
+
+# R2 independently falsifiable invented-clock regressions (E01-E04).
+def test_r2_e01_unclosed_30m_confirmation_must_not_be_pit() -> None:
+    a = alert(
+        confirmation_minutes=30,
+        confirmation_bar_start=12 * HOUR,
+        confirmation_bar_end=12 * HOUR + 30 * 60,
+        confirmation_received_at=12 * HOUR + 30 * 60,
+        confirmation_receiver_witnessed=True,
+    )
+    r = count([a])
+    assert r.pit_qualified == 0
+    assert r.decisions[0].reason == "CONFIRMATION_NOT_PIT"
+
+
+def test_r2_e02_future_state_must_not_poison_later_valid_seed() -> None:
+    old = seed()
+    future = alert(old, state_known_at=14 * HOUR)
+    new = seed(first_known_at=12 * HOUR + 10 * 60)
+    valid = alert(
+        new, decision_at=12 * HOUR + 15 * 60,
+        state_known_at=12 * HOUR + 10 * 60,
+        oi_event_at=12 * HOUR + 10 * 60,
+        oi_received_at=12 * HOUR + 11 * 60,
+    )
+    assert count([valid]).pit_qualified == 1
+    observed = count([future, valid])
+    assert [d.reason for d in observed.decisions] == [
+        "FUTURE_STATE", "PIT_QUALIFIED"
+    ]
+    assert observed.episode == 1 and observed.pit_qualified == 1
+
+
+def test_r2_e03_missing_confirmation_feature_window_blocks_pit() -> None:
+    a = alert()
+    unavailable = replace(
+        CLOCK, missing=((12 * HOUR, 12 * HOUR + 5 * 60),)
+    )
+    r = count([a], clock=unavailable)
+    assert r.pit_qualified == 0
+    assert r.decisions[0].reason == "SOURCE_GAP"
+
+
+def test_r2_e04_opaque_source_id_cannot_be_source_qualified() -> None:
+    a = alert()
+    assert a.seed is not None
+    assert a.seed.source_identity_kind == "SYNTHETIC_OPAQUE_ID"
+    r = count([a])
+    assert r.source_qualified == 0
+    assert r.source_status == "SOURCE_IDENTITY_UNVERIFIED"
+    assert r.rate_status == "RATE_NOT_ADMITTED"
