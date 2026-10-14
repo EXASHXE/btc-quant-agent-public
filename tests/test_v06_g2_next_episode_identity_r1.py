@@ -484,3 +484,5 @@ def test_r2_e04_source_qualified_identity_cannot_be_forged_by_string():
     assert count([alert(s)]).source_qualified == 0
     with pytest.raises(ValueError, match="external admitted contract"):
         seed(source_identity_kind="SHA256_VERIFIED")
+
+# CI focused evidence branch: GREEN synthetic-only exact-parent witness.
