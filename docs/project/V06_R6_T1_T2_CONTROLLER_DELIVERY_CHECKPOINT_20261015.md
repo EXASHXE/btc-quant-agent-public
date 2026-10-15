@@ -1,0 +1,14 @@
+## R6 T1/T2 exact-SHA Controller checkpoint — 2026-10-15
+
+**Controller authority:** frozen R6 dispatch `c2d6276f9ee857d760adcc61b073547888d67535`; this update is administrative/conditional, not 2-C, ChatGPT-1 science, legal licensing, data capture or Alpha approval. Independently retrieved both branch HEADs, full parent, sole ADD path and Git blob.
+
+| Work | Git SHA / file blob | Verifiable terminal / current accepted extent |
+| --- | --- | --- |
+| **T1 2-R Episode V3 R2** | `6866af7832f34551938e0ccf7f6fbe5f47982559`; `docs/project/V06_R6_EPISODE_V3_PHYSICAL_ORIGIN_IDENTITY_CORRECTIVE_R2.md`, blob `527ace50b59e9491dc3fa56d60105f5220ae2637` | `EPISODE_V3_R2_DESIGN_READY_FOR_2C_REVIEW`; one ADD; author **design-only**, not independent PASS. R5 V3 blockers require real independent 2-C/1 findings. |
+| **T2 2-E source/PIT/cost feasibility** | `f84b470c9d608aee4a161fe4c4e646d83c587f33`; `docs/project/V06_R6_NATIVE_SOURCE_RIGHTS_PIT_COST_FEASIBILITY_DECISION_R1.md`, blob `69d83f101c9a03912c1705a69beecb10030048c1` | `SOURCE_FEASIBILITY_STOP_NO_VERIFIABLE_PATH`; one ADD documentary matrix. `RIGHTS_NOT_VERIFIED/PIT_UNKNOWN/COST_INCOMPLETE`. Interface/docs availability is **not** verified legal or real clock/quote cost clearance. Source-only QC **STOP** pending independent verifiable new evidence. |
+
+**Queue decision:** T1/T2 author tasks are terminal **and must not be reissued**. **T3 is now ready:** ChatGPT-2-C adversarial Episode V3 R2 challenge `prompts/v0.6/b_line/V06_R6_2C_EPISODE_V3_R2_CHALLENGE.md` at immutable dispatch `c2d6276f9ee857d760adcc61b073547888d67535` (prompt blob `3ad66913a5d7dbd860f21646214de24f062076f8`). **T4** ChatGPT-1 consequential audit is **waiting for a fresh 2-C exact-SHA challenge** (prompt blob `d360ef2d6c384618a724a5901fdefec6d41e1c2b`). **T5 Controller method L2** conditional on T4; **T6 PA-B** still conditional on positive V3 method adjudication. No T3 or T4 publication is present in the checked R6 role branch at this checkpoint.
+
+**Source priority:** T2's STOP warrants **no automatic Codex W04 task**, no prospective OI/quote/price capture, no fee restatement or prior-outcome research. Rights feasibility may be reconsidered only on independently verified materially new evidence under a separate bounded Controller authorization; do not create an audit/document loop for unverified license prose. OI remains potential mechanism research but is **SOURCE_BLOCKED**. Cost estimates and first receiver clocks unobserved. H40 H01 and full P1D R4 remain DEFERRED. R5 earlier mainline NO-GO states remain in force.
+
+**One task per session, serial**: 2-C T3 → 1 T4 → 0 T5. Then (only after accepted method/design scope) 2-R T6 and its independent review chain. Never treat author READY as independent pass or equate single-source documentation with source admission.

@@ -1,4 +1,6 @@
 # quant v0.6 B-line — Current Alpha Science Status and R6 Priority Roadmap
+
+**2026-10-15 T1/T2 Controller checkpoint:** [new T1/T2 delivery and queue disposition](V06_R6_T1_T2_CONTROLLER_DELIVERY_CHECKPOINT_20261015.md). Episode V3 R2 authored at `6866af7832f34551938e0ccf7f6fbe5f47982559` (2-C/1 still pending); source/PIT/cost feasibility report `f84b470c9d608aee4a161fe4c4e646d83c587f33` terminates `SOURCE_FEASIBILITY_STOP_NO_VERIFIABLE_PATH`. Next active T3 2-C challenge; no live source or Alpha permit. Historic below is as-of original R6 planning date.
 **Date:** 2026-10-15 Asia/Singapore. **Owner:** ChatGPT-0 Primary Controller. **Class:** canonical documentary status forward pointer, NOT new independent science, source permit or Alpha release. Underlying older roadmap sections retain their historic as-of dates.
 
 ## Current binding science and decisions

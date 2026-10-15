@@ -1,4 +1,6 @@
 # quant v0.6 — R6 Executable Task Queue & Immutable Prompt Index
+
+**T1/T2 completed (2026-10-15):** see [Controller delivery checkpoint](V06_R6_T1_T2_CONTROLLER_DELIVERY_CHECKPOINT_20261015.md). T1 `6866af78` author READY for independent 2-C; T2 `f84b470c` SOURCE_FEASIBILITY_STOP_NO_VERIFIABLE_PATH. The original 'Immediate' tasks below are a **historical dispatch**, not tasks to relaunch. Start **T3 2-C** now; T4/5/6 remain conditional. OI W04 Codex task still not authorized.
 **Controller:** ChatGPT-0 B-line. **As of:** 2026-10-15. This indexed dispatch is outcome-blind; it supersedes the historical R5 queue only as a **current task schedule**. Five B-line sessions; one substantive task per chat, cross-session concurrency only. R5 exact adjudication: `7300afa425277cf8f328082c15f17002552d6e8c`; frozen R5 reviews A1 `7dd129da...` FAIL/W04, B1 `90d7ef9c...` V3 FAIL, B2 `1498c6ba...` PA claim correction, A2 `c2e3424b...` MATERIAL_FAIL. Earlier R5 author/review prompts are FINISHED, do not restart.
 
 ## Immediate (different sessions, parallel)
