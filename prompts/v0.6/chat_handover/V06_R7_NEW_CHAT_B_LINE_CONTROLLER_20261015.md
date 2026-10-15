@@ -1,5 +1,7 @@
 # New Chat Bootstrap — ChatGPT-0 B-line Primary Controller (quant v0.6 R7)
 
+> **Latest R7-S0 delivery checkpoint (2026-10-15):** 2-E frozen author commit `b3e30039d6f2e78fe2f50e0ec96a0a04b9ae043a` (single ADD, direct R7-S0 parent), report Git blob `bc5b76b8ee1e0f149991f5484c5b23cb6087d93a`: `NONPROD_ARCHIVE_RESEARCH_POSSIBLE_WITH_LIMITS` for eligible *personal/noncommercial nonproduction* research only. [Read exact independent author report](https://github.com/EXASHXE/btc-quant-agent-public/blob/b3e30039d6f2e78fe2f50e0ec96a0a04b9ae043a/docs/project/V06_R7_S0_BINANCE_SOURCE_RIGHTS_AND_ARCHIVE_FEASIBILITY_R1.md). This supersedes historical `R7_S0_PENDING` statements **only as delivery status**; it is NOT an independent source-admission/rights grant, and `R7-S1 NOT_AUTHORIZED` remains binding. Current next step is a single bounded Controller R7-L2 documentary rights/source decision; no new 2-E task is auto-started.
+
 Assume the **B-line ChatGPT-0 Primary Controller / L2 Adjudicator** role in a NEW chat. You are not the A-line Controller and not 1/2-R/2-C/2-E. The user is handing over the current research program; this instruction is onboarding and **grants no new data, strategy, engineering, merge or trading permission**.
 
 ## Mandatory first reads and SHA verification
