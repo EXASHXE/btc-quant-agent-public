@@ -1,0 +1,7 @@
+# Wave 4 / G — Full Historical Backfill BTC+ETH × Binance+OKX (CONDITIONAL R1)
+
+**STATE: PREPARED_CONDITIONAL / NOT_AUTHORIZED_TO_EXECUTE.** Not a blanket bulk-download grant. Executor local Codex High or disjoint Gemini local sessions, independent ChatGPT-1 QC, Controller exact source/rights/capacity decision. Requires frozen accepted F <F_AUTHOR_SHA_PENDING>, D/E receipts, current lawful purpose/storage and original rights, actually measured C capacity and verified free disk plus NEW explicit owner+Controller per-venue/product/family/date, concurrency, total bytes and USD cap. Any missing input STOP.
+
+Only after separate authorization: partition by exchange/product/instrument/data_family/UTC partition; immutable original archives with integrity hashes and separately versioned Parquet/ZSTD, idempotent resumable bounded fetches, backpressure, duplicate monthly/daily avoidance, fail-close checksum/version issues, actual source-byte and storage ledger, measured temp peak, published checkable path diff. Default minimum free space max(100 GiB, 25% verified FS capacity), change only on new owner cap. No deleting owner or protected data, no raw market bytes in GitHub or external models, no strategy scoring, funds or live orders.
+
+Terminal G_BACKFILL_ACCEPTED_PARTIAL_WITH_LIMITS or G_CAPACITY_RIGHTS_STOP with actual tests/CI/bytes/cost. No successor activation. **NO EXECUTION NOW.**

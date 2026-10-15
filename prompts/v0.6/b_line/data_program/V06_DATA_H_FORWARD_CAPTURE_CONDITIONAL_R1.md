@@ -1,0 +1,7 @@
+# Wave 4 / H — Forward as-Received Multi-Venue Public Market Collector (CONDITIONAL R1)
+
+**STATE: PREPARED_CONDITIONAL / NOT_AUTHORIZED_TO_EXECUTE.** Executor local Codex High with independent ChatGPT-1 review and Controller gate. Requires F <F_AUTHOR_SHA_PENDING> acceptance, new verified direct Binance/OKX REST/WS allowed use/retention and future LIVE-production rights independently of Binance Vision archival license, owner-selected isolated device/path, explicit public-only symbols/channels/depth/disk/network, and a separate Controller signed scope. Historical download success cannot authorize forward endpoints.
+
+Once permitted, bounded PUBLIC source feed only: raw immutable event, source exchange time, local monotonic receive and UTC error bounds, durable journal/ACK, reconnect/sequence/gap/loss detection, L2 snapshot/delta order and recovery, funding/OI publication/receipt clock, instrument metadata/contract sizing, time-versioned raw-to-validated lineage, resource backpressure, clock-drift/missing-update synthetic negative tests. STOP on gaps rather than interpolate. Do not collect private order/account data, create/cancel orders, alter balances, trade, or imply maker fills or historical vintage are proven.
+
+Deliver one reproducible proof/code/test report and exact SHA/blob/CI. Terminal H_FORWARD_PROOF_PASS_WITH_LIMITS or H_RIGHTS_CLOCK_STOP; no G2/TESTNET/LIVE approval. **NO EXECUTION NOW.**

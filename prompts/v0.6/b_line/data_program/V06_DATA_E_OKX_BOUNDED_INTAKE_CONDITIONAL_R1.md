@@ -1,0 +1,9 @@
+# Wave 2 / E — OKX Limited Local Intake and QC (CONDITIONAL R1)
+
+**STATE `PREPARED_CONDITIONAL / NOT_AUTHORIZED_TO_EXECUTE`.** Executor separate **Gemini BOOST or local Codex**; ChatGPT-1 independent review. Require frozen B author `<B_AUTHOR_SHA_PENDING>`, C author `<C_AUTHOR_SHA_PENDING>`, Controller source-rights decision, owner-selected separate isolated workspace, plus NEW exact task-specific rights/date/product/byte-limit authorization. If absent STOP and do not probe market URLs.
+
+When permitted, limit to explicitly declared OKX Spot BTC-USDT/ETH-USDT or USDT-SWAP BTC-USDT-SWAP/ETH-USDT-SWAP, official portal archive object and exact DEV date(s), publisher integrity mechanism and <USD20 total owner budget. Validate real product/unit/contract multiplier, trade IDs, UTC vs UTC+8 date boundaries, Kline completion, published funding settlement and rate interval, native versus synthesized L2 snapshots/deltas, book sequencing/gaps, Mark/Index/Premium identity and any OI availability. Public V5 **current** OI doesn't establish historical OI. No venue data may be substituted for Binance.
+
+Local implementation must use bounded idempotent downloader, safe extraction/manifest/checksums, synthetic negative tests for market mismatch, compressed bomb, missing funding fields, wrong clock unit, snapshot-delta reset and link to source/rights. Keep raw source off GitHub and external LLMs. Do not select OOS by seeing outcomes or infer first-known-at from archived event timestamp. NO historical profitability/model search/testnet/live/orders.
+
+Future separately authorized worktree and paths only; terminal `E_DEV_QC_PASS_WITH_LIMITS`, `E_PARTIAL_STOP` or `E_RIGHTS_ENV_STOP`; record exact real bytes/rows/tests/authorship/CI. Do not auto-dispatch F/G/H. **No execution now.**

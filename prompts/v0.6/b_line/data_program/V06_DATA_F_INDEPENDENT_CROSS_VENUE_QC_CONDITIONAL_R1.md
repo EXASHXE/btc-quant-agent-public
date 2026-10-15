@@ -1,0 +1,7 @@
+# Wave 3 / F — Independent Cross-Venue Source / PIT / Economic QC (CONDITIONAL R1)
+
+**STATE: PREPARED_CONDITIONAL / NOT_AUTHORIZED_TO_EXECUTE.** Owner ChatGPT-1 independent Auditor, 2-C methodology challenger if significant. Frozen D <D_AUTHOR_SHA_PENDING> and E <E_AUTHOR_SHA_PENDING> required, including genuine tests; Controller final L2. If D/E STOPs, Controller must issue a separate narrower scope or STOP; this template cannot self-rewrite.
+
+Independently audit exact source rights, product names, Spot vs Perp contract sizes/units, exchange event time, original publication and historical receiver first-known, 5m Binance metrics time-label changes, OKX UTC vs UTC+8, corrections/gaps/checksums, L2 snapshot-delta continuity, funding settlement Mark and hypothetical maker ACK/fill/fees/no-action, exposure versus OOS and multiplicity. Re-check author tests, do not self-certify. Separate integrity/DEV usability PASS from source-native causal PIT, complete cost or Alpha PASS.
+
+Only sanitized and separately permitted raw-independent evidence; no source archive uploads to external LLM, protected paths, trading or new Alpha. Output one independent report, exact Git SHA/blob/CI and terminal F_SOURCE_QC_PASS_WITH_LIMITS or F_SOURCE_QC_FAIL_NO_GO. No automatic G/H. **NO EXECUTION NOW.**
