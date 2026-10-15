@@ -1,5 +1,8 @@
 # quant v0.6 — Five-Session ChatGPT Role Matrix R1
 
+> **R7 active role scheduler — 2026-10-15:** [Latest handover](../handover/V06_BLINE_CONTROLLER_R7_HANDOVER_20261015.md). Exactly five separate B-line chats: `0` Controller, `1` Auditor, `2-R` Researcher, `2-C` Challenger and `2-E` bounded Executor. A-line Controller separate. One task at a time **per chat**, cross-chat parallel only when each prerequisite is present. 2-R T6 concluded STOP; 2-C/1 final conditional T6 review not triggered; 2-E R7-S0 documentary-only pending. 0 alone adjudicates any new source-file/data permit. H40 A-line-specific and P1D full engine not in B-line active path. Earlier dated matrix examples are historical.
+
+
 **Date:** 2026-10-14. **Governance layer:** B-line. **Owner-requested numbering:** `0 / 1 / 2 / 2 / 2`. The last three are **different sessions all named ChatGPT-2**, uniquely distinguished by role IDs **2-R**, **2-C** and **2-E**. **There is NO ChatGPT-3 session in the current five-session roster.** A-line Scientific Controller remains a **separate** Controller program and is not counted in these five B-line conversations.
 
 | Conversation | Stable ID | Single core responsibility | Can author? | Can independently accept its own artifact? | Who controls escalation? |
