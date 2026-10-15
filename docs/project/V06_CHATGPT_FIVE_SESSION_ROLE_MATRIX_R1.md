@@ -1,5 +1,8 @@
 # quant v0.6 — Five-Session ChatGPT Role Matrix R1
 
+> **2026-10-15 owner superseding rule:** ChatGPT-2-E is now **M0 mechanical-only**, such as predetermined simple text edits, citations, metadata and Git docs. It no longer owns local dataset acquisition/QC, scripting, tests, validation, code refactors or research/backtest runtime. Gemini NORMAL / Codex own M1 local implementation, and Codex High / Gemini BOOST own consequential M2/M3 verification/engineering, always in an explicitly authorized isolated workspace. Existing statements below about 2-E small code/test or remote file changes are **historical and superseded**. The five separate 0/1/2-R/2-C/2-E chats remain unchanged; Gemini/Codex are execution resources only, not custom child agents. R10-D0 2-E STOP commit `980a4b6f79de5ad6dbff8d8b674ce3ca2d056c4b` is retained; next attempt belongs to a local Agent with real tests and independent audit.
+
+
 > **R7 active role scheduler — 2026-10-15:** [Latest handover](../handover/V06_BLINE_CONTROLLER_R7_HANDOVER_20261015.md). Exactly five separate B-line chats: `0` Controller, `1` Auditor, `2-R` Researcher, `2-C` Challenger and `2-E` bounded Executor. A-line Controller separate. One task at a time **per chat**, cross-chat parallel only when each prerequisite is present. 2-R T6 concluded STOP; 2-C/1 final conditional T6 review not triggered; 2-E R7-S0 documentary-only pending. 0 alone adjudicates any new source-file/data permit. H40 A-line-specific and P1D full engine not in B-line active path. Earlier dated matrix examples are historical.
 
 
