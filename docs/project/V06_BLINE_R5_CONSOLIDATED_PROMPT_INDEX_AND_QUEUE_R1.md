@@ -34,3 +34,18 @@ ChatGPT-2-R and ChatGPT-2-E have completed R5 author work; no follow-on implemen
 ## User launch template
 Paste this into the appropriate existing chat, replacing ONLY <TASK_URL>:
 "Execute the exact-SHA standalone task at <TASK_URL> in your assigned quant v0.6 session role. Validate frozen input commit and Git blobs, write only the allowed report, publish non-force SHA/parent/blob/diff, and report independent terminal verdict. No market source, historical returns, testnet, live, merge or release authority. If prerequisites are absent, stop with the named INCOMPLETE condition."
+
+
+## 2026-10-15 forward pointer — R5 queue terminal completion (do not rewrite dispatch history)
+
+**Later decision supersedes the historical PENDING queue rows above:** [Controller R5 L2 terminal adjudication](https://github.com/EXASHXE/btc-quant-agent-public/blob/7300afa425277cf8f328082c15f17002552d6e8c/reviews/v0.6/b_line/V06_CONTROLLER_R5_L2_ALPHA_AND_SOURCE_FEASIBILITY_ADJUDICATION_20261015_R1.md), blob `1d7f3e43304811891b15e66a73c274dbf3050ec2`; [independent role/status checkpoint](https://github.com/EXASHXE/btc-quant-agent-public/blob/64b715db5c5c520c2f23e1b28655c838b3932937/reviews/v0.6/b_line/V06_R5_1_ROLE_STATUS_SYNC_VERIFICATION_20261015.md), blob `da01ef90410f144b5372d3e2243b46af75b86d4f`. Branch-local artifacts are linked, not merged.
+
+| Original R5 queue item | Terminal status, completed in its own session | Frozen SHA |
+| --- | --- | --- |
+| A1 receiver review | **`REVIEW_FAIL`**, W04 HIGH OPEN | `7dd129da956a835ac92196aba27146e3d38294b6` |
+| B1 Episode V3 challenge | **`EPISODE_V3_CHALLENGE_FAIL`** | `90d7ef9c5485a72f6bcf4dacdc4310a7ff9373e6` |
+| B2 PA novelty/DPI challenge | **`PA_CLAIMS_CORRECTION_REQUIRED`** | `1498c6ba9948ab874cbde615a63bf079e7a548bc` |
+| A2 independent consequential science | **`R5_SCIENCE_MATERIAL_FAIL`**; cost matrix only `DOCUMENTARY_PASS_WITH_LIMITS` | `c2e3424b243e7796c8c595b8a836afe6795937a9` |
+| C1 Controller L2 | **`SOURCE_FEASIBILITY_BLOCKED`**; priorities decided, **NO_SOURCE_READY_NOVEL_DESIGN**, no data/experiment/release permit | `7300afa425277cf8f328082c15f17002552d6e8c` |
+
+**Current serial handoff:** 2-R corrected Episode V3 outcome-blind physical-origin/rearm/same-tick/action ID/E_S–E_X denominators → independent 2-C → independent 1 → Controller 0; **then** separate 2-R PA-B E1/E2/NO_ACTION **method-only** paired design → 2-C → 1 → 0. Optional Codex W04 synthetic A→B→A work requires a new separate authorization/feasible source-rights path. H40 H01 and full P1D R4 deferred. `SOURCE_NOT_ADMITTED / G2_ALPHA_NO_GO / G4_TESTNET_NO_GO / LIVE_NO_GO / REAL_FUNDS_WRITE_NONE`. This pointer does **not** issue new executable prompts, lift gates, merge branches or revise historical 2026-10-14 snapshots.
