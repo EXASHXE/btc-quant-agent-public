@@ -1,0 +1,307 @@
+[
+  {
+    "batch": 9,
+    "deleted": [],
+    "verified": false,
+    "before_count": 102,
+    "default": "v0.6.5",
+    "active_pr_branches": [
+      "docs/v06-next-p1d-c4-wal-design-r3",
+      "feature/v06-reset-r1-synthetic-inference-calibration",
+      "repair/v06-p1a-compat-full-git-history-r1",
+      "v0.6-docs"
+    ],
+    "effective_protection": [
+      {
+        "branch": "feature/v06-bline-gemini-a-sol-economic-recompute-r1",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-a-sol-economic-recompute-r1/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-abc-clash-routed-feed-bridge-r2",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-abc-clash-routed-feed-bridge-r2/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-abc-market-event-bridge-r1",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-abc-market-event-bridge-r1/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-b-scoped-ruff-r1",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-b-scoped-ruff-r1/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-boost-architecture-lean-test-r1",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-boost-architecture-lean-test-r1/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-f3-sparse-inference-audit-r1",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-f3-sparse-inference-audit-r1/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-forward-public-feed-r1",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-forward-public-feed-r1/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-forward-shadow-research-r1",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-forward-shadow-research-r1/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-g1-offline-assurance-r1",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-g1-offline-assurance-r1/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-g1g3-offline-ports-r1",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-g1g3-offline-ports-r1/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-g2-conditional-exit-r1",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-g2-conditional-exit-r1/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-g2-flow-funding-entries-r1",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-g2-flow-funding-entries-r1/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-goal-a-conformance-r2",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-goal-a-conformance-r2/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-goal-b-asof-repair-r2",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-goal-b-asof-repair-r2/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "branch": "feature/v06-bline-gemini-goal-c-risk-assurance-r2",
+        "result": {
+          "args": [
+            "gh",
+            "api",
+            "repos/EXASHXE/btc-quant-agent-public/branches/feature%2Fv06-bline-gemini-goal-c-risk-assurance-r2/protection"
+          ],
+          "returncode": 1,
+          "stdout": "{\"message\":\"Branch not protected\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"404\"}",
+          "stderr": "gh: Branch not protected (HTTP 404)\n"
+        }
+      }
+    ],
+    "selected": [
+      {
+        "branch": "feature/v06-bline-gemini-a-sol-economic-recompute-r1",
+        "sha": "d1f9f4316a2485f5d09ee1c910d7797ecfc6be7e"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-abc-clash-routed-feed-bridge-r2",
+        "sha": "632d2e37f28b8c3efbd2b818ecdb74783f0df238"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-abc-market-event-bridge-r1",
+        "sha": "df00997f344eba82f7cca0d03ee1617948abee44"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-b-scoped-ruff-r1",
+        "sha": "b51a0019c68c8539895ac1b48379f0045e5bfdae"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-boost-architecture-lean-test-r1",
+        "sha": "fdec02d5d7cf9d80ae45fc36c56af5008df003d6"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-f3-sparse-inference-audit-r1",
+        "sha": "48c39a387745f9ec379d78a001e6362579bf7a48"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-forward-public-feed-r1",
+        "sha": "df00997f344eba82f7cca0d03ee1617948abee44"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-forward-shadow-research-r1",
+        "sha": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-g1-offline-assurance-r1",
+        "sha": "9dad78c40ae28ec59fc1d186dc7802ea7f79594a"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-g1g3-offline-ports-r1",
+        "sha": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-g2-conditional-exit-r1",
+        "sha": "a862eece9733a614df7624449a8499716d9e6cb3"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-g2-flow-funding-entries-r1",
+        "sha": "f25954b45577cebb7624fae86cd91df9071a87ab"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-goal-a-conformance-r2",
+        "sha": "9415441f216b2eaca6078102cf7ec05b8e6b57cf"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-goal-b-asof-repair-r2",
+        "sha": "d5e3a8407b1b84111dc7f4276865ffd68cb0a7d2"
+      },
+      {
+        "branch": "feature/v06-bline-gemini-goal-c-risk-assurance-r2",
+        "sha": "c9846adacc1f2df85931ecf4649e02a3a61cf466"
+      }
+    ],
+    "actual_delete_response": {
+      "args": [
+        "git",
+        "--git-dir=/root/workspace/project/quant-v0.6/m1-remote-cleanup/repository.git",
+        "push",
+        "origin",
+        "--delete",
+        "feature/v06-bline-gemini-a-sol-economic-recompute-r1",
+        "feature/v06-bline-gemini-abc-clash-routed-feed-bridge-r2",
+        "feature/v06-bline-gemini-abc-market-event-bridge-r1",
+        "feature/v06-bline-gemini-b-scoped-ruff-r1",
+        "feature/v06-bline-gemini-boost-architecture-lean-test-r1",
+        "feature/v06-bline-gemini-f3-sparse-inference-audit-r1",
+        "feature/v06-bline-gemini-forward-public-feed-r1",
+        "feature/v06-bline-gemini-forward-shadow-research-r1",
+        "feature/v06-bline-gemini-g1-offline-assurance-r1",
+        "feature/v06-bline-gemini-g1g3-offline-ports-r1",
+        "feature/v06-bline-gemini-g2-conditional-exit-r1",
+        "feature/v06-bline-gemini-g2-flow-funding-entries-r1",
+        "feature/v06-bline-gemini-goal-a-conformance-r2",
+        "feature/v06-bline-gemini-goal-b-asof-repair-r2",
+        "feature/v06-bline-gemini-goal-c-risk-assurance-r2"
+      ],
+      "returncode": 128,
+      "stdout": "",
+      "stderr": "fatal: unable to access 'https://github.com/EXASHXE/btc-quant-agent-public.git/': gnutls_handshake() failed: The TLS connection was non-properly terminated.\n"
+    },
+    "error": "{\"args\": [\"git\", \"--git-dir=/root/workspace/project/quant-v0.6/m1-remote-cleanup/repository.git\", \"ls-remote\", \"--heads\", \"origin\"], \"returncode\": 128, \"stdout\": \"\", \"stderr\": \"fatal: unable to access 'https://github.com/EXASHXE/btc-quant-agent-public.git/': gnutls_handshake() failed: The TLS connection was non-properly terminated.\\n\"}",
+    "reconciliation": {
+      "fresh_remote_count": 102,
+      "all_15_selected_refs_still_present_at_exact_sha": true,
+      "deletions_from_failed_attempt": 0
+    }
+  }
+]

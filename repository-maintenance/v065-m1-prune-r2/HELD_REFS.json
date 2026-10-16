@@ -1,0 +1,324 @@
+[
+  {
+    "branch": "dispatch/v0.5.5-a1-forward-compression-trial1",
+    "sha": "9b51d7742ae2530aafaee48c7475a798ed21f756",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "dispatch/v0.5.5-a1-method-materialization-r1",
+    "sha": "c3adf57eaf8ed3d18fd8abf75586e5218b118cbb",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "dispatch/v0.5.5-a1-synthetic-method-astra-audit-r1",
+    "sha": "b5e941fc9db38c8c8160d980ed437144a18c676d",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "dispatch/v0.5.5-a1-synthetic-method-authority-r1",
+    "sha": "03c44007e6f3d92bc1bec2b470d2024139294d4f",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "dispatch/v0.5.5-a1-synthetic-method-sol-audit-r1",
+    "sha": "233d0c9cfdf15e9e74e4e87fa22b69d6460c8a2a",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "dispatch/v0.5.5-a1-synthetic-method-sol-audit-r1b",
+    "sha": "9fdb8b804e1f7b8eb6e261640eb1399c7eabe873",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "dispatch/v0.5.5-h41-successor-exposure-repair-r1",
+    "sha": "62201b5d46e29e6518eb65b740d4bb272033deea",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "dispatch/v0.5.5-h41-successor-exposure-repair-r1-v2",
+    "sha": "dfc28b38fa01543bbdb07ddd1f2183a3f396c493",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "dispatch/v0.5.5-h41-successor-forward-r1-1-reaudit",
+    "sha": "f61fea677f15d61ae4cc81e584cdb75332d74fdb",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "dispatch/v0.5.5-h42-feasibility-r1",
+    "sha": "a7b1290e541f610ba72295508f004d5c1a3f10c1",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "docs/v06-next-h40-independent-audit-r1",
+    "sha": "32d837f0053eb8709ea09ff891137366f5830a7c",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "docs/v06-next-h40-r2-independent-operational-audit",
+    "sha": "31faf8267f87f790619ad3256b9ab2c8dc9cbb8d",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "docs/v06-next-p1d-c4-wal-design-r3",
+    "sha": "8c7693700c15f32329614a23b737d34cc7e2b0c4",
+    "classification": "HOLD_ACTIVE_PR_OR_BASE",
+    "reason": "PR #3 or #5 remains open, pending independent review; retain head and base dependencies.",
+    "end_condition": "EXASHXE/Controller explicitly resolves the pending independent review and active PR; then refresh protection/ancestry/activity gates."
+  },
+  {
+    "branch": "docs/v06-r4-1-h40-proof-review",
+    "sha": "8ab7cc373db943f9084ada94a9b321403b4e5e48",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "feature/a1-forward-compression-trial1-v055",
+    "sha": "f76c05ceab83963d6a5cb1271805b3c217ebfa33",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "feature/a1-method-materialization-r1-v055",
+    "sha": "d96708cdf2cdc7c88386c02d635f5edf4021d857",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "feature/a1-synthetic-method-astra-audit-r1-v055",
+    "sha": "736cde806bcbd726eaab2bca4d794c3a2df20ee6",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "feature/a1-synthetic-method-authority-r1-v055",
+    "sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "feature/a1-synthetic-method-sol-audit-r1-v055",
+    "sha": "a7db56f516f616688438f1c02bc47c7618a9d281",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "feature/a1-synthetic-method-sol-audit-r1b-v055",
+    "sha": "d2905d80daacab1cd2aad55cfaf4501445c65fb2",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "feature/h42-feasibility-r1-v055",
+    "sha": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "feature/v06-reset-r1-synthetic-inference-calibration",
+    "sha": "c7c8d98520b21f3d36352e1ba0df408327e011fe",
+    "classification": "HOLD_ACTIVE_PR_OR_BASE",
+    "reason": "PR #3 or #5 remains open, pending independent review; retain head and base dependencies.",
+    "end_condition": "EXASHXE/Controller explicitly resolves the pending independent review and active PR; then refresh protection/ancestry/activity gates."
+  },
+  {
+    "branch": "proof/v06-h40-r2-eligible-single-node-ci-r1",
+    "sha": "ccf3ce8733088071020c8d5cd7e5c1984dc0c5b7",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "repair/v06-bline-ci-single-h40-node-quarantine-r1",
+    "sha": "99cc32a8de78538dcf7f8a131b9c3f65bad76863",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "repair/v06-bline-h40-operational-quarantine-r2",
+    "sha": "31e71342ad165189bfbf920e8da81bbeabb76708",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "repair/v06-p1a-compat-full-git-history-r1",
+    "sha": "13e3a710b137efeec2e21e3002f748834ec0cc22",
+    "classification": "HOLD_ACTIVE_PR_OR_BASE",
+    "reason": "PR #3 or #5 remains open, pending independent review; retain head and base dependencies.",
+    "end_condition": "EXASHXE/Controller explicitly resolves the pending independent review and active PR; then refresh protection/ancestry/activity gates."
+  },
+  {
+    "branch": "v0.5-refactor",
+    "sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "classification": "HOLD_DEFAULT_AND_A_LINE",
+    "reason": "Current default plus independent legacy scientific authority; default switch and A-line decision required.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "v0.5-refactor-docs",
+    "sha": "248f00f88d5bb659d80db658ff9bf6d55402a329",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "v0.5.5",
+    "sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "v0.5.5-docs",
+    "sha": "f123cc5811aa4be0f071922d7c42d6145ed0f6fd",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "v0.6-docs",
+    "sha": "2f1e4b340c56448bfa0207ee2d6fc6dded797cfd",
+    "classification": "HOLD_ACTIVE_PR_OR_BASE",
+    "reason": "PR #3 or #5 remains open, pending independent review; retain head and base dependencies.",
+    "end_condition": "EXASHXE/Controller explicitly resolves the pending independent review and active PR; then refresh protection/ancestry/activity gates."
+  },
+  {
+    "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+    "sha": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/b-line-rc2-holdout-harness-r2",
+    "sha": "cbc903d9ba448059121db96c3572a2677d5b53f8",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/b-line-rc2-holdout-r3-runner",
+    "sha": "ded194c63bfcbbfd58daa450646cb76f979a2ff6",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/b-line-rc2-holdout-r3-runner-repair-r1",
+    "sha": "0d61b564fa178af0f0a8e7df1c0a6b13586711e3",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/b-line-rc2-holdout-r3-runner-repair-r2",
+    "sha": "6f9b9bd1606c06664129b43293699fd05abd3297",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/b-line-rc2-successor-r1-holdout",
+    "sha": "f5da2f2f90d55da42563a21d61faa05d1fd4ecc0",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/b-line-rc2-successor-r1-holdout-r1-1",
+    "sha": "c166899d714e6a03eb43ab53c65eea9a0e2bc966",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/v0.5.5-live-v1-b5-r3",
+    "sha": "f39c7cca6040f507e2778253ab70adb438cc12bf",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/v0.5.5-live-v1-b5-r4-independent-20261003",
+    "sha": "80f6123a58520bca739f74ea62c7315bf44f1cf5",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/v0.5.5-live-v1-b5-r5-independent-20261004",
+    "sha": "7e795ec525bac50841c5ce45014bafd38fdb7990",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/v0.5.5-live-v1-b5-r6-independent-20261004",
+    "sha": "8a80203ec6f10ff6fdbcca346ca3a1e7924064d2",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/v0.5.5-live-v1-b5-r7-independent-20261005",
+    "sha": "9d5ca2da3c11fb3a6680c20b00808f22c760359d",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/v0.5.5-live-v1-b5-r8-independent-20261005",
+    "sha": "05e375b202b0119b52e5f890c20ac77925890ff6",
+    "classification": "HOLD_A_LINE",
+    "reason": "Legacy/A-line lineage indicated by branch and changed-path metadata; no new scientific ownership grant.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/v06-g1-h40-baseline-diff-r1",
+    "sha": "e7ebb05c06f2dcd5f05d8d9c58250ad898893957",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  },
+  {
+    "branch": "validation/v06-h40-baseline-full-suite-r1",
+    "sha": "76d424460235bbb2794ad385041cf83f3aece0ad",
+    "classification": "HOLD_PROTECTED_CONTROL",
+    "reason": "Protected holdout/H40/H41/control risk indicated by ref and changed paths; metadata only, original ref retained.",
+    "end_condition": "Independent A-line/control owner explicitly releases exact ref; effective protection and dependencies verified. Default also requires authorized admin reconciliation."
+  }
+]

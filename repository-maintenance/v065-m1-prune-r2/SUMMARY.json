@@ -1,0 +1,50 @@
+{
+  "terminal": "M1_PARTIAL_CLEAN_WITH_EXPLICIT_HOLDS",
+  "verified_at_utc": "2026-10-16T14:54:54.465605+00:00",
+  "before": 222,
+  "after": 49,
+  "deleted": 173,
+  "permanent_target_refs": 3,
+  "held_additional_refs": 46,
+  "held_classification_counts": {
+    "HOLD_A_LINE": 26,
+    "HOLD_PROTECTED_CONTROL": 15,
+    "HOLD_ACTIVE_PR_OR_BASE": 4,
+    "HOLD_DEFAULT_AND_A_LINE": 1
+  },
+  "default": "v0.6.5",
+  "main_sha": "941f24af8f1e12c1f314e2d970e7af8f97293b21",
+  "archive_sha": "0176cdde836a660420e5e4b5693591cb8108a4f6",
+  "engineering_head_before_this_receipt": "d2ff586cb234dd3a3999ab5f77409bec6c274923",
+  "engineering_final_head": "Containing receipt commit; fresh remote verification supplied in final delivery",
+  "batches": 12,
+  "batch_sizes": [
+    15,
+    15,
+    15,
+    15,
+    15,
+    15,
+    15,
+    15,
+    15,
+    15,
+    13,
+    10
+  ],
+  "ci_fix_run": 38918484549,
+  "ci_fix_result": "success",
+  "backup": {
+    "file": "pre-prune-execution.bundle",
+    "sha256": "44e9b94242bff4bf950018d61c026639746774aeaab2472c1a65d575d537c8da",
+    "bytes": 39924384,
+    "owner_approved_durable_local_directory": "/root/workspace/project/quant-v0.6/m1-remote-cleanup/backups",
+    "restored_exact_heads": 222,
+    "complete_history": true,
+    "connectivity_fsck_exit": 0,
+    "selected_archive_refs_verified": 178,
+    "deleted_commit_local_rollback_push_and_exact_ref_verification": 173
+  },
+  "failed_delete_attempts": 1,
+  "failed_attempt_deletions": 0
+}
