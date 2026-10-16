@@ -1,3 +1,5 @@
+> **2026-10-16 owner workflow R2 (proposed on isolated docs branch):** [Research-first B-line operating contract](docs/project/V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md) · [live research dashboard](docs/project/V0.6_PROJECT_STATUS_AND_ROADMAP.md) · [role/chat index](docs/project/V0.6_NEW_CHAT_HANDOVER_INDEX.md) · [UI task card standard](docs/project/V06_CHATGPT_OUTPUT_UI_AND_TASK_CARD_STANDARD_R1.md). Active integration target: `v0.6.5`; exact HEAD and independent integration review must be checked before acceptance. The v0.5 instructions below describe existing CLI behavior, not the current Controller work queue.
+
 > **B-line v0.6.5 integration target:** [start here](docs/project/V065_INTEGRATION_STATUS_R1.md) · [216-branch manifest](docs/project/V065_BRANCH_CONSOLIDATION_MANIFEST_R1.md). Accepted current v0.6 core plus reconciled documentation; unapproved pilots remain isolated. This is not a release or scientific promotion.
 
 # BTC Quant Agent v0.5
