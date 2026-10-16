@@ -1,3 +1,5 @@
+> **B-line v0.6.5 integration target:** [start here](docs/project/V065_INTEGRATION_STATUS_R1.md) · [216-branch manifest](docs/project/V065_BRANCH_CONSOLIDATION_MANIFEST_R1.md). Accepted current v0.6 core plus reconciled documentation; unapproved pilots remain isolated. This is not a release or scientific promotion.
+
 # BTC Quant Agent v0.5
 
 面向 BTCUSDT 永续合约的离线研究与数据验证项目。当前通用研究入口只有
