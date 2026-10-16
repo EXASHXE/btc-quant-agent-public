@@ -11,8 +11,6 @@ on:
         default: focused
         type: choice
         options: [focused, integration, full]
-  schedule:
-    - cron: "21 3 * * 1"
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -27,9 +25,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Fetch v0.6 immutable base for merge-base resolution
+      - name: Fetch immutable CI base for merge-base resolution
         run: |
-          git fetch --no-tags origin v0.6 || true
+          git fetch --no-tags origin 11e4ccc5f1c86ce4680b54be1e6329993f9db380
       - name: Ensure cache directory exists for docs-only/zero-pip FAST paths
         run: mkdir -p "$HOME/.cache/pip"
       - uses: actions/setup-python@v5

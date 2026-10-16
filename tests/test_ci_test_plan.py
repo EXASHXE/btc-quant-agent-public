@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts.ci.test_plan import (
+    IMMUTABLE_CI_BASE_SHA,
     IMMUTABLE_V06_BASE_SHA,
     KNOWN_EXE001,
     changed_paths,
@@ -232,3 +233,24 @@ def test_12_git_rename_from_source_to_docs_must_not_skip_original_path(tmp_path:
         assert "docs/safety.md" in changed
         assert "src/btc_quant_agent/safety.py" in changed
         assert planner.classify(changed)["mode"] == "full"
+
+
+def test_immutable_ci_base_matches_v06_without_branch_refs() -> None:
+    """Deleting the old branch keeps first-push and PR-fallback scopes identical."""
+    import scripts.ci.test_plan as planner
+
+    assert planner.git("cat-file", "-e", f"{IMMUTABLE_CI_BASE_SHA}^{{commit}}").returncode == 0
+    base = planner.git("merge-base", IMMUTABLE_CI_BASE_SHA, "HEAD").stdout.strip()
+    expected = planner.git("diff", "--no-renames", "--name-only", base, "HEAD").stdout.splitlines()
+    actual_git = planner.git
+
+    def without_old_branch(*args: str) -> subprocess.CompletedProcess[str]:
+        assert not any("v0.6" in arg for arg in args)
+        # Model a PR checkout of a single-parent commit, reaching the fallback.
+        if args == ("rev-parse", "HEAD^@"):
+            return subprocess.CompletedProcess(args, 0, "parent\n", "")
+        return actual_git(*args)
+
+    with patch.object(planner, "git", side_effect=without_old_branch):
+        assert changed_paths(before="0" * 40, event="push") == expected
+        assert changed_paths(event="pull_request") == expected

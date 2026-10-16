@@ -25,6 +25,7 @@ HISTORICAL_EXE001 = {
 }
 KNOWN_EXE001 = {p for p in HISTORICAL_EXE001 if (ROOT / p).is_file()}
 
+IMMUTABLE_CI_BASE_SHA = "11e4ccc5f1c86ce4680b54be1e6329993f9db380"
 IMMUTABLE_V06_BASE_SHA = "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
 
 
@@ -69,7 +70,7 @@ def changed_paths(
             if len(parents) >= 2 and git("cat-file", "-e", "HEAD^1^{commit}").returncode == 0:
                 base = "HEAD^1"
             else:
-                for ref in ["origin/v0.6", "v0.6", IMMUTABLE_V06_BASE_SHA]:
+                for ref in [IMMUTABLE_CI_BASE_SHA, IMMUTABLE_V06_BASE_SHA]:
                     if git("cat-file", "-e", f"{ref}^{{commit}}").returncode == 0:
                         mb = git("merge-base", ref, "HEAD")
                         if mb.returncode == 0 and mb.stdout.strip():
@@ -86,15 +87,14 @@ def changed_paths(
 
     elif before == "0" * 40 or not before:
         # First push of a new branch:
-        # Must resolve via explicitly verified merge-base against fetched v0.6 base,
+        # Must resolve via explicitly verified merge-base against the immutable CI base,
         # ensuring ALL branch commits are diffed, not merely HEAD^ (last commit).
         resolved_base = None
         candidates = []
         if base_ref:
             candidates.extend([f"origin/{base_ref}", base_ref])
         candidates.extend([
-            "origin/v0.6",
-            "v0.6",
+            IMMUTABLE_CI_BASE_SHA,
             IMMUTABLE_V06_BASE_SHA,
         ])
         for ref in candidates:
