@@ -1,0 +1,56 @@
+{
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "branch_protection": [
+    {
+      "path": "/repos/EXASHXE/btc-quant-agent-public/branches/v0.6.5/protection",
+      "status": 403,
+      "message": "Resource not accessible by integration"
+    },
+    {
+      "path": "/repos/EXASHXE/btc-quant-agent-public/branches/v0.5-refactor/protection",
+      "status": 403,
+      "message": "Resource not accessible by integration"
+    },
+    {
+      "path": "/repos/EXASHXE/btc-quant-agent-public/branches/docs/engineering/protection",
+      "status": 403,
+      "message": "Resource not accessible by integration"
+    },
+    {
+      "path": "/repos/EXASHXE/btc-quant-agent-public/branches/legacy/research-archive/protection",
+      "status": 403,
+      "message": "Resource not accessible by integration"
+    }
+  ],
+  "rulesets": {
+    "path": "/repos/EXASHXE/btc-quant-agent-public/rulesets?includes_parents=true&per_page=100",
+    "result": [],
+    "status": "successful GET; empty visible list does not prove absent protection"
+  },
+  "owner_type": "User",
+  "organization_scope": "Repository owner EXASHXE is a User, not an Organization; no organization ownership claimed. Effective repository policy remains unknown.",
+  "required_checks": "UNKNOWN",
+  "required_PR_reviews": "UNKNOWN",
+  "bypass_actors": "UNKNOWN",
+  "push_restrictions": "UNKNOWN",
+  "ruleset_patterns": "No visible patterns; effective branch-protection patterns UNKNOWN",
+  "git_push_dry_run": {
+    "status": "FAILED_BEFORE_REMOTE_UPDATE",
+    "message": "could not read Username for https://github.com: terminal prompts disabled"
+  },
+  "browser_auth": {
+    "status": "declined",
+    "admin_mutations": 0
+  },
+  "protection_terminal": "BRANCH_PROTECTION_VERIFICATION_PENDING",
+  "writes": "GitHub create_tree/create_commit/update_ref returned normalized success; raw HTTP status not exposed. All ref writes non-force with expected SHA.",
+  "read_paths": [
+    "/repos/EXASHXE/btc-quant-agent-public",
+    "/repos/EXASHXE/btc-quant-agent-public/branches?per_page=100&page={1,2,3}",
+    "/repos/EXASHXE/btc-quant-agent-public/pulls?state=open&per_page=100",
+    "/repos/EXASHXE/btc-quant-agent-public/pulls/{2,3,5,6}",
+    "/repos/EXASHXE/btc-quant-agent-public/git/ref/heads/{branch}",
+    "/repos/EXASHXE/btc-quant-agent-public/actions/runs?head_sha=273dffa8e805c8dc32a04f72f747490b1dd27f2f&per_page=100",
+    "/repos/EXASHXE/btc-quant-agent-public/actions/runs/38895173698/jobs"
+  ]
+}

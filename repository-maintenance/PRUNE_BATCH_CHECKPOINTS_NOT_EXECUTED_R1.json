@@ -1,0 +1,1299 @@
+{
+  "status": "PREPARED_ONLY_NOT_EXECUTED_NOT_AUTHORIZED_BY_THIS_FILE",
+  "eligible_now": 0,
+  "delete_attempts": 0,
+  "blocking_gates": [
+    "Effective protection/required-check details HTTP 403",
+    "No authenticated Git push channel",
+    "Secure browser sign-in declined"
+  ],
+  "excluded": [
+    "3 permanent target refs",
+    "42 A-line/control/default refs",
+    "4 active PR head/base refs",
+    "v0.6 CI-base dependency"
+  ],
+  "mandatory_per_batch": [
+    "Use authorized administration session; prove effective rules and required checks",
+    "Refresh all refs and open PRs; require exact current SHA match and no new activity/dependency",
+    "Prove current head is ancestor of retained main/archive and present in verified private backup or new supplemental backup",
+    "Do not touch moved/default/protected/active-PR refs; no force or wildcard",
+    "Explicit branch-name deletions only, preserve remote response and list SHA256; refresh all refs after batch; stop on first mismatch/failure"
+  ],
+  "batches": [
+    {
+      "number": 1,
+      "executed": false,
+      "reason": "contained/duplicate first, then archived original history; all still HOLD_PROTECTION_UNKNOWN",
+      "refs": [
+        {
+          "branch": "docs/v065-research-first-role-controller-ui-r2",
+          "frozen_before_head": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+          "checkpoint_current_head": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": true
+        },
+        {
+          "branch": "feature/v06-bline-engineering-preview-r1",
+          "frozen_before_head": "efd73496d01a71a158d67343b64695d33fab16a8",
+          "checkpoint_current_head": "efd73496d01a71a158d67343b64695d33fab16a8",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": true
+        },
+        {
+          "branch": "feature/v06-bline-foundation-r1",
+          "frozen_before_head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+          "checkpoint_current_head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": true
+        },
+        {
+          "branch": "feature/v06-bline-g3-operational-readiness-r1",
+          "frozen_before_head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+          "checkpoint_current_head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": true
+        },
+        {
+          "branch": "feature/v06-ci-docs-only-pip-cache-fix",
+          "frozen_before_head": "03c4b5ebea299a11a5f0c64f45572b27cc4ad4b8",
+          "checkpoint_current_head": "03c4b5ebea299a11a5f0c64f45572b27cc4ad4b8",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": true
+        },
+        {
+          "branch": "integration/v0.6.5-candidate-r1",
+          "frozen_before_head": "065d62965373627c4887e52f482d1dcb984af860",
+          "checkpoint_current_head": "273dffa8e805c8dc32a04f72f747490b1dd27f2f",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": true
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "executed": false,
+      "reason": "contained/duplicate first, then archived original history; all still HOLD_PROTECTION_UNKNOWN",
+      "refs": [
+        {
+          "branch": "dispatch/v065-m1-repository-hygiene-r1",
+          "frozen_before_head": "dc04f56e418e762e0137fbc28429fef0f545bce4",
+          "checkpoint_current_head": "dc04f56e418e762e0137fbc28429fef0f545bce4",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/rc2-downstream-readiness-outcome-blind",
+          "frozen_before_head": "1c4bc2a9dd26dde9553653408452cb0a80c7c7d3",
+          "checkpoint_current_head": "1c4bc2a9dd26dde9553653408452cb0a80c7c7d3",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-bline-historical-cost-revival-eligibility-r1",
+          "frozen_before_head": "1da458bfcd1bc3642ffc740290a1f871fd1c3997",
+          "checkpoint_current_head": "1da458bfcd1bc3642ffc740290a1f871fd1c3997",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-bline-role-roadmap-auditor-handover-20261013-r2",
+          "frozen_before_head": "d2d43604e84e865e4e37daf4df27781a8bd9e26f",
+          "checkpoint_current_head": "d2d43604e84e865e4e37daf4df27781a8bd9e26f",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-btc-execution-cost-method-synthetic-r1",
+          "frozen_before_head": "a68eeef973a178a68005f7eca247ec15bc9bf2a2",
+          "checkpoint_current_head": "a68eeef973a178a68005f7eca247ec15bc9bf2a2",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-chatgpt-five-session-role-reset-20261014-r1",
+          "frozen_before_head": "3c22d31a1666fed639da29b61bae4a52329bce1b",
+          "checkpoint_current_head": "3c22d31a1666fed639da29b61bae4a52329bce1b",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-codex-ci-compat-git-history-forensics-r1",
+          "frozen_before_head": "4e350fdce4bf79ef4b3cea8e3499a29a7d776f39",
+          "checkpoint_current_head": "4e350fdce4bf79ef4b3cea8e3499a29a7d776f39",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-data-a-binance-source-inventory-r1",
+          "frozen_before_head": "561084fe1c1f566138e7c4a2ab4c24fe3625ee94",
+          "checkpoint_current_head": "561084fe1c1f566138e7c4a2ab4c24fe3625ee94",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-data-b-okx-source-feasibility-r1",
+          "frozen_before_head": "5d394450f447d728e0fc103ea72cab33b40a3a46",
+          "checkpoint_current_head": "5d394450f447d728e0fc103ea72cab33b40a3a46",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-data-c-storage-schema-plan-r1",
+          "frozen_before_head": "5b9d86209fa71ca2f4732f85b85846434c52af3e",
+          "checkpoint_current_head": "5b9d86209fa71ca2f4732f85b85846434c52af3e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-data-controller-multivenue-parallel-program-r1",
+          "frozen_before_head": "ade4df19872122686432cd955d8f139f16069449",
+          "checkpoint_current_head": "ade4df19872122686432cd955d8f139f16069449",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-next-1-codex-oi-r2-independent-audit-r1",
+          "frozen_before_head": "7dd129da956a835ac92196aba27146e3d38294b6",
+          "checkpoint_current_head": "7dd129da956a835ac92196aba27146e3d38294b6",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-next-2c-oi-c01-c03-design-r3-challenge",
+          "frozen_before_head": "a1e9632a30f330041bcffb22c2ba3d3d656963bc",
+          "checkpoint_current_head": "a1e9632a30f330041bcffb22c2ba3d3d656963bc",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-next-2c-oi-pit-challenge-r2",
+          "frozen_before_head": "69afad0a6b83e7d842dd1615f4f28c96d2e467a9",
+          "checkpoint_current_head": "69afad0a6b83e7d842dd1615f4f28c96d2e467a9",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-next-2r-oi-c01-c03-design-r3",
+          "frozen_before_head": "35c269aecf0f1b756575af2ac5e355f2cf53757c",
+          "checkpoint_current_head": "35c269aecf0f1b756575af2ac5e355f2cf53757c",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-next-2r-oi-episode-id-v3-crosswalk-r1",
+          "frozen_before_head": "68f7b48feeeef611f0a514600d72217058f21637",
+          "checkpoint_current_head": "68f7b48feeeef611f0a514600d72217058f21637",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-next-2r-oi-pit-corrective-r2",
+          "frozen_before_head": "1e830a238906771585b49d844d9cb58ad79bba36",
+          "checkpoint_current_head": "1e830a238906771585b49d844d9cb58ad79bba36",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-next-episode-independent-audit-r1",
+          "frozen_before_head": "60ec10e6a039482a14f36fa4eef1035adc9da8e1",
+          "checkpoint_current_head": "60ec10e6a039482a14f36fa4eef1035adc9da8e1",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-next-episode-r2-independent-audit",
+          "frozen_before_head": "31b0d12d202862899829158f3b50c44fab8067df",
+          "checkpoint_current_head": "31b0d12d202862899829158f3b50c44fab8067df",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-next-oi-pit-r2-source-audit-r1",
+          "frozen_before_head": "8781a8e5439f6ed92d24ed69e2f9e0422b664745",
+          "checkpoint_current_head": "8781a8e5439f6ed92d24ed69e2f9e0422b664745",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "executed": false,
+      "reason": "contained/duplicate first, then archived original history; all still HOLD_PROTECTION_UNKNOWN",
+      "refs": [
+        {
+          "branch": "docs/v06-next-p1d-c4-independent-design-audit-r1",
+          "frozen_before_head": "019682bc0178504ef233e4560bb1e91508954f76",
+          "checkpoint_current_head": "019682bc0178504ef233e4560bb1e91508954f76",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-next-p1d-c4-versioned-design-r2",
+          "frozen_before_head": "931ee5c5ae1cbf341ce771269d4829d3eafa3deb",
+          "checkpoint_current_head": "931ee5c5ae1cbf341ce771269d4829d3eafa3deb",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-p1a-p1d-ci-report-archive-r1",
+          "frozen_before_head": "7ac48cb15cdbc0a8d9b1614251b238fd25190c49",
+          "checkpoint_current_head": "7ac48cb15cdbc0a8d9b1614251b238fd25190c49",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-p1c-h18-erratum-r3-correction",
+          "frozen_before_head": "c7d68cfd3f97c27723a48fb4722dd39ddc4a1290",
+          "checkpoint_current_head": "c7d68cfd3f97c27723a48fb4722dd39ddc4a1290",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-p1c-h18-narrative-erratum-r2",
+          "frozen_before_head": "b4f24c763895c97a0c304dc422db76a73761251d",
+          "checkpoint_current_head": "b4f24c763895c97a0c304dc422db76a73761251d",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-p1c-r3-independent-attestation-r1",
+          "frozen_before_head": "7750b69a87dcfb392bdfc8d20e7b7f174276452e",
+          "checkpoint_current_head": "7750b69a87dcfb392bdfc8d20e7b7f174276452e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-p1c-r4-clarification-response-r1",
+          "frozen_before_head": "3a5c071c1e25a11d8047105657f8df6755dc3aba",
+          "checkpoint_current_head": "3a5c071c1e25a11d8047105657f8df6755dc3aba",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-p1c-r4-five-citations-independent-review-r1",
+          "frozen_before_head": "e7a3f1100f781b8c0ecea6640a454f924b5ffeb3",
+          "checkpoint_current_head": "e7a3f1100f781b8c0ecea6640a454f924b5ffeb3",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-p1c-r4-five-citations-repair-r1",
+          "frozen_before_head": "62b06100eda56ee4af4b5051c5d67ac50dd461df",
+          "checkpoint_current_head": "62b06100eda56ee4af4b5051c5d67ac50dd461df",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-p1c-r4-independent-terminal-audit-r1",
+          "frozen_before_head": "b1f211b16be78bd1a73f004f5134f9e27f1a85a2",
+          "checkpoint_current_head": "b1f211b16be78bd1a73f004f5134f9e27f1a85a2",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-p1d-independent-causal-review-r1",
+          "frozen_before_head": "e11f84963adddc29b1dc106c1e0d2a984dd6add2",
+          "checkpoint_current_head": "e11f84963adddc29b1dc106c1e0d2a984dd6add2",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-p2-btc-feasibility-r2-independent-challenger",
+          "frozen_before_head": "6a35092d280dd35c7d1e81c4b6816540df847a16",
+          "checkpoint_current_head": "6a35092d280dd35c7d1e81c4b6816540df847a16",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-p2-btc-outcome-blind-source-cost-feasibility-r2",
+          "frozen_before_head": "1bd24ff42a5eedf498cb5ee574207790e2f3c144",
+          "checkpoint_current_head": "1bd24ff42a5eedf498cb5ee574207790e2f3c144",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-pa-price-action-novelty-crosswalk-r1",
+          "frozen_before_head": "414906cc78e15b57e7b37728da2d0858592e4c61",
+          "checkpoint_current_head": "414906cc78e15b57e7b37728da2d0858592e4c61",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r4-1-oi-r3-science-audit",
+          "frozen_before_head": "371a0c7160cf2da6685a3588d7b9a48c686443c8",
+          "checkpoint_current_head": "371a0c7160cf2da6685a3588d7b9a48c686443c8",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r4-1-oi-synthetic-receiver-audit",
+          "frozen_before_head": "557805c29508e212c3f01e309d9f183e3fd7d73e",
+          "checkpoint_current_head": "557805c29508e212c3f01e309d9f183e3fd7d73e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r4-1-p1d-wal-design-audit",
+          "frozen_before_head": "c95003d6a8498806586b94dfcfb1ac672e3b32e4",
+          "checkpoint_current_head": "c95003d6a8498806586b94dfcfb1ac672e3b32e4",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r5-1-pa-episode-cost-consequential-audit-r1",
+          "frozen_before_head": "c2e3424b243e7796c8c595b8a836afe6795937a9",
+          "checkpoint_current_head": "c2e3424b243e7796c8c595b8a836afe6795937a9",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r5-1-role-status-sync-verification-20261015",
+          "frozen_before_head": "64b715db5c5c520c2f23e1b28655c838b3932937",
+          "checkpoint_current_head": "64b715db5c5c520c2f23e1b28655c838b3932937",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r5-2c-episode-v3-challenge-r1",
+          "frozen_before_head": "90d7ef9c5485a72f6bcf4dacdc4310a7ff9373e6",
+          "checkpoint_current_head": "90d7ef9c5485a72f6bcf4dacdc4310a7ff9373e6",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "executed": false,
+      "reason": "contained/duplicate first, then archived original history; all still HOLD_PROTECTION_UNKNOWN",
+      "refs": [
+        {
+          "branch": "docs/v06-r5-2c-pa-novelty-challenge-r1",
+          "frozen_before_head": "1498c6ba9948ab874cbde615a63bf079e7a548bc",
+          "checkpoint_current_head": "1498c6ba9948ab874cbde615a63bf079e7a548bc",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r5-canonical-role-project-status-sync-20261015",
+          "frozen_before_head": "a85f7102fae3a4854cc1e3a9212caed3a02e3e9d",
+          "checkpoint_current_head": "a85f7102fae3a4854cc1e3a9212caed3a02e3e9d",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r5-controller-l2-alpha-source-feasibility-20261015-r1",
+          "frozen_before_head": "7300afa425277cf8f328082c15f17002552d6e8c",
+          "checkpoint_current_head": "7300afa425277cf8f328082c15f17002552d6e8c",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r6-1-episode-v3-r2-consequential-audit",
+          "frozen_before_head": "f41b369324883e8eacc6abdc3dfce2acdabf9e07",
+          "checkpoint_current_head": "f41b369324883e8eacc6abdc3dfce2acdabf9e07",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r6-2c-episode-v3-r2-challenge",
+          "frozen_before_head": "4ede5af0c5978b6dfb651d38aaa04ca6fd1016f6",
+          "checkpoint_current_head": "4ede5af0c5978b6dfb651d38aaa04ca6fd1016f6",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r6-2e-source-pit-cost-feasibility-r1",
+          "frozen_before_head": "f84b470c9d608aee4a161fe4c4e646d83c587f33",
+          "checkpoint_current_head": "f84b470c9d608aee4a161fe4c4e646d83c587f33",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r6-2r-episode-identity-correction-r2",
+          "frozen_before_head": "6866af7832f34551938e0ccf7f6fbe5f47982559",
+          "checkpoint_current_head": "6866af7832f34551938e0ccf7f6fbe5f47982559",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r6-2r-pa-b-paired-policy-contract-r1",
+          "frozen_before_head": "cfdebcf0b56b61c1db79c8595a222fdc5f8c3b2e",
+          "checkpoint_current_head": "cfdebcf0b56b61c1db79c8595a222fdc5f8c3b2e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r6-2r-pa-b-single-corrective-r2",
+          "frozen_before_head": "6718c1181160da8815084dfc6b0ba3f90420ac2c",
+          "checkpoint_current_head": "6718c1181160da8815084dfc6b0ba3f90420ac2c",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r6-t6-2c-pa-b-independent-challenge-r1",
+          "frozen_before_head": "46d77620b34aaba7cd02b1fab5d2397471738f1c",
+          "checkpoint_current_head": "46d77620b34aaba7cd02b1fab5d2397471738f1c",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r7-2e-source-rights-archive-preflight-r1",
+          "frozen_before_head": "b3e30039d6f2e78fe2f50e0ec96a0a04b9ae043a",
+          "checkpoint_current_head": "b3e30039d6f2e78fe2f50e0ec96a0a04b9ae043a",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r7-b0-2e-usdm-marketdata-rights-r1",
+          "frozen_before_head": "d10653b8220521b6091ab69aa426657c479f6e3e",
+          "checkpoint_current_head": "d10653b8220521b6091ab69aa426657c479f6e3e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r7-b0-controller-rest-ws-rights-dispatch-r1",
+          "frozen_before_head": "b4ce7868b4879d2b11a6e59437edeaa4b23b0b01",
+          "checkpoint_current_head": "b4ce7868b4879d2b11a6e59437edeaa4b23b0b01",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r7-five-role-copyable-prompt-cards-20261015-r1",
+          "frozen_before_head": "ab1270ebe3ff3141d75f976c74264a7022d00fda",
+          "checkpoint_current_head": "ab1270ebe3ff3141d75f976c74264a7022d00fda",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r7-l2-controller-source-rights-route-adjudication-r1",
+          "frozen_before_head": "f2fea1c90ff10b45d2bbd38bcd3a6f71ddc7e173",
+          "checkpoint_current_head": "f2fea1c90ff10b45d2bbd38bcd3a6f71ddc7e173",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r8-controller-d1-hm1-novelty-stop-r1",
+          "frozen_before_head": "53705d577b6212c282e7f9f3d912e94c5e2d9129",
+          "checkpoint_current_head": "53705d577b6212c282e7f9f3d912e94c5e2d9129",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r8-controller-strategy-first-phases-and-2r-d0-dispatch-r1",
+          "frozen_before_head": "046113826f747b6397bda2df6c36d170be813223",
+          "checkpoint_current_head": "046113826f747b6397bda2df6c36d170be813223",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r8-d0-2r-strategy-failure-hypothesis-r1",
+          "frozen_before_head": "05ebeb49927d3a0d5a9b85a24e29facb191335ee",
+          "checkpoint_current_head": "05ebeb49927d3a0d5a9b85a24e29facb191335ee",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r8-d1-2c-hm1-independent-challenge-r1",
+          "frozen_before_head": "bc90f5c8cd808b5e2d2f8c51a8a8d94100f727aa",
+          "checkpoint_current_head": "bc90f5c8cd808b5e2d2f8c51a8a8d94100f727aa",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r8-d1-2c-hm1-landmark-independent-challenge-r1",
+          "frozen_before_head": "29de5a231c3400901afc0b02a31bcbfbfd4d776f",
+          "checkpoint_current_head": "29de5a231c3400901afc0b02a31bcbfbfd4d776f",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "executed": false,
+      "reason": "contained/duplicate first, then archived original history; all still HOLD_PROTECTION_UNKNOWN",
+      "refs": [
+        {
+          "branch": "docs/v06-r9-g0-1-independent-strategy-program-audit-r1",
+          "frozen_before_head": "54d5d8c665814a53b0424e1584ac72a98a45c465",
+          "checkpoint_current_head": "54d5d8c665814a53b0424e1584ac72a98a45c465",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r9-g0-controller-strategy-program-audit-dispatch-r1",
+          "frozen_before_head": "62ca0c35cfbf9e78bee0beab76e04777ca960a37",
+          "checkpoint_current_head": "62ca0c35cfbf9e78bee0beab76e04777ca960a37",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r9-l1-controller-program-pause-and-restart-gate-r1",
+          "frozen_before_head": "ab0761ac81d0877e017673b8af40d64299107563",
+          "checkpoint_current_head": "ab0761ac81d0877e017673b8af40d64299107563",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r10-controller-budget-data-source-candidate-update-r1",
+          "frozen_before_head": "2913dc412544f5be8080e996aa7044d53265a688",
+          "checkpoint_current_head": "2913dc412544f5be8080e996aa7044d53265a688",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r10-d0-2e-binance-vision-offline-dev-pilot-r1",
+          "frozen_before_head": "980a4b6f79de5ad6dbff8d8b674ce3ca2d056c4b",
+          "checkpoint_current_head": "980a4b6f79de5ad6dbff8d8b674ce3ca2d056c4b",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r10-d0-controller-binance-vision-dev-pilot-dispatch-r1",
+          "frozen_before_head": "d560b60f87719941a0895dba1b2060718ba54784",
+          "checkpoint_current_head": "d560b60f87719941a0895dba1b2060718ba54784",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r10-d1-controller-local-agent-first-dispatch-r1",
+          "frozen_before_head": "4d83123243db8cf5ac4fd7b1c00608cb149f7bdc",
+          "checkpoint_current_head": "4d83123243db8cf5ac4fd7b1c00608cb149f7bdc",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r10-l2-low-budget-source-route-and-2e-manifest-preflight-r1",
+          "frozen_before_head": "6907718f9664aa4b84bc045128479cfc8c02a4c3",
+          "checkpoint_current_head": "6907718f9664aa4b84bc045128479cfc8c02a4c3",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r10-l3-controller-free-data-pilot-gate-r1",
+          "frozen_before_head": "3304109f6cecbea858dfb958381202bf30033868",
+          "checkpoint_current_head": "3304109f6cecbea858dfb958381202bf30033868",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r10-l4-exposed-development-hf-lineage-live-rights-clarification-r1",
+          "frozen_before_head": "285149095fc0d9a47ab86248d42fb609555a767d",
+          "checkpoint_current_head": "285149095fc0d9a47ab86248d42fb609555a767d",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r10-m0-2e-free-archive-metadata-preflight-r1",
+          "frozen_before_head": "53e0becd3ba47e383b92d399d0b0f92989e23ada",
+          "checkpoint_current_head": "53e0becd3ba47e383b92d399d0b0f92989e23ada",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r10-s0-2e-tardis-rights-pit-feasibility-r1",
+          "frozen_before_head": "185ae2e3f906f32ed8e19d3f4ad662c9183ca1fc",
+          "checkpoint_current_head": "185ae2e3f906f32ed8e19d3f4ad662c9183ca1fc",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r10-s0-controller-thirdparty-source-feasibility-dispatch-r1",
+          "frozen_before_head": "18d32305221c7ba3192269137daeb3ca4d2c6bd2",
+          "checkpoint_current_head": "18d32305221c7ba3192269137daeb3ca4d2c6bd2",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r11-c2-capacity-calibration-r1",
+          "frozen_before_head": "9dbb0ce7d266c0d6731775a7a53170bf34400520",
+          "checkpoint_current_head": "9dbb0ce7d266c0d6731775a7a53170bf34400520",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r11-controller-research-first-ci-mode-decision-20261016",
+          "frozen_before_head": "6b592a4162ca85bdb5552c75ba45f6a0838c61f0",
+          "checkpoint_current_head": "6b592a4162ca85bdb5552c75ba45f6a0838c61f0",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r11-controller-status-routing-and-bootstrap-20261016",
+          "frozen_before_head": "2f1e4b340c56448bfa0207ee2d6fc6dded797cfd",
+          "checkpoint_current_head": "2f1e4b340c56448bfa0207ee2d6fc6dded797cfd",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r11-l1-controller-wave1-review-and-independent-audit-dispatch-r1",
+          "frozen_before_head": "60afd151f4fde4c934dd2c58c857bd358efb178f",
+          "checkpoint_current_head": "60afd151f4fde4c934dd2c58c857bd358efb178f",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r11-q1-1-independent-data-gate-audit-r1",
+          "frozen_before_head": "8c3e53f8fe37d9a8acd340944b843e04f05d2fdc",
+          "checkpoint_current_head": "8c3e53f8fe37d9a8acd340944b843e04f05d2fdc",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-r11-q2-data-foundation-capacity-expansion-r1",
+          "frozen_before_head": "c07c60385479f0d595352ad751c1c49150b4cbbc",
+          "checkpoint_current_head": "c07c60385479f0d595352ad751c1c49150b4cbbc",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-reset-r1-fakeout-independent-novelty",
+          "frozen_before_head": "0c323641e4bcc1dcff43a06b02b931c72c15a24d",
+          "checkpoint_current_head": "0c323641e4bcc1dcff43a06b02b931c72c15a24d",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "executed": false,
+      "reason": "contained/duplicate first, then archived original history; all still HOLD_PROTECTION_UNKNOWN",
+      "refs": [
+        {
+          "branch": "docs/v06-reset-r1-historical-mechanism-crosswalk",
+          "frozen_before_head": "194cbac1d6846dd6ea4fa11b3dd6567b01969bd9",
+          "checkpoint_current_head": "194cbac1d6846dd6ea4fa11b3dd6567b01969bd9",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-reset-r1-inference-independent-method-audit",
+          "frozen_before_head": "ba0fb128add65c02fb8dfa4538e1cb065620d87e",
+          "checkpoint_current_head": "ba0fb128add65c02fb8dfa4538e1cb065620d87e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-reset-r1-oi-pit-source-independent-audit",
+          "frozen_before_head": "d825fd5de59cf2e88041fad23142dd3ceecb2711",
+          "checkpoint_current_head": "d825fd5de59cf2e88041fad23142dd3ceecb2711",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "docs/v06-reset-r1-price-shock-oi-source-pit",
+          "frozen_before_head": "5897e31661834272f2a4f2a8828fb987725cb2e0",
+          "checkpoint_current_head": "5897e31661834272f2a4f2a8828fb987725cb2e0",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/b-line-ci-fast-path-r1",
+          "frozen_before_head": "430becb96389a62481e4d4def07065054e658eee",
+          "checkpoint_current_head": "430becb96389a62481e4d4def07065054e658eee",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/b-line-live-v1",
+          "frozen_before_head": "08e81bec003d645a0a0582db183a1b6916887eff",
+          "checkpoint_current_head": "08e81bec003d645a0a0582db183a1b6916887eff",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/b-line-rc1-wp-a-operational-readiness",
+          "frozen_before_head": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+          "checkpoint_current_head": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/b-line-rc1-wp-b-decision-quality",
+          "frozen_before_head": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
+          "checkpoint_current_head": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/b-line-rc1-wp-c-llm-approval",
+          "frozen_before_head": "72b39de71024b3051357c17eee7922e657dcb81f",
+          "checkpoint_current_head": "72b39de71024b3051357c17eee7922e657dcb81f",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/b-line-rc1-wp-d-release-engineering",
+          "frozen_before_head": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+          "checkpoint_current_head": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/b-line-rc2-tactical-successor-r1",
+          "frozen_before_head": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+          "checkpoint_current_head": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/market-watch-feishu",
+          "frozen_before_head": "155fb76ae288d270c380d930c072b3092993caec",
+          "checkpoint_current_head": "155fb76ae288d270c380d930c072b3092993caec",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/market-watch-feishu-r1",
+          "frozen_before_head": "d9e509ad0c3cabbfd0bd0b474e3f9be63f5133dc",
+          "checkpoint_current_head": "d9e509ad0c3cabbfd0bd0b474e3f9be63f5133dc",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/tactical-policy-r2",
+          "frozen_before_head": "52c16a28153de307dc6132c0975fe29341a0a918",
+          "checkpoint_current_head": "52c16a28153de307dc6132c0975fe29341a0a918",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-btc-12h-funding-mark-economic-admission-r3",
+          "frozen_before_head": "057c47a4bfd248131f4fd94d12d3deef73c65e1f",
+          "checkpoint_current_head": "057c47a4bfd248131f4fd94d12d3deef73c65e1f",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-btc-two-lead-mark-gap-repair-r31",
+          "frozen_before_head": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+          "checkpoint_current_head": "990c02b5479b3b14996f90fdbf677cb672ada81e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-codex-g1-offline-dryrun-preview-r1",
+          "frozen_before_head": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+          "checkpoint_current_head": "861a9d148f72db00e6079e53af78220bdd7e84ce",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-codex-r3-independent-causal-audit-r1",
+          "frozen_before_head": "a64a33caf3323447daa09b4e15214894007b8dfe",
+          "checkpoint_current_head": "a64a33caf3323447daa09b4e15214894007b8dfe",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-exit-horizon-r1",
+          "frozen_before_head": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+          "checkpoint_current_head": "55ac4c631c69f6edbd275462ad23e4486b9782ed",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-btc-flow-regime-discovery-r2",
+          "frozen_before_head": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
+          "checkpoint_current_head": "3df7a9a490a06c398d20da57bf19fc48d3b1c74e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "executed": false,
+      "reason": "contained/duplicate first, then archived original history; all still HOLD_PROTECTION_UNKNOWN",
+      "refs": [
+        {
+          "branch": "feature/v06-bline-g2-btc-public-empirical-fast-r1",
+          "frozen_before_head": "920b244d06541da5cb9fc3dcaa39e5b15e914d32",
+          "checkpoint_current_head": "920b244d06541da5cb9fc3dcaa39e5b15e914d32",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-codex-btc-exit-aware-research-r3",
+          "frozen_before_head": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+          "checkpoint_current_head": "a69ccfdfd578bd0b7d3aa43d75959a659f969782",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-data-readiness-sol61-r1",
+          "frozen_before_head": "7f96369b1209ffdaca5d7f1233c2c9c0ae17ae29",
+          "checkpoint_current_head": "7f96369b1209ffdaca5d7f1233c2c9c0ae17ae29",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-independent-science-pivot-r4",
+          "frozen_before_head": "98c99ae2690c9e771f65e8ef9dc6a2124d8d6c3f",
+          "checkpoint_current_head": "98c99ae2690c9e771f65e8ef9dc6a2124d8d6c3f",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-overnight-discovery-a",
+          "frozen_before_head": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+          "checkpoint_current_head": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-overnight-verifier-b",
+          "frozen_before_head": "52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7",
+          "checkpoint_current_head": "52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+          "frozen_before_head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+          "checkpoint_current_head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+          "frozen_before_head": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+          "checkpoint_current_head": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-r3-p1-alt-engine-final-independent-b-r1",
+          "frozen_before_head": "fc0e4a2faedbd87880ad0fa3d415756add5bf72d",
+          "checkpoint_current_head": "fc0e4a2faedbd87880ad0fa3d415756add5bf72d",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-r3-p1-alt-engine-gemini-a-r1",
+          "frozen_before_head": "164243b770f74f98876b55a7f070b1adf2f554d5",
+          "checkpoint_current_head": "164243b770f74f98876b55a7f070b1adf2f554d5",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-r3-p1-alternative-engine-design-sol61-r1",
+          "frozen_before_head": "c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01",
+          "checkpoint_current_head": "c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-r3-scientific-strategy-review-sol61-r1",
+          "frozen_before_head": "57818b967a836382caa3fa95516d3e027e990f61",
+          "checkpoint_current_head": "57818b967a836382caa3fa95516d3e027e990f61",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-r3-sol-science-gate-r1",
+          "frozen_before_head": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+          "checkpoint_current_head": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+          "frozen_before_head": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+          "checkpoint_current_head": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+          "frozen_before_head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+          "checkpoint_current_head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-a-code-identity-exploratory-replay-r2",
+          "frozen_before_head": "d2477c1aaff601e0740a6899e60d85224c75a4dc",
+          "checkpoint_current_head": "d2477c1aaff601e0740a6899e60d85224c75a4dc",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-a-sol-economic-recompute-r1",
+          "frozen_before_head": "d1f9f4316a2485f5d09ee1c910d7797ecfc6be7e",
+          "checkpoint_current_head": "d1f9f4316a2485f5d09ee1c910d7797ecfc6be7e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-abc-clash-routed-feed-bridge-r2",
+          "frozen_before_head": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "checkpoint_current_head": "632d2e37f28b8c3efbd2b818ecdb74783f0df238",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-abc-market-event-bridge-r1",
+          "frozen_before_head": "df00997f344eba82f7cca0d03ee1617948abee44",
+          "checkpoint_current_head": "df00997f344eba82f7cca0d03ee1617948abee44",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-b-scoped-ruff-r1",
+          "frozen_before_head": "b51a0019c68c8539895ac1b48379f0045e5bfdae",
+          "checkpoint_current_head": "b51a0019c68c8539895ac1b48379f0045e5bfdae",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "executed": false,
+      "reason": "contained/duplicate first, then archived original history; all still HOLD_PROTECTION_UNKNOWN",
+      "refs": [
+        {
+          "branch": "feature/v06-bline-gemini-boost-architecture-lean-test-r1",
+          "frozen_before_head": "fdec02d5d7cf9d80ae45fc36c56af5008df003d6",
+          "checkpoint_current_head": "fdec02d5d7cf9d80ae45fc36c56af5008df003d6",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-f3-sparse-inference-audit-r1",
+          "frozen_before_head": "48c39a387745f9ec379d78a001e6362579bf7a48",
+          "checkpoint_current_head": "48c39a387745f9ec379d78a001e6362579bf7a48",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-forward-public-feed-r1",
+          "frozen_before_head": "df00997f344eba82f7cca0d03ee1617948abee44",
+          "checkpoint_current_head": "df00997f344eba82f7cca0d03ee1617948abee44",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-forward-shadow-research-r1",
+          "frozen_before_head": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+          "checkpoint_current_head": "51cdd4e17503fbd18ad22aaeeaba3580f5efacf8",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-g1-offline-assurance-r1",
+          "frozen_before_head": "9dad78c40ae28ec59fc1d186dc7802ea7f79594a",
+          "checkpoint_current_head": "9dad78c40ae28ec59fc1d186dc7802ea7f79594a",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-g1g3-offline-ports-r1",
+          "frozen_before_head": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+          "checkpoint_current_head": "91495e5b8c178e60f3cf2f56eab3ad4deeb7c86b",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-g2-conditional-exit-r1",
+          "frozen_before_head": "a862eece9733a614df7624449a8499716d9e6cb3",
+          "checkpoint_current_head": "a862eece9733a614df7624449a8499716d9e6cb3",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-g2-flow-funding-entries-r1",
+          "frozen_before_head": "f25954b45577cebb7624fae86cd91df9071a87ab",
+          "checkpoint_current_head": "f25954b45577cebb7624fae86cd91df9071a87ab",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-goal-a-conformance-r2",
+          "frozen_before_head": "9415441f216b2eaca6078102cf7ec05b8e6b57cf",
+          "checkpoint_current_head": "9415441f216b2eaca6078102cf7ec05b8e6b57cf",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-goal-b-asof-repair-r2",
+          "frozen_before_head": "d5e3a8407b1b84111dc7f4276865ffd68cb0a7d2",
+          "checkpoint_current_head": "d5e3a8407b1b84111dc7f4276865ffd68cb0a7d2",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-goal-c-risk-assurance-r2",
+          "frozen_before_head": "c9846adacc1f2df85931ecf4649e02a3a61cf466",
+          "checkpoint_current_head": "c9846adacc1f2df85931ecf4649e02a3a61cf466",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-goal-entry-discovery-r2",
+          "frozen_before_head": "efa0b302233800f6474b3dda5775be56a77d0860",
+          "checkpoint_current_head": "efa0b302233800f6474b3dda5775be56a77d0860",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-goal-execution-assurance-r1",
+          "frozen_before_head": "f381dd73a8c583e2a28dcab2e354b019b1d946fa",
+          "checkpoint_current_head": "f381dd73a8c583e2a28dcab2e354b019b1d946fa",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-goal-h18-mechanism-r1",
+          "frozen_before_head": "397a62c1a0fbd6ad14a569a5be0058b1f684f08e",
+          "checkpoint_current_head": "397a62c1a0fbd6ad14a569a5be0058b1f684f08e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-goal-range-reversal-r1",
+          "frozen_before_head": "db0f01e9d8674c0ce9f0b083c5961f6d17f20eda",
+          "checkpoint_current_head": "db0f01e9d8674c0ce9f0b083c5961f6d17f20eda",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-goal-trend-flow-r1",
+          "frozen_before_head": "a37721eaa1f3cd176146df6bdb63fbd17746189e",
+          "checkpoint_current_head": "a37721eaa1f3cd176146df6bdb63fbd17746189e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-normal-ci-riskmap-fastpath-r1",
+          "frozen_before_head": "b760a5e43e6bedc44ecec81284b8db094f50c902",
+          "checkpoint_current_head": "b760a5e43e6bedc44ecec81284b8db094f50c902",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-gemini-r3-portable-ci-funding-pit-source-qualification",
+          "frozen_before_head": "97f4040b9380f2069575a989c066d1daeef15194",
+          "checkpoint_current_head": "97f4040b9380f2069575a989c066d1daeef15194",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-p2-owner-exact-root-metadata-r1",
+          "frozen_before_head": "4a1fcc2871708f0e9e3a7c40036ecaab39ba99b8",
+          "checkpoint_current_head": "4a1fcc2871708f0e9e3a7c40036ecaab39ba99b8",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-p2-s2-gemini-source-contract-r1",
+          "frozen_before_head": "01af4fcef012e28fd85eaa2550d9539bd23fcf3a",
+          "checkpoint_current_head": "01af4fcef012e28fd85eaa2550d9539bd23fcf3a",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "executed": false,
+      "reason": "contained/duplicate first, then archived original history; all still HOLD_PROTECTION_UNKNOWN",
+      "refs": [
+        {
+          "branch": "feature/v06-bline-p2-s2-sol61-pit-science-r1",
+          "frozen_before_head": "e6bcaf62a69cde32149db3cd4997f7f2dad526ef",
+          "checkpoint_current_head": "e6bcaf62a69cde32149db3cd4997f7f2dad526ef",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-p2-s3-footer-reader-r1",
+          "frozen_before_head": "999cf7005c741bdbabae727f10f90f23330fb035",
+          "checkpoint_current_head": "999cf7005c741bdbabae727f10f90f23330fb035",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-p2-s3a-codex-one-shot-fd-r3",
+          "frozen_before_head": "db77118b9fa49d4626b39c2120cc19ca2341245a",
+          "checkpoint_current_head": "db77118b9fa49d4626b39c2120cc19ca2341245a",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-p2-s3a-codex-sol-audit-r1",
+          "frozen_before_head": "91bf48e007dc36239a79ec38ce01f4f77abadc4c",
+          "checkpoint_current_head": "91bf48e007dc36239a79ec38ce01f4f77abadc4c",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-p2-s3a-r3-ci-parity-diagnostic-r1",
+          "frozen_before_head": "db77118b9fa49d4626b39c2120cc19ca2341245a",
+          "checkpoint_current_head": "db77118b9fa49d4626b39c2120cc19ca2341245a",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-postp1-gemini-p2-metadata-r1",
+          "frozen_before_head": "1e12d6a6467d3bc39c0deedd97204604ac623f18",
+          "checkpoint_current_head": "1e12d6a6467d3bc39c0deedd97204604ac623f18",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-bline-postp1-sol61-opportunity-science-r1",
+          "frozen_before_head": "5032259954e001635c97110c9c50e4a35a2c95b5",
+          "checkpoint_current_head": "5032259954e001635c97110c9c50e4a35a2c95b5",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-chat-researcher-collaboration-proposal-r1",
+          "frozen_before_head": "b21b1b724c470ae61b18822e3bdb0c52aa480a59",
+          "checkpoint_current_head": "b21b1b724c470ae61b18822e3bdb0c52aa480a59",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-next-codex-oi-receiver-r2",
+          "frozen_before_head": "d528976217ec6d5b1ece621d409bbfba0019e36c",
+          "checkpoint_current_head": "d528976217ec6d5b1ece621d409bbfba0019e36c",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-next-episode-causal-input-repair-r2",
+          "frozen_before_head": "bc27ab8ab41319ba08f381d908d12f8fb05a104e",
+          "checkpoint_current_head": "bc27ab8ab41319ba08f381d908d12f8fb05a104e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-p1a-r2-btc-synthetic-per-fill-cost-engine",
+          "frozen_before_head": "0540e2c902ef9565cd3719e60174ac01b1c22adf",
+          "checkpoint_current_head": "0540e2c902ef9565cd3719e60174ac01b1c22adf",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-p1d-consumer-c-late-funding-pit-r2",
+          "frozen_before_head": "81c613c3c8dc3fb22fd4d09b2d0ef4674f09c079",
+          "checkpoint_current_head": "81c613c3c8dc3fb22fd4d09b2d0ef4674f09c079",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-p1d-r4-synthetic-g1-funding-causal-integration",
+          "frozen_before_head": "81a71467ac7a9b852587b6e5f826d8ee28fc769c",
+          "checkpoint_current_head": "81a71467ac7a9b852587b6e5f826d8ee28fc769c",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-r4-2e-oi-synthetic-witness-r1",
+          "frozen_before_head": "2320c59ad7b324cdf3947826e82e042d8be38ddc",
+          "checkpoint_current_head": "2320c59ad7b324cdf3947826e82e042d8be38ddc",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-r10-d1-local-binance-vision-dev-qc-r1",
+          "frozen_before_head": "5630b178bf2f497f67a7e2db2d730f0b2aacabfe",
+          "checkpoint_current_head": "5630b178bf2f497f67a7e2db2d730f0b2aacabfe",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-r11-d2-binance-core-pilot-r1",
+          "frozen_before_head": "803a4173717ace9c03ff97051b7696210e183bef",
+          "checkpoint_current_head": "803a4173717ace9c03ff97051b7696210e183bef",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-r11-e2-okx-portal-pilot-r1",
+          "frozen_before_head": "7f8c6acadead47dccdeba80b2ae27c2497ee8cdf",
+          "checkpoint_current_head": "7f8c6acadead47dccdeba80b2ae27c2497ee8cdf",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "feature/v06-reset-r1-canonical-episode-counter-synthetic",
+          "frozen_before_head": "a144640acda5340b2b120ad5a451c3d193dea81c",
+          "checkpoint_current_head": "a144640acda5340b2b120ad5a451c3d193dea81c",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "proof/v06-episode-r2-green-final-focused",
+          "frozen_before_head": "bc27ab8ab41319ba08f381d908d12f8fb05a104e",
+          "checkpoint_current_head": "bc27ab8ab41319ba08f381d908d12f8fb05a104e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "proof/v06-episode-r2-green-focused",
+          "frozen_before_head": "e754c6096ed687e5a11a74ab3491199c720afc72",
+          "checkpoint_current_head": "e754c6096ed687e5a11a74ab3491199c720afc72",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "executed": false,
+      "reason": "contained/duplicate first, then archived original history; all still HOLD_PROTECTION_UNKNOWN",
+      "refs": [
+        {
+          "branch": "proof/v06-episode-r2-red-focused",
+          "frozen_before_head": "993a69a387cb1bd4b9df772d415c1e3792b128ee",
+          "checkpoint_current_head": "993a69a387cb1bd4b9df772d415c1e3792b128ee",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "proof/v06-episode-r2-red-synthetic-only",
+          "frozen_before_head": "b05715704e228e7ad06597a919c0fd2f802d491d",
+          "checkpoint_current_head": "b05715704e228e7ad06597a919c0fd2f802d491d",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "repair/v06-p1a-r2-doc-surface-ci-r1",
+          "frozen_before_head": "bc91a9d58701f5ace3b7d26e912e2a81ad9502a5",
+          "checkpoint_current_head": "bc91a9d58701f5ace3b7d26e912e2a81ad9502a5",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "repair/v06-p1d-r2-doc-surface-ci-r1",
+          "frozen_before_head": "04cbc46497ed26b0c4e889f30fa10eb8d666a79e",
+          "checkpoint_current_head": "04cbc46497ed26b0c4e889f30fa10eb8d666a79e",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "v0.6.1",
+          "frozen_before_head": "5e7a33bf3ffb73704092e1497055926b89b21b55",
+          "checkpoint_current_head": "5e7a33bf3ffb73704092e1497055926b89b21b55",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        },
+        {
+          "branch": "validation/b-line-rc2-r11-l2-qualification",
+          "frozen_before_head": "274b396aca5990f56ca59d058d865d573b3d0011",
+          "checkpoint_current_head": "274b396aca5990f56ca59d058d865d573b3d0011",
+          "preserved_original_by_sha": "eeb12e83497a85d25c9ac8df6040a2bf45c4ad79",
+          "current_head_retained_main": false
+        }
+      ]
+    }
+  ]
+}
