@@ -1,3 +1,5 @@
+> **Owner-directed R2 operating docs prepared (isolated branch; not independently merged):** [Research-first process](V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md) · [current concise roadmap](V0.6_PROJECT_STATUS_AND_ROADMAP.md) · [Controller R2 bootstrap](../../prompts/v0.6/chat_handover/V065_NEW_CHAT_B_LINE_CONTROLLER_R2.md). No executable source/CI/workflow change. This is an updated navigation pointer, not an alteration of M0's frozen code/validation conclusion.
+
 > **Current unified Controller entry:** [V065 fresh bootstrap](../../prompts/v0.6/chat_handover/V065_NEW_CHAT_B_LINE_CONTROLLER_R1.md). Existing dispatched bootstraps remain historical, unmodified artifacts.
 
 # v0.6.5 — Unified B-line Integration Status R1
