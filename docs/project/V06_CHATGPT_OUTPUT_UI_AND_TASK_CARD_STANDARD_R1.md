@@ -1,156 +1,56 @@
-# quant v0.6 — ChatGPT Output UI & Task Card Standard R1
+# v0.6.5 — Controller UI and Copyable Task Cards R2
 
-**Status:** ACTIVE  
-**Applies to:** B-line five sessions and the separate A-line Controller  
-**Purpose:** keep owner-facing outputs scannable while preserving exact-SHA scientific governance.
+**ACTIVE after integration review.** Audience: B-line 0 / 1 / 2-R / 2-C / 2-E. Owner preference: **visual, compact, action-oriented**, with prompt-copy controls and exact links, not full prompt dumps. [Research-first operating contract](V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md). [Prior complete R1 standard](https://github.com/EXASHXE/btc-quant-agent-public/blob/065d62965373627c4887e52f482d1dcb984af860/docs/project/V06_CHATGPT_OUTPUT_UI_AND_TASK_CARD_STANDARD_R1.md).
 
-> [!IMPORTANT]
-> Presentation never changes authority. A compact card, green status, or copyable prompt is not a scientific acceptance, source-admission grant, merge approval, TESTNET approval, or LIVE approval.
+## First-screen contract for Controller 0
 
-## 1. Owner-facing hierarchy
+Show the same five elements in this order (aim for one mobile screen):
+1. **Phase header:** `quant v0.6.5 | observed SHA | priority BTC 4–24h after-cost Alpha`.
+2. **4–7 row dashboard:** branch integration, data/D2/E2/C2, PIT/source, strategy/Alpha, critical blocker, next gate, TESTNET/LIVE. Avoid decorative green `PASS` for author-only receipts.
+3. **One Controller decision:** `GO_FOR_BOUNDED_TASK`, `WAIT_FOR_EVIDENCE` or `STOP/REPLAN` + strongest factual reason.
+4. **Small READY task cards**, grouped by parallel W1 / serial gate / conditional W2.
+5. **Next checkpoint:** the exact new fact or owner choice that can change the decision.
 
-Unless the owner explicitly asks for the full report, use:
+No repeated list of old phases or massive review quote before actionable choices.
 
-1. **Status dashboard** — phase, gates, blockers, next gate.
-2. **Decision card** — only when a decision exists.
-3. **Task cards** — grouped by parallel wave.
-4. **Evidence/receipt card** — exact SHA/blob, tests, diff, terminal.
-5. **Long-form detail** — only on request or where a consequential audit trail requires it.
+## Task card fields (always populated where known)
 
-Do not repeat the same information in prose, tables and prompt bodies.
+**`TASK_ID · SHORT TITLE`** / state `READY | RUNNING | DELIVERED | REVIEWED | BLOCKED | PREPARED_CONDITIONAL | STOP`
 
-## 2. Status dashboard
+- **Executor + observed model:** ChatGPT role or Codex/Gemini mode; no unverified model assertion.
+- **Objective + acceptance:** one result in 1–2 sentences.
+- **Prerequisite and parallel wave:** exact SHA for consequential targets; distinct branch/worktree/path owner; W2 conditions visibly **NOT DISPATCHED**.
+- **Frozen original Prompt:** a real `github.com/.../blob/<full commit SHA>/<prompt path>` URL. If no published prompt exists, explicitly label `UNPUBLISHED` instead of inventing a link.
+- **Copy prompt:** where interactive UI supports host copy, use a real button/action that copies the exact ready prompt; otherwise show **one** copyable code block or exact prompt link, not an inert fake button or raw prompt repeated in narrative.
+- **Receipt:** if task delivered, replace “Copy to execute” with author SHA, report link, actual test status and review dependency.
 
-Keep the first screen to 6–8 rows.
+Do not paste full task prose outside the card. If owner specifically requests the full prompt, give one clearly copyable block, not multiple identical versions.
 
-| Dimension | Status | Next gate |
-|---|---|---|
-| Phase | current stage | stage gate |
-| Alpha | NO_GO / CANDIDATE / VALIDATED | explicit scientific test |
-| Data | READY / PARTIAL / BLOCKED | source/PIT admission |
-| Engineering | RESEARCH_ONLY / INTEGRATION / RELEASE | engineering gate |
-| TESTNET | NOT_AUTHORIZED / READY | safety gate |
-| LIVE | NO_GO / NOT_AUTHORIZED | release authorization |
-| Critical blocker | one line | owner/controller action |
-| Next wave | task IDs | dependencies |
+## Ready wave vs conditional successors
 
-The dashboard is navigation, not evidence.
+The Controller should present all independent READY tasks in one packet where source scopes and path ownership are known. They may run concurrently across **different** role chats/Codex worktrees. **One substantive task per chat at a time**. W2 remains draft/prepared until W1 evidence is frozen and gates are decided; prewriting does not constitute dispatch. Parallelize docs/architecture/source metadata only if no overlapping target files or decisions.
 
-## 3. Task card
+## Progress vocabulary
 
-### STATUS · TASK_ID · SHORT TITLE
+- `DRAFT`: unpublished; `READY`: requirements met and scope frozen; `RUNNING`: observed execution; `DELIVERED`: author pushed only; `REVIEWED`: an independent verdict, including FAIL; `CONTROLLER_DECIDED`: exact authority; `BLOCKED`: missing specific source/rights/PIT/capacity; `STOP`: finite terminal; `SUPERSEDED`: pointer replaced, old evidence frozen.
+- Do **not** conflate published commit, local tests, hosted green CI, independently accepted source or successful Alpha.
+- A/C2/D2/E2 docs should never show an independently green check solely because the author says accepted-with-limits.
 
-| Field | Value |
+## Other roles' default UIs
+
+| Role | Default |
 |---|---|
-| Executor | role + model mode |
-| Objective | one sentence |
-| Scope | one short line |
-| Prerequisites | exact task IDs / SHA state |
-| Expected output | report / code / data receipt |
-| Authorization | READY / CONDITIONAL / BLOCKED / NOT_AUTHORIZED |
-| Original prompt | exact GitHub prompt link |
-| Parallel wave | W1 / W2 / SERIAL |
+| Controller 0 | concise dashboard → decision → W1 cards → W2 conditional → next evidence |
+| Auditor 1 | target/evidence → top 2–4 consequential findings → one verdict/required witness |
+| Researcher 2-R | novelty vs historical X → new data Z → falsifier → causal/cost/power gates |
+| Challenger 2-C | strongest claim → most damaging counterexample → challenge verdict |
+| Executor 2-E | changed file/SHA → focused test/NOT_RUN → completion |
+| Codex/Gemini | implemented change + measured evidence + exact diff, no unbounded logs |
 
-Rules:
-- Never paste the full prompt into card prose.
-- The exact GitHub prompt is canonical.
-- READY tasks may expose one copyable prompt block when dispatch is requested.
-- PREPARED_CONDITIONAL tasks show dependencies but do not look executable.
-- BLOCKED tasks show blocker and required evidence, not a large prompt.
-- COMPLETED tasks show the receipt and original prompt link; do not reissue them.
-- Never invent future SHAs.
-- One substantive task per chat/session; parallelism is cross-session only when safe.
+## Testing and receipt economy
 
-## 4. Copyable prompt UX
+**T0 docs:** changed path/commit, link/diff integrity; **no mandatory entire pytest/Ruff/mypy**. **T1 low-risk code:** only changed-module unit tests/lint. **T2 causal/source/financial semantics:** targeted positive and negative invariants and an independent decision *when consequential*. **T3 TESTNET/live/release:** full required exact-SHA CI and independent gate. Actual automatic CI may run under existing workflow; report its real status. `NOT_RUN_BY_SCOPE` is not `PASS`. See [test ladder](V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md#5-risk-weighted-verification-instead-of-all-tests-always).
 
-For ChatGPT owner-facing responses, use one copyable code/writing block for a READY prompt when the owner needs to dispatch it. Do not duplicate the prompt in prose.
+## Immutable prompt lifecycle and boundaries
 
-Copy/edit actions vary by ChatGPT plan, device and rollout, so use supported copyable blocks rather than fabricated HTML buttons.
-
-For repository Markdown, long prompt bodies should be inside a collapsed details section:
-
-<details>
-<summary>Copy / inspect exact prompt</summary>
-
-~~~text
-EXACT PROMPT CONTENT
-~~~
-
-</details>
-
-Keep the original GitHub prompt link visible outside the collapsed section.
-
-## 5. Parallel waves
-
-Represent concurrent work as:
-
-### Parallel Wave W1
-- task card A
-- task card B
-- task card C
-
-### Gate W1 → W2
-A PASS + B PASS + C PASS → W2
-
-Do not serialize independent documentary, capacity or source-feasibility work without a dependency reason.
-
-Do not parallelize work that shares a path, depends on an unfrozen SHA, compromises reviewer independence, violates one-chat-one-task, or exceeds approved resource limits.
-
-## 6. Status vocabulary
-
-- READY — dispatchable now.
-- PREPARED_CONDITIONAL — designed but prerequisites are not satisfied.
-- BLOCKED — authority/evidence missing.
-- RUNNING — execution started.
-- DELIVERED — artifact exists; Controller has not adjudicated.
-- ACCEPTED — authorized independent acceptance exists.
-- STOP — terminal negative decision.
-- SUPERSEDED — replaced by later exact-SHA authority.
-
-A prepared prompt is never implicit execution authorization.
-
-## 7. Role output defaults
-
-| Role | Default surface |
-|---|---|
-| 0 Controller | STATUS → DECISION → TASK CARDS → NEXT GATE |
-| 1 Auditor | TARGET → EVIDENCE → FINDINGS → VERDICT |
-| 2-R Researcher | HYPOTHESIS → MECHANISM → DATA/PIT → FALSIFICATION → NEXT TEST |
-| 2-C Challenger | TARGET → COUNTERARGUMENT → FAILURE MODE → REPAIR/STOP |
-| 2-E Executor | EXECUTION → CHANGE → TEST → REMOTE RECEIPT → TERMINAL |
-| A-line Controller | STATUS → DECISION → TASK CARDS → EVIDENCE, with A-line authority boundary |
-
-## 8. Evidence receipt
-
-| Field | Value |
-|---|---|
-| Task | task ID |
-| Start SHA | exact |
-| Parent | exact |
-| Changed paths | allowlist result |
-| Output SHA | exact |
-| Output blob | exact |
-| Tests | actual commands/results |
-| Remote push | VERIFIED / NOT_VERIFIED |
-| Reviewer | distinct role |
-| Terminal | exact |
-
-A local commit is not a remote delivery receipt.
-
-## 9. Project progress
-
-Status documents lead with phase, scientific verdict, active gates, parallel wave, critical blockers and next decision. Historical detail may be collapsed. Historical evidence remains immutable and must not be overwritten to make the dashboard look cleaner.
-
-## 10. Prompt lifecycle
-
-DRAFT → READY → DISPATCHED → RUNNING → DELIVERED → INDEPENDENTLY REVIEWED → CONTROLLER ADJUDICATED
-
-A material scope change requires a new prompt SHA/blob and revision/task identity. Never silently mutate an already dispatched prompt.
-
-## 11. Governance invariant
-
-The UI must never bypass PIT, execution-cost, source-rights, multiplicity, protected-data, TESTNET/LIVE, reviewer-independence or G2/G4 gates.
-
-## 12. Owner preference
-
-Default communication is **card-first and concise**. Full prompts/reports are shown only once, inside the appropriate copyable or requested detailed surface. The objective is maximum decision information per screen without reducing the underlying scientific record.
+`DRAFT → PUBLISHED_READY → RUNNING → DELIVERED → INDEPENDENTLY_REVIEWED (when material) → CONTROLLER_DECIDED`. Content edits to a dispatched prompt need a new revision and blob. No role can create authority by presentation, and one green card cannot remove `SOURCE_NOT_ADMITTED / PIT_UNKNOWN / COST_INCOMPLETE / G2_ALPHA_NO_GO / G4_TESTNET_NO_GO / LIVE_NO_GO / REAL_FUNDS_WRITE_NONE`.
