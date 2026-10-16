@@ -1,5 +1,16 @@
 # quant v0.6 — Five-Session ChatGPT Role Matrix R1
 
+## R11 execution-routing update — 2026-10-16
+
+**Default implementation rule:** local Codex/Gemini handles local data acquisition, data QC, filesystem/capacity measurement, long-running operations and quality-critical or complex engineering. Gemini NORMAL is for routine deterministic engineering; Gemini BOOST for cross-module/semantic complexity; Codex High/Sol for economically or scientifically consequential work and high-correctness validation when explicitly available.
+
+**2-E boundary:** 2-E is intentionally limited to simple deterministic edits: small documentation/metadata/link repairs and narrowly specified code/test changes with known semantics. It is not the default for data ingestion, PIT/source-rights, financial semantics, strategy discovery, broad refactors or quality-critical consequential implementation.
+
+**Current R11 queue:** C2/D2/E2 are local-agent tasks authorized by R11-Q2 and are not 2-E tasks. They may run in parallel because they have distinct workspaces/outputs and no shared scientific result dependency. R11-Q3 follows exact-SHA delivery and Controller L2 verification.
+
+**Owner-facing prompt format:** each dispatched task must have a compact card, exact GitHub prompt link, and a separate copyable prompt block.
+
+
 > **R7 active role scheduler — 2026-10-15:** [Latest handover](../handover/V06_BLINE_CONTROLLER_R7_HANDOVER_20261015.md). Exactly five separate B-line chats: `0` Controller, `1` Auditor, `2-R` Researcher, `2-C` Challenger and `2-E` bounded Executor. A-line Controller separate. One task at a time **per chat**, cross-chat parallel only when each prerequisite is present. 2-R T6 concluded STOP; 2-C/1 final conditional T6 review not triggered; 2-E R7-S0 documentary-only pending. 0 alone adjudicates any new source-file/data permit. H40 A-line-specific and P1D full engine not in B-line active path. Earlier dated matrix examples are historical.
 
 
