@@ -25,7 +25,7 @@
 - **T2 market-source/PIT/financial code**: affected invariant positive/negative tests + independent gate if used to claim true source/Alpha/financial authority.
 - **T3 real integration/release/account capability**: required full suites, branch checks, negative financial safety, independent release verdict.
 
-CI is **not yet formally disabled**, and protection verification is pending; this matrix does not authorize trigger changes. Failure not relabeled success.
+M1 completed verified default migration, removed only the old weekly scheduled CI, and retained push/PR/manual checks. Scoped main CI #38918484549 at `941f24af8f1e12c1f314e2d970e7af8f97293b21` SUCCESS does not imply full source/science/release acceptance. Further workflow/protection changes require fresh authorization.
 
 ## Current v0.6.5 queue facts
 
@@ -36,3 +36,7 @@ Integration candidate `065d62965373627c4887e52f482d1dcb984af860` exists but stil
 [0 Controller](../roles/V0.6_CHATGPT_0_PRIMARY_CONTROLLER.md) · [1 Auditor](../roles/V0.6_CHATGPT_1_SUPERVISORY_AUDITOR.md) · [2-R Researcher](../roles/V0.6_CHATGPT_2_INDEPENDENT_RESEARCH_SCIENTIST.md) · [2-C Challenger](../roles/V0.6_CHATGPT_2_ADVERSARIAL_CHALLENGER.md) · [2-E Executor](../roles/V0.6_CHATGPT_2_DIRECT_EXECUTION_OPERATOR.md). [A-line separate Controller](../roles/V0.6_CHATGPT_A_LINE_PRIMARY_CONTROLLER.md).
 
 **Gates:** `SOURCE_NOT_ADMITTED / PIT_UNKNOWN / COST_INCOMPLETE / UTILITY_NOT_IDENTIFIED / G2_ALPHA_NO_GO / G4_TESTNET_NO_GO / LIVE_NO_GO / REAL_FUNDS_WRITE_NONE`.
+
+## 2026-10-17 R3 external-review routing
+
+One local Codex Sol Max or Astra High **read-only** review may inspect B-line code/allowed evidence at exact baseline and produce a bounded failure map, source/PIT/economic gap list and 0–2 hypotheses plus research DAG. See [review dispatch](../../prompts/v0.6/review/V065_BLINE_FULL_REPOSITORY_STRATEGY_REVIEW_SOL_ASTRA_R1.md). 0 owns decisions, 1 consequential science/source audit, 2-R novel hypotheses, 2-C targeted falsification, 2-E deterministic docs. A-line separately controlled; PR #3/#5 KEEP. Repository topology has moved to default `v0.6.5`; 46 governance holds do not block independent B-line research analysis.
