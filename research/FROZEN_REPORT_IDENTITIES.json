@@ -1,0 +1,93 @@
+[
+  {
+    "commit": "065d62965373627c4887e52f482d1dcb984af860",
+    "path": "docs/project/V0.6_B_LINE_STRATEGY_VALIDATION_REGISTER.md",
+    "blob": "8611713b016c6ea8cd13b96bcf692a036e04ed39",
+    "status": "Original detailed scientific labels; not a new inference.",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/065d62965373627c4887e52f482d1dcb984af860/docs/project/V0.6_B_LINE_STRATEGY_VALIDATION_REGISTER.md"
+  },
+  {
+    "commit": "8c3e53f8fe37d9a8acd340944b843e04f05d2fdc",
+    "path": "reviews/v0.6/b_line/V06_R11_Q1_1_INDEPENDENT_WAVE1_SOURCE_PIT_CAPACITY_AUDIT_R1.md",
+    "blob": "1f3c8286c871253e45eb82f74f5f78c5353e183c",
+    "status": "R11_Q1_GATE_BLOCKED_CONSEQUENTIAL",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/8c3e53f8fe37d9a8acd340944b843e04f05d2fdc/reviews/v0.6/b_line/V06_R11_Q1_1_INDEPENDENT_WAVE1_SOURCE_PIT_CAPACITY_AUDIT_R1.md"
+  },
+  {
+    "commit": "c07c60385479f0d595352ad751c1c49150b4cbbc",
+    "path": "reviews/v0.6/b_line/V06_R11_Q2_CONTROLLER_CAPACITY_EXPANSION_AND_NEXT_STAGE_DECISION_R1.md",
+    "blob": "1ce7812722229a3fa4393f9dd384f871975ade62",
+    "status": "Bounded pilot scope only",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/c07c60385479f0d595352ad751c1c49150b4cbbc/reviews/v0.6/b_line/V06_R11_Q2_CONTROLLER_CAPACITY_EXPANSION_AND_NEXT_STAGE_DECISION_R1.md"
+  },
+  {
+    "commit": "803a4173717ace9c03ff97051b7696210e183bef",
+    "path": "docs/project/V06_R11_D2_BINANCE_CORE_DATA_FOUNDATION_PILOT_R1.md",
+    "blob": "f7bb0f322dd8317d983abe143b0dcf86c21414c2",
+    "status": "AUTHOR_DELIVERED / NOT_ACCEPTED",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/803a4173717ace9c03ff97051b7696210e183bef/docs/project/V06_R11_D2_BINANCE_CORE_DATA_FOUNDATION_PILOT_R1.md"
+  },
+  {
+    "commit": "803a4173717ace9c03ff97051b7696210e183bef",
+    "path": "scripts/research/r11_d2/binance_core_pilot.py",
+    "blob": "dbc724f0dfd0a3f537e7ddb6bd1f818913ef7707",
+    "status": "Original research-only code",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/803a4173717ace9c03ff97051b7696210e183bef/scripts/research/r11_d2/binance_core_pilot.py"
+  },
+  {
+    "commit": "803a4173717ace9c03ff97051b7696210e183bef",
+    "path": "tests/research/r11_d2/test_binance_core_pilot.py",
+    "blob": "3285d80ebf63a39f91dddeb01f307851d8e16b89",
+    "status": "Original pilot tests",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/803a4173717ace9c03ff97051b7696210e183bef/tests/research/r11_d2/test_binance_core_pilot.py"
+  },
+  {
+    "commit": "7f8c6acadead47dccdeba80b2ae27c2497ee8cdf",
+    "path": "docs/project/V06_R11_E2_OKX_HISTORICAL_PORTAL_ONE_FILE_PILOT_R1.md",
+    "blob": "6a6b172ea734d8c62f0c581faaca0d4e86dc48c1",
+    "status": "AUTHOR_DELIVERED / NOT_ACCEPTED",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/7f8c6acadead47dccdeba80b2ae27c2497ee8cdf/docs/project/V06_R11_E2_OKX_HISTORICAL_PORTAL_ONE_FILE_PILOT_R1.md"
+  },
+  {
+    "commit": "7f8c6acadead47dccdeba80b2ae27c2497ee8cdf",
+    "path": "scripts/research/r11_e2/okx_portal_pilot_qc.py",
+    "blob": "d82a81a8546ad0b3b549b427260153c39370fc0c",
+    "status": "Original research-only code",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/7f8c6acadead47dccdeba80b2ae27c2497ee8cdf/scripts/research/r11_e2/okx_portal_pilot_qc.py"
+  },
+  {
+    "commit": "7f8c6acadead47dccdeba80b2ae27c2497ee8cdf",
+    "path": "tests/research/r11_e2/test_okx_portal_pilot_qc.py",
+    "blob": "5706ff4af38231b9b825f7b444807b0adb7d0e2f",
+    "status": "Original pilot tests",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/7f8c6acadead47dccdeba80b2ae27c2497ee8cdf/tests/research/r11_e2/test_okx_portal_pilot_qc.py"
+  },
+  {
+    "commit": "9dbb0ce7d266c0d6731775a7a53170bf34400520",
+    "path": "docs/project/V06_R11_C2_LOCAL_CAPACITY_CALIBRATION_AND_EXPANSION_SPEC_R1.md",
+    "blob": "9f89374f3785cc15400d82ac474ffa01989b0014",
+    "status": "STOP_UNMEASURED_SOURCE",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/9dbb0ce7d266c0d6731775a7a53170bf34400520/docs/project/V06_R11_C2_LOCAL_CAPACITY_CALIBRATION_AND_EXPANSION_SPEC_R1.md"
+  },
+  {
+    "commit": "dc04f56e418e762e0137fbc28429fef0f545bce4",
+    "path": "prompts/v0.6/repository/V065_M1_CODEX_CLEAN_MAIN_DOCS_LEGACY_BRANCH_PRUNE_R1.md",
+    "blob": "78d988cfbaace40be9effa397a2c09adb92eb593",
+    "status": "Exact owner task retained",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/dc04f56e418e762e0137fbc28429fef0f545bce4/prompts/v0.6/repository/V065_M1_CODEX_CLEAN_MAIN_DOCS_LEGACY_BRANCH_PRUNE_R1.md"
+  },
+  {
+    "commit": "dc04f56e418e762e0137fbc28429fef0f545bce4",
+    "path": "docs/engineering/V065_BRANCH_LIFECYCLE_ARCHIVE_AND_DELETE_RUNBOOK_R1.md",
+    "blob": "a6924be096065a92dd5c266efa04fe1e72860246",
+    "status": "Exact archive runbook retained",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/dc04f56e418e762e0137fbc28429fef0f545bce4/docs/engineering/V065_BRANCH_LIFECYCLE_ARCHIVE_AND_DELETE_RUNBOOK_R1.md"
+  },
+  {
+    "commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+    "path": "docs/project/V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md",
+    "blob": "c20975dce9fd1b2becec09f3e3f05598b0055004",
+    "status": "PR6 original research operating contract",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/9ec13bb44dc674c45c7099db1ff2177ea60393ff/docs/project/V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md"
+  }
+]
