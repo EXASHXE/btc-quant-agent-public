@@ -1,86 +1,38 @@
-# quant v0.6 — Five-Session ChatGPT Role Matrix R1
+# v0.6.5 — Five-Session Role / Executor Routing Matrix R2
 
-## R11 execution-routing update — 2026-10-16
+**Scope:** B-line research-first personal/noncommercial project. ChatGPT has exactly **five separate conversations: 0 Controller; 1 Independent Auditor; 2-R Research Scientist; 2-C Challenger; 2-E Direct Executor.** No “ChatGPT-3” and no custom subagents. A-line Controller is separate. [Operating contract](V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md) · [UI standard](V06_CHATGPT_OUTPUT_UI_AND_TASK_CARD_STANDARD_R1.md). Original matrix preserved at [v0.6.5 M0](https://github.com/EXASHXE/btc-quant-agent-public/blob/065d62965373627c4887e52f482d1dcb984af860/docs/project/V06_CHATGPT_FIVE_SESSION_ROLE_MATRIX_R1.md).
 
-**Default implementation rule:** local Codex/Gemini handles local data acquisition, data QC, filesystem/capacity measurement, long-running operations and quality-critical or complex engineering. Gemini NORMAL is for routine deterministic engineering; Gemini BOOST for cross-module/semantic complexity; Codex High/Sol for economically or scientifically consequential work and high-correctness validation when explicitly available.
+## Dispatch rules
 
-**2-E boundary:** 2-E is intentionally limited to simple deterministic edits: small documentation/metadata/link repairs and narrowly specified code/test changes with known semantics. It is not the default for data ingestion, PIT/source-rights, financial semantics, strategy discovery, broad refactors or quality-critical consequential implementation.
-
-**Current R11 queue:** C2/D2/E2 are local-agent tasks authorized by R11-Q2 and are not 2-E tasks. They may run in parallel because they have distinct workspaces/outputs and no shared scientific result dependency. R11-Q3 follows exact-SHA delivery and Controller L2 verification.
-
-**Owner-facing prompt format:** each dispatched task must have a compact card, exact GitHub prompt link, and a separate copyable prompt block.
-
-
-> **R7 active role scheduler — 2026-10-15:** [Latest handover](../handover/V06_BLINE_CONTROLLER_R7_HANDOVER_20261015.md). Exactly five separate B-line chats: `0` Controller, `1` Auditor, `2-R` Researcher, `2-C` Challenger and `2-E` bounded Executor. A-line Controller separate. One task at a time **per chat**, cross-chat parallel only when each prerequisite is present. 2-R T6 concluded STOP; 2-C/1 final conditional T6 review not triggered; 2-E R7-S0 documentary-only pending. 0 alone adjudicates any new source-file/data permit. H40 A-line-specific and P1D full engine not in B-line active path. Earlier dated matrix examples are historical.
-
-
-**Date:** 2026-10-14. **Governance layer:** B-line. **Owner-requested numbering:** `0 / 1 / 2 / 2 / 2`. The last three are **different sessions all named ChatGPT-2**, uniquely distinguished by role IDs **2-R**, **2-C** and **2-E**. **There is NO ChatGPT-3 session in the current five-session roster.** A-line Scientific Controller remains a **separate** Controller program and is not counted in these five B-line conversations.
-
-| Conversation | Stable ID | Single core responsibility | Can author? | Can independently accept its own artifact? | Who controls escalation? |
-|---|---|---|---|---|---|
-| **ChatGPT-0 Controller** | `CHATGPT_0_BLINE_CONTROLLER` | Source/strategy/governance L2 task scoping and terminal decisions | Task dispatches and Controller adjudications | NO | Owner plus B-line Controller exact-SHA contract |
-| **ChatGPT-1 Auditor** | `CHATGPT_1_SUPERVISORY_AUDITOR` | Consequential independent science/PIT/economic/release audit | Separate independent review only | NO | Cannot approve protected trials, Alpha/TESTNET/LIVE by itself |
-| **ChatGPT-2 Researcher (2-R)** | `CHATGPT_2_RESEARCH_SCIENTIST` | Source-first, outcome-blind hypothesis, novelty and falsifiable methodology | Scoped research designs | NO | Controller authorizes outcomes/data; 2-C challenges |
-| **ChatGPT-2 Challenger (2-C)** | `CHATGPT_2_ADVERSARIAL_CHALLENGER` | Independently disprove or qualify 2-R claims and methods | Scoped independent challenges (different target author) | NO | ChatGPT-1 formal high-impact acceptance; Controller L2 |
-| **ChatGPT-2 Executor (2-E)** | `CHATGPT_2_DIRECT_EXECUTION_OPERATOR` | Direct light GitHub/local authorized edits, source citations, docs, deterministic small code/test fixes | Scoped implementation/repair | NO | ChatGPT-1 for consequential review; Controller for merge/admission |
-
-**Canonical role files:** [ChatGPT-0](../roles/V0.6_CHATGPT_0_PRIMARY_CONTROLLER.md), [ChatGPT-1](../roles/V0.6_CHATGPT_1_SUPERVISORY_AUDITOR.md), [2-R](../roles/V0.6_CHATGPT_2_INDEPENDENT_RESEARCH_SCIENTIST.md), [2-C](../roles/V0.6_CHATGPT_2_ADVERSARIAL_CHALLENGER.md), [2-E](../roles/V0.6_CHATGPT_2_DIRECT_EXECUTION_OPERATOR.md).
-
-**Bootstraps:** [all five chat prompts](V0.6_NEW_CHAT_HANDOVER_INDEX.md). Each role has a **separate chat**; same “2” number does not mean shared conversation, shared tool session, shared trust, or interchangeable independence. Each authored artifact records an exact role ID and full target SHA/blob to avoid identity collisions.
-
-## Collaboration and authority edges
-
-```text
-                        USER / PROJECT OWNER
-                                 |
-                      ChatGPT-0 (Controller)
-              exact task/SHA/path/data authority
-                  /               |               \
-     ChatGPT-2 (2-R)       ChatGPT-2 (2-C)      ChatGPT-2 (2-E)
-        Researcher            Challenger        Direct Operator
-        design/claims         adversarial        bounded changes
-                  \              |               /
-                     ChatGPT-1 (independent auditor)
-                         consequential review
-                                 |
-                 ChatGPT-0 (final L2 decision/merge)
-```
-
-- **2-R → 2-C → 0:** Scientific source design/proposal → independently challenged counterarguments → Controller's next-scoped decision. For consequential science add **ChatGPT-1** independent formal audit before L2.
-- **0 → 2-E → 1 → 0:** Bounded repair/engineering change → exact-SHA implementation receipt → independent audit where required → Controller L2. For simple typo/docs and task-specific owner permission, 2-E may act in chat immediately on a separate branch; its own diff check is **implementation QA**, not an independent scientific PASS.
-- **2-R vs 2-C independence:** Each reads frozen primary sources separately for Round 0. If 2-C becomes an author of a corrective artifact, it loses independence as **its own** terminal reviewer. Another genuinely separate reviewer is needed.
-- **GitHub Issue #1** historic `[R2]` and `[R3]` debate labels map to **2-R** and **2-C**. Do not rewrite the old issue/body/comments. New posts use `[2-R]` and `[2-C]`; Issue #1 is discussion only, not a study/data/release authorization. Legacy references to a “ChatGPT-3 Challenger” are an outdated session label, **not a new sixth role**.
-- Gemini NORMAL, Gemini BOOST, Codex Sol, and remote/local MCP tools are **execution resources**, not additional ChatGPT chat role numbers. Choose by bounded compute/problem complexity, without automatically spawning parallel work.
-
-## Direct execution lanes (2-E) and concrete task boundaries
-
-| Lane | Accepted low-complexity work | Preconditions | Stop condition |
+| Task type | Primary executor | When review is useful | Do not waste time on |
 |---|---|---|---|
-| **Docs/metadata** | citation repairs, role/status notes, links, task prompts, append-only provenance | Owner or Controller explicit ordinary docs scope; isolated branch and single-writer path | Existing frozen record, protected data, ambiguous base, prior conflicting edit |
-| **Small code/test** | narrowly specified deterministic fix, fixtures, static parsers, exact test corrections | Real Controller/owner bounded task, source exact SHA, paths and negative cases; independent gate if consequential | Finance/PIT/order authority, source semantics, risky CI policy, broad regression or unknown cost |
-| **Remote local files** | bounded text edits in explicitly named unprotected worktree through connected Desktop Commander | Device ONLINE at execution time + **specific directory/path authorization**, clean worktree/diff, no user secrets | Any protected/owner root, unrelated home filesystem, unsafe shell or side-effect uncertainty |
-| **Read-only diagnosis** | GitHub evidence, static diff, reports; propose small repair | Known public reference and requested read scope | No write or access rights; report `AUTHORITY_PENDING` |
+| Priorities, project road map, accepted source/merge decisions, task cards | **0 Controller** | 1 only for consequential new claims | parallel Controllers or re-auditing static status |
+| Independent source rights/physical PIT/economics or material integration proof | **1 Auditor** | cross-check author frozen evidence | independent audit for every ordinary docs fix |
+| New BTC 4–24h mechanism/novelty/prereg | **2-R Researcher** | 2-C for hypothesis novelty, 1 for consequential source/science | indicator renaming, output-heavy 8-candidate speculation |
+| Falsification of a specific novel hypothesis | **2-C Challenger** | 1 only if still economically consequential | compulsory challenge for dataset list or ordinary parser UI |
+| Small deterministic docs/metadata/fix/test | **2-E Direct Executor** | usually 0 checks diff; no 1 required | large ETL, PIT/funding logic, long CI |
+| Complex repo integration, data archive QC, bounded historical pipeline | **Codex High/Sol** or **Gemini** | 1 for material source admission/cross-module correctness | unbounded full test rounds on every small change |
+| Normal bounded code with clear acceptance | **Gemini NORMAL** | scoped unit tests | BOOST on copy/rename tasks |
+| Causal or cross-module architecture/invariant design | **Gemini BOOST** / Codex High | 1 or 2-C if actual scientific claim | recursively spawned custom agents |
+| Capacity/data hygiene | local Codex/Gemini only in **owner-approved isolated workspace** | Controller verifies real sample numbers | invented disk estimates and protected-root scans |
 
-**Not allowed:** remote-access capability itself is not authorization to inspect local owner roots, open sensitive data, or run arbitrary shell commands. No trading account, private exchange endpoint, testnet, Live, historical PnL, forward market collection or holdout. No auto-merge.
+**One substantial task per chat**, but disjoint tasks can run in parallel on independently owned worktrees. Pre-stage the next wave's conditional prompts, explicitly **NOT DISPATCHED** until dependencies pass. Authors do not independently accept their own source, strategy or release claims; no mandatory chain 2-R→2-C→1→0 for every task. For hypotheses use 2-R/2-C; for consequential source/integration use 1; only 0 decides progression.
 
-## Exact evidence and task state precedence
+## Verification by impact
 
-Immutable Controller dispatch and explicitly scoped owner authority + observed Git commit/blob/diff/tests take priority over an agent's claims, cached status JSON and moving branch narratives. A successful docs-only CI, a green focused CI, a full executable safety CI, an independent science PASS, source admission and release PASS are **distinct outcomes**. If exact target/push missing, report `INCOMPLETE_TARGET_UNFROZEN` or `BLOCKED_NOT_PUSHED`, never invent SHAs.
+- **T0 docs**: exact changed paths + link/diff check; no mandatory full tests.
+- **T1 routine code**: focused module tests/lint/syntax.
+- **T2 market-source/PIT/financial code**: affected invariant positive/negative tests + independent gate if used to claim true source/Alpha/financial authority.
+- **T3 real integration/release/account capability**: required full suites, branch checks, negative financial safety, independent release verdict.
 
-**Current cross-role invariant:** `SOURCE_NOT_ADMITTED / G2_ALPHA_NO_GO / G4_TESTNET_NO_GO / LIVE_NO_GO / REAL_FUNDS_WRITE_NONE`. Separate A-line H39/H40/H41/Forward authorities cannot be inherited.
-## 2026-10-16 UI-FIRST ROLE / HANDOFF CONTRACT
+CI is **not yet formally disabled**, and protection verification is pending; this matrix does not authorize trigger changes. Failure not relabeled success.
 
-The role matrix is also the owner-facing communication contract.
+## Current v0.6.5 queue facts
 
-| Role | Default UI | Must expose | Avoid by default |
-|---|---|---|---|
-| 0 Controller | status + decision + task cards | executor, objective, prerequisites, prompt link, authorization | full prompt duplication |
-| 1 Auditor | verdict card | exact target, evidence, severity, uncertainty, terminal | long narrative before verdict |
-| 2-R | hypothesis card | mechanism, novelty, PIT/data, falsification | exposed-result inflation |
-| 2-C | challenge card | objection, evidence, failure/repair, terminal | target prompt repetition |
-| 2-E | execution receipt | SHA, paths, tests, remote receipt, terminal | self-acceptance |
-| A-line | same compact surface | A-line authority boundary | B-line inheritance |
+Integration candidate `065d62965373627c4887e52f482d1dcb984af860` exists but still needs independent M0 review. R11-Q1 `8c3e53f...` is an immutable negative consequential review; R11-Q2 `c07c603...` authorized bounded data work only. D2 `803a417...` and E2 `7f8c6ac...` author delivered, pending independent review; C2 `9dbb0ce...` STOP_UNMEASURED_SOURCE. Next possible L2: R11-Q3, **not** automatic Alpha. No TESTNET/LIVE/funds.
 
-Render task planning by wave: W1 independent → W1 gate → W2 dependent. Issue all justified READY_PARALLEL cards together; keep PREPARED_CONDITIONAL work visible without implying authorization.
+## Canonical per-role documents
 
-Canonical standard: [V06 ChatGPT Output UI & Task Card Standard R1](V06_CHATGPT_OUTPUT_UI_AND_TASK_CARD_STANDARD_R1.md).
+[0 Controller](../roles/V0.6_CHATGPT_0_PRIMARY_CONTROLLER.md) · [1 Auditor](../roles/V0.6_CHATGPT_1_SUPERVISORY_AUDITOR.md) · [2-R Researcher](../roles/V0.6_CHATGPT_2_INDEPENDENT_RESEARCH_SCIENTIST.md) · [2-C Challenger](../roles/V0.6_CHATGPT_2_ADVERSARIAL_CHALLENGER.md) · [2-E Executor](../roles/V0.6_CHATGPT_2_DIRECT_EXECUTION_OPERATOR.md). [A-line separate Controller](../roles/V0.6_CHATGPT_A_LINE_PRIMARY_CONTROLLER.md).
+
+**Gates:** `SOURCE_NOT_ADMITTED / PIT_UNKNOWN / COST_INCOMPLETE / UTILITY_NOT_IDENTIFIED / G2_ALPHA_NO_GO / G4_TESTNET_NO_GO / LIVE_NO_GO / REAL_FUNDS_WRITE_NONE`.
