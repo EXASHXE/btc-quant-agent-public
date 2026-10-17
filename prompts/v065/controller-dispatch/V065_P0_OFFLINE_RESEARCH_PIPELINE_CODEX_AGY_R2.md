@@ -1,0 +1,16 @@
+# V065-P0-R2 — Codex offline research pipeline
+
+Role: Codex Sol Max. Goal: ship actual runnable offline BTCUSDT 4–24h research entry point, not a new report or reviewer chain.
+Engineering repo: /root/workspace/project/quant-0.6.5, branch v0.6.5, last verified HEAD 12b74b4c2fd3a22a9f4b35dbf331cfb1166aae77. Refresh HEAD and inspect status, but DO NOT modify/stage/stash/reset/commit/push the 14 Owner R4 dirty docs/prompt paths. No new feature branch/worktree by default.
+Your code ownership: scripts/research/r11_d2/offline_research_pipeline.py and tests/research/r11_d2/test_offline_research_pipeline.py; minimal other research-code changes only with demonstrated necessity. Do not touch scripts/data or tools/data owned by the simultaneous data agent.
+
+Implement one command: python3 -m scripts.research.r11_d2.offline_research_pipeline demo --output-dir NEW_EMPTY_DIR.
+Reuse the existing D2 Binance QC and manifest-v2 code in scripts/research/r11_d2/binance_core_pilot.py and R3 claimed-only causal clock in prospective_causal_clock.py, rather than duplicating them. Existing D2 verify is not read-only: it writes reports/offline-qc.json, so never run it against protected/old source workspaces. Existing R3 clock only establishes CLAIMED_TIMING_ELIGIBLE on synthetic caller claims; never infer real original receiver PIT or data admission.
+
+Deliver qc.json, manifest.json, origins.jsonl, summary.json and a CLI summary. At least four predeclared origin rows: internally coherent synthetic X+Z timing; missing Z; stale/late Z; failed source identity/QC. Every origin stays in the denominator. Missing/late/unknown Z => NO_ACTION with stable reason, no outcome-based dropping, future fill, synthetic trade or favorable origin selection. A positive claimed-clock verdict is not a trading signal: all actions default NO_ACTION absent a separately preregistered strategy. Clearly label synthetic fixtures DEV_SYNTHETIC_CLAIMED_ONLY, alpha NO_ALPHA_ESTABLISHED, no executions.
+
+Use deterministically seeded synthetic input and include family/symbol/UTC/interval/raw-hash/source-type checks; do not forge historical receiver times. Fail closed on missing required object, malformed manifest/schema, wrong family, digest mismatch and unsafe output directory/symlink. Outputs must be byte reproducible for repeated equivalent runs, excluding isolated runtime metadata. Do not read protected Quant-agent/Quant-agent-sanitized/history/Forward/OOS or access any external API/WebSocket or account. Optional inspection of already-owned historical data must remain read-only and is lower priority than shipping the demo.
+
+Run focused tests for new module + existing D2 and clock tests, and run the one-line demo in a fresh scratch output under crypto-data/research-dev or a temp fixture. Report exact command, exit code, test count, output files/action counts and modified code diff; do not run all-repo CI or write to GitHub unless separately approved.
+
+Terminal P0_DEV_READY only if demonstration and positive/negative scoped tests actually pass; otherwise P0_BLOCKED with specific failing reproducer. Controller directly accepts routine code. Production data migration, external source admission, TESTNET/LIVE and money writes remain outside scope.
