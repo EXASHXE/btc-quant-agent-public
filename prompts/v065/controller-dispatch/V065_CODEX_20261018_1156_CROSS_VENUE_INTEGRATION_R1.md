@@ -1,0 +1,18 @@
+# V065-CODEX-1156 — Cross-venue feature adapter + evaluation integration
+
+Role: Codex 6.1 Sol HIGH, time slot 2026-10-18 11:56 Asia/Shanghai. Long-horizon engineering task with concrete code, data QC, and meaningful reproducible research tests, NOT another review cascade. Requires confirmed released writing slot and absence of overlapping ongoing P0/P1/data writer. The earlier 06:55 P1 task may still be active; if so, do not simultaneously write its files. If no slot, run read-only diagnosis/handoff only and return HOLD_NO_WRITER_SLOT without touching repo.
+
+Read current /root/workspace/project/quant-0.6.5 branch and dirty changes and actual P0/P1/data outputs. Protect Owner's 14 uncommitted R4 changes, current P0 code, Agy historical scripts/data and all original Quant-agent archives. Do not assume earlier prompts executed or succeeded. No branch/worktree/commit/push, no generic whole-repo CI.
+
+Conditional implementation, using a **separate module** from active authors (e.g. scripts/research/cross_venue/ plus tests/research/cross_venue/) and only once dependency status is known:
+1. Produce a documented read-only adapter and aligned feature time-series for actual available *eligible* Binance USD-M BTCUSDT vs OKX BTC-USDT-SWAP (ETH as control), precisely accounting OKX UTC+8 archive day naming, native event-time vs sample-time, 1m OHLCV, venue-specific funding events, historical OI constraints and trades/L2 semantics. Do not conflate spot, swap and USD-M contracts; do not invent full-depth continuity from one daily snapshot.
+2. Incremental Z = OI-like positioning or L2 impact/replenishment **hypothesis-level** features with causal feature availability treatment. Historical archives alone cannot authenticate local receiver-first-known; make a labelled offline retrospective descriptive adapter and keep prospective claimed-clock semantics separate. Null/absent/stale Z leads NO_ACTION at a fixed origin; preserve denominator and list missing reasons.
+3. Integrate into P0 + P1 via explicitly versioned data contracts and module-level APIs when their code is actually stable. If P0 or P1 unfinished, implement contract adapter in an isolated module with a dependency-failure fixture rather than touching their work. No use of future funding realization or bar close at the origin.
+4. Reproducibility artifacts: source file hashes, deterministic transformation manifest, bounded dataset QC/coverage, positive and negative clock leakage tests, fee/funding schedule interactions, one minimal end-to-end demonstration. Keep 2025-10..2026-09 historical extension coverage from Agy manifest separate from source admission.
+5. Material evidence: quantify feature coverage and missing-Z/no-action rates and compare control X vs incremental Z only under honest offline exploratory status. Output NO_ALPHA_ESTABLISHED unless robust preregistered after-cost test actually warrants further challenge (not automatic scientific promotion). Finish with remaining data holes and exact next module path. Do not invent outcomes.
+
+Primary demonstration:
+python3 -m scripts.research.cross_venue.pipeline demo --output-dir <new_empty_dir>
+May choose a better stable module invocation if justified. Minimal focused tests only; do not run protected final OOS, full CI, live market requests, API keys, systemd changes, trading or SOURCE_QA.
+
+Final terminal: CROSS_VENUE_DEV_READY, CROSS_VENUE_PARTIAL_BLOCKED or HOLD_NO_WRITER_SLOT. Report code diff, actual tests/demo output, coverage and one next engineering decision. This task can be a multi-hour code/build run when resources permit, but must not run over other writers.
