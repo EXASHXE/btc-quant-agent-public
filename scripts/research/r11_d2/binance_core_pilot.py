@@ -274,6 +274,9 @@ def integer(value: str) -> int:
 
 
 def qc_rows(rows: Iterator[list[str]], family: str, symbol: str, period: str, is_monthly: bool) -> dict[str, Any]:
+    if family in TRADE_FAMILIES:
+        require(not is_monthly and re.fullmatch(r"\d{4}-\d{2}-\d{2}", period) is not None,
+                "TRADE_DAILY_PERIOD")
     first = next(rows, None)
     if first is None:
         raise SafetyError("EMPTY_CSV")
@@ -389,7 +392,7 @@ def qc_rows(rows: Iterator[list[str]], family: str, symbol: str, period: str, is
                 require(px > 0 and qty > 0, "POSITIVE_PRICE_AND_QTY")
                 first_id = integer(row[3])
                 last_id = integer(row[4])
-                require(first_id <= last_id, "TRADE_ID_BOUND")
+                require(0 <= first_id <= last_id, "TRADE_ID_BOUND")
                 ts = integer(row[5])
                 timestamps.append(ts)
                 require(row[6].lower() in ("true", "false"), "BUYER_MAKER_BOOLEAN")
@@ -405,6 +408,8 @@ def qc_rows(rows: Iterator[list[str]], family: str, symbol: str, period: str, is
                 timestamps.append(ts)
                 require(row[5].lower() in ("true", "false"), "BUYER_MAKER_BOOLEAN")
 
+            if family in TRADE_FAMILIES:
+                require(start_ms <= ts < end_ms, "TRADE_TIMESTAMP_OUTSIDE_DAY")
             complete += int(row_complete)
         except (SafetyError, ValueError, OverflowError):
             malformed += 1
@@ -447,6 +452,7 @@ def qc_rows(rows: Iterator[list[str]], family: str, symbol: str, period: str, is
             observed_grid_type = "IRREGULAR"
             errors.append("GRID_ANOMALY")
     elif family == "fundingRate":
+        # Frozen D2 January-2024 USD-M calendar, not a universal funding rule.
         step = 8 * 3600 * 1000
         expected_set = set(range(start_ms, end_ms, step))
         expected_rows = len(expected_set)
@@ -467,6 +473,12 @@ def qc_rows(rows: Iterator[list[str]], family: str, symbol: str, period: str, is
             errors.append("DUPLICATE_FUNDING_SLOT")
         if any(b <= a for a, b in pairwise(timestamps)):
             errors.append("NONMONOTONIC_FUNDING_TIME")
+    elif family in TRADE_FAMILIES:
+        if complete == 0:
+            errors.append("NO_VALID_TRADE_OBSERVATIONS")
+        unexpected_intervals = sum(not start_ms <= ts < end_ms for ts in timestamps)
+        if unexpected_intervals:
+            errors.append("TRADE_TIMESTAMP_OUTSIDE_DAY")
 
     if expected_rows and seen != expected_rows:
         errors.append("ROW_COUNT_MISMATCH")
@@ -516,6 +528,9 @@ def qc_rows(rows: Iterator[list[str]], family: str, symbol: str, period: str, is
 
 def qc_zip(path: Path, check_path: Path, family: str, symbol: str, period: str,
            is_monthly: bool, budget: Budget) -> dict[str, Any]:
+    if family in TRADE_FAMILIES:
+        expected_name = object_url(family, symbol, period, is_monthly).rsplit("/", 1)[1]
+        require(path.name == expected_name, "TRADE_ARCHIVE_IDENTITY")
     digest = verify_checksum(path, check_path)
     with zipfile.ZipFile(path) as zf:
         members = zf.infolist()
@@ -644,8 +659,29 @@ def manifest_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
         if record.get("qc") not in ("PASS", "PARTIAL_PASS"):
             errors.append("MANIFEST_QC_INCOMPLETE_OR_FAILED")
             continue
-        if (record.get("errors") or record.get("invalid_field_counts")
-                or (record.get("qc") == "PASS" and record.get("missing_field_counts"))):
+        missing = record.get("missing_field_counts")
+        invalid = record.get("invalid_field_counts")
+        row_errors = record.get("errors")
+        total, valid = record.get("total_rows"), record.get("valid_rows")
+        row_counts_valid = (type(total) is int and total > 0
+                            and type(valid) is int and 0 <= valid <= total)
+        partial_valid = (
+            record.get("family") == "metrics" and row_counts_valid
+            and isinstance(missing, dict) and bool(missing)
+            and all(field in METRICS_SCHEMA[2:] and type(count) is int and 0 < count <= total
+                    for field, count in missing.items())
+            and max(missing.values()) <= total - valid <= sum(missing.values())
+        )
+        zero_counters = ("malformed_rows", "missing_intervals", "unexpected_intervals")
+        if record.get("family") not in TRADE_FAMILIES:
+            zero_counters += ("duplicate_timestamps",)
+        if (not isinstance(row_errors, list) or row_errors
+                or not isinstance(invalid, dict) or invalid
+                or not isinstance(missing, dict) or not row_counts_valid
+                or any(type(record.get(key, 0)) is not int or record.get(key, 0) != 0
+                       for key in zero_counters)
+                or (record["qc"] == "PASS" and (missing or valid != total))
+                or (record["qc"] == "PARTIAL_PASS" and not partial_valid)):
             errors.append("MANIFEST_QC_CONTRADICTION")
         if (record.get("publisher_checksum") != "VERIFIED"
                 or re.fullmatch(r"[0-9a-f]{64}", record.get("sha256", "")) is None):

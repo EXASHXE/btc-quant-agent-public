@@ -54,7 +54,8 @@ def record_set():
 def qc_ok():
     return {"qc": "PASS", "errors": [], "missing_field_counts": {},
             "invalid_field_counts": {}, "publisher_checksum": "VERIFIED",
-            "sha256": "a" * 64, "compressed_bytes": 1, "expanded_bytes": 1}
+            "sha256": "a" * 64, "compressed_bytes": 1, "expanded_bytes": 1,
+            "total_rows": 1, "valid_rows": 1, "malformed_rows": 0}
 
 
 class TestChangedQC(unittest.TestCase):
@@ -262,9 +263,11 @@ class TestChangedManifests(unittest.TestCase):
 
     def test_manifest_partial_is_explicit_not_full_pass(self):
         records = record_set()
-        records[0].update(qc="PARTIAL_PASS", missing_field_counts={"sum_open_interest": 1})
+        record = next(r for r in records if r["family"] == "metrics")
+        record.update(qc="PARTIAL_PASS", missing_field_counts={"sum_open_interest": 1},
+                      valid_rows=0)
         self.assertEqual(pilot.manifest_summary(records)["errors"], [])
-        self.assertEqual(records[0]["qc"], "PARTIAL_PASS")
+        self.assertEqual(record["qc"], "PARTIAL_PASS")
 
     def test_execute_offline_manifest_success_and_failure(self):
         for change in ("none", "missing_zip", "missing_checksum", "bad_oi", "parity"):
