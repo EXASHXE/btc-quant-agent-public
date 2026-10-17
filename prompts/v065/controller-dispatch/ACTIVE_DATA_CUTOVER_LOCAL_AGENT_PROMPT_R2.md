@@ -1,0 +1,32 @@
+You are LOCAL Codex Sol Max or Astra High, acting as the single bounded operational data-cutover engineer for quant v0.6.5.
+
+TASK ID: V065-ACTIVE-DATA-CUTOVER-R2.
+OWNER ALREADY AUTHORIZED: receive host hyz-laptop; the dataset root /root/workspace/project/crypto-data; migrate previously downloaded and continuously collected historical/forward data to that data root. No trading/source-QA permission follows.
+
+FIRST: Read the entire current Controller decision:
+/root/workspace/project/crypto-data/_control/ACTIVE_DATA_CUTOVER_CONTROLLER_DECISION_R2.md
+Read the independently checked R1 STOP report:
+/root/workspace/project/crypto-data/_control/ACTIVE_DATA_CUTOVER_REPORT_R1.md
+Its SHA256 must equal a4e66405ddee479ba63951591e1f2264fcd697fa6cf27eb860d1bcfcba436a37.
+
+MAIN: /root/workspace/project/quant-0.6.5, branch v0.6.5. Expected recent HEAD 12b74b4c2fd3a22a9f4b35dbf331cfb1166aae77; compare with live remote BEFORE any work. If HEAD drifts, document and STOP on material discrepancy; a legitimate docs-only commit is not automatically a data blocker if re-reviewed. No need to create a new Git branch/worktree, and no local AGENTS.md/GEMINI.md mandates apply. This task authorizes no Git changes.
+
+PHASE A — only narrowly targeted read-only discovery
+1. Verify exact systemd user service files, drop-ins, active/last/next timers, code configuration flags and process/write-map for these existing units: btc-quant-forward-derivatives, btc-quant-forward-health, btc-quant-opportunity-forward, btc-quant-opportunity-resolve, and persistent btc-quant-microstructure-forward. Include both explicit and implicit data-store reads/exports. Identify all new operational consumers discovered within these named roles.
+2. Verify no running legacy API/dashboard process. Legacy api.py: /health → QuantService.health, service.py hardcodes relative derivatives.sqlite3. Treat it as EXCLUDED_DORMANT_KNOWN_READER (not a routed reader) **only if it is demonstrably absent again immediately before quiesce**. Include a prominent API_HEALTH_NOT_MIGRATED / DO_NOT_ENABLE_API_UNTIL_PATH_OVERRIDE_VERIFIED warning. If active or required for running health, STOP; no protected code edits/old-path symlink tricks.
+3. Freeze original active paths under /root/workspace/project/Quant-agent/data/forward/BTCUSDT, current microstructure finalization, SQLite WAL/SHM state, mutable 100+GB size, path allowlist, realpath/symlink boundaries, unit and configuration SHA256s, old+new FS geometry, and a reversible DROP-IN-only routing plan. Do not alter or scan other Quant-agent protected data, Quant-agent-sanitized, history, archived A-line datasets or user credentials.
+4. Confirm no incomplete/endless active processes, unbounded waits, concurrent writers or new consumers; emit bounded preflight table, failure reasons and rollback steps. Ensure target under /root/workspace/project/crypto-data/active/forward/BTCUSDT; never mix with separate prospective/source-qa folder.
+
+PHASE B — only if complete A proofs PASS
+5. Reserve a planned finite maintenance window and journal actual missed timer origins. Stop the four timers first (and any exact approved microstructure unit) using user systemd after recording prior states, await graceful microstructure shutdown/finalize; do NOT kill, lose WAL, or continue if source is still changing unexpectedly.
+6. Make an unmodified immutable rollback copy under an approved distinct /crypto-data/_control/active-cutover-backups/<cutover-id>. Snapshot all identified original store components including microstructure complete partition graph, manifests, SQLite/sidecars and dependencies. Use a provably crash-consistent copy/SQLite backup strategy, not a blind copy of a hot WAL DB. Do not overwrite/delete/truncate/chmod original protected source bytes. Verify contents/integrity, permit bounded streaming SHA256 without extracting market rows into console.
+7. Copy/check the proposed new active store to crypto-data/active/forward/BTCUSDT; verify every expected file and manifest, SQLite quick/integrity checks in a safe state, file counts/hashes plus immutable source/target mapping. No restart if evidence mismatch or resource reserve endangered.
+8. Create reversible user systemd drop-ins OUTSIDE protected Quant-agent with explicitly configured new --store/--root arguments for ALL verified production + health/resolve consumer paths. Preserve original WorkingDirectory/campaign/registry and endpoint options, remain within original schedule. Validate rendered effective ExecStart and flags before daemon reload; ensure no old/new concurrent writers.
+9. Resume exactly previously active scheduled services/timers (not an additional collector); verify successful new-path output and matching readers over the first eligible bounded scheduled executions and the persistent microstructure receiver epoch. If verification cannot complete now, return STOP_PENDING_SCHEDULE_CONFIRMATION with factual states, not success. Any failure: follow proven rollback, restore exact original unit behavior and verify no duplicated writer.
+10. Never falsely claim no gap, exact PIT restoration, 2024 receiver timestamp repair, full market sequence or original raw immutable archive admission. Preserve all errors/restarts/epoch and fresh-start clocks.
+
+STOP CONDITIONS: any running API/dashboard, unknown consumer, inability to override ALL known active consumer paths, inconsistent WAL, mispinned unit file, root escape, dangerous mutation to protected source, insufficient capacity/reserve, missing rollback or unexpected main checkout mutation. Stop BEFORE quiesce if Phase A remains incomplete.
+
+EXPLICIT NONACTIONS: NO new SOURCE_QA REST/WS subscription/collector, no user account/trading/testnet/live, no original-file deletion, no symlink rewrites of protected old stores, no new branch/worktree/commit/push/CI changes, no geofence bypass or historical 2024 retrospective promotion.
+
+DELIVERABLE: ONE report /root/workspace/project/crypto-data/_control/ACTIVE_DATA_CUTOVER_REPORT_R2.md, SHA256, exact HEAD, paths, snapshots/hashes, systemd state, diagnostic test outputs (summaries only), rollback and remaining hard-coded API disposition. Verdict must be one of ACTIVE_DATA_CUTOVER_VERIFIED, STOP_UNSAFE_CUTOVER, STOP_PENDING_SCHEDULE_CONFIRMATION. Any STOP is acceptable. Do not silently retry or broaden scope. Retain SOURCE_NOT_ADMITTED / PIT_UNKNOWN / COST_INCOMPLETE / UTILITY_NOT_IDENTIFIED / G2_ALPHA_NO_GO / G4_TESTNET_NO_GO / LIVE_NO_GO / REAL_FUNDS_WRITE_NONE.
