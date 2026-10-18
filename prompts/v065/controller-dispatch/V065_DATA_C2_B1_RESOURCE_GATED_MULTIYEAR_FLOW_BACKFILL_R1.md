@@ -1,0 +1,32 @@
+# quant v0.6.5 — DATA-C2-B1 resource-gated multi-year BTC flow backfill
+
+Role: direct data engineer, execute in CURRENT agent session. Do not restart any model, invoke other agents, create scheduled jobs or spend time on routine independent audit. Actual code/tests/data are expected, not a plan.
+
+## Verified baseline
+
+Worktree /root/workspace/project/quant-0.6.5, branch v0.6.5, last HEAD 12b74b4c2fd3a22a9f4b35dbf331cfb1166aae77. Protect all Owner R4 dirty docs, P0/P1/P2/P3 and data infrastructure, old Quant-agent data, active Forward collector. No stash, clean, checkout, reset, commit or push. Owned changes: scripts/data/catalog/ and tests/data/catalog/ only, plus lakehouse/c2 outputs.
+
+C0/C1 done, existing DATA-C2 PILOT DONE:
+- Binance BTCUSDT USD-M perpetual and BTCUSDT Spot, full 2023-08 source ZIPs, SUCCESS checkpoints in /root/workspace/project/crypto-data/lakehouse/c2/checkpoints/.
+- Perp 24,166,578 events -> 44,640 native-minute flow rows, source conversion time 60.86s, checkpoint RSS ~79.22MB; Spot 15,369,604 events -> 44,640 flow rows, conversion time 41.14s, checkpoint RSS ~66.93MB. Total 39,536,182 events and 89,280 minute rows.
+- Raw and Parquet SHA pinned. QA compare 2023-08-15 perp native candle vs source flow has close-price difference zero, relative traded volume diff approximately 1e-6. Causal BTC spot/perp flow demo exists.
+- 2 of 122 source months complete; 120 remain. Independently rerun focused DATA-C0/C1/C2 tests 22/22 PASS.
+- Existing code scripts/data/catalog/flow_materializer.py, flow_query.py and normalize.py; CLI has pilot, run, status, --months, --output-dir. Reuse, don't reimplement or rerun the pilot.
+- Host currently only 1.9GiB RAM, ~298MiB MemAvailable, 5GiB swap and SwapFree=0 KiB (observed 2026-10-18 23:59 Asia/Shanghai). quantctl ~806MB RSS, Forward systemd service active. DO NOT begin heavy ingestion while host is under this pressure. No host swapoff, process killing, auto restart, modifying global WSL settings or active Forward service. A safe gated stop is better than OOM.
+- Existing cumulative actual_data_run_receipt.json has misleading duration_seconds 0.03 for a fast receipt refresh, not original source conversion time. Existing README contradicts itself saying peak RSS 586.63 MB (<400MB). Make all measurements and their definitions truthful.
+
+## Required implementation
+
+1. Implement **resource preflight** before opening EVERY new large ZIP: read /proc/meminfo MemAvailable and SwapFree and calculate a conservative headroom threshold; default fail closed if BOTH MemAvailable under 384MiB and SwapFree under 512MiB. A manual operator can select stricter, never a trivial bypass. Also protect against zero free swap when new predicted load is unsafe; document rationale. At current host state, DO NOT open new source ZIPs. No resource-reset side effects.
+2. Add minimal deterministic bounded batch control to existing flow CLI: --months, --max-sources, --max-wall-seconds and optionally --max-input-compressed-bytes. Process only one archive per worker, sequentially. Between sources recheck memory/swap, current UTC clock and manifest/source stability; STOP without damaging previous successes. Resume/skip only when checkpoint, raw source SHA and output Parquet SHA all match. Changed output must revalidate/quarantine before republish. Interrupted temp files never count completed.
+3. Fix progress and timing semantics: distinct per-source measured wall_time_s, per-source RSS and run-local elapsed; never report 0.03s as 39.5M event conversion time. Sum completed checkpoint work separately from wall clock of reporting process. Clearly distinguish initial vs rerun, cumulative 2/122 from newly completed this run, and statuses PILOT_READY, RESOURCE_GATED_NO_NEW_INGEST, BATCH_READY or all-months-complete only at 122/122. Fix README erroneous 586.63 (<400) statement rather than misrepresenting memory budget.
+4. A chronological cross-regime source batch candidate chosen BEFORE looking at any strategy returns: 2021-02, 2022-11, 2024-03, 2025-09, each Spot and perpetual. Check presence/size from existing source manifest, choose smallest total compression to start within those months. If and ONLY IF resource guard permits, actually complete up to two new source ZIPs on this run, record UTC windows/rows/sha/time/RSS, and preserve first 2023-08 pilot. If memory still unsafe, finish tests/code and return RESOURCE_GATED_READY without starting any new sources. No unattended 85GB full sweep.
+5. Keep as-of flow features (perp and spot signed flows, base and quote volume, 1m/5m/1h closed intervals) queryable with existing C1 candle prices, maintaining product identity. isBuyerMaker=true is taker SELL. No future settlement/returns, no unverified receiver first-known clocks. Missing/partial monthly ZIPs and sparse 2026 samples must stay marked, not gap-filled.
+6. Focused tests: simulated zero SwapFree gate without opening source, threshold behavior, deterministic file ordering, max-sources and wall-stop, checkpoint/output hash tamper refusal, interrupted temp handling, idempotent status, truthful timing, total sources completion not inferred from pilot, future feature leak prevention, aggressor direction and source preservation. Run tests/data/catalog tests with bounded resources only and report exact exit/count.
+7. Write new c2 resource_preflight.json, batch_decision.json, cumulative_progress.json and distinct per-run receipt under c2/runs/; update existing coverage/README only in a reproducible schema-preserving way, no touching existing raw ZIPs or C0/C1. If no new ingest due to resource pressure, provide concrete minimum WSL memory/swap remediation needed as advice only; do not execute system changes.
+
+Terminal:
+- DATA_C2_B1_BATCH_READY if verified real additional monthly source(s) ingested and all guards+tests work.
+- DATA_C2_B1_RESOURCE_GATED_READY if code+tests complete but no real new source opened because resource headroom insufficient.
+- DATA_C2_B1_PARTIAL with exact blocker if implementation incomplete.
+A full multi-year conclusion requires all 122 months actually source-hash verified and ingested. No protected Final/A-line/Forward result labels; no historical strategy returns or trading, no testnet/live. P3_ACCESS_SCOPE_HOLD, SOURCE_NOT_ADMITTED, PIT_UNKNOWN, NO_ALPHA_ESTABLISHED, LIVE_NO_GO and REAL_FUNDS_WRITE_NONE stay in force.
