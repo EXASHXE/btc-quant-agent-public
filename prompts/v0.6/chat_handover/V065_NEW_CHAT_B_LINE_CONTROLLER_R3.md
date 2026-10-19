@@ -42,6 +42,12 @@ Owner directive: After accepting each implementation/research stage, **commit an
 
 Next Controller decision: a truly differentiated R4 falsifiable proposition or source feasibility question, rather than re-tuning previous failures; R3 terminal receipts are local and should be read when the owner computer is available.
 
+## R5 acceptance check — 2026-10-20
+
+Do not mistake the completed, source-bounded R4 revalidation under `crypto-data/lakehouse/research-bline-r4-novel/revalidation-20261020/` for the separately assigned `V065-BLINE-R5-TLOB-P1-DISCRIMINATION-01`. It confirmed saved counts (34,821 paired, 1,265 triggers, 515 eight-hour episodes in 168 weeks), zero returns, 9 tests and Ruff PASS. It did not produce the P1-vs-TLOB matched-population novelty discriminator. At the last inspection, no R5 code/tests/output root existed. The novel-family question remains `HOLD_NOVELTY_VS_P1_UNRESOLVED`.
+
+Known technical caveat: the published R4 OI build scans an unrestricted normalized directory and overwrites duplicate labels, while the read-only revalidation strictly bounded source years and rejected conflicts. Correct safely before re-running build; preserve R4 frozen outputs. No new publishable files resulted from the revalidation and code HEAD remains `v0.6.5@39a68a1c8b3490a5a3826d2fab6a7e3f0e441dc2`. P3 Owner scope remains blocked.
+
 ## R4 stage checkpoint and new R5 handoff — 2026-10-20
 
 Refreshed executable main: `v0.6.5@39a68a1c8b3490a5a3826d2fab6a7e3f0e441dc2` (scoped 6-file R4 TLOB publication). R4-A is complete with `R4_REAL_DEV_BLOCKED_OWNER_SCOPE`, no valid pre-existing Owner v2 attestation/P3 derived panel allowlist provided and zero real labels. R4-B is complete with feature-only `R4_NOVEL_FEATURE_CANDIDATE_READY`: 34,821 paired eligible origins, 1,265 triggers, 515 nonoverlapping 8h episodes, 168 ISO weeks, 0.710 episodes per 48 eligible hours across 2021–2024; the 2023 density is 0.269. 9 tests, Ruff and bit-exact SHA verify PASS; original frozen registration SHA `62332f599cb1a643cb1575c6b7b4aaebe174dbe7daffe21d0f903fc50092eacc`.
