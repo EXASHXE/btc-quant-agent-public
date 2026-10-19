@@ -34,6 +34,14 @@ Last independently refreshed executable main `v0.6.5`: `12b74b4c2fd3a22a9f4b35db
 
 ---
 
+## Current stage checkpoint (2026-10-20): R3 complete and published
+
+Refresh the moving `v0.6.5` ref; last remotely verified executable main is `a4e28c0c7952a84ea77597f18c72dac30b6b3723` (`research(bline): publish offline R1-R3 stage checkpoint`). **Do not reassign completed R2 or R3 tasks.** R3 price-discovery-lag/recovery was falsified at feature feasibility: 35,021 paired origins, 0 triggers, 0 8h episodes, 0 episode-start weeks. R3 2022 native Top Trader POSITION ratio missingness is a genuine Binance publisher data gap (7,645 blank-ratio hourly origins, 1,115/8,760 usable), not a fixable parser bug. No real outcomes, PIT admission or Alpha established. 472 cross-stage tests passed (`pytest --import-mode=importlib`), relevant R2/R3 Ruff passed.
+
+Owner directive: After accepting each implementation/research stage, **commit and push the stage-scoped source, dependencies and tests to the remote executable branch**, then verify the remote SHA; keep private/Owner/Forward/Final/OOS data, local receipts and unrelated dirty edits outside the commit. CI and broad unrelated lint may be deprioritized but focused tests, path/secret review, no-alpha/no-live conditions and normal fast-forward safety still apply. Update docs/engineering separately.
+
+Next Controller decision: a truly differentiated R4 falsifiable proposition or source feasibility question, rather than re-tuning previous failures; R3 terminal receipts are local and should be read when the owner computer is available.
+
 ## Current delivery and scientific boundaries
 
 - **`BLINE_R1_RESEARCH_PIPELINE_READY`**: 50,376 scheduled origins; 40,896 Binance BTC historical feature-only points; 35,250 Funding/Premium-eligible and 3,667 native OI-paired-eligible. Four CLI entries, coverage/lineage artifacts, two preregistered fixed short-only candidate policies. The R1 author reports 131 focused tests and 84-day synthetic P1 three-fold pass.
