@@ -42,6 +42,12 @@ Owner directive: After accepting each implementation/research stage, **commit an
 
 Next Controller decision: a truly differentiated R4 falsifiable proposition or source feasibility question, rather than re-tuning previous failures; R3 terminal receipts are local and should be read when the owner computer is available.
 
+## R4 stage checkpoint and new R5 handoff — 2026-10-20
+
+Refreshed executable main: `v0.6.5@39a68a1c8b3490a5a3826d2fab6a7e3f0e441dc2` (scoped 6-file R4 TLOB publication). R4-A is complete with `R4_REAL_DEV_BLOCKED_OWNER_SCOPE`, no valid pre-existing Owner v2 attestation/P3 derived panel allowlist provided and zero real labels. R4-B is complete with feature-only `R4_NOVEL_FEATURE_CANDIDATE_READY`: 34,821 paired eligible origins, 1,265 triggers, 515 nonoverlapping 8h episodes, 168 ISO weeks, 0.710 episodes per 48 eligible hours across 2021–2024; the 2023 density is 0.269. 9 tests, Ruff and bit-exact SHA verify PASS; original frozen registration SHA `62332f599cb1a643cb1575c6b7b4aaebe174dbe7daffe21d0f903fc50092eacc`.
+
+Important: TLOB's 24h rising-OI plus drop rule is not proof that trapped LONG positions were observed and may overlap historical P1 `A_POSITION_OVERHANG`; compare same-family mechanisms before independent novelty claims. No after-cost economic data may be read pending authentic Owner decision. Do not redispatch R4-A without new authorization evidence. User wants commit/push after stage acceptance; protect unrelated local dirty files and lakehouse data, verify remote SHA. Next is one focused scientific R5 falsifier and a private Owner scope decision, not another generic audit round.
+
 ## Current delivery and scientific boundaries
 
 - **`BLINE_R1_RESEARCH_PIPELINE_READY`**: 50,376 scheduled origins; 40,896 Binance BTC historical feature-only points; 35,250 Funding/Premium-eligible and 3,667 native OI-paired-eligible. Four CLI entries, coverage/lineage artifacts, two preregistered fixed short-only candidate policies. The R1 author reports 131 focused tests and 84-day synthetic P1 three-fold pass.
