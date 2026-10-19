@@ -9,3 +9,12 @@ This is a documentation-only branch descending from a new root with no research/
 - infrastructure/ — deployment and offline G3 operational notes; historical-engineering/ — retired process notes; ci/ — CI maintenance context.
 
 Some runtime/test-referenced compatibility documents remain unchanged on main. No protected payload was copied. Historical files preserve their original wording and exact source blobs; their old READY/NOT EXECUTED labels are historical, not the current M1 execution state. [M1 actual execution receipt](repository-maintenance/V065_M1_EXECUTION_RECEIPT_R1.md) records published main/docs/archive, verified backup/reachability, actual CI, 0 deletions and explicit admin holds. The topology is not finished. This branch creates no independent source/science/Alpha/release authority.
+
+## Active Controller B documentation (English, R5)
+
+- [Controller B role](docs/roles/V0.6_CHATGPT_0_PRIMARY_CONTROLLER.md) — default Codex/Agy-first routing and on-demand audit threshold.
+- [B-line project status and roadmap](docs/project/V0.6_PROJECT_STATUS_AND_ROADMAP.md) — R1 engineering completion, sample sufficiency and R2 expansion priorities.
+- [Execution-first dispatch policy](docs/project/V065_EXECUTION_FIRST_CONTROLLER_POLICY_R4.md) — lightweight verification ladder and protected boundaries.
+- [New Controller B chat bootstrap](prompts/v0.6/chat_handover/V065_NEW_CHAT_B_LINE_CONTROLLER_R3.md) — current English R5 start prompt.
+
+These are published on the independent **docs/engineering** branch. They do not modify executable main **v0.6.5** or the owner's uncommitted local research checkout.
