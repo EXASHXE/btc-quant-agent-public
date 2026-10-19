@@ -15,6 +15,18 @@
 - Avoid repeated review cycles with no new evidence. After one focused corrective pass, state the exact blocker or move to the next informative task.
 - Preserve owner files, active collectors, protected roots, and parallel-agent outputs. Never use destructive cleanup/reset to make a workspace appear clean.
 
+## Stage-closeout commit/push rule (Owner decision, 2026-10-20)
+
+On acceptance of a completed implementation/research stage, **commit and push the scoped deliverable to the remote executable branch**; do not leave completed stage code exclusively in the owner's local untracked/dirty working tree. Keep this separate from documentary updates to `docs/engineering`.
+
+1. Refresh local `HEAD`, `git status`, remote `refs/heads/v0.6.5`, active writers and stage receipts. Re-check writer ownership and avoid duplicate work.
+2. Stage **only** explicit, stage-related code/test/doc paths plus the minimal dependency closure. Scan staged paths/content for private Owner/archive/Forward/Final/OOS data, credentials, large artifacts, temporary test files and private links. Do not stage unrelated pre-existing dirty user files or use reset/clean/stash/force-push.
+3. Run focused changed-invariant tests, reproduce the stage terminal verdict, perform appropriate secret/scope inspection, and document exceptions. Full CI, workflow runs and unrelated broad Ruff failures **may be nonblocking for now** under the owner's instruction; substantive source/PIT, safety and scope blockers are never waived by skipping CI.
+4. Commit the scoped stage checkpoint with terminal verdict, no-alpha/no-live boundaries and relevant source/test dependencies; push normally to the intended remote branch if authorized, subject to normal fast-forward checks and branch protections. On a remote divergence or permission failure, do not force-push; report the exact blocker.
+5. **Confirm published remote SHA** (not merely local commit SHA). Report commit URL, file scope, tests, terminal decision and remaining uncommitted work. Distinguish source-code publication from data rights, authenticated source clock, real-return scope or trading permission.
+
+2026-10-20 precedent: `v0.6.5@a4e28c0c7952a84ea77597f18c72dac30b6b3723` contains 89 scoped offline R1–R3 code/test files; 472 relevant tests passed using `pytest --import-mode=importlib` (duplicate filenames), and R2/R3 focused Ruff passed. Preexisting modified docs and unrelated dirty work were not included.
+
 ## Verification ladder
 
 - **Docs-only:** inspect changed paths, links, and diff scope.
