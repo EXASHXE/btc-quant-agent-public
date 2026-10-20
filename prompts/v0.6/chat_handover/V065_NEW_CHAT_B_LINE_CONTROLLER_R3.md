@@ -42,11 +42,16 @@ Owner directive: After accepting each implementation/research stage, **commit an
 
 Next Controller decision: a truly differentiated R4 falsifiable proposition or source feasibility question, rather than re-tuning previous failures; R3 terminal receipts are local and should be read when the owner computer is available.
 
-## R5 acceptance check — 2026-10-20
+## R5 status — partial engineering published, science held (2026-10-20)
 
-Do not mistake the completed, source-bounded R4 revalidation under `crypto-data/lakehouse/research-bline-r4-novel/revalidation-20261020/` for the separately assigned `V065-BLINE-R5-TLOB-P1-DISCRIMINATION-01`. It confirmed saved counts (34,821 paired, 1,265 triggers, 515 eight-hour episodes in 168 weeks), zero returns, 9 tests and Ruff PASS. It did not produce the P1-vs-TLOB matched-population novelty discriminator. At the last inspection, no R5 code/tests/output root existed. The novel-family question remains `HOLD_NOVELTY_VS_P1_UNRESOLVED`.
+Executable main is `v0.6.5@5116a61fa255d9823be80416a659ca6acdecf70f`. Four scoped code/test files are pushed; this does NOT represent full scientific R5 acceptance. Independent focused rerun with `BLINE_R4_ROOT=/root/workspace/project/crypto-data/lakehouse/research-bline-r4-novel`, `PYTHONPATH=src:.`, `PYTHONDONTWRITEBYTECODE=1`: 24/24 pass in 8.59s; Ruff pass; output hashes match; all 14 R4 frozen artifacts unchanged.
 
-Known technical caveat: the published R4 OI build scans an unrestricted normalized directory and overwrites duplicate labels, while the read-only revalidation strictly bounded source years and rejected conflicts. Correct safely before re-running build; preserve R4 frozen outputs. No new publishable files resulted from the revalidation and code HEAD remains `v0.6.5@39a68a1c8b3490a5a3826d2fab6a7e3f0e441dc2`. P3 Owner scope remains blocked.
+Scientific terminal: `R5_INCONCLUSIVE_P1_COMPARATOR_UNAVAILABLE`; `full_R5_acceptance=false`. Matched feature-only population 34,821; X events 4,651; TLOB events 1,265. TLOB is X AND Z and adds no exact event timestamps. TLOB 515 greedy 8h windows all overlap an X window; 199 different start times do not establish new independent exposure. P1 authentic fitted parameters/native top-position ratio panel/original X controls/fold eligibility were unavailable; three-way denominator and P1 intersections are null, not zero. No outcome/PnL read.
+
+Execution qualification: preliminary schema inspection parsed/displayed one 2026-04-01 05:01 UTC pure-feature row outside the intended 2021–2024 inspection bound, not used in analysis. No protected labels/PnL read. Do not claim zero out-of-range preliminary feature reads. Private report root: `/root/workspace/project/crypto-data/lakehouse/research-bline-r5-tlob-p1-20261020/`.
+
+Next information-changing input is an independently authenticated feature-only P1 frozen model/fold + training-only parameter + native ratio/OI timing + original P1 X schema/eligibility bundle without outcomes. Do not rerun R4, retune TLOB or repeat preflight. P3/source/PIT/cost/utility/Alpha/TESTNET/LIVE/funds HOLD labels stay unchanged.
+
 
 ## R4 stage checkpoint and new R5 handoff — 2026-10-20
 
