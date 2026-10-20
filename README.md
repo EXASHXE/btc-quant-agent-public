@@ -19,3 +19,7 @@ Some runtime/test-referenced compatibility documents remain unchanged on main. N
 - [New Controller B chat bootstrap](prompts/v0.6/chat_handover/V065_NEW_CHAT_B_LINE_CONTROLLER_R3.md) — current English R5 start prompt.
 
 These are published on the independent **docs/engineering** branch. They do not modify executable main **v0.6.5** or the owner's uncommitted local research checkout.
+
+## Latest R6 research architecture (2026-10-20)
+
+- [Native 2022 Binance data-gap forensics, P1-R2 ML engineering plan, multi-asset result and P3 outcome readiness](docs/project/V065_R6_NATIVE_DATA_RECOVERY_ML_AND_P3_READINESS_20261020.md) — authoritative R6 status; older R5/R2 assignments below it are historical.
