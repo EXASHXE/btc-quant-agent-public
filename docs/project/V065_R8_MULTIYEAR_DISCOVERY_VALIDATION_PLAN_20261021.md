@@ -1,5 +1,7 @@
 # R8 — Multiyear Strategy Discovery, Rolling Selection, and Locked Validation
 
+> **R8-7 STATUS SUPERSEDES STALE TASK-1 HANDOFF (2026-10-21):** See [R8-7 X-only economic priority update](V065_R8_7_X_ONLY_ECONOMICS_PRIORITY_UPDATE_20261021.md). R8-5 public 2021–2023 feature-support completed and R8-6 H1 X+Z was retired after only 4 selected events; the original shared X-only calendar contains 545 fixed non-overlapping-by-time slots. Controller reports separate R8-7 economics authorization. Prioritize the frozen X-only 545-event actual economic study, not repeating Task 1, H1 feature counting or scope archaeology. Do not touch 2024/2025/2026 validation/holdout sets.
+
 **Date:** 2026-10-21  
 **Purpose:** Reach a reproducible, economically meaningful exploratory BTC strategy result using broad historical data, without restarting completed R1–R5 work or creating another governance-heavy stage.
 

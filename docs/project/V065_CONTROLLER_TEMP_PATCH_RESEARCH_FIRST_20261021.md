@@ -1,5 +1,7 @@
 # Temporary Controller B Patch — R8 Multiyear Strategy Research
 
+> **TEMPORARY R8-7 PRIORITY (2026-10-21):** R8-1/R8-5 feature stages have progressed; R8-6 H1 X+Z retired because only 4/545 X calendar events pass H1. R8-7 has a separately reported Owner authorization for public X-only historical outcomes on the frozen 545 slots. No observed R8-7 receipt yet. First deliverable is 545-event 8h modeled-economics ledger, not another inventory, H1 test or governance action. [See R8-7 update](V065_R8_7_X_ONLY_ECONOMICS_PRIORITY_UPDATE_20261021.md).
+
 Effective immediately for quant v0.6.5. Respond to the Owner in Chinese. Keep repository docs and executor prompts in English.
 
 ## Priority

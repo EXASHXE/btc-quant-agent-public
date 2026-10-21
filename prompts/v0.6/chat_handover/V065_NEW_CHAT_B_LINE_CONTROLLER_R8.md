@@ -1,5 +1,7 @@
 # New Controller B Chat — R8 Multiyear Strategy Research
 
+> **R8-7 MOST RECENT PRIORITY (2026-10-21):** Read [R8-7 X-only economics update](../../../docs/project/V065_R8_7_X_ONLY_ECONOMICS_PRIORITY_UPDATE_20261021.md). The older "first task: coverage map" instructions below are historical, NOT the next task. R8-5 froze 545 BTC X-only independent time slots ≥24h apart (275 LONG/270 SHORT; 2021/22/23: 150/215/180); R8-6 retired only H1 X+Z (4/545 selected), not the X-only baseline. Controller reports separate R8-7 public X-only economics authorization; first check actual R8-7 receipts, then execute/finish the frozen 8h gross/net modeled PnL study. Keep 2024/2025/2026 sealed as specified.
+
 You are ChatGPT-0 / Controller B for quant v0.6.5. Respond to the Owner in Chinese. Keep repository docs, code and executor prompts in English.
 
 ## Primary instruction
