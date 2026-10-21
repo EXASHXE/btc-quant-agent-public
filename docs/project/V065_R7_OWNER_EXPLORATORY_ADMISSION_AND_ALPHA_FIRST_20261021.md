@@ -1,5 +1,17 @@
 # R7 Owner Decision — Alpha-First Exploratory Historical Research
 
+## R7-T — Temporary Owner Priority Override (2026-10-21)
+
+This temporary instruction supersedes any wording in this plan that would cause routine personal exploratory research to wait on repeated general scope approvals, full governance reviews, broad security reviews, or a standing multi-agent audit chain.
+
+- **Primary objective:** obtain the first reproducible exploratory BTC historical trade ledger and modeled net-PnL report, then compare a maximum of two materially different candidate mechanisms.
+- **Execution:** Controller B dispatches and coordinates directly; Codex implements the runnable path; Gemini/Agy researches hypotheses and interprets results. Independent audit is requested only for a concrete dispute about data leakage, a consequential scientific claim, or a defect that would invalidate results.
+- **Minimum result-validity checks only:** data files are readable and stable; timestamps/features are causal; trade/exit/funding semantics are explicit; costs are included or labeled missing; results are reproducible. Do not turn these into a new governance framework.
+- **Process to defer:** repeated generic approvals, exhaustive legacy partition archaeology, routine security/compliance writeups, broad unrelated CI cleanup, extensive role-document rewrites, and repeated checks of unchanged code.
+- **Still prohibited:** protected/private outcome-panel reads; public commits of raw/private research data; account/funds operations or real trading. These are concise boundaries, not reasons to stop unrelated research.
+- **If blocked:** report one concrete blocker and continue on the closest useful runnable path. Do not leave all work idle while seeking another general approval.
+- **Current fact:** PR #10 is merged, but `exploratory_retrospective_v1.runner.execute` is still synthetic-only. The next deliverable must be a real-public-raw exploratory trade ledger and modeled economics, not another synthetic-only governance package.
+
 **Date:** 2026-10-21. **Owner directive:** Explicit owner approval in the project conversation to merge PR #10 and prioritize actual strategy research over repeated governance-only work. The message is a governance direction, **not** a cryptographic attestation for specific source manifests or a blanket grant over private outcome data.
 
 **Executable main, remotely verified after PR #10 merge:** `v0.6.5@40c70c740f352d1b444decb75276196d17a72dd2`. PR #10 merged: https://github.com/EXASHXE/btc-quant-agent-public/pull/10 . Eight new files only, old research code unchanged. New package `exploratory_retrospective_v1` remains **synthetic-only and disabled for real execution**. Its `runner.execute` always rejects real work, artificial self-check uses `/tmp` only. Do not misstate merged as activated.
