@@ -4,7 +4,7 @@
 
 ## Current R8 State — 2026-10-22
 
-All five R8-8/Argon tasks completed successfully; this is not a queue of still-running jobs. Review their receipts and the [research results](V065_R8_ARGON_RESEARCH_RESULTS_20261022.md), then choose one high-value next action: source-feasibility review of the selected liquidation-flow mechanism. Avoid routine broad audits and do not launch empirical outcomes before source and registration gates are frozen and Owner authorization is explicit. Keep the worktrees isolated; no merge or promotion is implied by passing synthetic tests.
+All five R8-8/Argon tasks completed successfully; do not relaunch them. R8-7's frozen X-only baseline is negative and closed. The only immediate work candidate is `V065-R8-NEXT-SOURCE-FEASIBILITY-01`, state `PREPARED_NOT_DISPATCHED`; follow the [source-feasibility plan](V065_NEXT_GATE_LIQUIDATION_FLOW_SOURCE_FEASIBILITY_PLAN_20261022.md). Its scope is metadata-only. No market payload, outcome, backtest, merge or Alpha claim is authorized. The five R8 worktrees remain isolated; passing synthetic tests do not establish source completeness or receiver PIT.
 
 <!-- /R8-ARGON-STATE-20261022 -->
 **Purpose:** maximize useful implementation throughput, historical-data coverage, effective research samples, and credible BTCUSDT 4–24h evidence for a personal research project. This is an execution-routing policy, not a grant of source rights, outcome access, or trading authority.
@@ -43,11 +43,13 @@ On acceptance of a completed implementation/research stage, **commit and push th
 
 ## Current work priority
 
-BLINE-R1's feature-only historical research pipeline is delivered. Continue BLINE-R2 with two evidence-producing workstreams: (A) inventory and expand useful public historical data—prioritizing native OI and top-position metrics, then mark/index/premium/funding and missing BTC/ETH periods; (B) quantify non-overlapping events, effective weekly blocks, source missingness, and regime concentration. More downloaded hours are not automatically more independent opportunities. Freeze R1 parameters; version any new mechanism separately.
+R1/R2 data expansion and the R8-8 five-task packet are completed; do not relaunch their historical jobs. The current candidate is one metadata-only source-feasibility task for the forced-liquidation flow-exhaustion mechanism, documented in [Next Gate — Liquidation-Flow Source Feasibility](V065_NEXT_GATE_LIQUIDATION_FLOW_SOURCE_FEASIBILITY_PLAN_20261022.md). It is `PREPARED_NOT_DISPATCHED`, not running. First establish documented field availability, lawful source route, native units, coverage metadata and timestamp/receiver-clock evidence. No market payload reads, outcome access, backtest, live collection or integration are included. A blocked or inconclusive source result closes this route or identifies one missing piece; do not automatically pivot to R8-C/R8-D.
 
-Check whether tasks are already underway before redispatching. Public static acquisition must be scoped, source/terms reviewed, resumable, hash-verified, and bounded by an explicit disk budget. Do not start a live collector or use private accounts.
+Check receipts before dispatching. Any future public-data acquisition must be separately scoped, terms-reviewed, resumable, hash-verified and bounded by an explicit disk budget. Do not start a live collector or use private accounts.
 
-## Conversation and task-card contract
+## Conversation and task-card contract — mandatory across all roles and executors
+
+Follow the [project-wide prompt-card standard](V06_CHATGPT_OUTPUT_UI_AND_TASK_CARD_STANDARD_R1.md). This rule applies to every role document and every executor prompt; it is not a Controller-only UI preference.
 
 - Respond to the owner in **Chinese by default**, unless the owner explicitly asks for English conversation.
 - Write repository role docs, project docs, handover prompts, and runnable execution prompts in **English by default**, unless the owner explicitly requests another language.

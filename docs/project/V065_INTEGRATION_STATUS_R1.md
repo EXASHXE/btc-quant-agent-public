@@ -1,4 +1,4 @@
-# quant v0.6.5 — Current Engineering Integration Snapshot · 2026-10-18
+# quant v0.6.5 — Current Engineering Integration Snapshot · R8 update 2026-10-22
 
 <!-- R8-ARGON-STATE-20261022 -->
 
@@ -6,10 +6,12 @@
 
 R8-8 and R8-A/B/C/D are **engineering-complete but not integrated**. All five remote Codex runs exited 0. Focused validation: R8-8 3,772 ledger checks; R8-A 48 tests; R8-B 82 tests; R8-C 76 tests; R8-D 43 tests. No new real historical outcome, no protected 2024–2026 access, no commit/push from those worktrees.
 
-Integration blockers: (1) R8-A SMA-seeded EMA/MACD differs from the production-seeded primitives used by R8-C; choose and validate one implementation. (2) R8-D joint coverage is unknown; the legacy 35,250 funding-z count is not joint feature coverage, and normalized bars do not retain taker-buy columns. (3) the selected liquidation hypothesis still needs direct liquidation/OI/spot/executable-perp source completeness and receiver-clock feasibility. Do not merge or run empirical strategy outcomes until a separate scoped task and explicit Owner authorization. See [research results](V065_R8_ARGON_RESEARCH_RESULTS_20261022.md).
+**Next gate:** metadata-only source feasibility for the selected forced-liquidation flow-exhaustion hypothesis, state `PREPARED_NOT_DISPATCHED`; see [source-feasibility plan](V065_NEXT_GATE_LIQUIDATION_FLOW_SOURCE_FEASIBILITY_PLAN_20261022.md). This gate may establish feasibility for separately authorized source/clock QA only, not source admission or receiver PIT acceptance. No market-value payload, outcome, backtest or integration is authorized by the plan.
+
+Integration blockers: (1) R8-A SMA-seeded EMA/MACD differs from the production-seeded primitives used by R8-C; choose and validate one implementation before any shared trial. (2) R8-D joint coverage is unknown; the legacy 35,250 funding-z count is not joint feature coverage, and normalized bars do not retain taker-buy columns. (3) the selected liquidation hypothesis needs direct liquidation/OI/spot/executable-perp source completeness and receiver-clock feasibility. Do not merge or run empirical strategy outcomes until a separate scoped task and explicit Owner authorization. See [research results](V065_R8_ARGON_RESEARCH_RESULTS_20261022.md).
 
 <!-- /R8-ARGON-STATE-20261022 -->
-**Current GitHub default and local checkout:** `v0.6.5@12b74b4c2fd3a22a9f4b35dbf331cfb1166aae77` (independently observed on 2026-10-18). This moves; refresh before publishing. [Live roadmap](V0.6_PROJECT_STATUS_AND_ROADMAP.md) · [Execution-first policy](V065_EXECUTION_FIRST_CONTROLLER_POLICY_R4.md).
+**Historical GitHub default snapshot (2026-10-18):** `v0.6.5@12b74b4c2fd3a22a9f4b35dbf331cfb1166aae77`. The five R8 worktrees later used baseline `40c70c740f352d1b444decb75276196d17a72dd2`; neither value is a fresh check of the moving remote ref. Refresh before code dispatch/publication. The current R8 next gate is metadata-only source feasibility; see the [live roadmap](V0.6_PROJECT_STATUS_AND_ROADMAP.md), [R5 execution policy](V065_EXECUTION_FIRST_CONTROLLER_POLICY_R5.md), and [source-feasibility plan](V065_NEXT_GATE_LIQUIDATION_FLOW_SOURCE_FEASIBILITY_PLAN_20261022.md).
 
 | Scope | Verified state | Limit |
 |---|---|---|

@@ -1,13 +1,13 @@
-# quant v0.6.5 — Five-Session Routing Matrix · Execution-First R4
+# quant v0.6.5 — Five-Session Routing Matrix · Execution-First R5
 
 <!-- R8-ARGON-STATE-20261022 -->
 
 ## Current Dispatch State — 2026-10-22
 
-R8-8, R8-A, R8-B, R8-C and R8-D have completed in isolated worktrees. Controller B owns the next source-feasibility / registration decision; 1-A checks exact receipts and boundary compliance only; 2-C attacks causal alternatives and source completeness; 2-E executes only an explicitly authorized next task; 2-R develops an outcome-blind registration; A-line remains separate. No role should treat synthetic tests as profitability evidence or treat the selected hypothesis as authorization to read outcomes. See [results](V065_R8_ARGON_RESEARCH_RESULTS_20261022.md).
+R8-8, R8-A, R8-B, R8-C and R8-D are complete in isolated worktrees. The only prepared next task is `V065-R8-NEXT-SOURCE-FEASIBILITY-01` (`PREPARED_NOT_DISPATCHED`), defined in [the source-feasibility plan](V065_NEXT_GATE_LIQUIDATION_FLOW_SOURCE_FEASIBILITY_PLAN_20261022.md). Codex/Agy may execute it only after Controller dispatches the scoped card. 1-A is not currently dispatched; it may review a consequential source/rights/clock claim if one arises. 2-R registration and 2-C challenge are conditional on source-feasibility evidence and a concrete Controller question; 2-E has no integration task. A-line remains separate. Synthetic tests do not establish profitability or authorize outcome access. See [results](V065_R8_ARGON_RESEARCH_RESULTS_20261022.md).
 
 <!-- /R8-ARGON-STATE-20261022 -->
-Owner-directed dispatch policy: [R4](V065_EXECUTION_FIRST_CONTROLLER_POLICY_R4.md). Five ChatGPT conversations remain **0 / 1 / 2-R / 2-C / 2-E**, but **not five mandatory stages**. Codex and Antigravity (Agy/Gemini) are the default coding executors; these five conversations are *roles*, not a required waterfall.
+Owner-directed dispatch policy: [R5](V065_EXECUTION_FIRST_CONTROLLER_POLICY_R5.md). Five ChatGPT conversations remain **0 / 1 / 2-R / 2-C / 2-E**, but **not five mandatory stages**. Codex and Antigravity (Agy/Gemini) are the default coding executors; these five conversations are *roles*, not a required waterfall.
 
 | Work | Default owner | Escalation rule |
 |---|---|---|
@@ -24,3 +24,8 @@ Owner-directed dispatch policy: [R4](V065_EXECUTION_FIRST_CONTROLLER_POLICY_R4.m
 **Parallelism:** max two active writers across non-overlapping paths, one read-only investigation; one task per chat. Prefer current local `/root/workspace/project/quant-0.6.5`, create new worktrees only if needed. Avoid custom agents unless requested. Keep protected A-line separate.
 
 **Success = working vertical slice and validated new information, not role utilization.** All existing source/PIT, Alpha, protected data, TESTNET/LIVE and funds gates remain unchanged.
+
+
+## Mandatory shared prompt-card contract
+
+All roles and executors must follow [V06 ChatGPT Output UI and Task Card Standard R1](V06_CHATGPT_OUTPUT_UI_AND_TASK_CARD_STANDARD_R1.md). Any executable/dispatchable prompt shown to the Owner must be represented by a compact card (at most two cards per response) with exactly one functional Copy prompt button; the complete prompt body is only the copy-action payload and must not be displayed visibly. If a working copy action is unavailable, state the limitation and ask before showing the prompt body. This applies to Controller, Auditor, Researcher, Challenger, Direct Executor, A-line Controller, Codex/Sol/Astra/Gemini, and subagents.
