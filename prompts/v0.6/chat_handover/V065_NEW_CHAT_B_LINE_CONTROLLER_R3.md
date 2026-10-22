@@ -1,5 +1,12 @@
 # New Controller B Chat — R5 Bootstrap (English)
 
+<!-- R8-ARGON-STATE-20261022 -->
+
+## Current Controller State — 2026-10-22
+
+All five R8-8/Argon jobs have completed normally (exit 0); do not relaunch. R8-7 fixed 8h X-only is closed negative. Review docs/project/V065_R8_ARGON_RESEARCH_RESULTS_20261022.md and docs/project/V065_R8_8_ARGON_FIVE_TASK_DISPATCH_20261022.md. Next gate: metadata-only source feasibility for the selected liquidation-flow exhaustion hypothesis, then freeze an independent registration and obtain explicit Owner authorization before outcome access. R8-A/B/C/D remain isolated and unmerged.
+
+<!-- /R8-ARGON-STATE-20261022 -->
 > **R7 primary bootstrap (2026-10-21):** Read [R7 Owner decision and Alpha-first tasks](../../../docs/project/V065_R7_OWNER_EXPLORATORY_ADMISSION_AND_ALPHA_FIRST_20261021.md) before the R6/R5 text below. PR #10 is merged into executable main `40c70c740f352d1b444decb75276196d17a72dd2` but its real mode is INACTIVE. Owner approved narrow exploratory-research engineering and delegated task-level source-qualified public-raw scope decisions; no real/protected outcome access is granted by the synthetic scaffold. Keep Chinese chat, English artifacts and one-button copy-only prompt cards.
 
 > **R6 superseding bootstrap — 2026-10-20:** First read [R6 authoritative status and architecture](../../../docs/project/V065_R6_NATIVE_DATA_RECOVERY_ML_AND_P3_READINESS_20261020.md). This supersedes older R2/R5 READY assignments below: 2022 Binance native ratio gap verified as publisher-empty; feature-only multi-asset pilot COMPLETED with 826 vs 294 distinct 8h clusters; first real DEV PnL attempt is `P3_SCOPE_BLOCKED`; Owner v2 scope remains an unauthenticated draft. Prioritize authenticated task-specific authority/entry-exit/economic contract and synthetic-only P1-R2 compatibility engineering, not a fresh trial. Continue in Chinese with English artifact prompts and copy-only task cards.
@@ -74,10 +81,12 @@ Important: TLOB's 24h rising-OI plus drop rule is not proof that trapped LONG po
 
 ## Required next wave (check whether already assigned before duplicating)
 
-**COMPLETE Task A — `V065-BLINE-R2-DATA-EXPANSION` / Codex**  
+**COMPLETE Task A — `V065-BLINE-R2-DATA-EXPANSION` / Codex**
+
 Inventory and deduplicate existing Binance BTC/ETH, OKX, and any separately eligible Bybit archives. Prioritize native historical Binance USD-M 5m OI, Top Trader ratio and missing mark/index/premium/funding/candle months. Determine **actual** coverage, rights, native units, UTC roles, historical availability, SHA, compression/temp disk budget, and *new paired usable origins*. Keep OI from different exchanges in separately identified source families. Batch public static historical acquisition only in a separately approved scope; never start new production collection. Use a new isolated R2 output root, not original Owner files or frozen R1 outputs.
 
-**COMPLETE Task B — `V065-BLINE-R2-SAMPLE-EXPANSION` / Antigravity (Agy/Gemini)**  
+**COMPLETE Task B — `V065-BLINE-R2-SAMPLE-EXPANSION` / Antigravity (Agy/Gemini)**
+
 From the frozen R1 168 Funding and 4 OI trigger-hour sets, calculate non-overlapping episodes, effective weekly blocks and source missingness (native 5m OI/4h predecessor/top-position, X baseline and time boundary). Report by year/regime, paired X/Z denominators and NO_ACTION. Compare real incremental eligible origins against the preregistered **30 acted-origin / 12 weekly-block** floor. Keep fixed R1 thresholds; new exploratory venue/period tests require new versioned registration. No real returns or protected outcomes.
 
 Keep simultaneous tasks isolated by writer/path. Codex/Agy implement; **Controller B accepts routine changes directly after focused tests**, without an automatic 1-A audit. Trigger 2-R only for a truly new falsifiable mechanism; 2-C only for a specific material scientific challenge; 1-A only for a consequential real source/PIT/rights, production or financial decision.

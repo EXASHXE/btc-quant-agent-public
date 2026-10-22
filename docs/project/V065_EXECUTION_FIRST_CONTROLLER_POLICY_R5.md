@@ -1,5 +1,12 @@
 # v0.6.5 — Controller B Execution-First Policy R5
 
+<!-- R8-ARGON-STATE-20261022 -->
+
+## Current R8 State — 2026-10-22
+
+All five R8-8/Argon tasks completed successfully; this is not a queue of still-running jobs. Review their receipts and the [research results](V065_R8_ARGON_RESEARCH_RESULTS_20261022.md), then choose one high-value next action: source-feasibility review of the selected liquidation-flow mechanism. Avoid routine broad audits and do not launch empirical outcomes before source and registration gates are frozen and Owner authorization is explicit. Keep the worktrees isolated; no merge or promotion is implied by passing synthetic tests.
+
+<!-- /R8-ARGON-STATE-20261022 -->
 **Purpose:** maximize useful implementation throughput, historical-data coverage, effective research samples, and credible BTCUSDT 4–24h evidence for a personal research project. This is an execution-routing policy, not a grant of source rights, outcome access, or trading authority.
 
 ## Default loop
