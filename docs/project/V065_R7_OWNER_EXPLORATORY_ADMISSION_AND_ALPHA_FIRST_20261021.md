@@ -1,4 +1,18 @@
-# R7 Owner Decision — Alpha-First Exploratory Historical Research
+# R7 Owner Decision — Alpha-First Exploratory Historical Research (Historical)
+
+> **Superseded by the R8-8 current state (2026-10-22):** This document preserves the R7 Owner direction and its original limits. Its former first-real-PnL priority is no longer the active queue: R8-7 has completed negative, and the next prepared task is metadata-only source feasibility. See [current roadmap](V0.6_PROJECT_STATUS_AND_ROADMAP.md), [R8 results](V065_R8_ARGON_RESEARCH_RESULTS_20261022.md), and [source-feasibility plan](V065_NEXT_GATE_LIQUIDATION_FLOW_SOURCE_FEASIBILITY_PLAN_20261022.md). This historical directive does not grant source admission or protected-outcome access.
+
+## R7-T — Temporary Owner Priority Override (2026-10-21)
+
+This temporary instruction supersedes any wording in this plan that would cause routine personal exploratory research to wait on repeated general scope approvals, full governance reviews, broad security reviews, or a standing multi-agent audit chain.
+
+- **Primary objective:** obtain the first reproducible exploratory BTC historical trade ledger and modeled net-PnL report, then compare a maximum of two materially different candidate mechanisms.
+- **Execution:** Controller B dispatches and coordinates directly; Codex implements the runnable path; Gemini/Agy researches hypotheses and interprets results. Independent audit is requested only for a concrete dispute about data leakage, a consequential scientific claim, or a defect that would invalidate results.
+- **Minimum result-validity checks only:** data files are readable and stable; timestamps/features are causal; trade/exit/funding semantics are explicit; costs are included or labeled missing; results are reproducible. Do not turn these into a new governance framework.
+- **Process to defer:** repeated generic approvals, exhaustive legacy partition archaeology, routine security/compliance writeups, broad unrelated CI cleanup, extensive role-document rewrites, and repeated checks of unchanged code.
+- **Still prohibited:** protected/private outcome-panel reads; public commits of raw/private research data; account/funds operations or real trading. These are concise boundaries, not reasons to stop unrelated research.
+- **If blocked:** report one concrete blocker and continue on the closest useful runnable path. Do not leave all work idle while seeking another general approval.
+- **Fact at the R7 checkpoint:** PR #10 was merged, but `exploratory_retrospective_v1.runner.execute` was still synthetic-only. The planned next deliverable at that checkpoint was a real-public-raw exploratory trade ledger and modeled economics. The current R8 gate above supersedes this former priority.
 
 **Date:** 2026-10-21. **Owner directive:** Explicit owner approval in the project conversation to merge PR #10 and prioritize actual strategy research over repeated governance-only work. The message is a governance direction, **not** a cryptographic attestation for specific source manifests or a blanket grant over private outcome data.
 

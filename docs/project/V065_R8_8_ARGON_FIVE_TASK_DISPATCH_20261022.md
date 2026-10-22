@@ -18,6 +18,10 @@ R8-7 completed with 545 frozen BTCUSDT X-only 8h modeled reference events (2021â
 
 Process proof is stored under `/root/workspace/project/crypto-data/lakehouse/r8-argon-parallel-20261022/runs/<TASK>/attempt_1.log` and `exit.code`. `monitor_latest.tsv` records all five as `COMPLETED_EXIT0`; `future_schedule_monitor.log` records the post-06:00 launch and output checks. Each attempt count is 1.
 
+## Launch supervisor and retry evidence
+
+The launch tooling used an exclusive `flock` mutex per task, active-PID and prior-completion checks, and a maximum of three attempts per task. A future supervisor scheduled the two post-06:00 jobs; the all-task monitor checked task-specific output and completion receipts at roughly 60-second intervals. One-shot scheduled checks at approximately 06:25 and 07:10 independently checked later-job startup and completion. The terminal receipts show all five tasks completed on attempt 1, so no retry was needed. A scheduled job was not labeled RUNNING until an actual thread/task command and task-specific output were observed.
+
 ## Results and boundary
 
 - **R8-8:** reconciles the existing R8-7 economics only. It selects forced-liquidation inventory-pressure relaxation for a future independent registration; no new outcome or performance claim.
