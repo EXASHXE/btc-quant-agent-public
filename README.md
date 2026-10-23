@@ -23,3 +23,15 @@ These are published on the independent **docs/engineering** branch. They do not 
 ## Latest R6 research architecture (2026-10-20)
 
 - [Native 2022 Binance data-gap forensics, P1-R2 ML engineering plan, multi-asset result and P3 outcome readiness](docs/project/V065_R6_NATIVE_DATA_RECOVERY_ML_AND_P3_READINESS_20261020.md) — authoritative R6 status; older R5/R2 assignments below it are historical.
+
+
+## Current V0.7.0 strategy research status (2026-10-23)
+
+The V0.7.0 price-primary campaign has completed three one-shot historical trials. No positive after-cost strategy is established; the three remaining PRIMARY slots are intentionally unassigned. These current reports supersede the old V0.6.5/R8 queue for V0.7.0 strategy decisions, while preserving R8 artifacts as separate historical evidence.
+
+- [V070 project status and research roadmap](docs/project/V070_PROJECT_STATUS_AND_RESEARCH_ROADMAP_20261023.md) — current branch/registry state, terminal decisions, research queue and ML/DL gates.
+- [PRIMARY-01 to PRIMARY-03 results and failure analysis](docs/project/V070_PRIMARY_RESULTS_AND_FAILURE_ANALYSIS_20261023.md) — exact economic/support findings and lessons across the three registered trials.
+- [Astra research directions after PRIMARY-03](docs/project/ASTRA_V070_POST_PRIMARY03_RESEARCH_DIRECTIONS_20261023.md) — constraints for independent mechanism discovery and next research decision.
+- [Astra independent mechanism discovery prompt](prompts/v0.7/ASTRA_V070_INDEPENDENT_MECHANISM_DISCOVERY_20261023.md) — one research-only prompt; no data reads, backtest, model fit, registration or trial execution.
+
+These updates are documentation-only commits on docs/engineering. They do not alter the executable v0.7.0 branch, the local dirty research worktree, the active registry, any frozen trial, or any source/experiment authorization. The old V0.6.5/R8 status remains historical context and is not merged with the V0.7.0 PRIMARY ledger.
