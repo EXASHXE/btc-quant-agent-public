@@ -43,7 +43,7 @@ Frozen trial: PRICE_PRIMARY_02_FAILED_ESCAPE_4H_E0.
 
 The important distinction from PRIMARY-01 is that A's candidate and continuation control used the same 413 scheduled events. Its relative advantage was not primarily caused by reducing the number of trades. However, relative advantage over a losing control is insufficient when the candidate's own costed expectancy remains negative.
 
-Primary evidence: local report path /root/workspace/project/quant-0.7.0/a-failed-escape-isolated/a_failed_escape/execution-OWNER-V070-PRICE-PRIMARY-02-FAILED-ESCAPE-01/ECONOMIC_REPORT.md. SHA-256: 33d14b128433f64bb4d5b2a18f1b9dd38355506acaee47f241712a459b13b.
+Primary evidence: local report path /root/workspace/project/quant-0.7.0/a-failed-escape-isolated/a_failed_escape/execution-OWNER-V070-PRICE-PRIMARY-02-FAILED-ESCAPE-01/ECONOMIC_REPORT.md. SHA-256: 33d14b128433f64bb4d5b2a18f1b9dd38355506aca7436ae99f1e531c3b47a3c.
 
 ## 4. PRIMARY-03 — continuous-flow Ridge
 
