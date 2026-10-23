@@ -39,7 +39,7 @@ Read and reconcile these artifacts before proposing anything:
 
 2. PRIMARY-02 economic report:
  /root/workspace/project/quant-0.7.0/a-failed-escape-isolated/a_failed_escape/execution-OWNER-V070-PRICE-PRIMARY-02-FAILED-ESCAPE-01/ECONOMIC_REPORT.md
- SHA256 33d14b128433f64bb4d5b2a18f1b9dd38355506acaee47f241712a459b13b
+ SHA256 33d14b128433f64bb4d5b2a18f1b9dd38355506aca7436ae99f1e531c3b47a3c
 
 3. PRIMARY-03 support/economic report:
  /root/workspace/project/quant-0.7.0/continuous-flow-ridge-01b-isolated/execution-OWNER-V070-CONTINUOUS-FLOW-RIDGE-03-01/ECONOMIC_AND_SUPPORT_REPORT.md
