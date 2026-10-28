@@ -19,6 +19,13 @@ Owner decision: 2026-10-28. Active canonical remote documentation branch: **docs
 - [ChatGPT strategic advisor startup](V070_CHATGPT_NEW_CHAT_START.md)
 - [Controller 0-C startup](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md)
 
+## External reviewer evidence snapshots
+For reviewers who cannot access local R/M/Q or protected data, the Owner may authorize a **separate, dated, read-only public evidence snapshot branch** derived from docs/engineering. Such a branch is an export/review artifact, NOT a parallel living documentation authority. All subsequent project, role, roadmap, task-card, and new-chat documentation updates remain exclusively on docs/engineering.
+- Current Opus snapshot: [Remote-only Opus review pack](https://github.com/EXASHXE/btc-quant-agent-public/tree/review/opus-v070-independent-20261028/reviews/opus-v070-20261028).
+- Do not describe inaccessible local files as uploaded; include only public-safe summaries with dated provenance and clear UNKNOWN statuses.
+- The reviewer should read the included full inherited historical reports and the current docs/engineering branch separately. Actual code and future deployment claims require their respective code/runtime evidence.
+- Publication of a review pack does not authorize a historical data read, a new economic trial, a branch merge, or an engineering implementation.
+
 ## Mandatory prompt copy UX
 For any full Controller, Codex, Astra, Opus, Gemini or new-chat prompt, when the chat UI supports interactive clipboard actions, provide a **working, visibly labeled Copy Full Prompt button** copying the **complete untruncated exact prompt**. A truncated preview is fine only if copy still gets the full text. No inert/decorative button.
 If the UI lacks a real copy action, provide the entire prompt in ONE fenced code block or another complete easy-to-copy fallback; explain the limitation. A repository Markdown file cannot itself render a functional chat button.
