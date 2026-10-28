@@ -1,6 +1,16 @@
-# BTC Quant Research — v0.6.5
+# BTC Quant Agent — v0.7.0 Advisory Product Mission
 
-Personal, noncommercial BTCUSDT **4–24 hour** strategy research. Current priority: establish usable BTC/ETH source data, causal clocks and realistic costs, then test a genuinely new mechanism. **No independently validated after-cost Alpha; TESTNET/LIVE remain unauthorized.**
+**Current Owner direction (2026-10-28):** Build a reliable, read-only crypto market opportunity and position-management advisory robot. Continuously scan liquid instruments, provide evidence-backed entry zones, structural invalidation/stops and non-arbitrary target/trailing policies, then track user-confirmed positions and risk events. **No automatic trading or independently validated after-cost Alpha.**
+
+**Active v0.7.0 handoff:** [Mission & scope](docs/project/V070_ADVISORY_MISSION_AND_SCOPE.md) · [Delivery roadmap](docs/project/V070_ADVISORY_ROADMAP.md) · [Roles & authorization](docs/roles/V070_ADVISORY_AGENT_ROLES.md) · [Current state & new chat](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md) · [Next bounded task](docs/project/V070_ADVISORY_FOUNDATION_TASK.md) · [ChatGPT independent advisor](docs/roles/V070_CHATGPT_STRATEGIC_ADVISOR.md) · [New ChatGPT conversation](docs/project/V070_CHATGPT_NEW_CHAT_START.md) · [Agent overlay](AGENTS.md).
+
+The research executable remains at HEAD `40c70c7` as last inspected; these documents describe the **new product direction**, not a deployed or scientifically validated change. Preserve the old frozen trials and their negatives. The current Q collector and M market-watch feature worktree remain separate and are not implicitly updated by these docs.
+
+---
+
+## Historical v0.6.5 research context (retained for evidence and compatibility)
+
+Personal, noncommercial BTCUSDT **4–24 hour** strategy research was the previous principal mandate. Its results and research protocols remain valid **only for their exact historical scope**. **No independently validated after-cost Alpha; TESTNET/LIVE remain unauthorized.**
 
 [Research dashboard](docs/project/V0.6_PROJECT_STATUS_AND_ROADMAP.md) · [Research operating contract](docs/project/V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md) · [Role/chat entrypoints](docs/project/V0.6_NEW_CHAT_HANDOVER_INDEX.md) · [Scientific register](docs/project/V0.6_B_LINE_STRATEGY_VALIDATION_REGISTER.md)
 
