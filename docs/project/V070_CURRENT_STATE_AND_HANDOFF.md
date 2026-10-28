@@ -3,6 +3,18 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Verified reference date: 2026-10-28. This is a point-in-time documentation snapshot; always recheck current files/processes before action.
 
+## Latest Controller read-only reconciliation — 2026-10-28
+
+**More recent than the original handoff's Foundation-01 proposal.** Verified local R/M/Q heads remained `40c70c7` / `fde61daf` / `6bd63db`, with pre-existing dirty work preserved. No matching active Foundation reconciliation worker or newer ACCEPT receipt was observed during the bounded process and isolated-artifact inspection.
+
+- `V070-ADVISORY-FOUNDATION-01`: **PARTIAL**, isolated package only.
+- `V070-ADVISORY-FOUNDATION-COMPLETION-01`: final receipt at `/root/workspace/project/quant-0.7.0/advisory-foundation-completion-01/EXECUTION_AND_PRESERVATION_RECEIPT.json`, **PARTIAL**, not ACCEPT. Original 34 synthetic cases **33 pass/1 fail**; original 141 affected tests **140/1**; 35 new continuation cases **35/0**; original 7 decision E2E **6/1**. Total distinct scoped cases **214 pass / 3 fail / 0 skipped**. Ruff/mypy/compilation and fabricated three-process notification identity/restart checks pass. These are isolated results, **not production readiness**.
+- Three open conflicts are *legacy assertions versus the newer Owner safety contract*, not waived passes: a missing executable quote must block **ACTION** but must not suppress useful **WATCH/RISK**; a candle-only retest must not yield an authorized LONG; a WAIT/degraded fixture must not become a positive approval case. Preserve each original failure, reconcile its expectation/fixture transparently, and rerun original plus replacement suites. The completed isolated patch remains unintegrated, with no deployment or actual notifications.
+- The latest isolated preservation receipt reports 9 registry events and PRIMARY **3/6 consumed**. This checkpoint did not rerun a protected-data or outcome audit. T2B and F0B remain isolated, not generic prerequisites.
+- **Exactly one next engineering task:** `V070-ADVISORY-FOUNDATION-CONTRACT-RECONCILIATION-01`, subject to separate explicit implementation authorization and confirmation no competing worker has begun. After Foundation ACCEPT: first a narrowly scoped **user-reported Position Risk Copilot** (no account connection, no fabricated fill), then versioned TradePlan/claim ledger and integrated durable risk alerts. Do not auto-start a successor.
+
+**Owner research update:** notification-to-manual-order submission is normally **1–5 minutes**; 1/3/5-minute human scenarios plus 10–15-minute *end-to-end* stress are necessary for later economic work. Read [M1 source/latency feasibility decision](V070_M1_MANUAL_DELAY_RESEARCH_PRIORITIES_20261028.md). Research R0 is metadata/source-contract/timestamp feasibility only; no historical event counts requiring protected values, outcome rows, new studies or forward payloads. M1 remains a hypothesis; current opportunity strategies are RESEARCH or at most unvalidated CANDIDATE, with **no VALIDATED Alpha**. Opus is a dated critical-review input, not an execution authority or a substitute for local receipts.
+
 ## Worktree inventory
 - R: /root/workspace/project/quant-0.7.0/research-loop-bootstrap, branch codex/research-loop-bootstrap at 40c70c740f352d1b444decb75276196d17a72dd2; 12 pre-existing added paths under scripts/research/research_loop and tests/research/research_loop. Current product/role/new-chat documents are now canonical on GitHub docs/engineering, not in R local files.
 - Q: /root/workspace/project/Quant-agent, branch v0.5-refactor, HEAD 6bd63db96e5b54b9cec27a74cd2f728e19fc5b7d; deployed forward collector points here. Do not touch runtime.
@@ -32,7 +44,7 @@ Verified reference date: 2026-10-28. This is a point-in-time documentation snaps
 These are code-review findings, not proof of a live incident. Validate with targeted synthetic tests.
 
 ## Immediate next Owner/Codex action
-V070-ADVISORY-FOUNDATION-01, see linked task card. First select a safe integration baseline, then implement only the bounded foundation in isolated code with synthetic tests and a concise patch. Do not merge into current dirty trees, restart services or send real external messages under documentation authority alone.
+**V070-ADVISORY-FOUNDATION-CONTRACT-RECONCILIATION-01**, not a repeat of Foundation-01. First confirm no newer ACCEPT or active worker, then reconcile the three exact legacy test-contract conflicts under an explicit new engineering authorization. Keep fail-closed ACTION, useful WATCH/RISK, original failures, and all original R/M/Q/registry bytes. Do not merge, deploy, launch market collectors, or start TradePlan work under documentation authority alone.
 
 ## New conversation
 All new conversations must fetch current role/project/new-chat instructions from GitHub docs/engineering, not the stale copies on v0.7.0.

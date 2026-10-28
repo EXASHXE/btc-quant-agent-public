@@ -21,6 +21,8 @@ Official Binance docs: https://developers.binance.com/docs/derivatives/usds-marg
 The OI history REST interface offers 5m+ periods but only about the most recent month; 2021–2023 source availability must be proven with already-accepted archived data or a legitimate vendor and PIT semantics:
 https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Open-Interest-Statistics
 
+**R0 source-only contract (no payloads):** For each 2021–2023 candidate source, record venue/symbol and delisting coverage, contract/units, field name and interval, event/publish/receiver-known/availability clock semantics, archival location and source/version provenance, permitted read scope, missingness metadata, and a binary or UNKNOWN PIT-admission decision. Historical OI 5m+ availability through the current official REST endpoint does not itself establish 2021–2023 archived PIT access. Binance forceOrder snapshots are incomplete, never liquidation-volume ground truth. A plausible EARLY_WATCH from price/flow/perp-spot divergence and a later OI-confirmed candidate are **distinct causal hypotheses** with separate decision clocks. R0 can decide `FEASIBLE_FOR_BOUNDED_EXPLORATION`, `SOURCE_OR_LATENCY_BLOCKED`, or `INSUFFICIENT_SUPPORT` only when metadata justifies the terminal; otherwise list exact missing source contracts and remain open. No event statistics, return curves, no-fill economics or new data collection are authorized here.
+
 ## Revised scientific priority order
 | Priority | Decision | Scope and terminal deliverable |
 |---|---|---|
@@ -35,7 +37,7 @@ These are **research priority labels** not dispatch permission, date commitments
 ## R0 preflight questions and stop conditions
 1. Can a historical 2021–2023 non-leaking symbol universe be reconstructed, including delisted instruments, from documented admitted sources?
 2. What exact timestamp and granularity are known-at for 5m OI statistics, perp/spot prices, taker trade information, bid/ask/spread, and premium? What is missing?
-3. How many *independent market shock clusters* and opposite-direction controls are potentially supported? Count event candidates before reading returns; do not optimize a family of outcome-conditioned thresholds.
+3. Can the *metadata* establish the calendar, instrument coverage and grouping keys needed for independent market-shock clusters and opposite-direction controls? **Do not count event candidates in metadata-only R0**: event identification from market values requires separately authorized access even when no outcome/return labels are read. If later authorized, count candidates before opening returns and never optimize outcome-conditioned thresholds.
 4. Does a causal early WATCH using price/trades/perp-spot dislocation, followed by delayed OI evidence for ACTION, make sense? Test both distinctly; never backdate the OI confirmation. A rapid entry based only on early evidence is a DIFFERENT hypothesis and must be explicitly identified.
 5. If source availability or clock provenance cannot demonstrate an actionable decision while the reversion window is still plausible, STOP the historical M1 economic campaign. A limited prospective timing/monitoring pilot may be proposed under separate authorization.
 
