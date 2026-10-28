@@ -3,6 +3,18 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: proposed by current Owner direction (2026-10-28); stages are not permissions and no gate is declared passed by this document.
 
+## Research priority update — Owner manual response 1–5 min (2026-10-28)
+
+The Owner reports **1–5 minutes from receiving an alert to manually submitting an order**. Read the [M1 delay and revised research-priority decision](V070_M1_MANUAL_DELAY_RESEARCH_PRIORITIES_20261028.md) before commissioning new mechanism work.
+
+- **R0 first:** source/clock/independent-support feasibility for *forced-deleveraging reversion* (M1), strictly **without outcome-data access**. Do not assume a 5-minute human response implies a 5-minute total event-to-fill delay.
+- **R1 conditional:** if evidence and exact Owner authorization permit, test the residual feasible move and cost-aware execution with 1, 3, 5 min manual delays plus 10–15 min total-latency stress. The 5-minute case matters for real advisory usability.
+- **R2 low-cost exploratory control:** the existing pullback/retest structural playbooks versus matched placebos if separately authorized.
+- **R3:** medium/slow trend + structural execution as a product-aligned alternative. **R4:** low-turnover hedged carry only if the Owner wants a distinct two-leg capital-management product.
+- Risk copilot and plan/claim ledger engineering can proceed independently of Alpha research once the existing Foundation contract issues are accepted. RESEARCH / CANDIDATE / VALIDATED must not imply an already proven tradeable edge.
+
+This is an Owner-input planning update, not authorization to read market outcomes, launch workers or consume protected data.
+
 ## Strategy
 Build a narrow real-time advisory vertical slice by reusing existing deterministic modules. Preserve fixed-horizon E0 research as a frozen benchmark; new plans use event-driven structural exits and do not claim Alpha. The first demonstration covers one playbook and a small liquid-universe subset, then expands on measured evidence.
 

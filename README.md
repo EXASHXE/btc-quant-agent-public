@@ -4,6 +4,10 @@
 
 - [Independent Opus v0.7.0 review pack — 2026-10-28](https://github.com/EXASHXE/btc-quant-agent-public/tree/review/opus-v070-independent-20261028/reviews/opus-v070-20261028) — dated public project brief, research evidence summary, implementation snapshot, source catalogue, and unconstrained strategy/architecture review prompt. This branch is **only a reviewer snapshot**; current canonical docs stay on docs/engineering. Raw protected data and uncommitted local patches are not published.
 
+## Latest research-priority update
+
+- [M1 liquidation-shock reversion with 1–5 minute manual response: causal latency, source feasibility, and revised research order](docs/project/V070_M1_MANUAL_DELAY_RESEARCH_PRIORITIES_20261028.md) — **conditional research candidate, no strategy validation or experiment authorization**. Risk copilot and immutable plan/notification lifecycle remain the independent product track.
+
 ## Current v0.7.0 Advisory documentation — canonical (2026-10-28)
 
 **The Owner designates this `docs/engineering` branch as the ONLY future source of project, role, roadmap, task-card, handoff and new-chat documentation.** `v0.7.0` is the executable code/research branch; any matching older documentation there is non-authoritative. Documentation updates must remain on docs/engineering.
