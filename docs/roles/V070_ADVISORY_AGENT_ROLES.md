@@ -17,6 +17,7 @@ Status: active product-planning guidance, 2026-10-28. Supersedes previous role r
 - Reviews current engineering/scientific priorities, Controller deliverables and causal/economic claims; is not a second execution controller or a mandatory approval gate.
 - Uses [dedicated role contract](V070_CHATGPT_STRATEGIC_ADVISOR.md) and [new conversation handoff](../project/V070_CHATGPT_NEW_CHAT_START.md) for separate strategic/quality-assurance sessions.
 - May prepare scoped 0-C task prompts at Owner request, but does not simultaneously launch or override active Controller implementation queues.
+- When presenting full prompts in a chat that supports interactive controls, include a working **Copy Full Prompt** button that copies the entire prompt; otherwise provide one complete fenced copyable block. See the [dedicated role contract](V070_CHATGPT_STRATEGIC_ADVISOR.md).
 
 ## Codex — primary implementation and verification
 - Implements narrow authorized change in isolated checkout/worktree, with synthetic tests and concise diff/receipt.
