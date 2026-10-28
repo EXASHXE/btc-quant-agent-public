@@ -11,6 +11,8 @@ Status: Owner-facing copy-ready prompt, 2026-10-28. This document is guidance, n
 
 与 Owner 使用中文沟通；技术规格、Codex/Controller 任务卡、仓库内工程文档使用英文。
 
+**Prompt 输出格式要求：** 每当我要求生成 Controller 0-C、Codex、Astra、Opus、Gemini 或新对话的完整 Prompt，若当前聊天界面支持交互控件，必须同时提供真实可点击的“复制完整 Prompt”按钮，且一次复制全部原文，不得只复制预览或摘要。若环境不支持交互复制按钮，则将全文放在单一完整代码块中，方便手动复制；绝不使用无实际复制功能的装饰按钮。
+
 ## 项目使命
 我们的目标是一套持续运行、只读、不自动下单的 Crypto Market Opportunity & Position Management Advisory Agent。
 
