@@ -1,6 +1,27 @@
 # Engineering documentation — docs/engineering
 
-This is a documentation-only branch descending from a new root with no research/runtime history. It contains no src/, tests/, configs/ or GitHub Actions workflow. Active research belongs on [v0.6.5](https://github.com/EXASHXE/btc-quant-agent-public/tree/v0.6.5).
+## Current v0.7.0 Advisory documentation — canonical (2026-10-28)
+
+**The Owner designates this `docs/engineering` branch as the ONLY future source of project, role, roadmap, task-card, handoff and new-chat documentation.** `v0.7.0` is the executable code/research branch; any matching older documentation there is non-authoritative. Documentation updates must remain on docs/engineering.
+
+Start with [Documentation Branch Policy](docs/project/V070_DOCUMENTATION_BRANCH_POLICY.md) and [AGENTS.md](AGENTS.md).
+
+- [Advisory mission](docs/project/V070_ADVISORY_MISSION_AND_SCOPE.md)
+- [Roles and permissions](docs/roles/V070_ADVISORY_AGENT_ROLES.md)
+- [ChatGPT strategic advisor role](docs/roles/V070_CHATGPT_STRATEGIC_ADVISOR.md)
+- [Current advisory roadmap](docs/project/V070_ADVISORY_ROADMAP.md)
+- [Verified state and handoff](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md)
+- [Current Foundation task](docs/project/V070_ADVISORY_FOUNDATION_TASK.md)
+- [New ChatGPT strategic-advisor prompt](docs/project/V070_CHATGPT_NEW_CHAT_START.md)
+- [New Controller 0-C prompt](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md)
+
+**Mandatory chat prompt UX:** display a functional **Copy Full Prompt** button copying the entire prompt when interactive controls exist. Otherwise provide one full code block. See the [policy](docs/project/V070_DOCUMENTATION_BRANCH_POLICY.md).
+
+Earlier Controller B, v0.6.5 and 2026-10-23 v0.7.0 research documents below are retained as historical evidence, not the current Advisory execution plan.
+
+---
+
+This is a documentation-only branch descending from a new root with no research/runtime history. It contains no src/, tests/, configs/ or GitHub Actions workflow. Executable v0.7.0 code/research belongs on [v0.7.0](https://github.com/EXASHXE/btc-quant-agent-public/tree/v0.7.0); earlier v0.6.5 material is historical.
 
 - [Research execution / CI process R2](ci/RESEARCH_EXECUTION_ROUTING_AND_LIGHTWEIGHT_TESTING_R2.md) — full PR #6 engineering page; main keeps a short research-facing pointer.
 - [M1 archive/pruning runbook](repository-maintenance/V065_BRANCH_LIFECYCLE_ARCHIVE_AND_DELETE_RUNBOOK_R1.md) and [exact owner task](repository-maintenance/V065_M1_CODEX_CLEAN_MAIN_DOCS_LEGACY_BRANCH_PRUNE_R1.md).
@@ -25,7 +46,7 @@ These are published on the independent **docs/engineering** branch. They do not 
 - [Native 2022 Binance data-gap forensics, P1-R2 ML engineering plan, multi-asset result and P3 outcome readiness](docs/project/V065_R6_NATIVE_DATA_RECOVERY_ML_AND_P3_READINESS_20261020.md) — authoritative R6 status; older R5/R2 assignments below it are historical.
 
 
-## Current V0.7.0 strategy research status (2026-10-23)
+## Historical V0.7.0 strategy research status (2026-10-23)
 
 The V0.7.0 price-primary campaign has completed three one-shot historical trials. No positive after-cost strategy is established; the three remaining PRIMARY slots are intentionally unassigned. These current reports supersede the old V0.6.5/R8 queue for V0.7.0 strategy decisions, while preserving R8 artifacts as separate historical evidence.
 
