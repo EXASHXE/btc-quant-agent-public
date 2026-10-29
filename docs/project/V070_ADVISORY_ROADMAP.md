@@ -3,6 +3,14 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: proposed by current Owner direction (2026-10-28); stages are not permissions and no gate is declared passed by this document.
 
+## L4 Phase A milestone — 2026-10-29 19:38 Asia/Shanghai
+
+Controller 0-C verifies `l4-readonly-source-canary-01` Phase A **ACCEPT / OFFLINE_READY_PENDING_AUTH**. Exact `L4_ACCEPTANCE.json`: 590 unique passes including 108 new L4 tests, 3 unchanged known-red legacy assertions (separate safety replacements pass), 0 skips/xfails, 204/204 fabricated raw-to-normalized replay pairs. Source transport calls, external notifications, account/order actions, deployed services and scheduled collectors: **0**. R/M/Q and the L23/Bridge/Platform isolated base hashes match within the preservation receipt's declared scope.
+
+**Important newly evidenced bottlenecks:** 22-row endpoint policy only, no live transport or native source qualification; 36h raw receipt volume is estimated near **4.17 GB**, whereas the 16 MiB synthetic quota is insufficient. A future public-source run must specify sufficient disk quota/retention and verified per-endpoint weight/WS limits, legal/region/terms status, clock semantics, symbols and UTC acquisition window. Three-symbol source integrity may qualify while 10-symbol percentile ranks, >=201 aligned 5m bars for beta and other warmups remain disabled. No real-market/economic qualification follows.
+
+**Queue:** L4 Phase A closes. Phases B/C in the **existing L4 A/B/C mandate** remain `BLOCKED_PENDING_OWNER_AUTH`; do not create a parallel task or worker. An exact Owner grant is required before implementing/enabling real public transport and before any source read. Without grant: terminate normally; do not wait, schedule or run in background. No original integration/deployment/notifications/credentials/accounts/orders/PRIMARY. One future phase-end source/shadow acceptance only.
+
 ## Controller 0-C L23 milestone — 2026-10-29
 
 `l23-selector-evaluation-01` has reached **ACCEPT for isolated offline synthetic engineering**: 482 unique passing tests, three unchanged old-contract failures, zero skipped/xfail, plus four genuine multi-process tests. The deterministic V1 selector and source fields, 5m/1m monitoring, entry/limit lifecycle, conservative risk reservations, user-reported positions, shared exit policy, and episode funnel are implemented in a separate worktree. Its synthetic 26 scenario rows depend on three structural episodes and cannot establish market Alpha. The original R/M/Q trees are unintegrated and live source access remains BLOCKED_PENDING_OWNER_AUTH.
