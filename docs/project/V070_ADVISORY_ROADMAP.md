@@ -3,6 +3,12 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: proposed by current Owner direction (2026-10-28); stages are not permissions and no gate is declared passed by this document.
 
+## L4 canary advanced to tomorrow — Owner decision 2026-10-29
+
+Controller 0-C records \`OWNER-V070-L4-WINDOW-20261030\`: **26h finite source acquisition on 2026-10-30 00:00Z to 2026-10-31 02:00Z (exclusive)**, equivalently 2026-10-30 08:00 to 2026-10-31 10:00 Beijing/Hong Kong. This NEW window supersedes the formerly authorized 2026-11-01/02 window; no operation under the old date. New isolated dated output \`artifacts/live_public_canary_20261030/\`, old blocked preflight preserved.
+
+The same L4 B/C owner scope and self-attestation remain valid. Three Binance public USD-M symbols, nine already-approved public endpoint IDs, <=60 REST IP weight/min including retry, native stream quotas, minimum 36h raw/168h normalized retention and capped disk space remain unchanged. L4 Phase A is ACCEPT (590 pass, 3 old red, 204/204 fabricated replay). B/C native transport, source timing and finite launcher are NOT YET delivered. Prioritize engineering and simulated tests NOW, then a technical go/no-go and one operator-started finite canary in the exact new UTC window. No premature network requests, cron, sleep/background daemon, second engineering queue, original integration, accounts, orders, alerts or PRIMARY. If not ready by start, only shorten within current window; never extend beyond the end. A completed canary yields source/shadow qualification metrics, not Alpha.
+
 ## Latest Owner decision — 2026-10-29, L4 internal region gate lifted
 
 Owner attests they have reviewed applicable regional/terms restrictions and authorize personal non-commercial public read-only market-data research: \`OWNER-V070-L4-REGION-ATTESTED-20261029\`. Controller 0-C accepts this as sufficient **for internal project dispatch**, replacing the earlier repeated demand for independent host-jurisdiction proof. It does not establish a legal opinion, excuse a known venue restriction, authorize VPN/proxy evasion or alter the strict source/clock/budget/time/retention controls. The older L4 B/C BLOCKED receipt remains preserved as historical state, not a current duplicate-review prerequisite.
