@@ -3,6 +3,14 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Verified reference date: 2026-10-28. This is a point-in-time documentation snapshot; always recheck current files/processes before action.
 
+## Latest 2026-10-29 17:00+08 L23 terminal acceptance
+
+**Controller 0-C read-only verification:** `/root/workspace/project/quant-0.7.0/l23-selector-evaluation-01/L23_FINAL_DELIVERY.md`, `L23_ACCEPTANCE.json`, `L23_TEST_MATRIX.json`, `L23_PRESERVATION.json`, and `artifacts/final/source_readiness.json` identify **ACCEPT for isolated offline synthetic engineering only**. Unique tested results: **482 pass, 3 unchanged legacy failures**, with zero skips/xfails. Components: causal field histories, deterministic six-state regime/selector and three bounded playbooks, immutable entry episodes and post-notification 1/3/5-minute revalidation, user-reported position risk, shared exit policy, atomic reservations, restart-safe fake notification outbox, and paired synthetic candidate funnel. The 26 scenario rows derive from only **3 structural episodes** and are not independent market evidence. Only three old catalog entries retain `SYNTHETIC_VALIDATED`; no new Alpha evidence. Old original failures are deliberately visible and replacement coverage is separate.
+
+Preservation receipt reports unchanged R/M/Q HEADs, indexes and allowlisted dirty source hashes, and unchanged base platform/bridge inventories. Initial hash coverage was incomplete for dirty R/README.md; therefore its byte-for-byte identity is not independently proven. Real market source and all account/network/notification/deploy activity remain **BLOCKED_PENDING_OWNER_AUTH**; zero exchange API reads and zero economic/PRIMARY operations.
+
+**Queue:** L23 can close as offline ACCEPT. No next worker has been launched by this update. The next material dependency is a bounded **read-only public-market source-admission pilot** with explicit Owner approval specifying provider, symbol set, endpoints/streams, fields, UTC window, cadence/rate limits and retention. `artifacts/final/source_readiness.json` proposes a future-only 26-hour window, **not an approval**. Before a live pilot, independently verify current endpoint schemas and authoritative quote clocks; timestamp-less REST quotes cannot be upgraded into ACTION. Prepare only safe offline work without that authorization. No integration into R/M/Q or deployment is implied.
+
 ## Current delivery handoff — 2026-10-29 (supersedes earlier immediate task queue)
 
 Owner has delegated roadmap, long-running task design, dispatch and milestone acceptance to Controller 0-C. Engineering cadence is now one autonomous mandate per substantial phase or connected phases, one terminal receipt and optional concentrated independent audit, not one fix/approval chain.
