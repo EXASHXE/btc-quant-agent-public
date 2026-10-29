@@ -3,6 +3,12 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: proposed by current Owner direction (2026-10-28); stages are not permissions and no gate is declared passed by this document.
 
+## L4 B/C preflight terminal — 2026-10-29 22:14 Asia/Shanghai
+
+The existing approved, finite Binance Global public USD-M source scope is **not rescinded**; `OWNER-V070-L4-3SYM-20261029` remains recorded. L4 B/C executor exited **BLOCKED — REGION_OR_TERMS_UNVERIFIED** before native transport implementation or any public market request. No market data, account actions, notifications or scheduled collection occurred. New 65 passing tests are prior-suite subset; Phase A's 590 unique pass / 3 legacy-red and 204/204 fabricated replay receipts remain unchanged. Original worktrees and 695 recorded Phase A files were preserved. No verified legal execution-host region/provider terms eligibility evidence exists in the current handoff. Do not guess from user UI location or route around restrictions.
+
+The existing L4 B/C mandate is the ONLY potential continuation, after trusted host-jurisdiction and official permitted-use evidence plus endpoint/time/clock/cap/storage preflight. If host eligibility is prohibited/unverifiable, keep no-requests block. A materially different provider, region or acquisition window requires distinct Owner consent. No new worker/reviewer/collector or automatic rescheduling; the original [2026-11-01T00:00Z, 2026-11-02T02:00Z) window remains bounded and unscheduled.
+
 ## L4 Phase A milestone — 2026-10-29 19:38 Asia/Shanghai
 
 Controller 0-C verifies `l4-readonly-source-canary-01` Phase A **ACCEPT / OFFLINE_READY_PENDING_AUTH**. Exact `L4_ACCEPTANCE.json`: 590 unique passes including 108 new L4 tests, 3 unchanged known-red legacy assertions (separate safety replacements pass), 0 skips/xfails, 204/204 fabricated raw-to-normalized replay pairs. Source transport calls, external notifications, account/order actions, deployed services and scheduled collectors: **0**. R/M/Q and the L23/Bridge/Platform isolated base hashes match within the preservation receipt's declared scope.
