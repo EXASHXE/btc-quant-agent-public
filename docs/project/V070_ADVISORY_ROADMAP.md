@@ -3,6 +3,12 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: proposed by current Owner direction (2026-10-28); stages are not permissions and no gate is declared passed by this document.
 
+## Latest Owner decision — 2026-10-29, L4 internal region gate lifted
+
+Owner attests they have reviewed applicable regional/terms restrictions and authorize personal non-commercial public read-only market-data research: \`OWNER-V070-L4-REGION-ATTESTED-20261029\`. Controller 0-C accepts this as sufficient **for internal project dispatch**, replacing the earlier repeated demand for independent host-jurisdiction proof. It does not establish a legal opinion, excuse a known venue restriction, authorize VPN/proxy evasion or alter the strict source/clock/budget/time/retention controls. The older L4 B/C BLOCKED receipt remains preserved as historical state, not a current duplicate-review prerequisite.
+
+Next action is the original **L4 B/C continuation only**, in the same isolated codebase: implement source-read-only REST/WS transport and one-shot operator launcher, test with simulated responses, verify endpoint-native timestamps/units/rate/actual disk/retention, and conduct a finite public-source/shadow canary **only inside the previously approved [2026-11-01T00:00Z, 2026-11-02T02:00Z) window** when technical gates pass. Do not schedule or make an early market request. No other worker/audit queue, private API, original integration, alerts, accounts, trading or economics.
+
 ## L4 B/C preflight terminal — 2026-10-29 22:14 Asia/Shanghai
 
 The existing approved, finite Binance Global public USD-M source scope is **not rescinded**; `OWNER-V070-L4-3SYM-20261029` remains recorded. L4 B/C executor exited **BLOCKED — REGION_OR_TERMS_UNVERIFIED** before native transport implementation or any public market request. No market data, account actions, notifications or scheduled collection occurred. New 65 passing tests are prior-suite subset; Phase A's 590 unique pass / 3 legacy-red and 204/204 fabricated replay receipts remain unchanged. Original worktrees and 695 recorded Phase A files were preserved. No verified legal execution-host region/provider terms eligibility evidence exists in the current handoff. Do not guess from user UI location or route around restrictions.
