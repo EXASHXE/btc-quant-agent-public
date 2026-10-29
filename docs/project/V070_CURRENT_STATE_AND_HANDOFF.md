@@ -3,6 +3,18 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Verified reference date: 2026-10-28. This is a point-in-time documentation snapshot; always recheck current files/processes before action.
 
+## Current delivery handoff — 2026-10-29 (supersedes earlier immediate task queue)
+
+Owner has delegated roadmap, long-running task design, dispatch and milestone acceptance to Controller 0-C. Engineering cadence is now one autonomous mandate per substantial phase or connected phases, one terminal receipt and optional concentrated independent audit, not one fix/approval chain.
+
+**New isolated product baseline:** `/root/workspace/project/quant-0.7.0/multi-strategy-platform-01/`. Read `FINAL_DELIVERY.md`, `IMPLEMENTATION_PROGRESS.md`, `artifacts/acceptance.json`, factor/strategy catalogs and `artifacts/final_delivery_v3/comparison/comparison.json` before working. Reported and file-inspected: `WORKING_BASELINE`, synthetic only; 69 factors; 21 directional and 7 research portfolio strategies; 158/158 new tests, 250/250 focused inherited regression, 175 passed/3 failed unchanged old-contract suite; 9 demos; 3 SYNTHETIC_VALIDATED and 25 IMPLEMENTED_UNTESTED. This is NOT an integrated release, approved live feed, historical validation or Alpha.
+
+**Active worker check:** at 10:03 Asia/Shanghai, two Codex threads remained `inProgress` (platform build `01a18378-9a0f-7e50-892c-9748674ed639`; independent Astra adaptive-selection research `01a1855f-9b30-7e52-baab-c78573a3f6fd`). Current L1+L2 engineering has **not been newly dispatched** to avoid competing ownership. Verify thread/queue state again before sending any prompt. Do not terminate or interfere with either worker.
+
+**Single next major mandate:** [V070-L12-OFFLINE-MULTISTRATEGY-ADVISORY-01](V070_L12_OFFLINE_MULTISTRATEGY_ADVISORY_MANDATE_20261029.md). Combine L1 provider-neutral source/clock/quote contract with L2 offline end-to-end strategy/position/notification lifecycle and failure injection; reuse the existing platform. The old three legacy WATCH/source test failures remain visibly recorded and can be contract-reconciled as an internal subtask rather than another approval loop. Do not weaken safety or claim original tests green. L3 evaluation and conditional L4 extensions follow a phase-level acceptance, with protected/live data separately authorized.
+
+R/M/Q last observed HEADs remain `40c70c740f35` / `fde61dafb301` / `6bd63db96e5b`, with original dirty work preserved. No collector controls, integration, deployment, history/outcome reads, PRIMARY registration, account actions or real notifications under this Owner direction. The existing M1 human-delay research ranking is separate and does not confer economic-study authority.
+
 ## Latest Controller read-only reconciliation — 2026-10-28
 
 **More recent than the original handoff's Foundation-01 proposal.** Verified local R/M/Q heads remained `40c70c7` / `fde61daf` / `6bd63db`, with pre-existing dirty work preserved. No matching active Foundation reconciliation worker or newer ACCEPT receipt was observed during the bounded process and isolated-artifact inspection.

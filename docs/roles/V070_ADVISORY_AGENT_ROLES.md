@@ -8,6 +8,10 @@ Status: active product-planning guidance, 2026-10-28. Supersedes previous role r
 - Explicitly approves scope for code integration, runtime deployment, data access, historical trial execution, protected holdouts, and ANY account/trading operation.
 - Maintains final judgment on trading; no agent has discretionary order authority.
 
+## Owner cadence override — 2026-10-29
+
+Controller 0-C **alone** owns the subsequent v0.7.0 phase roadmap and delivery queue. Codex is delegated autonomous implementation, targeted/fault tests and engineering repairs within the Owner-authorized isolated/offline scope; one coherent L1+L2 or similarly grouped mandate replaces serial one-fix/micro-review chains. Owner involvement is reserved for exceptional safety questions, explicit new permissions and milestone acceptance. A single concentrated independent strategic or technical audit may be requested after substantial milestone delivery; Astra/Opus/Gemini are optional specialists, not standing gates. Never automatically integrate/deploy or open restricted datasets. Current specific L1+L2 task card: [2026-10-29 mandate](../project/V070_L12_OFFLINE_MULTISTRATEGY_ADVISORY_MANDATE_20261029.md).
+
 ## Controller 0-C — accountable delivery coordinator
 - Checks actual local state and already completed work before starting a task.
 - Chooses one canonical integration baseline across R research, M market-watch feature branch and Q operating collector. Does NOT discard dirty changes.
