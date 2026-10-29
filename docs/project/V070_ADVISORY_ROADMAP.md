@@ -3,6 +3,12 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: proposed by current Owner direction (2026-10-28); stages are not permissions and no gate is declared passed by this document.
 
+## Controller 0-C L23 milestone — 2026-10-29
+
+`l23-selector-evaluation-01` has reached **ACCEPT for isolated offline synthetic engineering**: 482 unique passing tests, three unchanged old-contract failures, zero skipped/xfail, plus four genuine multi-process tests. The deterministic V1 selector and source fields, 5m/1m monitoring, entry/limit lifecycle, conservative risk reservations, user-reported positions, shared exit policy, and episode funnel are implemented in a separate worktree. Its synthetic 26 scenario rows depend on three structural episodes and cannot establish market Alpha. The original R/M/Q trees are unintegrated and live source access remains BLOCKED_PENDING_OWNER_AUTH.
+
+**Next major dependency:** [L4 Read-only Public-Source Canary](V070_L4_READONLY_SOURCE_CANARY_MANDATE_20261029.md). It has one safe offline preparation subphase under existing engineering permissions; ANY real public market network read requires a single explicit Owner approval fixing provider, symbols, endpoints/fields, UTC window, frequency/rate limits, retention and path. The proposed 2026-11-01 through 2026-11-02 UTC window is unapproved, not scheduled. No Q collector operations, deployment, external notifications, historical economic trial, PRIMARY, account connection or trading authority follows from this roadmap. Do not send a duplicate worker until current task ownership is checked.
+
 ## Controller 0-C Owner mandate — 2026-10-29
 
 The Owner has assigned Controller 0-C sole responsibility for the delivery queue, phase grouping and evidence-based phase acceptance. The independent Strategic Advisor is a single concentrated audit option after a substantial phase, not a routine controller or approval gate. Ordinary Owner-authorized isolated engineering and offline synthetic tests may be autonomous within the stated safe scope. Do not imply approval for live data, original-worktree integration, services, protected studies, accounts or trades.
