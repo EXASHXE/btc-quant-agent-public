@@ -3,6 +3,12 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: proposed by current Owner direction (2026-10-28); stages are not permissions and no gate is declared passed by this document.
 
+## L4 B/C latest one-shot access result — 2026-10-30
+
+Controller 0-C accepted \`L4_EGRESS_CORRECTION_REPROBE_20261030.md\`: **VENUE_ACCESS_PERMITTED for the single public \`/fapi/v1/exchangeInfo\` request only**. Exactly 1 native GET, HTTP 200, weight 1, no retry or WS. The earlier observed HTTP 451 is preserved with immutable hash and its active blocker cleared. BTC/ETH/SOL native USD-M metadata/weight rules parsed. The post-probe local technical preflight passed. No native finite acquisition run has started and SOURCE_QUALIFIED/SHADOW_ADVISORY_QUALIFIED/ECONOMICALLY_VALIDATED remain false. Older doc-202 and direct ENETUNREACH receipts remain historical; no extra generic region check or repeat of the consumed one-shot probe is required.
+
+Next: the SAME existing finite L4 B/C source/shadow canary, operator-started once after fresh bounded technical/venue stop checks, within the current strict [2026-10-30T00:00Z, 2026-10-31T02:00Z) window. Preserve all old receipts; stop on a fresh 403/451/418, clock/budget/contract conflict, proxy denial, storage or source uncertainty. Record late-start reduced duration; no extension, new task queue, standing collector or trading/economic trial. Maintain three-symbol warmup/rank limits and independent source/shadow outcome flags.
+
 ## L4 canary advanced to tomorrow — Owner decision 2026-10-29
 
 Controller 0-C records \`OWNER-V070-L4-WINDOW-20261030\`: **26h finite source acquisition on 2026-10-30 00:00Z to 2026-10-31 02:00Z (exclusive)**, equivalently 2026-10-30 08:00 to 2026-10-31 10:00 Beijing/Hong Kong. This NEW window supersedes the formerly authorized 2026-11-01/02 window; no operation under the old date. New isolated dated output \`artifacts/live_public_canary_20261030/\`, old blocked preflight preserved.
