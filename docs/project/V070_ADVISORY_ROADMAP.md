@@ -3,6 +3,12 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: proposed by current Owner direction (2026-10-28); stages are not permissions and no gate is declared passed by this document.
 
+## L4 Session 02 independently isolated operator PREPARED_BUT_NOT_AUTHORIZED (2026-10-30)
+
+The 180s maximum **Session 02 one-shot operator**, exact signed \`GrantEnvelope\` schema, Ed25519 verification and distinctive output isolation are now implemented and **accepted offline**. Scoped validation: 427 PASS, 3 prior unchanged known-red, 41 new tests included in 427, static checks pass, 13 modified/added file hashes checked. Old sealed run remains unchanged and Session02 output absent; no new native calls. Owner signing-key trust store is empty; no signing key/Owner grant is established. **Native access remains NO-GO**.
+
+Next dependency: Controller must receive Owner's distinct explicit assent to a fixed [start,end) UTC 180s clock/BBO-only session and independently verifiable Owner/authorized Controller public signing key. Provision public key in local trust store, recompute current source fingerprint including trust file, approve exact hash, sign canonical GrantBody with privately held Ed25519 key, pass current preflight, then and only then operator-activate one finite run. No automatic start/clock-window roll, changing venue, extension beyond \`2026-10-31T02:00:00Z\`, request to private API, account, alert, strategy promotion, original session overwrite or second parallel agent queue. Successful clock/BBO test is not sufficient for 66/201 5m bars or full Source/Shadow Qualification. See handoff for exact frozen source HEAD and signing order.
+
 ## L4 clock-domain repair ACCEPT offline — next gate separate 3-minute native session (2026-10-30)
 
 \`L4_CLOCK_DOMAIN_V2\` remediation delivered and Controller 0-C accepted for **offline code/readiness only**. Verified reported 1053 unique passing tests including 46 new, 3 existing legacy-red unchanged; 19/19 changed source/test/config hashes independently matched. Clock-bracket/epoch/probe-bound causal admission and persistent invalidation implemented, 50ms wall-step hard stop unchanged. Historical ~900ms relative step confirmed but NTP/VM root cause not determined; old 100 BBO still 0 admitted. No post-repair native stream or decision qualification, no new request. Old \`run/started.json\` sealed; R/M/Q and 724 recorded baseline files preserved.
