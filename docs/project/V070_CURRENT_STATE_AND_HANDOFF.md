@@ -1,5 +1,10 @@
 # v0.7.0 Current State and New-Chat Handoff
 
+## 2026-10-31 22:22 Asia/Shanghai — P0 crossphase acceptance and duplicate-work stop
+
+Controller verified on local device that existing P0 delivery was completed 2026-10-31T11:40:45Z: Session03 V2 8h capability and LONG versioned clock eligibility/three-tier acceptance. SHA256 source maps verified independently 69/69 and 224/224, zero mismatches. Existing receipts report 616 deduplicated PASS and 3 historical known-red, without Controller re-running tests. The later conflicting copy of the Codex task stopped at CONFLICTING_OWNER_STATE and did not overwrite it; no additional Codex work should be launched for this completed scope. Both independent public trust maps remain empty and no new native outputs/grants exist. Current state PREPARED_BUT_NOT_AUTHORIZED / NO_GO_NATIVE_SOURCE. Earlier signed Session02 remains historical. Beijing 2026-11-01 00:00–08:00 is proposed, not an authorized V2 source window. Next gate: separately approve Session03 signing key, verify post-trust final code fingerprint and exact grant, then manually launch <=180s only within its signed interval; truthful native evidence is required for any subsequent LONG grant. LONG eligibility has <=300s handoff expiry, raw36h retention does not imply full 48h replay, and Tier1/Tier2/Tier3 readiness must stay separate. P0 full receipt: V070_L4_CROSSPHASE_P0_ACCEPTANCE_20261031.md.
+
+
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Verified reference date: 2026-10-28. This is a point-in-time documentation snapshot; always recheck current files/processes before action.
 
