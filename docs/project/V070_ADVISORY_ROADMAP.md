@@ -1,5 +1,12 @@
 # v0.7.0 Advisory Delivery Roadmap
 
+## 2026-11-01 — L4 first genuine native capture: evidence secured, Source qualification blocked on backpressure
+
+Session03 signed V2 run consumed once at UTC 2026-10-31T20:26:43.822Z; sealed report terminates PARTIAL / BACKPRESSURE_BLOCKED at 20:28:46.492Z. Fresh clock preflight PASS and real E/T-qualified BBOs 1549 BTC + 2074 ETH + 1623 SOL, 2 independent probes, no clock fault. One WS / 9153 frames, 3 REST requests; 147 paired raw+normalized chunks PARITY_VERIFIED and sealed reconcile CONSUMED_SEALED. This is not SOURCE_QUALIFIED or SHADOW_ADVISORY_QUALIFIED, even though real transport and short-clock admission proved functional. No retry of the consumed grant permitted.
+
+Current P0 now safe offline backpressure root-cause diagnosis and bounded throughput improvement under one scoped Codex worker, not further legacy architecture or redundant strategy search. The next real source attempt requires NEW exact Owner scope/key/fingerprint/grant after the fix; the existing 48h native entry also separately needs authentic, independently signed and fresh (<=300s) source qualification, distinct keys and new Owner approval. No 48h launch or account/trade/notification. Source qualification and Shadow then 1/3/5min observed human-response windows are sequential gates. Keep old BTC microstructure source stopped and sealed, without A/B-line separation.
+
+
 ## 2026-11-01 — Owner priority override: continuous public-source-to-advisory evidence
 
 Owner directs v0.7.0 to prioritize its present real-time read-only crypto advisory mission, without reviving historical A-line/B-line organizational branches. Legacy BTC microstructure-forward capture is no longer a prerequisite for L4 validation; preserve existing SQLite evidence for optional later order-flow research. Actual local user service was stopped and disabled after Owner's explicit instruction (stop timed out and systemd killed the process; this is a discontinuity, not a clean finalization). Last active ~1.3GB UTC daily SQLite partition passed read-only PRAGMA quick_check(1), which does NOT prove session completeness. Keep historical collection immutable.
