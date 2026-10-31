@@ -1,5 +1,10 @@
 # v0.7.0 Advisory Delivery Roadmap
 
+## Latest acceptance — L4 P0 crossphase OFFLINE COMPLETE (2026-10-31 22:22 Asia/Shanghai)
+
+One completed cross-phase offline delivery supersedes the prior 6h-window and Session02-only qualification blockers: Session03 V2 allows up to 8h operator launch eligibility with one <=180s native run; LONG accepts only authenticated, versioned Session03 V2 qualification evidence. Controller independently checked 69/69 and 224/224 source hashes; the source receipts report 616 unique combined PASS / 3 unchanged known-red. All signer trusts and native grants remain missing, real Session03 and LONG outputs absent; SOURCE_QUALIFIED and SHADOW_ADVISORY_QUALIFIED remain false. The originally proposed Beijing 2026-11-01 00:00–08:00 is NOT a signed authorization. Next is explicit Owner key/time approval and post-trust fingerprint review, then one native clock/BBO operator trial; only after real qualification may <=48h Source+Shadow be separately authorized. Qualified clock handoff expires within 300s; pre-stage the signing workflow without fabricating receipts or bypassing freshness. The 36h raw retention policy does not guarantee full 48h raw replay. See V070_L4_CROSSPHASE_P0_ACCEPTANCE_20261031.md. No duplicate engineering Codex worker should be started.
+
+
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: proposed by current Owner direction (2026-10-28); stages are not permissions and no gate is declared passed by this document.
 
