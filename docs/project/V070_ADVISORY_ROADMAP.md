@@ -1,5 +1,12 @@
 # v0.7.0 Advisory Delivery Roadmap
 
+## 2026-11-01 — Stage 1A offline backpressure diagnosis complete; native qualification NOT MET
+
+Single Codex offline diagnosis task for the consumed genuine Session03 V2 source run is complete and accepted. Proven fail-closed point: 128 pending messages triggered persistent BACKPRESSURE_BLOCKED guard. No conclusive native producer-consumer stall attribution, no production remediation made, no new native requests. Current bounded affected suite 531 PASS including 18 new tests; inherited known-red retained and one historical native-payload case deselected. All 306 prior captured files preserved; 702 offline delivery hashes independently matched.
+
+Current P0 is not another automatic acquisition: first instrument bounded enqueue/dequeue and SQLite commit/fsync/lock/service timing and prove a production-safe remedy offline, then seek explicit Owner reauthorization with distinct unconsumed session/output and fresh signed grant. Following only a genuinely qualified 180s clock/BBO run, independently provision qualification and LONG signing keys and prepare exact <=48h Source+Shadow grant, respecting 300s source-clock freshness. Do not claim Shadow/economic readiness, resume old microstructure-forward, or reinstate A/B-line.
+
+
 ## 2026-11-01 — L4 first genuine native capture: evidence secured, Source qualification blocked on backpressure
 
 Session03 signed V2 run consumed once at UTC 2026-10-31T20:26:43.822Z; sealed report terminates PARTIAL / BACKPRESSURE_BLOCKED at 20:28:46.492Z. Fresh clock preflight PASS and real E/T-qualified BBOs 1549 BTC + 2074 ETH + 1623 SOL, 2 independent probes, no clock fault. One WS / 9153 frames, 3 REST requests; 147 paired raw+normalized chunks PARITY_VERIFIED and sealed reconcile CONSUMED_SEALED. This is not SOURCE_QUALIFIED or SHADOW_ADVISORY_QUALIFIED, even though real transport and short-clock admission proved functional. No retry of the consumed grant permitted.
