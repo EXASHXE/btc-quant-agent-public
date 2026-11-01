@@ -1,5 +1,10 @@
 # v0.7.0 Current State and New-Chat Handoff
 
+## 2026-11-02 01:20 HKT — Owner accelerated closure directive
+
+Roadmap consolidated into A reliable Source + one fresh signed native, B independently authorized <=48h source plus concurrent local Shadow/dashboard, C prospective 1/3/5min executability and local MVP. Latest on-device evidence shows active exclusive SOURCE_RUNTIME_BACKPRESSURE_REMEDIATION_02 Codex in progress with instrumentation, local benchmark and 45 focused tests PASS; final acceptance not yet issued and lint/mypy interim errors remain. Controller did NOT launch a competing worker or authorize native acquisition. Details in V070_ADVISORY_ROADMAP.md.
+
+
 ## 2026-11-01 14:51 Asia/Shanghai — Session03 backpressure offline diagnosis ACCEPTED, not repaired
 
 Scoped Codex task PID 411894 completed by 2026-11-01 05:05 local filesystem timestamp (read actual UTC from acceptance receipt for canonical audit); no active process. Formal local artifacts: l4-readonly-source-canary-01/SESSION03_NATIVE_BACKPRESSURE_DIAGNOSIS_20261101.md and SESSION03_NATIVE_BACKPRESSURE_ACCEPTANCE_20261101.json. Independent Controller verification checked 702 delivery manifest hashes with zero mismatches and final receipts. Current suite: 531 PASS, zero current FAIL/ERROR/SKIP, including 18 new cases; three inherited known-red cases not rerun, one historical native payload test explicitly deselected. No market I/O, no production runtime/code/config/grant/trust modification. All 306 original sealed Session03 native capture files unchanged; reconcile remains CONSUMED_SEALED, request_count=3, retry_authorized=false.
