@@ -372,9 +372,40 @@ class DerivativesMetrics:
     endpoint_errors: dict[str, str] = field(default_factory=dict)
 
 
+class PriceSource(StrEnum):
+    CLOSED_CANDLE = "CLOSED_CANDLE_ANALYTICAL_REFERENCE"
+    EXECUTABLE_BID_ASK = "EXECUTABLE_BID_ASK"
+    UNKNOWN = "UNKNOWN"
+
+
+class QuoteVerification(StrEnum):
+    VERIFIED = "VERIFIED"
+    UNKNOWN = "UNKNOWN"
+
+
+@dataclass(frozen=True)
+class InputClock:
+    source_event_at_ms: int | None = None
+    receiver_known_at_ms: int | None = None
+    available_at_ms: int | None = None
+
+
+@dataclass(frozen=True)
+class ExecutableQuote:
+    symbol: str
+    bid: float
+    ask: float
+    authority: str
+    clock: InputClock = field(default_factory=InputClock)
+    source: PriceSource = PriceSource.UNKNOWN
+    verification: QuoteVerification = QuoteVerification.UNKNOWN
+
+
 @dataclass(frozen=True)
 class PriceMetrics:
     last_price: float
+    source: PriceSource = PriceSource.CLOSED_CANDLE
+    executable_quote: ExecutableQuote | None = None
     mark_price: float | None = None
     change_24h_pct: float = 0.0
     high_24h: float = 0.0
@@ -415,10 +446,18 @@ class MarketSnapshot:
     return_observations: tuple[Any, ...] = ()
     source_receipt_timestamps: dict[str, int] = field(default_factory=dict)
 
+    clock: InputClock = field(default_factory=InputClock)
+    candle_clocks: dict[str, InputClock] = field(default_factory=dict)
+    candle_counts: dict[str, int] = field(default_factory=dict)
+    derivative_clocks: dict[str, InputClock] = field(default_factory=dict)
+    symbol_filters: dict[str, float] = field(default_factory=dict)
+    reference_clocks: dict[str, InputClock] = field(default_factory=dict)
+    reference_timing_reasons: tuple[str, ...] = ()
+
     def as_dict(self) -> dict[str, Any]:
         payload = asdict(self)
         payload["health"] = str(self.health)
-        return payload
+        return {k: source_json_value(v) for k, v in payload.items()}
 
 
 @dataclass(frozen=True)
@@ -597,27 +636,36 @@ def validate_time_coverage(
     )
 
 
+def source_json_value(value: Any) -> Any:
+    """Unknown source objects stay null, never numeric/stringified mock evidence."""
+    from math import isfinite
+
+    if value is None or type(value) in (str, bool, int):
+        return value
+    if isinstance(value, StrEnum):
+        return value.value
+    if type(value) is float:
+        return value if isfinite(value) else None
+    if type(value) is dict:
+        return {k: source_json_value(v) for k, v in value.items() if type(k) is str}
+    if type(value) in (list, tuple):
+        return [source_json_value(v) for v in value]
+    return None
+
+
 def normalize_price_level(price: float | None, tick_size: float | None = None) -> str:
     """Deterministic, scale-aware normalization of price level without fixed-decimal collisions."""
-    if price is None or price <= 0:
-        return "0"
-    if tick_size is not None and tick_size > 0:
-        tick_str = f"{tick_size:.10f}".rstrip("0")
-        decimals = len(tick_str.split(".")[1]) if "." in tick_str else 0
-        norm_val = round(price / tick_size) * tick_size
-        return f"{norm_val:.{decimals}f}"
+    from math import isfinite
 
-    abs_p = abs(price)
-    if abs_p >= 1000.0:
-        return f"{price:.2f}"
-    elif abs_p >= 10.0:
-        return f"{price:.3f}"
-    elif abs_p >= 0.1:
-        return f"{price:.6f}"
-    elif abs_p >= 0.001:
-        return f"{price:.7f}"
-    else:
-        return f"{price:.8f}"
+    if not isinstance(price, (int, float)) or type(price) not in (int, float) or not isfinite(price) or price <= 0:
+        return "0"
+    from decimal import ROUND_HALF_EVEN, Decimal
+
+    value = Decimal(str(price))
+    if isinstance(tick_size, (int, float)) and type(tick_size) in (int, float) and isfinite(tick_size) and tick_size > 0:
+        tick = Decimal(str(tick_size))
+        value = (value / tick).to_integral_value(rounding=ROUND_HALF_EVEN) * tick
+    return format(value, "f")
 
 
 def compute_setup_key(
@@ -663,6 +711,9 @@ def extract_setup_key(
 ) -> str:
     """Extract setup_key from DirectionalPlan and structural snapshot anchors."""
     d = directional
+    if tick_size is None and snapshot is not None:
+        filters = snapshot.symbol_filters
+        tick_size = filters.get("tick_size") if type(filters) is dict else None
     if str(d.decision.value) in ("LONG", "SHORT"):
         intended_dir = str(d.decision.value)
     elif d.breakout_direction:
@@ -759,6 +810,8 @@ class SymbolAssessment:
     semantic_identity: TacticalSemanticIdentity = field(default_factory=TacticalSemanticIdentity)
     feature_evidence_id: str | None = None
     feature_evidence: Any = None
+    frozen_inputs_json: str = ""
+    policy_state_before_json: str = "null"
 
     def __post_init__(self) -> None:
         if self.rule_score == 0.0 and self.opportunity_score != 0.0:
@@ -773,6 +826,7 @@ class SymbolAssessment:
         return {
             "symbol": self.symbol,
             "feature_evidence_id": self.feature_evidence_id,
+            "snapshot": self.snapshot.as_dict() if type(self.snapshot) is MarketSnapshot else {"source_evidence": "UNKNOWN"},
             "opportunity_score": round(self.opportunity_score, 2),
             "rule_score": round(self.rule_score, 2),
             "rule_score_semantics": self.rule_score_semantics,
@@ -822,3 +876,4 @@ class MarketWatchAlert:
     oi_1h_change: float | None = None
     oi_12h_change: float | None = None
     regime_1h: str = ""
+    event_id: str = ""

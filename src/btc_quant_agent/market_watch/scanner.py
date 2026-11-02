@@ -1,17 +1,19 @@
 from __future__ import annotations
 
+import json
 import logging
 import os
 import time
-from collections.abc import Sequence
-from dataclasses import replace
+from collections.abc import Callable, Sequence
+from dataclasses import asdict, replace
 from typing import Any
 
 from ..data.binance import BinancePublicClient
-from .alerting import send_market_watch_alert
+from .alerting import NotificationNotSent, send_market_watch_alert
 from .config import (
     MarketWatchConfig,
     compute_market_watch_config_hash,
+    compute_required_closed_bars,
     compute_required_fetch_bars,
 )
 from .context import apply_benchmark_context_gate, evaluate_benchmark_context
@@ -35,6 +37,7 @@ from .domain import (
     EntryQuality,
     GridDecision,
     GridPlan,
+    InputClock,
     MarketSnapshot,
     MarketWatchAlert,
     PlaybookType,
@@ -48,13 +51,23 @@ from .domain import (
     TacticalSemanticIdentity,
     extract_setup_key,
     extract_signal_identity,
+    source_json_value,
 )
 from .entry_quality import calculate_net_risk_reward, evaluate_entry_quality, evaluate_exhaustion
 from .evidence import (
     PolicyDecisionTrace,
     PolicyGateStageTrace,
+    TacticalEvidenceConflictError,
     TacticalFeatureEvidenceV2,
     build_tactical_feature_evidence,
+)
+from .foundation import (
+    actionable_reasons,
+    increment,
+    metadata_map,
+    positive,
+    reference_reasons,
+    timestamp,
 )
 from .grid_policy import evaluate_grid_policy
 from .lifecycle import advance_lifecycle_state
@@ -87,7 +100,11 @@ logger = logging.getLogger(__name__)
 class MarketWatchScanner:
     """Multi-asset operational scanner with PIT-safe snapshots and failure isolation."""
 
-    def __init__(self, config: MarketWatchConfig, client: BinancePublicClient, store: MarketWatchStateStore) -> None:
+    def __init__(self, config: MarketWatchConfig, client: BinancePublicClient,
+                 store: MarketWatchStateStore, *, clock_ms: Callable[[], int] | None = None,
+                 symbol_filters: dict[str, dict[str, float]] | None = None) -> None:
+        self.clock_ms = clock_ms or (lambda: int(time.time() * 1000))
+        self.symbol_filters = symbol_filters or {}
         self.config = config
         self.client = client
         self.store = store
@@ -99,7 +116,7 @@ class MarketWatchScanner:
 
     def collect_symbol_snapshot(self, symbol: str, now_ms: int) -> tuple[MarketSnapshot | None, ScanHealth, tuple[str, ...]]:
         """Collect market snapshot for one symbol with robust degradation handling."""
-        collection_started_at_ms = int(time.time() * 1000)
+        collection_started_at_ms = self.clock_ms()
         symbol = symbol.upper()
         health_reasons: list[str] = []
         health = ScanHealth.OK
@@ -114,6 +131,9 @@ class MarketWatchScanner:
             logger.warning("Core candle retrieval failed for %s: %s", symbol, exc)
             return None, ScanHealth.FAILED, (f"CORE_CANDLE_ERROR: {exc}",)
 
+        raw_15m = [c for c in raw_15m if c.closed]
+        raw_1h = [c for c in raw_1h if c.closed]
+        raw_4h = [c for c in raw_4h if c.closed]
         if len(raw_15m) < 30 or len(raw_1h) < 30 or len(raw_4h) < 30:
             return None, ScanHealth.FAILED, ("INSUFFICIENT_CANDLE_HISTORY",)
 
@@ -122,6 +142,8 @@ class MarketWatchScanner:
         index_price = None
         funding_rate = None
         funding_time_ms = None
+        premium_index_time_ms = None
+        next_funding_time_ms = None
         open_interest = None
         open_interest_time_ms = None
         oi_1h_change = None
@@ -144,7 +166,7 @@ class MarketWatchScanner:
         for _tf_name, raw_tf in (("15m", raw_15m), ("1h", raw_1h), ("4h", raw_4h)):
             if raw_tf:
                 last_c = raw_tf[-1]
-                avail = last_c.available_at_ms if last_c.available_at_ms is not None else last_c.close_time_ms
+                avail = last_c.available_at_ms
                 if avail and avail > 0:
                     candle_avail_timestamps.append(int(avail))
 
@@ -155,29 +177,28 @@ class MarketWatchScanner:
         try:
             deriv_collection = self.client.collect_derivatives(symbol, include_order_book=True)
             snap = deriv_collection.snapshot
-            deriv_observed_at_ms = _to_opt_int(getattr(snap, "observed_at_ms", None))
-            mark_price = snap.mark_price
-            index_price = snap.index_price
-            funding_rate = snap.funding_rate
+            deriv_observed_at_ms = self.clock_ms()
+            mark_price = getattr(snap, "mark_price", None)
+            index_price = getattr(snap, "index_price", None)
+            funding_rate = getattr(snap, "funding_rate", None)
             funding_time_ms = _to_opt_int(getattr(snap, "funding_time_ms", None))
             premium_index_time_ms = _to_opt_int(getattr(snap, "premium_index_time_ms", None))
             next_funding_time_ms = _to_opt_int(getattr(snap, "next_funding_time_ms", None))
-            if premium_index_time_ms is None and funding_time_ms is not None:
-                premium_index_time_ms = funding_time_ms
-            if funding_time_ms is None and premium_index_time_ms is not None:
-                funding_time_ms = premium_index_time_ms
-            open_interest = snap.open_interest
+            open_interest = getattr(snap, "open_interest", None)
             open_interest_time_ms = _to_opt_int(getattr(snap, "open_interest_time_ms", None))
-            oi_1h_change = snap.open_interest_change_pct
-            taker_ratio = snap.taker_buy_sell_ratio
+            oi_1h_change = getattr(snap, "open_interest_change_pct", None)
+            taker_ratio = getattr(snap, "taker_buy_sell_ratio", None)
             taker_time_ms = _to_opt_int(getattr(snap, "taker_time_ms", None))
-            basis_rate = snap.basis_rate
+            basis_rate = getattr(snap, "basis_rate", None)
             basis_time_ms = _to_opt_int(getattr(snap, "basis_time_ms", None))
-            long_short_ratio = snap.long_short_account_ratio
+            long_short_ratio = getattr(snap, "long_short_account_ratio", None)
             long_short_time_ms = _to_opt_int(getattr(snap, "long_short_time_ms", None))
-            order_book_imbalance = snap.order_book_imbalance
-            spread_bps = snap.spread_bps
+            order_book_imbalance = getattr(snap, "order_book_imbalance", None)
+            spread_bps = getattr(snap, "spread_bps", None)
             field_avail = dict(deriv_collection.field_availability)
+            if any(v is None for v in (funding_rate, open_interest, oi_1h_change)):
+                health = ScanHealth.DEGRADED
+                health_reasons.append("DERIVATIVES_REQUIRED_FIELDS_UNKNOWN")
             if deriv_collection.endpoint_errors:
                 health = ScanHealth.DEGRADED
                 for ep, err in deriv_collection.endpoint_errors.items():
@@ -190,13 +211,15 @@ class MarketWatchScanner:
 
         # Optional multi-horizon OI history query
         oi_hist_receipt_ms: int | None = None
+        oi_hist_source_ms: int | None = None
         try:
             oi_hist = self.client._optional_get(
                 "/futures/data/openInterestHist",
                 {"symbol": symbol, "period": "1h", "limit": 13},
             )
-            oi_hist_receipt_ms = int(time.time() * 1000)
+            oi_hist_receipt_ms = self.clock_ms()
             if oi_hist and len(oi_hist) >= 2:
+                oi_hist_source_ms = _to_opt_int(oi_hist[-1].get("timestamp"))
                 curr_oi = float(oi_hist[-1].get("sumOpenInterest", 0.0))
                 if len(oi_hist) >= 2 and oi_1h_change is None:
                     p1 = float(oi_hist[-2].get("sumOpenInterest", 0.0))
@@ -207,7 +230,7 @@ class MarketWatchScanner:
                 if len(oi_hist) >= 13:
                     p12 = float(oi_hist[-13].get("sumOpenInterest", 0.0))
                     oi_12h_change = (curr_oi / p12 - 1.0) if p12 > 0 else None
-        except (KeyError, ValueError, TypeError, IndexError) as exc:
+        except Exception as exc:  # noqa: BLE001 - optional sources fail closed
             logger.debug("OI history parse failed for %s: %s", symbol, exc)
 
         # Optional top trader position/account ratio queries
@@ -217,10 +240,10 @@ class MarketWatchScanner:
                 "/futures/data/topLongShortPositionRatio",
                 {"symbol": symbol, "period": "1h", "limit": 1},
             )
-            top_pos_receipt_ms = int(time.time() * 1000)
+            top_pos_receipt_ms = self.clock_ms()
             if top_pos_payload and isinstance(top_pos_payload, list) and "longShortRatio" in top_pos_payload[-1]:
                 top_pos_ratio = float(top_pos_payload[-1]["longShortRatio"])
-        except (KeyError, ValueError, TypeError, IndexError) as exc:
+        except Exception as exc:  # noqa: BLE001 - optional sources fail closed
             logger.debug("Top pos ratio parse failed for %s: %s", symbol, exc)
 
         top_acc_receipt_ms: int | None = None
@@ -229,10 +252,10 @@ class MarketWatchScanner:
                 "/futures/data/topLongShortAccountRatio",
                 {"symbol": symbol, "period": "1h", "limit": 1},
             )
-            top_acc_receipt_ms = int(time.time() * 1000)
+            top_acc_receipt_ms = self.clock_ms()
             if top_acc_payload and isinstance(top_acc_payload, list) and "longShortRatio" in top_acc_payload[-1]:
                 top_acc_ratio = float(top_acc_payload[-1]["longShortRatio"])
-        except (KeyError, ValueError, TypeError, IndexError) as exc:
+        except Exception as exc:  # noqa: BLE001 - optional sources fail closed
             logger.debug("Top acc ratio parse failed for %s: %s", symbol, exc)
 
         # Exchange time and staleness check
@@ -240,7 +263,7 @@ class MarketWatchScanner:
         server_time_receipt_ms: int | None = None
         try:
             val = self.client.server_time_ms()
-            server_time_receipt_ms = int(time.time() * 1000)
+            server_time_receipt_ms = self.clock_ms()
             if isinstance(val, (int, float)):
                 exchange_time_ms = int(val)
         except Exception as exc:  # noqa: BLE001
@@ -262,13 +285,13 @@ class MarketWatchScanner:
         ticker_receipt_ms: int | None = None
         try:
             ticker = self.client._optional_get("/fapi/v1/ticker/24hr", {"symbol": symbol})
-            ticker_receipt_ms = int(time.time() * 1000)
+            ticker_receipt_ms = self.clock_ms()
             if ticker and isinstance(ticker, dict):
                 change_24h = float(ticker.get("priceChangePercent", 0.0)) / 100.0
                 high_24h = float(ticker.get("highPrice", high_24h))
                 low_24h = float(ticker.get("lowPrice", low_24h))
                 quote_vol_24h = float(ticker.get("quoteVolume", 0.0))
-        except (KeyError, ValueError, TypeError) as exc:
+        except Exception as exc:  # noqa: BLE001 - optional sources fail closed
             logger.debug("24hr ticker parse failed for %s: %s", symbol, exc)
 
         last_price = raw_15m[-1].close
@@ -353,6 +376,7 @@ class MarketWatchScanner:
             spread_bps=deriv_metrics.spread_bps,
             order_book_imbalance=deriv_metrics.order_book_imbalance,
             field_availability=deriv_metrics.field_availability,
+            endpoint_errors=deriv_metrics.endpoint_errors,
             regime=d_regime,
             reasons=d_reasons + d_risks,
             risk_codes=tuple(d_risks),
@@ -385,9 +409,10 @@ class MarketWatchScanner:
             elif isinstance(item, (int, float)) and item > 0:
                 flat_availability.append(int(item))
 
-        collection_completed_ms = int(time.time() * 1000)
-        observed_at_ms = max([collection_started_at_ms, *flat_availability])
-        decision_time_ms = max(collection_completed_ms, now_ms, observed_at_ms, *flat_availability)
+        collection_completed_ms = self.clock_ms()
+        observed_at_ms = collection_completed_ms
+        # Never move a decision into the future to make input clocks appear admissible.
+        decision_time_ms = max(collection_completed_ms, now_ms)
 
         snap_hash = compute_snapshot_hash(
             symbol=symbol,
@@ -421,6 +446,22 @@ class MarketWatchScanner:
         if server_time_receipt_ms:
             source_receipt_timestamps["server_time_receipt_ms"] = server_time_receipt_ms
 
+        candle_clocks = {}
+        candle_counts = {}
+        for name, candles in (("15m", raw_15m), ("1h", raw_1h), ("4h", raw_4h)):
+            receipts = [c.available_at_ms for c in candles]
+            known_receipts = [t for t in receipts if timestamp(t)]
+            known = max(known_receipts) if len(known_receipts) == len(receipts) else None
+            candle_clocks[name] = InputClock(candles[-1].close_time_ms, known, known)
+            candle_counts[name] = len(candles)
+            if len(candles) < compute_required_closed_bars(self.config):
+                health = ScanHealth.DEGRADED
+                health_reasons.append(f"BARS_{name}_INSUFFICIENT")
+        derivative_clocks = {
+            "funding_rate": InputClock(premium_index_time_ms, deriv_observed_at_ms, deriv_observed_at_ms),
+            "current_open_interest": InputClock(open_interest_time_ms, deriv_observed_at_ms, deriv_observed_at_ms),
+            "oi_1h_change": InputClock(oi_hist_source_ms, oi_hist_receipt_ms, oi_hist_receipt_ms),
+        }
         snapshot = MarketSnapshot(
             symbol=symbol,
             decision_time_ms=decision_time_ms,
@@ -445,6 +486,11 @@ class MarketWatchScanner:
             closed_bar_watermarks=closed_bar_watermarks,
             return_observations=(r1h_obs, r4h_obs, r12h_obs),
             source_receipt_timestamps=source_receipt_timestamps,
+            clock=InputClock(max(closed_bar_watermarks.values()), collection_completed_ms, collection_completed_ms),
+            candle_clocks=candle_clocks,
+            candle_counts=candle_counts,
+            derivative_clocks=derivative_clocks,
+            symbol_filters=dict(self.symbol_filters.get(symbol, {})),
         )
 
         return snapshot, health, tuple(health_reasons)
@@ -458,7 +504,49 @@ class MarketWatchScanner:
         relative_perf: RelativePerformance | None,
     ) -> SymbolAssessment:
         """Evaluate directional policy, grid policy, ranking score, and state transitions."""
+        if type(snapshot) is not MarketSnapshot:
+            raise ValueError("SOURCE_METADATA_UNKNOWN")
+        if not timestamp(snapshot.decision_time_ms):
+            raise ValueError("SOURCE_DECISION_TIMING_UNKNOWN")
+        if (type(snapshot.symbol) is not str or not snapshot.symbol.strip()
+                or type(snapshot.snapshot_hash) is not str or not snapshot.snapshot_hash):
+            raise ValueError("SOURCE_IDENTITY_UNKNOWN")
         symbol = snapshot.symbol
+        timing_reasons = list(snapshot.reference_timing_reasons) if type(snapshot.reference_timing_reasons) in (tuple, list) and all(type(r) is str for r in snapshot.reference_timing_reasons) else ["SOURCE_METADATA_UNKNOWN"]
+        normalized_maps: dict[str, Any] = {}
+        for field in ("candle_clocks", "candle_counts", "derivative_clocks", "symbol_filters",
+                      "reference_clocks", "closed_bar_watermarks", "source_receipt_timestamps"):
+            value = getattr(snapshot, field)
+            if type(value) is not dict:
+                timing_reasons.append("SOURCE_METADATA_UNKNOWN")
+                normalized_maps[field] = {}
+        if normalized_maps:
+            snapshot = replace(snapshot, **normalized_maps)
+        reference_clocks = {}
+        admitted = {}
+        for name, ref in (("BTCUSDT", btc_snapshot), ("ETHUSDT", eth_snapshot)):
+            if name == symbol:
+                ref = snapshot
+            failures = reference_reasons(snapshot, ref, name)
+            timing_reasons.extend(failures)
+            if not failures and ref is not None:
+                admitted[name] = ref
+                reference_clocks[name] = ref.clock
+        snapshot = replace(snapshot, reference_clocks=reference_clocks,
+                           reference_timing_reasons=tuple(sorted(set(timing_reasons))))
+        btc_snapshot, eth_snapshot = admitted.get("BTCUSDT"), admitted.get("ETHUSDT")
+        frozen_inputs_json = json.dumps({
+            "snapshot": snapshot.as_dict(),
+            "references": {name: ref.as_dict() for name, ref in admitted.items()},
+            "relative_performance": source_json_value(asdict(relative_perf)) if type(relative_perf) is RelativePerformance else None,
+        }, sort_keys=True, allow_nan=False)
+        origin = self.store.get_decision_origin(snapshot, compute_market_watch_config_hash(self.config))
+        if origin is not None:
+            if origin["frozen_inputs_json"] != frozen_inputs_json:
+                raise TacticalEvidenceConflictError("FROZEN_DECISION_INPUT_CONFLICT")
+            prev_state = json.loads(origin["policy_state_before_json"])
+        policy_state_before_json = json.dumps(prev_state, sort_keys=True, allow_nan=False)
+        source_reasons = actionable_reasons(snapshot, self.config)
         tf_15m = snapshot.tf_15m
         tf_1h = snapshot.tf_1h
         tf_4h = snapshot.tf_4h
@@ -522,6 +610,28 @@ class MarketWatchScanner:
             reasons = ["NO_CONFIRMED_PLAYBOOK_CANDIDATE"] + tf_reasons
             risks = list(bench_risks)
 
+        tick = metadata_map(snapshot.symbol_filters).get("tick_size")
+        precision_reasons = []
+        if positive(tick) and raw_decision != DirectionalDecision.WAIT:
+            try:
+                entry_low = increment(entry_low, tick, upward=True)
+                entry_high = increment(entry_high, tick)
+                # Tighten toward entry: never silently widen protective risk.
+                stop_loss = increment(stop_loss, tick, upward=raw_decision == DirectionalDecision.LONG)
+                if tp1 > 0:
+                    tp1 = increment(tp1, tick, upward=raw_decision == DirectionalDecision.SHORT)
+                if tp2 > 0:
+                    tp2 = increment(tp2, tick, upward=raw_decision == DirectionalDecision.SHORT)
+                if invalidation > 0:
+                    invalidation = increment(invalidation, tick, upward=raw_decision == DirectionalDecision.LONG)
+                if entry_low > entry_high or not (
+                    stop_loss < entry_low if raw_decision == DirectionalDecision.LONG
+                    else stop_loss > entry_high
+                ):
+                    raise ValueError("INVALID_ROUNDED_PLAN")
+            except ValueError:
+                precision_reasons.append("PRICE_INCREMENT_INVALID")
+        source_reasons = tuple(sorted({*source_reasons, *precision_reasons}))
         initial_selected_decision = raw_decision.value
 
         # 5. Friction and Net Risk/Reward
@@ -622,6 +732,10 @@ class MarketWatchScanner:
             benchmark_context=bench_context,
             config=self.config,
         )
+        fatal_reasons = tuple(sorted({*fatal_reasons, *source_reasons}))
+        has_fatal_veto = bool(fatal_reasons)
+        if source_reasons:
+            actionable_playbooks = ()
         if has_fatal_veto:
             gated_decision = DirectionalDecision.WAIT
             reasons.extend(fatal_reasons)
@@ -666,12 +780,12 @@ class MarketWatchScanner:
             setup=setup,
             regime=tf_1h.regime,
             entry_quality=entry_quality,
-            entry_low=round(entry_low, 4),
-            entry_high=round(entry_high, 4),
-            stop_loss=round(stop_loss, 4),
-            take_profit_1=round(tp1, 4),
-            take_profit_2=round(tp2, 4),
-            invalidation_level=round(invalidation, 4),
+            entry_low=entry_low,
+            entry_high=entry_high,
+            stop_loss=stop_loss,
+            take_profit_1=tp1,
+            take_profit_2=tp2,
+            invalidation_level=invalidation,
             gross_rr=gross_rr,
             net_rr=net_rr,
             confidence_band=confidence,
@@ -713,6 +827,18 @@ class MarketWatchScanner:
             config=self.config,
         )
 
+        if not source_reasons and grid_plan.decision != GridDecision.PAUSE:
+            levels = (grid_plan.lower_bound, grid_plan.upper_bound,
+                      grid_plan.stop_loss, grid_plan.take_profit)
+            lower, upper = grid_plan.lower_bound, grid_plan.upper_bound
+            if not (positive(tick) and positive(lower) and positive(upper) and lower < upper
+                    and all(positive(level) and increment(level, tick) == level for level in levels)):
+                grid_plan = GridPlan(symbol=symbol, decision=GridDecision.PAUSE,
+                                     reason_codes=("GRID_PRECISION_INVALID",))
+        if source_reasons:
+            grid_plan = GridPlan(symbol=symbol, decision=GridDecision.PAUSE,
+                                 reason_codes=tuple(sorted({*grid_plan.reason_codes, *source_reasons})))
+
         # 11. Lifecycle State (Keyed by deterministic signal_identity)
         setup_key = extract_setup_key(symbol, directional_plan, snapshot)
         intended_dir = setup_key.split(":")[2] if ":" in setup_key else "NONE"
@@ -743,7 +869,7 @@ class MarketWatchScanner:
         bo_level_changed = (
             curr_bo_level is not None
             and prev_bo_level is not None
-            and round(curr_bo_level, 2) != round(prev_bo_level, 2)
+            and curr_bo_level != prev_bo_level
         )
         prev_bo_dir = prev_state.get("breakout_direction") if prev_state else None
         dir_changed = (
@@ -841,6 +967,8 @@ class MarketWatchScanner:
             config_hash=cfg_hash,
             signal_identity=sig_id,
             setup_key=setup_key,
+            frozen_inputs_json=frozen_inputs_json,
+            policy_state_before_json=policy_state_before_json,
         )
         evidence = build_tactical_feature_evidence(
             assessment=temp_assessment,
@@ -984,7 +1112,7 @@ class MarketWatchScanner:
     ) -> tuple[list[SymbolAssessment], list[MarketWatchAlert]]:
         """Run universe scan with symbol-level failure isolation and state continuity."""
         target_symbols = [s.upper() for s in (symbols or self.config.symbols)]
-        now_ms = int(time.time() * 1000)
+        now_ms = self.clock_ms()
 
         # Frozen Section 21 collection semantics:
         # Collect target_symbols UNION reference_universe UNION benchmark_symbols
@@ -1008,12 +1136,10 @@ class MarketWatchScanner:
             logger.warning("No symbol snapshots successfully collected.")
             return [], []
 
-        # 2. Compute cross-asset relative performance
-        rel_perfs = compute_relative_performances(snapshots, self.config)
+        # Relative inputs are admitted separately at each candidate decision cutoff.
 
         # 3. Retrieve benchmark snapshots
-        btc_snap = snapshots.get("BTCUSDT")
-        eth_snap = snapshots.get("ETHUSDT")
+
 
         # 4. Assess TARGET symbols only
         assessments: list[SymbolAssessment] = []
@@ -1021,12 +1147,19 @@ class MarketWatchScanner:
             snap = snapshots.get(s)
             if snap is None:
                 continue
+            allowed = {name: ref for name, ref in snapshots.items()
+                       if not reference_reasons(snap, ref, name)}
+            excluded_reasons = tuple(reason for name, ref in snapshots.items()
+                                     for reason in reference_reasons(snap, ref, name))
+            if type(snap) is MarketSnapshot:
+                snap = replace(snap, reference_timing_reasons=excluded_reasons)
+            rel_perfs = compute_relative_performances(allowed, self.config)
             prev_st = self.store.get_symbol_state(s)
             item = self.assess_symbol(
                 snapshot=snap,
                 prev_state=prev_st,
-                btc_snapshot=btc_snap,
-                eth_snapshot=eth_snap,
+                btc_snapshot=allowed.get("BTCUSDT"),
+                eth_snapshot=allowed.get("ETHUSDT"),
                 relative_perf=rel_perfs.get(s),
             )
             assessments.append(item)
@@ -1044,7 +1177,7 @@ class MarketWatchScanner:
         assessments.sort(key=_get_sort_score, reverse=True)
         ranked_assessments: list[SymbolAssessment] = []
         for rank_num, a in enumerate(assessments, 1):
-            if hasattr(a, "__dataclass_fields__"):
+            if type(a) is SymbolAssessment:
                 ranked_assessments.append(replace(a, rank=rank_num))
             else:
                 try:
@@ -1062,6 +1195,9 @@ class MarketWatchScanner:
             prev_st = self.store.get_symbol_state(a.symbol) or {}
             emit, severity, _reasons = evaluate_alert_emission(a, prev_st, self.config)
             if emit:
+                source_veto = actionable_reasons(a.snapshot, self.config)
+                if severity == AlertSeverity.ACTION and source_veto:
+                    severity = AlertSeverity.WATCH
                 alert = MarketWatchAlert(
                     symbol=a.symbol,
                     severity=severity,
@@ -1070,7 +1206,7 @@ class MarketWatchScanner:
                     grid=a.grid,
                     fingerprint=a.alert_fingerprint,
                     evidence=a.directional.reason_codes,
-                    risks=a.directional.risk_codes,
+                    risks=tuple(sorted({*a.directional.risk_codes, *source_veto})),
                     alert_time_ms=now_ms,
                     last_price=a.snapshot.price.last_price,
                     change_24h_pct=a.snapshot.price.change_24h_pct,
@@ -1110,24 +1246,45 @@ class MarketWatchScanner:
         remaining_slots = max(0, self.config.max_alert_symbols - len(selected_candidates))
         selected_candidates.extend(non_risk_candidates[:remaining_slots])
 
-        selected_symbols = {item[0].symbol for item in selected_candidates}
-        alerts_to_send: list[MarketWatchAlert] = [item[1] for item in selected_candidates]
+        alerts_to_send: list[MarketWatchAlert] = []
 
-        # Dispatch alerts
-        sent_symbols: set[str] = set()
-        for a, alert, _sev in selected_candidates:
-            if notify and self.config.feishu_enabled and webhook_url:
-                try:
-                    send_market_watch_alert(webhook_url, alert, secret)
-                    sent_symbols.add(a.symbol)
-                except Exception as exc:  # noqa: BLE001
-                    logger.error("Feishu alert failed for %s: %s", a.symbol, exc)
-
-        # Persist state and feature evidence to SQLite, then record shadow observation
+        # Evidence and assessment commit precedes event reservation and any sender call.
         for a in ranked_assessments:
-            is_sent = a.symbol in sent_symbols or (not notify and a.symbol in selected_symbols)
             ev = getattr(a, "feature_evidence", None) or self._last_evidences.get(a.symbol)
-            self.store.save_symbol_state(a.symbol, a, now_ms, alert_sent=is_sent, evidence=ev)
-            self._record_shadow_observations_if_needed(a, now_ms)
+            self.store.save_symbol_state(a.symbol, a, self.clock_ms(), alert_sent=False, evidence=ev)
 
+        for a, alert, severity in selected_candidates:
+            # Unknown source objects may expose a degraded observation, never a send.
+            if (type(a) is not SymbolAssessment or type(a.snapshot) is not MarketSnapshot
+                    or not timestamp(a.snapshot.decision_time_ms)
+                    or type(a.feature_evidence) is not TacticalFeatureEvidenceV2):
+                alerts_to_send.append(alert)
+                continue
+            event_id = self.store.prepare_notification(a, alert, self.clock_ms())
+            alert = replace(alert, event_id=event_id)
+            alerts_to_send.append(alert)
+            if not (notify and self.config.feishu_enabled and webhook_url):
+                continue
+            # Recheck freshness at the actual send attempt, including queued/restarted work.
+            if (severity == AlertSeverity.ACTION
+                    and actionable_reasons(a.snapshot, self.config, cutoff_ms=self.clock_ms())):
+                continue
+            if not self.store.claim_notification(event_id, self.clock_ms()):
+                continue
+            try:
+                send_market_watch_alert(
+                    webhook_url, alert, secret,
+                    payload=json.loads(self.store.get_notification(event_id)["payload_json"]),
+                )
+            except Exception as exc:  # noqa: BLE001 - remote acceptance may be unknown
+                self.store.fail_notification(
+                    event_id, self.clock_ms(), type(exc).__name__,
+                    definitely_not_sent=isinstance(exc, NotificationNotSent),
+                )
+                logger.error("Feishu alert failed for %s: %s", a.symbol, type(exc).__name__)
+            else:
+                self.store.acknowledge_notification(event_id, self.clock_ms())
+
+        for a in ranked_assessments:
+            self._record_shadow_observations_if_needed(a, self.clock_ms())
         return ranked_assessments, alerts_to_send

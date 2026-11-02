@@ -12,6 +12,7 @@ from ..approval.feishu import FeishuAppClient
 from ..approval.store import LiveState, LiveStore
 from ..config import LiveV1Config
 from ..market_watch.domain import SymbolAssessment
+from ..market_watch.foundation import actionable_reasons
 from ..market_watch.service import MarketWatchService
 from .backends import AnalysisBackend, AnalysisMode, CodexExecBackend, ResponsesBackend
 from .case import case_from_assessment
@@ -57,8 +58,7 @@ class TacticalLiveService:
         )
         secret = os.getenv("FEISHU_APP_SECRET", "")
         notifier = (
-            FeishuAppClient(config.feishu_app_id, secret, config.feishu_receive_id,
-                            receive_id_type=config.feishu_receive_id_type)
+            FeishuAppClient(config.feishu_app_id, secret, config.feishu_receive_id)
             if config.feishu_app_id and secret and config.feishu_receive_id else None
         )
         return cls(LiveStore(config.sqlite_path), primary, RiskCompilerV1(policy),
@@ -77,6 +77,9 @@ class TacticalLiveService:
         return proposals
 
     async def run_assessment(self, assessment: SymbolAssessment) -> TradeProposalV1 | None:
+        config = self.market_watch.config if self.market_watch is not None else None
+        if actionable_reasons(assessment.snapshot, config, cutoff_ms=self.clock_ms()):
+            return None
         case = case_from_assessment(assessment, ttl_ms=self.case_ttl_ms)
         return await self.analyze_case(case)
 

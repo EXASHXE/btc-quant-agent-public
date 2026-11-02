@@ -81,6 +81,7 @@ class DerivativeCollection:
 class BinancePublicClient:
     config: DataConfig
     _requester: BoundedRequester = field(init=False, repr=False)
+    receive_clock_ms: Callable[[], int] = field(default=lambda: int(time.time() * 1000), repr=False)
 
     def __post_init__(self) -> None:
         origin = urllib.parse.urlsplit(self.config.rest_base_url)
@@ -146,35 +147,17 @@ class BinancePublicClient:
         rows = self._request(
             "/fapi/v1/klines", {"symbol": symbol.upper(), "interval": interval, "limit": limit}
         )
-        return self._parse_klines(rows, symbol, interval, now_ms)
+        return self._parse_klines(
+            rows, symbol, interval, now_ms, received_at_ms=self.receive_clock_ms()
+        )
 
     def _parse_klines(
-        self, rows: list[list[Any]], symbol: str, interval: str, latest_close_ms: int
+        self, rows: list[list[Any]], symbol: str, interval: str, latest_close_ms: int,
+        *, received_at_ms: int | None = None,
     ) -> list[Candle]:
-        candles: list[Candle] = []
-        for row in rows:
-            close_time = int(row[6])
-            if close_time >= latest_close_ms:
-                continue
-            candles.append(
-                Candle(
-                    symbol=symbol.upper(),
-                    interval=interval,
-                    open_time_ms=int(row[0]),
-                    close_time_ms=close_time,
-                    open=float(row[1]),
-                    high=float(row[2]),
-                    low=float(row[3]),
-                    close=float(row[4]),
-                    volume=float(row[5]),
-                    quote_volume=float(row[7]),
-                    trades=int(row[8]),
-                    taker_buy_base_volume=float(row[9]),
-                    closed=True,
-                    available_at_ms=latest_close_ms,
-                )
-            )
-        return candles
+        return decode_public_klines(
+            rows, symbol, interval, latest_close_ms, received_at_ms=received_at_ms
+        )
 
     def historical_klines(
         self, symbol: str, interval: str, start_time_ms: int, end_time_ms: int
@@ -513,3 +496,33 @@ class BinancePublicClient:
                     }
                 )
         return records
+
+
+def decode_public_klines(
+    rows: list[list[Any]], symbol: str, interval: str, latest_close_ms: int,
+    *, received_at_ms: int | None = None,
+) -> list[Candle]:
+    candles: list[Candle] = []
+    for row in rows:
+        close_time = int(row[6])
+        if close_time >= latest_close_ms:
+            continue
+        candles.append(
+            Candle(
+                symbol=symbol.upper(),
+                interval=interval,
+                open_time_ms=int(row[0]),
+                close_time_ms=close_time,
+                open=float(row[1]),
+                high=float(row[2]),
+                low=float(row[3]),
+                close=float(row[4]),
+                volume=float(row[5]),
+                quote_volume=float(row[7]),
+                trades=int(row[8]),
+                taker_buy_base_volume=float(row[9]),
+                closed=True,
+                available_at_ms=received_at_ms,
+            )
+        )
+    return candles

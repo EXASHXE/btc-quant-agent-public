@@ -1,0 +1,14 @@
+schema_version: 0.7.0
+market: PERPETUAL
+universe:
+- BTCUSDT
+- ETHUSDT
+- SOLUSDT
+benchmark: BTCUSDT
+scenario: mixed
+bars: 240
+seed: 7
+dataset: synthetic
+name: funding_carry
+strategies:
+- id: funding_carry

@@ -1,0 +1,157 @@
+{
+  "$defs": {
+    "BundleBodyV2": {
+      "additionalProperties": false,
+      "properties": {
+        "acquisition_origin": {
+          "const": "NATIVE_PUBLIC_CANARY_CAPTURE",
+          "title": "Acquisition Origin",
+          "type": "string"
+        },
+        "artifacts": {
+          "additionalProperties": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "maxProperties": 4096,
+          "minProperties": 8,
+          "title": "Artifacts",
+          "type": "object"
+        },
+        "capture_end_utc_ms": {
+          "exclusiveMinimum": 0,
+          "title": "Capture End Utc Ms",
+          "type": "integer"
+        },
+        "clock_contract": {
+          "const": "L4_CLOCK_DOMAIN_V2",
+          "title": "Clock Contract",
+          "type": "string"
+        },
+        "expires_utc_ms": {
+          "exclusiveMinimum": 0,
+          "title": "Expires Utc Ms",
+          "type": "integer"
+        },
+        "exposure": {
+          "const": "PUBLIC_CANARY",
+          "title": "Exposure",
+          "type": "string"
+        },
+        "family": {
+          "const": "SESSION04_RUNTIME_V1",
+          "title": "Family",
+          "type": "string"
+        },
+        "grant_version": {
+          "title": "Grant Version",
+          "type": "string"
+        },
+        "issued_utc_ms": {
+          "exclusiveMinimum": 0,
+          "title": "Issued Utc Ms",
+          "type": "integer"
+        },
+        "original_receipt_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Original Receipt Sha256",
+          "type": "string"
+        },
+        "owner_grant_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Owner Grant Sha256",
+          "type": "string"
+        },
+        "predeclared_acceptance_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Predeclared Acceptance Sha256",
+          "type": "string"
+        },
+        "receipt_seal_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Receipt Seal Sha256",
+          "type": "string"
+        },
+        "scope_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scope Hash",
+          "type": "string"
+        },
+        "source_config_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Config Sha256",
+          "type": "string"
+        },
+        "source_session_id": {
+          "title": "Source Session Id",
+          "type": "string"
+        },
+        "source_sha256_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256 Fingerprint",
+          "type": "string"
+        },
+        "target_binding_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Target Binding Sha256",
+          "type": "string"
+        },
+        "version": {
+          "const": "L4_CLOCK_QUALIFICATION_BUNDLE_V2",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "family",
+        "source_session_id",
+        "grant_version",
+        "acquisition_origin",
+        "exposure",
+        "clock_contract",
+        "scope_hash",
+        "owner_grant_sha256",
+        "original_receipt_sha256",
+        "receipt_seal_sha256",
+        "source_config_sha256",
+        "source_sha256_fingerprint",
+        "target_binding_sha256",
+        "capture_end_utc_ms",
+        "issued_utc_ms",
+        "expires_utc_ms",
+        "artifacts",
+        "predeclared_acceptance_sha256"
+      ],
+      "title": "BundleBodyV2",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "attestation": {
+      "$ref": "#/$defs/BundleBodyV2"
+    },
+    "capture_key_id": {
+      "title": "Capture Key Id",
+      "type": "string"
+    },
+    "signature_algorithm": {
+      "const": "Ed25519",
+      "title": "Signature Algorithm",
+      "type": "string"
+    },
+    "signature_base64": {
+      "title": "Signature Base64",
+      "type": "string"
+    }
+  },
+  "required": [
+    "attestation",
+    "capture_key_id",
+    "signature_algorithm",
+    "signature_base64"
+  ],
+  "title": "BundleV2",
+  "type": "object"
+}

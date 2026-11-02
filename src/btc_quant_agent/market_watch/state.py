@@ -4,6 +4,8 @@ import hashlib
 import json
 import sqlite3
 import time
+from collections.abc import Callable
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -20,12 +22,15 @@ from .domain import (
     DirectionalDecision,
     GridDecision,
     GridPlan,
+    MarketSnapshot,
+    MarketWatchAlert,
     ShadowExecutionPathModel,
     SignalLifecycleState,
     SymbolAssessment,
     TacticalSemanticIdentity,
     extract_setup_key,
     extract_signal_identity,
+    source_json_value,
 )
 from .evidence import (
     TacticalEvidenceConflictError,
@@ -37,6 +42,7 @@ from .evidence import (
     validate_tactical_feature_evidence,
     verify_tactical_evidence_identity,
 )
+from .foundation import timestamp
 from .grid_shadow_evidence import (
     GridEligibilityStatus,
     TacticalGridShadowEvaluationConflictError,
@@ -80,11 +86,16 @@ def compute_decision_fingerprint(
         "setup": str(d.setup),
         "regime": str(d.regime),
         "entry_quality": str(d.entry_quality),
-        "stop_loss": round(d.stop_loss, 2),
-        "take_profit_1": round(d.take_profit_1, 2),
+        "entry_low": str(d.entry_low),
+        "entry_high": str(d.entry_high),
+        "stop_loss": str(d.stop_loss),
+        "take_profit_1": str(d.take_profit_1),
+        "take_profit_2": str(d.take_profit_2),
+        "invalidation": str(d.invalidation_level),
+        "symbol_filters": source_json_value(assessment.snapshot.symbol_filters),
         "grid_decision": str(g.decision),
-        "grid_lower": round(g.lower_bound, 2) if g.lower_bound is not None else None,
-        "grid_upper": round(g.upper_bound, 2) if g.upper_bound is not None else None,
+        "grid_lower": str(g.lower_bound) if g.lower_bound is not None else None,
+        "grid_upper": str(g.upper_bound) if g.upper_bound is not None else None,
         "derivatives_regime": str(d.derivatives_regime),
         "is_severe_long_crowding": is_severe_long_crowding(assessment.snapshot.derivatives, config),
         "is_severe_short_crowding": is_severe_short_crowding(assessment.snapshot.derivatives, config),
@@ -119,10 +130,114 @@ def _serialize_semantic_identity(val: Any) -> str | None:
 class MarketWatchStateStore:
     """Persistent SQLite store for stateful memory, audit trail, and shadow tracking."""
 
-    def __init__(self, db_path: str | Path = "./var/market_watch.db") -> None:
+    def __init__(self, db_path: str | Path = "./var/market_watch.db", *,
+                 clock_ms: Callable[[], int] | None = None) -> None:
+        self.clock_ms = clock_ms or (lambda: int(time.time() * 1000))
         self.db_path = str(db_path)
         self._ensure_dir()
         self._init_db()
+
+    def prepare_notification(self, assessment: SymbolAssessment, alert: MarketWatchAlert,
+                             now_ms: int) -> str:
+        """Freeze first evidence and wire payload for a deterministic semantic event."""
+        from .alerting import build_market_watch_card
+
+        if type(now_ms) is not int or type(assessment.snapshot.decision_time_ms) is not int:
+            raise ValueError("COMMIT_TIMING_UNKNOWN")
+        if now_ms < assessment.snapshot.decision_time_ms:
+            raise ValueError("COMMIT_BEFORE_DECISION")
+        identity = ["ADVISORY_FOUNDATION_V1", assessment.symbol,
+                    assessment.snapshot.decision_time_ms, assessment.snapshot.snapshot_hash,
+                    assessment.policy_version, assessment.config_hash, assessment.feature_evidence_id,
+                    assessment.signal_identity, assessment.alert_fingerprint]
+        event_id = hashlib.sha256(json.dumps(identity).encode()).hexdigest()
+        payload = build_market_watch_card(replace(alert, event_id=event_id))
+        with self._connect() as conn:
+            committed = conn.execute("""SELECT feature_evidence_id, persisted_commit_at_ms
+                FROM market_watch_assessments WHERE symbol=? AND decision_time_ms=?
+                AND snapshot_hash=? AND policy_version=? AND config_hash=?""",
+                (assessment.symbol, assessment.snapshot.decision_time_ms,
+                 assessment.snapshot.snapshot_hash, assessment.policy_version,
+                 assessment.config_hash)).fetchone()
+            if (committed is None or not assessment.feature_evidence_id
+                    or committed[0] != assessment.feature_evidence_id
+                    or committed[1] is None or committed[1] > now_ms):
+                raise ValueError("DECISION_NOT_COMMITTED")
+            conn.execute("""
+                INSERT OR IGNORE INTO market_watch_notifications
+                (event_id, symbol, fingerprint, decision_time_ms, prepared_at_ms, status,
+                 assessment_json, payload_json) VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?)
+            """, (event_id, assessment.symbol, assessment.alert_fingerprint,
+                  assessment.snapshot.decision_time_ms, now_ms,
+                  json.dumps(assessment.as_dict(), sort_keys=True),
+                  json.dumps(payload, sort_keys=True)))
+        # This receipt follows the payload commit. It is not an SQLite fsync timestamp.
+        # A missing receipt after a crash is repaired only by re-preparing the same event.
+        committed_at = self.clock_ms()
+        if not timestamp(committed_at) or committed_at < now_ms:
+            raise ValueError("COMMIT_CLOCK_ORDER_INVALID")
+        with self._connect() as conn:
+            conn.execute("""UPDATE market_watch_notifications SET persisted_commit_at_ms = ?
+                            WHERE event_id = ? AND persisted_commit_at_ms IS NULL""",
+                         (committed_at, event_id))
+        return event_id
+
+    def get_notification(self, event_id: str) -> dict[str, Any]:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            row = conn.execute("SELECT * FROM market_watch_notifications WHERE event_id = ?",
+                               (event_id,)).fetchone()
+            if row is None:
+                raise KeyError(event_id)
+            result = dict(row)
+            result["remote_acceptance_status"] = (
+                "ACCEPTED" if result["status"] == "SENDER_ACCEPTED" else
+                "UNKNOWN" if result["status"] in ("SENDING", "UNKNOWN") else "NOT_ACCEPTED"
+            )
+            result["user_delivery_status"] = "UNKNOWN"
+            return result
+
+    def claim_notification(self, event_id: str, now_ms: int) -> bool:
+        """One atomic claim; SENDING/UNKNOWN never automatically retry after a crash."""
+        if not timestamp(now_ms):
+            raise ValueError("ATTEMPT_TIMING_UNKNOWN")
+        with self._connect() as conn:
+            return conn.execute("""
+                UPDATE market_watch_notifications
+                SET status = 'SENDING', attempts = attempts + 1, attempted_at_ms = ?, error = NULL
+                WHERE event_id = ? AND status IN ('PENDING', 'FAILED') AND attempts < 3
+                  AND persisted_commit_at_ms IS NOT NULL AND persisted_commit_at_ms <= ?
+            """, (now_ms, event_id, now_ms)).rowcount == 1
+
+    def fail_notification(self, event_id: str, now_ms: int, error: str,
+                          *, definitely_not_sent: bool = False) -> None:
+        with self._connect() as conn:
+            conn.execute("""UPDATE market_watch_notifications SET status = ?, error = ?
+                            WHERE event_id = ? AND status = 'SENDING'""",
+                         ('FAILED' if definitely_not_sent else 'UNKNOWN', error, event_id))
+
+    def acknowledge_notification(self, event_id: str, now_ms: int) -> None:
+        """Sender acceptance and dedup commit together; never assert reader delivery."""
+        if not timestamp(now_ms):
+            raise ValueError("ACK_TIMING_UNKNOWN")
+        with self._connect() as conn:
+            row = conn.execute("""SELECT symbol, fingerprint, decision_time_ms, attempted_at_ms
+                                  FROM market_watch_notifications
+                                  WHERE event_id = ? AND status = 'SENDING'""", (event_id,)).fetchone()
+            if row is None:
+                return
+            symbol, fingerprint, decision, attempted = row
+            if now_ms < attempted:
+                raise ValueError("ACK_BEFORE_ATTEMPT")
+            conn.execute("""UPDATE market_watch_notifications
+                            SET status = 'SENDER_ACCEPTED', acknowledged_at_ms = ?
+                            WHERE event_id = ?""", (now_ms, event_id))
+            conn.execute("""UPDATE market_watch_symbol_state
+                            SET last_alert_fingerprint = ?, last_alert_time_ms = ? WHERE symbol = ?""",
+                         (fingerprint, now_ms, symbol))
+            conn.execute("""UPDATE market_watch_assessments SET notification_sent = 1
+                            WHERE symbol = ? AND alert_fingerprint = ? AND decision_time_ms = ?""",
+                         (symbol, fingerprint, decision))
 
     def _ensure_dir(self) -> None:
         parent = Path(self.db_path).parent
@@ -133,6 +248,16 @@ class MarketWatchStateStore:
 
     def _init_db(self) -> None:
         with self._connect() as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS market_watch_notifications (
+                    event_id TEXT PRIMARY KEY, symbol TEXT NOT NULL, fingerprint TEXT NOT NULL,
+                    decision_time_ms INTEGER NOT NULL, prepared_at_ms INTEGER NOT NULL,
+                    persisted_commit_at_ms INTEGER, attempted_at_ms INTEGER,
+                    acknowledged_at_ms INTEGER, status TEXT NOT NULL,
+                    attempts INTEGER NOT NULL DEFAULT 0, error TEXT,
+                    assessment_json TEXT NOT NULL, payload_json TEXT NOT NULL
+                )
+            """)
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS market_watch_symbol_state (
@@ -255,6 +380,9 @@ class MarketWatchStateStore:
                 ("missing_reference_members_json", "TEXT"),
                 ("semantic_identity_json", "TEXT"),
                 ("feature_evidence_id", "TEXT"),
+                ("persisted_commit_at_ms", "INTEGER"),
+                ("frozen_inputs_json", "TEXT"),
+                ("policy_state_before_json", "TEXT"),
             ]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_assessments ADD COLUMN {col_name} {col_type}")
@@ -544,6 +672,21 @@ class MarketWatchStateStore:
             row = cursor.fetchone()
             return dict(row) if row is not None else None
 
+    def get_decision_origin(self, snapshot: MarketSnapshot, config_hash: str) -> dict[str, Any] | None:
+        """Fetch the frozen inputs and first policy pre-state, never delivery state."""
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            row = conn.execute("""SELECT frozen_inputs_json, policy_state_before_json
+                FROM market_watch_assessments WHERE symbol=? AND decision_time_ms=?
+                AND snapshot_hash=? AND policy_version=? AND config_hash=? LIMIT 1""",
+                (snapshot.symbol, snapshot.decision_time_ms, snapshot.snapshot_hash,
+                 TACTICAL_POLICY_VERSION, config_hash)).fetchone()
+            if row is None:
+                return None
+            if not row["frozen_inputs_json"] or row["policy_state_before_json"] is None:
+                raise TacticalEvidenceConflictError("REPLAY_ORIGIN_UNKNOWN")
+            return dict(row)
+
     def save_symbol_state(
         self,
         symbol: str,
@@ -552,6 +695,10 @@ class MarketWatchStateStore:
         alert_sent: bool = False,
         evidence: TacticalFeatureEvidenceV2 | None = None,
     ) -> None:
+        if not timestamp(now_ms) or not timestamp(assessment.snapshot.decision_time_ms):
+            raise ValueError("COMMIT_TIMING_UNKNOWN")
+        if now_ms < assessment.snapshot.decision_time_ms:
+            raise ValueError("COMMIT_BEFORE_DECISION")
         prev = self.get_symbol_state(symbol) or {}
         last_fp = assessment.alert_fingerprint if alert_sent else prev.get("last_alert_fingerprint")
         last_alert_time = now_ms if alert_sent else prev.get("last_alert_time_ms")
@@ -678,6 +825,17 @@ class MarketWatchStateStore:
             verify_tactical_evidence_identity(evidence)
 
         with self._connect() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            origin = conn.execute("""SELECT frozen_inputs_json, policy_state_before_json
+                FROM market_watch_assessments WHERE symbol=? AND decision_time_ms=?
+                AND snapshot_hash=? AND policy_version=? AND config_hash=? LIMIT 1""",
+                (symbol, assessment.snapshot.decision_time_ms, assessment.snapshot.snapshot_hash,
+                 assessment.policy_version, assessment.config_hash)).fetchone()
+            if origin is not None and assessment.frozen_inputs_json and (
+                origin[0] != assessment.frozen_inputs_json
+                or origin[1] != assessment.policy_state_before_json
+            ):
+                raise TacticalEvidenceConflictError("FROZEN_DECISION_INPUT_CONFLICT")
             if evidence is not None:
                 cur_ev = conn.execute(
                     """
@@ -806,8 +964,11 @@ class MarketWatchStateStore:
                     lifecycle_state = excluded.lifecycle_state,
                     last_invalidation_reason = excluded.last_invalidation_reason,
                     last_rank = excluded.last_rank,
-                    last_alert_fingerprint = excluded.last_alert_fingerprint,
-                    last_alert_time_ms = excluded.last_alert_time_ms,
+                    last_alert_fingerprint = CASE
+                        WHEN excluded.last_alert_time_ms > COALESCE(market_watch_symbol_state.last_alert_time_ms, 0)
+                        THEN excluded.last_alert_fingerprint ELSE market_watch_symbol_state.last_alert_fingerprint END,
+                    last_alert_time_ms = MAX(COALESCE(market_watch_symbol_state.last_alert_time_ms, 0),
+                        COALESCE(excluded.last_alert_time_ms, 0)),
                     updated_at_ms = excluded.updated_at_ms,
                     breakout_level = excluded.breakout_level,
                     breakout_direction = excluded.breakout_direction,
@@ -933,7 +1094,23 @@ class MarketWatchStateStore:
                         feat_ev_id,
                     ),
                 )
+            if assessment.frozen_inputs_json:
+                conn.execute("""UPDATE market_watch_assessments
+                    SET frozen_inputs_json=?, policy_state_before_json=?
+                    WHERE symbol=? AND decision_time_ms=? AND snapshot_hash=?
+                    AND policy_version=? AND config_hash=? AND frozen_inputs_json IS NULL""",
+                    (assessment.frozen_inputs_json, assessment.policy_state_before_json,
+                     symbol, assessment.snapshot.decision_time_ms, assessment.snapshot.snapshot_hash,
+                     assessment.policy_version, assessment.config_hash))
             conn.commit()
+            committed_at = self.clock_ms()
+            if not timestamp(committed_at) or committed_at < now_ms:
+                raise ValueError("COMMIT_CLOCK_ORDER_INVALID")
+            conn.execute("""UPDATE market_watch_assessments SET persisted_commit_at_ms = ?
+                WHERE symbol = ? AND decision_time_ms = ? AND snapshot_hash = ?
+                  AND policy_version = ? AND config_hash = ? AND persisted_commit_at_ms IS NULL""",
+                (committed_at, symbol, assessment.snapshot.decision_time_ms,
+                 assessment.snapshot.snapshot_hash, assessment.policy_version, assessment.config_hash))
 
     def set_last_shadow_signal_ids(
         self,

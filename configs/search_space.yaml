@@ -1,0 +1,6 @@
+entry.region_bps:
+- 30
+- 50
+exits.trailing_atr:
+- 1.5
+- 2.5

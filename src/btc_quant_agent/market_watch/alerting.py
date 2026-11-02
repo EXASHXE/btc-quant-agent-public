@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import time
 import urllib.request
+from decimal import Decimal
 from typing import Any
 
 from ..notify.feishu import _signature
@@ -10,13 +11,16 @@ from .domain import AlertSeverity, DirectionalDecision, MarketWatchAlert
 
 
 def _format_price(val: float | None) -> str:
-    if val is None:
+    if type(val) not in (int, float, Decimal):
         return "N/A"
-    if abs(val) >= 100:
-        return f"{val:,.2f}"
-    if abs(val) >= 1:
-        return f"{val:,.4f}".rstrip("0").rstrip(".")
-    return f"{val:,.6f}".rstrip("0").rstrip(".")
+    amount = Decimal(str(val))
+    if not amount.is_finite():
+        return "N/A"
+    return format(amount.normalize(), ",f")
+
+
+class NotificationNotSent(RuntimeError):
+    """Sender proves no request left the process; eligible for bounded retry."""
 
 
 def build_market_watch_card(alert: MarketWatchAlert) -> dict[str, Any]:
@@ -51,7 +55,7 @@ def build_market_watch_card(alert: MarketWatchAlert) -> dict[str, Any]:
     regime_str = alert.regime_1h.value if hasattr(alert.regime_1h, "value") else (str(alert.regime_1h) if alert.regime_1h else "N/A")
 
     lines = [
-        f"**Latest Price**: {_format_price(alert.last_price)} ({alert.change_24h_pct * 100:+.2f}%)",
+        f"**Analytical Candle Reference**: {_format_price(alert.last_price)} ({alert.change_24h_pct * 100:+.2f}%)",
         f"**1H Regime**: {regime_str} | **1H ATR**: {_format_price(alert.atr)}",
         f"**Key Levels**: Support {_format_price(alert.key_support)} | Resistance {_format_price(alert.key_resistance)}",
         f"**Derivatives State**: {d.derivatives_regime.value} (Funding: {funding_str}, OI 1h/12h: {oi_1h_str}/{oi_12h_str})",
@@ -65,7 +69,7 @@ def build_market_watch_card(alert: MarketWatchAlert) -> dict[str, Any]:
             f"**Entry Quality**: {d.entry_quality.value}",
             f"**Entry Zone**: {_format_price(d.entry_low)} – {_format_price(d.entry_high)}",
             f"**Stop Loss**: {_format_price(d.stop_loss)}",
-            f"**TP1 / TP2**: {_format_price(d.take_profit_1)} / {_format_price(d.take_profit_2)}",
+            f"**Legacy projected levels (not structural targets)**: {_format_price(d.take_profit_1)} / {_format_price(d.take_profit_2)}",
             f"**Net RR**: {d.net_rr:.2f} (Gross {d.gross_rr:.2f})",
             f"**Rule Score**: {d.rule_score:.1f}",
             f"**Heuristic Rule Quality**: {d.confidence_band.value}",
@@ -89,6 +93,8 @@ def build_market_watch_card(alert: MarketWatchAlert) -> dict[str, Any]:
         lines.append("\n**Grid Recommendation**: PAUSED")
 
     lines.extend([
+        f"**Event ID**: {alert.event_id or 'UNCOMMITTED_PREVIEW'}",
+        "**Quote semantics**: Candle/mark/last price is not an executable quote or fill.",
         f"\n**Evidence**:\n{evidence_text}",
         f"\n**Risks**:\n{risks_text}",
         "\n**Classification**: `EXPERIMENTAL_OPERATIONAL_MARKET_WATCH`",
@@ -129,9 +135,10 @@ def send_market_watch_alert(
     webhook_url: str,
     alert: MarketWatchAlert,
     secret: str | None = None,
+    *, payload: dict[str, Any] | None = None,
 ) -> None:
     """Send MarketWatchAlert via Feishu webhook with HMAC signature support."""
-    payload = build_market_watch_card(alert)
+    payload = dict(payload) if payload is not None else build_market_watch_card(alert)
     if secret:
         timestamp = int(time.time())
         payload["timestamp"] = str(timestamp)
@@ -146,7 +153,7 @@ def send_market_watch_alert(
     )
     with urllib.request.urlopen(req, timeout=10) as response:
         result = json.loads(response.read().decode("utf-8"))
-    if result.get("code", result.get("StatusCode", 0)) != 0:
+    if result.get("code", result.get("StatusCode")) != 0:
         raise RuntimeError(f"Feishu rejected MarketWatch alert: {result.get('msg', result)}")
 
 

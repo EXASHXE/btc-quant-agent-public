@@ -3,42 +3,38 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "btc-quant-agent"
-version = "0.3.19"
-description = "Registry-gated BTCUSDT opportunity research and forward PIT data engine"
-readme = "README.md"
+name = "quant-advisory-platform"
+version = "0.7.0"
+description = "Isolated synthetic research and read-only advisory engineering build"
 requires-python = ">=3.11"
-license = {text = "MIT"}
-authors = [{name = "BTC Quant Agent"}]
-dependencies = ["websockets>=15,<17"]
+dependencies = ["numpy>=1.26,<3", "pandas>=2,<4", "PyYAML>=6,<7", "pydantic>=2.10,<3"]
 
 [project.optional-dependencies]
-api = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1", "pydantic>=2.10,<3"]
-research = ["numpy>=1.26,<3", "pyarrow>=18,<24"]
-live = ["pydantic>=2.10,<3", "openai>=1.82,<3", "httpx>=0.28,<1", "fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
-dev = [
-  "pytest>=8,<9",
-  "pytest-cov>=6,<8",
-  "ruff>=0.9,<1",
-  "mypy>=1.15,<2",
-  "fastapi>=0.115,<1",
-  "uvicorn>=0.30,<1",
-  "pydantic>=2.10,<3",
-  "openai>=1.82,<3",
-  "httpx>=0.28,<1",
-]
+ml = ["scikit-learn>=1.5", "lightgbm>=4"]
+deep = ["torch>=2.5"]
+public = ["httpx==0.28.1", "httpcore==1.0.9", "websockets==16.1.1", "cryptography==45.0.7"]
+dev = ["pytest>=8", "ruff>=0.9", "mypy>=1.15"]
 
 [project.scripts]
-quantctl = "btc_quant_agent.cli:main"
+quant = "btc_quant_agent.platform.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.pytest.ini_options]
+pythonpath = ["src", "tests"]
+testpaths = ["tests/canary", "tests/selection", "tests/bridge"]
+addopts = "-ra"
+
 [tool.ruff]
-line-length = 100
+line-length = 110
 target-version = "py311"
 
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
 [tool.mypy]
-files = ["src/btc_quant_agent"]
-strict = true
-warn_unused_ignores = true
+files = ["src/btc_quant_agent/platform/core.py", "src/btc_quant_agent/platform/config.py", "src/btc_quant_agent/platform/selection", "src/btc_quant_agent/platform/canary"]
+follow_imports = "silent"
+ignore_missing_imports = true
+check_untyped_defs = true
