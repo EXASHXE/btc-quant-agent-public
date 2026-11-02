@@ -1,0 +1,1008 @@
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import time
+from dataclasses import asdict
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
+
+from .config import load_config
+from .data.binance import BinancePublicClient
+from .data.binance_archive import audit_official_timeframes, build_official_dataset
+from .data.csvio import write_candles
+from .data.forward_store import (
+    ForwardDerivativeStore,
+    collect_once,
+    next_collection_time_ms,
+    scheduler_status,
+)
+from .data.manifest import build_manifest, write_manifest
+from .explain import explain_signal
+from .formal_research import run_formal_job_file
+from .forward_evidence import forward_evidence_status, forward_operations_health
+from .microstructure import MicrostructureCampaign, MicrostructureStore, run_daemon
+from .opportunity_forward import (
+    OpportunityCampaign,
+    OpportunityForwardStore,
+    collect_opportunity_once,
+    opportunity_scheduler_status,
+    resolve_opportunity_outcomes,
+)
+from .research_registry import RegistryError, ResearchRegistry
+from .service import QuantService
+from .shadow import read_legacy_shadow_performance
+
+
+def _print(payload: Any) -> None:
+    print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+
+
+def _service(config_path: str | None) -> QuantService:
+    return QuantService.create(load_config(config_path))
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="quantctl")
+    parser.add_argument("--config", help="TOML configuration path")
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    scan = sub.add_parser("scan", help="scan current market")
+    scan.add_argument("symbol", nargs="?", default="BTCUSDT")
+    scan.add_argument("--no-notify", action="store_true")
+
+    signal = sub.add_parser("signal", help="read immutable signals")
+    signal_sub = signal.add_subparsers(dest="signal_command", required=True)
+    signal_sub.add_parser("latest")
+    show = signal_sub.add_parser("show")
+    show.add_argument("signal_id")
+
+    explain = sub.add_parser("explain", help="explain a signal from stored fields")
+    explain.add_argument("signal_id")
+
+    decision = sub.add_parser("decision", help="record a manual user decision")
+    decision.add_argument("signal_id")
+    decision.add_argument("decision", choices=["accept", "ignore"])
+    decision.add_argument("--entry", type=float)
+
+    performance = sub.add_parser("performance", help="read legacy diagnostic R shadow performance")
+    performance.add_argument("--days", type=int, default=30)
+
+    sub.add_parser("health", help="health and execution-capability check")
+
+    execution = sub.add_parser("execution", help="gated order interface (disabled by default)")
+    execution_sub = execution.add_subparsers(dest="execution_command", required=True)
+    execution_sub.add_parser("status")
+    entry_plan = execution_sub.add_parser("plan-entry")
+    entry_plan.add_argument("signal_id")
+    submit = execution_sub.add_parser("submit")
+    submit.add_argument("plan_id")
+    submit.add_argument("--confirm", required=True)
+    reconcile = execution_sub.add_parser("reconcile")
+    reconcile.add_argument("plan_id")
+    close_preview = execution_sub.add_parser("plan-close")
+    close_preview.add_argument("--symbol", default="BTCUSDT")
+    close_submit = execution_sub.add_parser("submit-close")
+    close_submit.add_argument("plan_id")
+    close_submit.add_argument("--confirm", required=True)
+    cancel = execution_sub.add_parser("cancel")
+    cancel.add_argument("plan_id")
+    cancel.add_argument("--confirm", required=True)
+
+    download = sub.add_parser("download", help="download public historical candles to CSV")
+    download.add_argument("path")
+    download.add_argument("--start-ms", type=int, required=True)
+    download.add_argument("--end-ms", type=int, required=True)
+    download.add_argument("--interval", choices=["1m", "5m", "15m", "1h", "4h"], default="1m")
+
+    for name in ("backtest", "research", "replay"):
+        formal = sub.add_parser(name, help="current formal P5/P6 workflow; explicit job required")
+        formal.add_argument("--job", required=True, help="versioned formal job JSON and protocol")
+        formal.add_argument("--output", required=True, help="new immutable formal artifact root")
+        formal.add_argument("--registry", help="existing authoritative P5 registry")
+        formal.add_argument("--record-decision", action="store_true", help="explicit P5 decision")
+
+
+    derivatives = sub.add_parser("derivatives", help="append-safe forward PIT derivatives")
+    derivatives_sub = derivatives.add_subparsers(dest="derivatives_command", required=True)
+    for name in ("collect-once", "run", "status", "audit", "export"):
+        command = derivatives_sub.add_parser(name)
+        command.add_argument("--store", default="./data/forward/BTCUSDT/derivatives.sqlite3")
+        if name in {"collect-once", "run"}:
+            command.add_argument("--symbol", default="BTCUSDT")
+            command.add_argument("--include-order-book", action="store_true")
+            command.add_argument("--require-active-epoch", action="store_true", default=False)
+            command.add_argument(
+                "--epoch-registry",
+                default="configs/forward/derivatives_evidence_epochs.json",
+            )
+        if name == "run":
+            command.add_argument("--max-samples", type=int)
+        if name == "export":
+            command.add_argument("--csv")
+            command.add_argument("--manifest")
+
+    opportunity = sub.add_parser(
+        "opportunity-forward", help="directionless forward opportunity movement campaign"
+    )
+    opportunity_sub = opportunity.add_subparsers(dest="opportunity_command", required=True)
+    for name in ("collect-once", "status", "audit", "resolve", "report"):
+        command = opportunity_sub.add_parser(name)
+        command.add_argument(
+            "--store", default="./data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+        )
+        command.add_argument(
+            "--campaign",
+            default=None,
+        )
+        command.add_argument(
+            "--registry",
+            default="configs/forward/opportunity_forward_campaigns.json",
+        )
+        command.add_argument(
+            "--require-active-campaign",
+            action="store_true",
+            default=False,
+        )
+
+    forward_evidence = sub.add_parser(
+        "forward-evidence", help="unified non-alpha forward evidence watchdog"
+    )
+    forward_evidence_sub = forward_evidence.add_subparsers(
+        dest="forward_evidence_command", required=True
+    )
+    for name in ("status", "audit", "health", "doctor"):
+        command = forward_evidence_sub.add_parser(name)
+        command.add_argument(
+            "--derivatives-store",
+            default="./data/forward/BTCUSDT/derivatives.sqlite3",
+        )
+        command.add_argument(
+            "--opportunity-store",
+            default="./data/forward/BTCUSDT/opportunity_shadow.sqlite3",
+        )
+        command.add_argument(
+            "--epoch",
+            default="configs/forward/v0.3.14_derivatives_evidence_epoch.json",
+        )
+        command.add_argument(
+            "--epoch-registry",
+            default="configs/forward/derivatives_evidence_epochs.json",
+        )
+        command.add_argument(
+            "--campaign",
+            default="configs/forward/v0.3.13_opportunity_shadow_campaign.json",
+        )
+        command.add_argument(
+            "--opportunity-registry",
+            default="configs/forward/opportunity_forward_campaigns.json",
+        )
+        command.add_argument(
+            "--microstructure-root",
+            default="data/forward/BTCUSDT/microstructure",
+        )
+        command.add_argument(
+            "--microstructure-campaign",
+            default="configs/forward/v0.3.15_microstructure_capture_campaign.json",
+        )
+
+    recover_cmd = forward_evidence_sub.add_parser(
+        "recover-services", help="safely restart and recover forward services"
+    )
+    recover_cmd.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="print planned recovery actions without executing them",
+    )
+
+    microstructure = sub.add_parser(
+        "microstructure-forward", help="data-only PIT depth and aggregate-trade capture"
+    )
+    micro_sub = microstructure.add_subparsers(dest="microstructure_command", required=True)
+    for name in ("run", "status", "audit"):
+        command = micro_sub.add_parser(name)
+        command.add_argument("--root", default="data/forward/BTCUSDT/microstructure")
+        command.add_argument(
+            "--campaign",
+            default="configs/forward/v0.3.15_microstructure_capture_campaign.json",
+        )
+
+    # H39 blind validation interface
+    h39_parser = sub.add_parser(
+        "h39", help="H39 blind validation accumulation and operational status"
+    )
+    h39_sub = h39_parser.add_subparsers(dest="h39_command", required=True)
+
+    for p_sub in (h39_sub,):
+        h39_accum = p_sub.add_parser(
+            "validation-accumulate", help="accumulate validation evidence into blind ledger"
+        )
+        h39_accum.add_argument(
+            "--microstructure-root", default="data/forward/BTCUSDT/microstructure"
+        )
+        h39_accum.add_argument(
+            "--opportunity-store", default="data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+        )
+        h39_accum.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_accum.add_argument(
+            "--only-finalized", action="store_true", default=False, help="only ingest finalized partitions (prior to today UTC)"
+        )
+
+        h39_sched = p_sub.add_parser(
+            "scheduled-accumulate", help="execute scheduled accumulation with disk check, integrity check, and backup"
+        )
+        h39_sched.add_argument(
+            "--microstructure-root", default="data/forward/BTCUSDT/microstructure"
+        )
+        h39_sched.add_argument(
+            "--opportunity-store", default="data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+        )
+        h39_sched.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_sched.add_argument(
+            "--backup-dir", default="data/research/h39_validation/backups"
+        )
+        h39_sched.add_argument(
+            "--min-free-gb", type=float, default=5.0
+        )
+        h39_sched.add_argument(
+            "--only-finalized", action="store_true", default=True, help="only ingest finalized partitions"
+        )
+        h39_sched.add_argument(
+            "--include-active", action="store_true", default=False, help="include today's active partition as well"
+        )
+
+        h39_integ = p_sub.add_parser(
+            "verify-integrity", help="verify SQLite integrity and source partition hashes"
+        )
+        h39_integ.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+
+        h39_bak = p_sub.add_parser(
+            "backup-ledger", help="create consistent SQLite online backup and manifest"
+        )
+        h39_bak.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_bak.add_argument(
+            "--backup-dir", default="data/research/h39_validation/backups"
+        )
+
+        h39_status = p_sub.add_parser(
+            "validation-status", help="show blind validation accumulation status and metrics"
+        )
+        h39_status.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_status.add_argument("--as-of-ms", type=int, default=None)
+
+        h39_ready = p_sub.add_parser(
+            "validation-readiness", help="check readiness for one-shot unblind"
+        )
+        h39_ready.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_ready.add_argument("--as-of-ms", type=int, default=None)
+
+        h39_freeze = p_sub.add_parser(
+            "freeze-cutoff", help="freeze one-shot unblind cutoff manifest if readiness passes"
+        )
+        h39_freeze.add_argument(
+            "--output-path", default="deliverables/v0.3.26/H39_ONE_SHOT_UNBLIND_FREEZE.json"
+        )
+        h39_freeze.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_freeze.add_argument("--as-of-ms", type=int, default=None)
+        h39_freeze.add_argument(
+            "--snapshot-dir", default="data/research/h39_validation/frozen"
+        )
+        h39_freeze.add_argument(
+            "--readiness-path", default=None
+        )
+
+        h39_unblind = p_sub.add_parser(
+            "one-shot-unblind", help="execute one-shot unblind validation strictly using verified freeze manifest"
+        )
+        h39_unblind.add_argument(
+            "--freeze-manifest", required=True, help="path to verified H39_ONE_SHOT_UNBLIND_FREEZE.json"
+        )
+        h39_unblind.add_argument(
+            "--output-dir", default="deliverables/v0.3.26"
+        )
+        h39_unblind.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_unblind.add_argument(
+            "--registry-path", default="data/research/h39_validation/h39_one_shot_execution_registry.sqlite3"
+        )
+        h39_unblind.add_argument(
+            "--repo-root", default=None
+        )
+
+        h39_deliv = p_sub.add_parser(
+            "generate-deliverables", help="generate deliverables for h39 stage"
+        )
+        h39_deliv.add_argument("--output-dir", default="deliverables/v0.3.25")
+        h39_deliv.add_argument(
+            "--microstructure-root", default="data/forward/BTCUSDT/microstructure"
+        )
+        h39_deliv.add_argument(
+            "--opportunity-store", default="data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+        )
+        h39_deliv.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_deliv.add_argument(
+            "--backup-dir", default="data/research/h39_validation/backups"
+        )
+
+    registry = sub.add_parser("research-registry", help="inspect research eligibility")
+    registry.add_argument(
+        "--registry", default="configs/research_registry.json", help="registry JSON path"
+    )
+    registry_sub = registry.add_subparsers(dest="registry_command", required=True)
+    registry_sub.add_parser("validate")
+    registry_sub.add_parser("status")
+    registry_show = registry_sub.add_parser("show")
+    registry_show.add_argument("component_id")
+
+    dataset = sub.add_parser("build-official-dataset", help="build verified Binance monthly data")
+    dataset.add_argument("--root", default="./data/research/BTCUSDT")
+    dataset.add_argument("--start", default="2021-01-01")
+    dataset.add_argument("--end-exclusive", default="2026-08-01")
+
+    timeframe_audit = sub.add_parser(
+        "audit-official-timeframes", help="validate local resampling against official archives"
+    )
+    timeframe_audit.add_argument("--root", default="./data/research/BTCUSDT")
+    timeframe_audit.add_argument(
+        "--months", nargs="+", default=["2021-01", "2022-06", "2024-03", "2026-01", "2026-07"]
+    )
+
+    daemon = sub.add_parser("daemon", help="poll at closed 15m boundaries")
+    daemon.add_argument("--once", action="store_true")
+    daemon.add_argument("--poll-seconds", type=int, default=30)
+
+    market_watch = sub.add_parser("market-watch", help="isolated multi-asset operational market-watch")
+    mw_sub = market_watch.add_subparsers(dest="market_watch_command", required=True)
+
+    mw_scan = mw_sub.add_parser("scan", help="scan multi-asset market policy")
+    mw_scan.add_argument("--all", action="store_true", help="scan all configured symbols")
+    mw_scan.add_argument("--symbol", help="scan specific symbol")
+    mw_scan.add_argument("--symbols", help="comma-separated list of symbols to scan")
+    mw_scan.add_argument("--notify", action="store_true", help="send Feishu alerts on state change")
+
+    mw_status = mw_sub.add_parser("status", help="show latest state for monitored symbols")
+    mw_status.add_argument("--symbol", dest="opt_symbol", default=None, help="specific symbol to check")
+    mw_status.add_argument("symbol", nargs="?", default=None, help="specific symbol to check")
+
+    mw_top = mw_sub.add_parser("top", help="show top ranked opportunities")
+    mw_top.add_argument("--limit", type=int, default=5, help="max symbols to show")
+
+    mw_explain = mw_sub.add_parser("explain", help="structured reason codes for a symbol")
+    mw_explain.add_argument("--symbol", dest="opt_symbol", default=None, help="symbol to explain")
+    mw_explain.add_argument("symbol", nargs="?", default=None, help="symbol to explain, e.g. LINKUSDT")
+
+    mw_test_feishu = mw_sub.add_parser("test-feishu", help="send Feishu connectivity test message")
+    mw_test_feishu.add_argument("--symbol", default="BTCUSDT", help="symbol for test card")
+
+    mw_sub.add_parser("shadow-status", help="show shadow decision recording and resolution status")
+    mw_sub.add_parser("shadow-resolve", help="resolve pending shadow observations against closed candles")
+
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    if args.command in {"backtest", "research", "replay"}:
+        # Formal commands never construct the runtime service or its default DB.
+        if args.config is not None:
+            load_config(args.config)  # retain explicit-config failure semantics
+        try:
+            result = run_formal_job_file(
+                args.job, output_directory=args.output, registry_path=args.registry,
+                record_decision=args.record_decision,
+            )
+        except (OSError, ValueError, TypeError, KeyError, RuntimeError) as exc:
+            _print({"classification": "NOT_TESTABLE_FOR_NEW_PROMOTION", "error": str(exc)})
+            return 2
+        _print(result.status())
+        return 0
+    if args.command == "research-registry":
+        try:
+            registry = ResearchRegistry.load(args.registry)
+            if args.registry_command == "validate":
+                _print(
+                    {
+                        "status": "VALID",
+                        "schema_version": registry.schema_version,
+                        "registry_version": registry.registry_version,
+                        "component_count": len(registry.components),
+                    }
+                )
+            elif args.registry_command == "status":
+                _print(registry.status())
+            else:
+                component = registry.get(args.component_id)
+                payload = asdict(component)
+                payload["research_status"] = component.research_status.value
+                payload["runtime_eligibility"] = component.runtime_eligibility.value
+                _print(payload)
+        except RegistryError as exc:
+            _print({"status": "INVALID", "error": str(exc)})
+            return 2
+        return 0
+
+    _cached_service: QuantService | None = None
+
+    def _get_service() -> QuantService:
+        nonlocal _cached_service
+        if _cached_service is None:
+            _cached_service = _service(args.config)
+        return _cached_service
+
+    if args.command == "scan":
+        service = _get_service()
+        _print(service.scan(args.symbol, not args.no_notify).as_dict())
+        return 0
+    if args.command == "signal":
+        service = _get_service()
+        service.repository.expire_signals(int(time.time() * 1000))
+        signal = (
+            service.repository.latest_signal()
+            if args.signal_command == "latest"
+            else service.repository.get_signal(args.signal_id)
+        )
+        _print(signal.as_dict() if signal else {"error": "signal not found"})
+        return 0 if signal else 2
+    if args.command == "explain":
+        service = _get_service()
+        signal = service.repository.get_signal(args.signal_id)
+        if signal is None:
+            _print({"error": "signal not found"})
+            return 2
+        _print(explain_signal(signal))
+        return 0
+    if args.command == "decision":
+        service = _get_service()
+        try:
+            service.mark_decision(args.signal_id, args.decision, args.entry)
+        except KeyError as exc:
+            _print({"error": str(exc)})
+            return 2
+        _print({"status": "recorded", "signal_id": args.signal_id})
+        return 0
+    if args.command == "performance":
+        service = _get_service()
+        since = int(time.time() * 1000) - args.days * 86_400_000
+        _print(read_legacy_shadow_performance(service.repository, since))
+        return 0
+    if args.command == "health":
+        service = _get_service()
+        _print(service.health())
+        return 0
+    if args.command == "execution":
+        service = _get_service()
+        try:
+            if args.execution_command == "status":
+                payload = service.execution.status()
+            elif args.execution_command == "plan-entry":
+                payload = service.execution.build_entry_plan(args.signal_id).as_dict()
+            elif args.execution_command == "submit":
+                payload = service.execution.submit_entry(args.plan_id, args.confirm).as_dict()
+            elif args.execution_command == "reconcile":
+                payload = service.execution.reconcile(args.plan_id)
+            elif args.execution_command == "plan-close":
+                payload = service.execution.prepare_close(args.symbol).as_dict()
+            elif args.execution_command == "submit-close":
+                payload = service.execution.submit_close(args.plan_id, args.confirm).as_dict()
+            else:
+                payload = service.execution.cancel_entry(args.plan_id, args.confirm)
+        except (KeyError, RuntimeError, ValueError) as exc:
+            _print({"error": str(exc)})
+            return 2
+        _print(payload)
+        return 0
+    if args.command == "download":
+        client = BinancePublicClient(load_config(args.config).data)
+        bars = client.historical_klines("BTCUSDT", args.interval, args.start_ms, args.end_ms)
+        write_candles(args.path, bars)
+        manifest = build_manifest(
+            args.path,
+            source="Binance USD-M public REST klines",
+            rows=[asdict(bar) for bar in bars],
+            timestamp_field="open_time_ms",
+            expected_interval_ms={
+                "1m": 60_000,
+                "5m": 300_000,
+                "15m": 900_000,
+                "1h": 3_600_000,
+                "4h": 14_400_000,
+            }[args.interval],
+        )
+        manifest_path = f"{args.path}.manifest.json"
+        write_manifest(manifest_path, manifest)
+        _print(
+            {
+                "status": "written",
+                "path": args.path,
+                "candles": len(bars),
+                "data_manifest": manifest_path,
+            }
+        )
+        return 0
+    if args.command == "derivatives":
+        store = ForwardDerivativeStore(args.store)
+        if args.derivatives_command == "collect-once":
+            if getattr(args, "require_active_epoch", False):
+                from .evidence_epoch import resolve_active_derivatives_epoch
+
+                active = resolve_active_derivatives_epoch(registry_path=args.epoch_registry)
+                if active is None:
+                    _print(
+                        {
+                            "status": "REFUSED_NO_ACTIVE_EPOCH",
+                            "error": "No eligible active derivatives epoch found in registry. Scheduled collection refused on terminal/inactive epochs.",
+                            "epoch_registry": args.epoch_registry,
+                        }
+                    )
+                    return 0
+                epoch, lifecycle = active
+                now_ms = int(time.time() * 1000)
+                if (
+                    lifecycle.formal_eligibility_role == "FORMAL_SUCCESSOR_PENDING"
+                    and now_ms < epoch.epoch_start_ms
+                ):
+                    _print(
+                        {
+                            "status": "REFUSED_PREREGISTERED_PENDING",
+                            "error": "Successor epoch has not reached its frozen start boundary.",
+                            "epoch_id": epoch.epoch_id,
+                            "epoch_start_ms": epoch.epoch_start_ms,
+                            "starts_in_seconds": round((epoch.epoch_start_ms - now_ms) / 1000, 1),
+                        }
+                    )
+                    return 0
+            record = collect_once(
+                BinancePublicClient(load_config(args.config).data),
+                store,
+                symbol=args.symbol,
+                include_order_book=args.include_order_book,
+            )
+            successful = any(record.field_availability.values())
+            collection_status = (
+                "COLLECTED"
+                if not record.endpoint_errors
+                else "PARTIAL" if successful else "FAILED"
+            )
+            _print(
+                {
+                    "status": collection_status,
+                    "symbol": record.symbol,
+                    "observed_at_ms": record.observed_at_ms,
+                    "payload_hash": record.payload_hash,
+                    "field_availability": record.field_availability,
+                    "endpoint_errors": record.endpoint_errors,
+                    "store": str(store.path),
+                }
+            )
+            return 0 if successful else 2
+        if args.derivatives_command == "run":
+            if getattr(args, "require_active_epoch", False):
+                from .evidence_epoch import resolve_active_derivatives_epoch
+
+                active = resolve_active_derivatives_epoch(registry_path=args.epoch_registry)
+                if active is None:
+                    _print(
+                        {
+                            "status": "REFUSED_NO_ACTIVE_EPOCH",
+                            "error": "No eligible active derivatives epoch found in registry. Runner refused on terminal/inactive epochs.",
+                            "epoch_registry": args.epoch_registry,
+                        }
+                    )
+                    return 0
+            if args.max_samples is not None and args.max_samples < 1:
+                _print({"error": "max-samples must be positive"})
+                return 2
+            client = BinancePublicClient(load_config(args.config).data)
+            collected = 0
+            while args.max_samples is None or collected < args.max_samples:
+                now_ms = int(time.time() * 1000)
+                target_ms = next_collection_time_ms(now_ms)
+                time.sleep(max(0.0, (target_ms - now_ms) / 1000))
+                record = collect_once(
+                    client,
+                    store,
+                    symbol=args.symbol,
+                    include_order_book=args.include_order_book,
+                )
+                collected += 1
+                _print(
+                    {
+                        "status": "COLLECTED",
+                        "sample": collected,
+                        "observed_at_ms": record.observed_at_ms,
+                        "endpoint_errors": record.endpoint_errors,
+                    }
+                )
+            return 0
+        if args.derivatives_command == "status":
+            _print(store.status(scheduler=scheduler_status()))
+            return 0
+        if args.derivatives_command == "audit":
+            report = store.audit()
+            _print(report)
+            return (
+                0
+                if not (
+                    report["conflict_count"]
+                    or report["source_timestamp_after_observed_at"]
+                    or report["impossible_value_timestamps"]
+                )
+                else 2
+            )
+        export_csv = args.csv or str(Path(args.store).with_name("derivatives.csv"))
+        export_manifest = args.manifest or f"{export_csv}.manifest.json"
+        _print(store.export(export_csv, export_manifest))
+        return 0
+    if args.command == "opportunity-forward":
+        from .opportunity_forward import (
+            OpportunityCampaign,
+            OpportunityCampaignRegistry,
+            resolve_active_opportunity_campaign,
+        )
+
+        campaign: OpportunityCampaign | None = None
+        if args.campaign:
+            campaign = OpportunityCampaign.load(args.campaign)
+        else:
+            resolved = resolve_active_opportunity_campaign(args.registry)
+            if resolved is not None:
+                campaign = resolved[0]
+            elif (
+                getattr(args, "require_active_campaign", False)
+                or args.opportunity_command in {"collect-once", "resolve"}
+            ):
+                _print(
+                    {
+                        "status": "REFUSED_NO_ACTIVE_CAMPAIGN",
+                        "error": "No eligible active opportunity campaign found in registry. Scheduled action refused on terminal/inactive campaigns.",
+                        "registry": args.registry,
+                    }
+                )
+                return 0
+            else:
+                reg = OpportunityCampaignRegistry.load(args.registry)
+                campaign = reg.archive()[0]
+        assert campaign is not None
+        opportunity_store = OpportunityForwardStore(args.store)
+        if args.opportunity_command == "collect-once":
+            service = _get_service()
+            now_ms = int(time.time() * 1000)
+            slot_ms = (now_ms // 900_000) * 900_000
+            if campaign.has_data_quality_gate and slot_ms < campaign.campaign_start_ms:
+                _print(
+                    {
+                        "status": "REFUSED_PREREGISTERED_PENDING",
+                        "error": "Successor campaign has not reached its frozen start boundary.",
+                        "campaign_id": campaign.campaign_id,
+                        "campaign_start_ms": campaign.campaign_start_ms,
+                        "starts_in_seconds": round((campaign.campaign_start_ms - now_ms) / 1000, 1),
+                    }
+                )
+                return 0
+            observation = collect_opportunity_once(service, opportunity_store, campaign)
+            _print(asdict(observation))
+            return 0 if observation.status == "SUCCESSFUL_SCAN" else 2
+        if args.opportunity_command == "audit":
+            report = opportunity_store.audit(campaign.campaign_id)
+            _print(report)
+            return 0 if not report["direction_action_columns"] else 2
+        if args.opportunity_command == "resolve":
+            now_ms = int(time.time() * 1000)
+            if campaign.has_data_quality_gate and now_ms < campaign.campaign_start_ms:
+                _print(
+                    {
+                        "status": "REFUSED_PREREGISTERED_PENDING",
+                        "error": "Successor campaign has not reached its frozen start boundary.",
+                        "campaign_id": campaign.campaign_id,
+                    }
+                )
+                return 0
+            _print(
+                resolve_opportunity_outcomes(
+                    BinancePublicClient(load_config(args.config).data), opportunity_store, campaign
+                )
+            )
+            return 0
+        report = opportunity_store.status(
+            campaign, scheduler=opportunity_scheduler_status()
+        )
+        if args.opportunity_command == "report":
+            report = {
+                **report,
+                "audit": opportunity_store.audit(campaign.campaign_id),
+            }
+        _print(report)
+        return 0
+    if args.command == "forward-evidence":
+        if args.forward_evidence_command == "doctor":
+            from .forward_diagnostics import forward_doctor
+            doc = forward_doctor()
+            _print(doc)
+            return (
+                0
+                if doc.get(
+                    "is_healthy",
+                    doc.get("status") in {"HEALTHY", "HEALTHY_ACCUMULATING", "PREREGISTERED_NOT_STARTED"},
+                )
+                else 2
+            )
+        if args.forward_evidence_command == "recover-services":
+            from .forward_diagnostics import recover_services
+            res = recover_services(dry_run=getattr(args, "dry_run", False))
+            _print(res)
+            return 0
+        report = forward_evidence_status(
+            derivatives_store_path=args.derivatives_store,
+            opportunity_store_path=args.opportunity_store,
+            epoch_path=args.epoch,
+            epoch_registry_path=args.epoch_registry,
+            campaign_path=args.campaign,
+            opportunity_campaign_registry_path=args.opportunity_registry,
+            microstructure_root=args.microstructure_root,
+            microstructure_campaign_path=args.microstructure_campaign,
+        )
+        if args.forward_evidence_command == "audit":
+            report["audit"] = {
+                "backfill_occurred": False,
+                "manual_improves_eligibility": False,
+                "legacy_improves_eligibility": False,
+                "outcomes_mutate_observations": False,
+            }
+        if args.forward_evidence_command == "health":
+            health = forward_operations_health(report)
+            _print(health)
+            return 0 if health["state"] == "HEALTHY" else 2
+        _print(report)
+        return 0
+    if args.command == "microstructure-forward":
+        micro_campaign = MicrostructureCampaign.load(args.campaign)
+        micro_store = MicrostructureStore(
+            args.root, micro_campaign.campaign_id, micro_campaign.start_ms
+        )
+        if args.microstructure_command == "run":
+            import asyncio
+
+            try:
+                asyncio.run(run_daemon(micro_campaign, args.root))
+            except KeyboardInterrupt:
+                return 0
+        report = micro_store.status(
+            deep_integrity=(args.microstructure_command == "audit")
+        )
+        if args.microstructure_command == "audit":
+            report["audit"] = {
+                "retrospective_backfill": False,
+                "runtime_integration": "DISABLED",
+                "execution_integration": "DISABLED",
+                "final_holdout_access": False,
+            }
+        _print(report)
+        return 0
+    if args.command == "h39":
+        cmd = args.h39_command
+        from .microstructure_research import (
+            H39BlindLedger,
+            H39OneShotUnblindGatekeeper,
+            H39ResearchEngine,
+            generate_all_v0322_deliverables,
+            generate_all_v0323_deliverables,
+            generate_all_v0324_deliverables,
+            generate_all_v0325_deliverables,
+        )
+
+        if cmd == "validation-accumulate":
+            engine = H39ResearchEngine(
+                microstructure_root=args.microstructure_root,
+                opportunity_store_path=args.opportunity_store,
+            )
+            res = engine.accumulate_blind_validation(
+                output_ledger_path=args.ledger_path,
+                only_finalized=getattr(args, "only_finalized", False),
+            )
+            _print(res)
+            return 0
+        if cmd == "scheduled-accumulate":
+            engine = H39ResearchEngine(
+                microstructure_root=args.microstructure_root,
+                opportunity_store_path=args.opportunity_store,
+            )
+            only_fin = (
+                not getattr(args, "include_active", False)
+                if getattr(args, "include_active", False)
+                else getattr(args, "only_finalized", True)
+            )
+            res = engine.run_scheduled_accumulation(
+                output_ledger_path=args.ledger_path,
+                backup_dir=args.backup_dir,
+                min_free_gb=args.min_free_gb,
+                only_finalized=only_fin,
+            )
+            _print(res)
+            return 0
+        if cmd == "verify-integrity":
+            ledger = H39BlindLedger(args.ledger_path)
+            res = ledger.verify_integrity()
+            _print(res)
+            return 0 if res.get("status") == "OK" else 1
+        if cmd == "backup-ledger":
+            ledger = H39BlindLedger(args.ledger_path)
+            bak_path = ledger.backup_ledger(args.backup_dir)
+            _print({"status": "SUCCESS", "backup_path": str(bak_path)})
+            return 0
+        if cmd == "validation-status":
+            engine = H39ResearchEngine()
+            res = engine.get_blind_validation_status(
+                ledger_path=args.ledger_path, as_of_ms=args.as_of_ms
+            )
+            _print(res)
+            return 0
+        if cmd == "validation-readiness":
+            engine = H39ResearchEngine()
+            res = engine.check_unblind_readiness(
+                ledger_path=args.ledger_path, as_of_ms=args.as_of_ms
+            )
+            _print(res)
+            return 0 if res.get("ready_for_unblind") else 1
+        if cmd == "freeze-cutoff":
+            gatekeeper = H39OneShotUnblindGatekeeper(
+                ledger_path=args.ledger_path,
+                snapshot_dir=getattr(args, "snapshot_dir", "data/research/h39_validation/frozen"),
+            )
+            try:
+                freeze_manifest = gatekeeper.create_freeze_manifest(
+                    output_path=args.output_path,
+                    as_of_ms=args.as_of_ms,
+                    readiness_artifact_path=getattr(args, "readiness_path", None),
+                )
+                _print({"status": "SUCCESS", "manifest": freeze_manifest})
+                return 0
+            except RuntimeError as exc:
+                _print({"status": "REFUSED", "error": str(exc)})
+                return 1
+        if cmd == "one-shot-unblind":
+            gatekeeper = H39OneShotUnblindGatekeeper(
+                ledger_path=args.ledger_path,
+                registry_path=getattr(args, "registry_path", "data/research/h39_validation/h39_one_shot_execution_registry.sqlite3"),
+                repo_root=getattr(args, "repo_root", None),
+            )
+            try:
+                res = gatekeeper.execute_one_shot_unblind(
+                    freeze_manifest_path=args.freeze_manifest,
+                    output_dir=args.output_dir,
+                    repo_root=getattr(args, "repo_root", None),
+                )
+                _print({"status": "SUCCESS", "results": res})
+                return 0
+            except RuntimeError as exc:
+                _print({"status": "REFUSED", "error": str(exc)})
+                return 1
+        if cmd == "generate-deliverables":
+            if "v0.3.23" in args.output_dir:
+                res = generate_all_v0323_deliverables(
+                    output_dir=args.output_dir,
+                    microstructure_root=args.microstructure_root,
+                    opportunity_store_path=args.opportunity_store,
+                    ledger_path=args.ledger_path,
+                )
+            elif "v0.3.25" in args.output_dir:
+                res = generate_all_v0325_deliverables(
+                    output_dir=args.output_dir,
+                    microstructure_root=args.microstructure_root,
+                    opportunity_store_path=args.opportunity_store,
+                    ledger_path=args.ledger_path,
+                )
+            else:
+                res = generate_all_v0324_deliverables(
+                    output_dir=args.output_dir,
+                    microstructure_root=args.microstructure_root,
+                    opportunity_store_path=args.opportunity_store,
+                    ledger_path=args.ledger_path,
+                    backup_dir=getattr(args, "backup_dir", "data/research/h39_validation/backups"),
+                )
+            _print({"status": "SUCCESS", "deliverables": res})
+            return 0
+        if cmd == "run-h39":
+            res = generate_all_v0322_deliverables(
+                output_dir=args.output_dir,
+                microstructure_root=args.microstructure_root,
+                opportunity_store_path=args.opportunity_store,
+            )
+            _print({"status": "SUCCESS", "deliverables": res})
+            return 0
+        return 1
+    if args.command == "build-official-dataset":
+        if hasattr(os, "nice"):
+            try:
+                os.nice(10)
+            except OSError:
+                pass
+        start = datetime.fromisoformat(args.start).replace(tzinfo=UTC)
+        end = datetime.fromisoformat(args.end_exclusive).replace(tzinfo=UTC)
+        _print(build_official_dataset(args.root, start, end))
+        return 0
+    if args.command == "audit-official-timeframes":
+        months = [(int(value[:4]), int(value[5:7])) for value in args.months]
+        report = audit_official_timeframes(args.root, months)
+        _print(report)
+        return 0 if report["price_time_passed"] else 2
+    if args.command == "market-watch":
+        from .market_watch.service import MarketWatchService
+
+        cfg = load_config(args.config)
+        mw_service = MarketWatchService.create(cfg.market_watch, data_config=cfg.data)
+        cmd = args.market_watch_command
+        if cmd == "scan":
+            symbols = None
+            if getattr(args, "symbols", None):
+                symbols = [s.strip().upper() for s in args.symbols.split(",") if s.strip()]
+            elif getattr(args, "symbol", None):
+                symbols = [args.symbol.strip().upper()]
+            notify_enabled = bool(args.notify)
+            results = mw_service.scan(symbols=symbols, notify=notify_enabled)
+            _print([r.as_dict() for r in results])
+            return 0
+        if cmd == "status":
+            sym = getattr(args, "opt_symbol", None) or getattr(args, "symbol", None)
+            _print(mw_service.status(sym))
+            return 0
+        if cmd == "top":
+            _print(mw_service.top(args.limit))
+            return 0
+        if cmd == "explain":
+            sym = getattr(args, "opt_symbol", None) or getattr(args, "symbol", None) or "BTCUSDT"
+            _print(mw_service.explain(sym))
+            return 0
+        if cmd == "shadow-status":
+            _print(mw_service.shadow_status())
+            return 0
+        if cmd == "shadow-resolve":
+            _print(mw_service.shadow_resolve())
+            return 0
+        if cmd == "test-feishu":
+            sym = str(getattr(args, "symbol", None) or "BTCUSDT")
+            res = mw_service.test_feishu(symbol=sym)
+            _print(res)
+            return 0 if res.get("status") == "SUCCESS" else 1
+        return 1
+    if args.command == "daemon":
+        service = _get_service()
+        while True:
+            try:
+                shadow = service.update_shadow()
+                execution = service.execution.reconcile_open_plans()
+                _print(
+                    {
+                        "shadow_resolved": shadow,
+                        "execution_reconciled": execution,
+                        "scan": service.scan().as_dict(),
+                    }
+                )
+            except Exception as exc:  # noqa: BLE001 - daemon must remain alive and report faults
+                _print({"status": "DEGRADED", "error": str(exc)})
+            if args.once:
+                return 0
+            time.sleep(max(args.poll_seconds, 5))
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,38 @@
+mode: offline_fixture
+platform:
+  bars: 100
+  benchmark: BTCUSDT
+  entry:
+    expiry_minutes: 6
+    region_bps: 150
+  exits:
+    policy: trailing
+  factors:
+  - id: ADX
+    weight: 1
+  - id: RELATIVE_STRENGTH
+    weight: 1
+  - id: RELATIVE_VOLUME
+    weight: 1
+  market: PERPETUAL
+  name: offline_provider_bridge
+  scenario: mixed
+  seed: 7
+  strategies:
+  - id: double_ma
+    priority: 20
+  - id: single_ma
+    priority: 10
+  - id: rsi_reversion
+    priority: 0
+  universe:
+  - BTCUSDT
+  - ETHUSDT
+  - SOLUSDT
+  execution:
+    delay_minutes: 1
+provider: okx
+schema_version: V070-MARKET-BRIDGE-1
+universe:
+  min_quote_volume_24h: 10000000
+  quote_currency: USDT

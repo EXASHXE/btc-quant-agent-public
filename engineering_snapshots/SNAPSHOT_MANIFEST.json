@@ -1,0 +1,43 @@
+{
+  "kind": "ISOLATED_SOURCE_SNAPSHOT_NOT_INTEGRATED",
+  "snapshot_utc_date": "2026-11-02",
+  "code_baseline_ref": "v0.7.0",
+  "sources": {
+    "source-session04": {
+      "path": "engineering_snapshots/source-session04",
+      "counts": {
+        "src": 214,
+        "tests": 60,
+        "tools": 23,
+        "configs": 26
+      },
+      "bytes": 5077440,
+      "excluded_config_count": 19,
+      "trust_map_templates": "EMPTY_AND_NON_AUTHORIZING",
+      "purpose": "Source Session04 runtime diagnostic (offline prepared)"
+    },
+    "longhorizon-shadow": {
+      "path": "engineering_snapshots/longhorizon-shadow",
+      "counts": {
+        "src": 216,
+        "tests": 67,
+        "tools": 22,
+        "configs": 31
+      },
+      "bytes": 5111627,
+      "excluded_config_count": 14,
+      "trust_map_templates": "EMPTY_AND_NON_AUTHORIZING",
+      "purpose": "LONG V2 48h source/shadow (offline prepared)"
+    }
+  },
+  "permissions": "NO_NATIVE_GRANT_NO_TRADING_NO_DEPLOYMENT",
+  "source_and_shadow_qualified": false,
+  "excluded": [
+    "native payload and artifacts",
+    "private/public trusted Owner keys",
+    "signed/source grants and source binding files",
+    "runtime databases",
+    "caches and virtual environments",
+    "protected data and other workspace dirty files"
+  ]
+}

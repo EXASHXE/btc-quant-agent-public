@@ -1,0 +1,145 @@
+from __future__ import annotations
+
+import os
+import secrets
+import time
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING
+
+from . import __version__
+from .config import LiveV1Config, load_config
+from .explain import explain_signal
+from .service import QuantService
+
+if TYPE_CHECKING:
+    from .decision.service import TacticalLiveService
+    from .live_runtime import LiveV1Runtime
+
+try:
+    from fastapi import Depends, FastAPI, HTTPException
+    from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+except ImportError as exc:  # pragma: no cover - optional dependency guard
+    raise RuntimeError("Install the API extra: pip install -e '.[api]'") from exc
+
+
+_bearer = HTTPBearer(auto_error=False)
+
+
+def _require_api_token(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),  # noqa: B008
+) -> None:
+    expected = os.getenv("BTC_QUANT_API_TOKEN", "")
+    if not expected:
+        raise HTTPException(503, "BTC_QUANT_API_TOKEN is not configured")
+    if (
+        credentials is None
+        or credentials.scheme.lower() != "bearer"
+        or not secrets.compare_digest(credentials.credentials, expected)
+    ):
+        raise HTTPException(
+            401,
+            "invalid bearer token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+def create_app(
+    live_service: TacticalLiveService | None = None,
+    live_runtime: LiveV1Runtime | None = None,
+) -> FastAPI:
+    live_config = LiveV1Config.from_env()
+    runtime_requested = live_config.normalized_mode == "B4_RUNTIME"
+    runtime_mode = live_runtime is not None or runtime_requested
+    b3_mode = (live_service is not None or live_config.normalized_mode == "B3_CONTROL") and not runtime_mode
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+        if live_runtime is not None:
+            await live_runtime.start()
+        try:
+            yield
+        finally:
+            if live_runtime is not None:
+                await live_runtime.stop()
+
+    app = FastAPI(
+        title="BTC Quant Signal API",
+        version=__version__,
+        dependencies=[Depends(_require_api_token)],
+        lifespan=lifespan,
+    )
+    service = QuantService.create(load_config())
+
+    if b3_mode or runtime_mode:
+        from .approval.callback import create_callback_app
+        from .decision.service import TacticalLiveService
+        from .market_watch.service import MarketWatchService
+
+        live = live_service or (live_runtime.tactical_service if live_runtime is not None else None) or TacticalLiveService.from_config(
+            live_config,
+            MarketWatchService.create(service.config.market_watch, service.config.data),
+        )
+        # Mounted app authenticates Feishu callbacks independently of the API bearer.
+        app.mount("/live-v1/feishu", create_callback_app(
+            live.store, os.getenv("FEISHU_VERIFICATION_TOKEN", ""),
+            signing_secret=os.getenv("FEISHU_ENCRYPT_KEY", ""),
+            approver_open_ids=live_config.feishu_approver_open_ids,
+            app_id=live_config.feishu_app_id,
+        ))
+
+        if b3_mode:
+            from .decision.api import create_live_router
+
+            app.include_router(create_live_router(live))
+
+        if runtime_requested and live_runtime is None:
+            from .live_runtime import LiveV1Runtime
+
+            live_runtime = LiveV1Runtime.create(live_config, live)
+
+    @app.get("/health")
+    def health() -> dict[str, object]:
+        return service.health()
+
+    @app.get("/signals/latest")
+    def latest() -> dict[str, object]:
+        signal = service.repository.latest_signal()
+        if signal is None:
+            raise HTTPException(404, "signal not found")
+        return signal.as_dict()
+
+    @app.get("/signals/{signal_id}")
+    def get_signal(signal_id: str) -> dict[str, object]:
+        signal = service.repository.get_signal(signal_id)
+        if signal is None:
+            raise HTTPException(404, "signal not found")
+        return signal.as_dict()
+
+    @app.get("/signals/{signal_id}/explanation")
+    def explanation(signal_id: str) -> dict[str, object]:
+        signal = service.repository.get_signal(signal_id)
+        if signal is None:
+            raise HTTPException(404, "signal not found")
+        return explain_signal(signal)
+
+    @app.get("/performance")
+    def performance(days: int = 30) -> dict[str, object]:
+        if days < 1 or days > 3650:
+            raise HTTPException(422, "days must be between 1 and 3650")
+        since_ms = int(time.time() * 1000) - days * 86_400_000
+        from .shadow import read_legacy_shadow_performance
+
+        return read_legacy_shadow_performance(service.repository, since_ms)
+
+    @app.get("/execution/status")
+    def execution_status() -> dict[str, object]:
+        status = dict(service.execution.status())
+        if live_runtime is not None:
+            status["live_v1_runtime"] = live_runtime.status()
+        return status
+
+    return app
+
+
+app = create_app()

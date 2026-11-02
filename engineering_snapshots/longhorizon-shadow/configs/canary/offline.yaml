@@ -1,0 +1,21 @@
+version: L4-ACQUISITION-1
+mode: OFFLINE_FABRICATED_ONLY
+network_enabled: false
+symbols:
+- BTCUSDT
+- ETHUSDT
+- SOLUSDT
+benchmark: BTCUSDT
+endpoint_ids:
+- binance_usdm_exchange_info
+- binance_usdm_server_time
+- binance_usdm_bbo_ws
+- binance_usdm_klines_rest
+- binance_usdm_klines_ws
+- binance_usdm_oi
+- binance_usdm_premium
+- binance_usdm_funding_info
+- binance_usdm_turnover
+storage:
+  raw_retention_hours: 36
+  normalized_retention_hours: 168

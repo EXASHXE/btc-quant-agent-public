@@ -1,0 +1,124 @@
+{
+  "$defs": {
+    "CaptureKey": {
+      "additionalProperties": false,
+      "properties": {
+        "expires_utc_ms": {
+          "exclusiveMinimum": 0,
+          "title": "Expires Utc Ms",
+          "type": "integer"
+        },
+        "family": {
+          "title": "Family",
+          "type": "string"
+        },
+        "original_receipt_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Original Receipt Sha256",
+          "type": "string"
+        },
+        "owner_grant_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Owner Grant Sha256",
+          "type": "string"
+        },
+        "public_key_base64": {
+          "title": "Public Key Base64",
+          "type": "string"
+        },
+        "public_key_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Public Key Sha256",
+          "type": "string"
+        },
+        "purpose": {
+          "const": "INDEPENDENT_NATIVE_CAPTURE_AUDITOR",
+          "title": "Purpose",
+          "type": "string"
+        },
+        "receipt_seal_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Receipt Seal Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "public_key_base64",
+        "public_key_sha256",
+        "purpose",
+        "family",
+        "original_receipt_sha256",
+        "receipt_seal_sha256",
+        "owner_grant_sha256",
+        "expires_utc_ms"
+      ],
+      "title": "CaptureKey",
+      "type": "object"
+    },
+    "OwnerKey": {
+      "additionalProperties": false,
+      "properties": {
+        "family": {
+          "title": "Family",
+          "type": "string"
+        },
+        "owner_grant_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Owner Grant Sha256",
+          "type": "string"
+        },
+        "public_key_base64": {
+          "title": "Public Key Base64",
+          "type": "string"
+        },
+        "public_key_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Public Key Sha256",
+          "type": "string"
+        },
+        "verified_owner_reference": {
+          "title": "Verified Owner Reference",
+          "type": "string"
+        }
+      },
+      "required": [
+        "public_key_base64",
+        "public_key_sha256",
+        "family",
+        "verified_owner_reference",
+        "owner_grant_sha256"
+      ],
+      "title": "OwnerKey",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "capture_keys": {
+      "additionalProperties": {
+        "$ref": "#/$defs/CaptureKey"
+      },
+      "title": "Capture Keys",
+      "type": "object"
+    },
+    "owner_keys": {
+      "additionalProperties": {
+        "$ref": "#/$defs/OwnerKey"
+      },
+      "title": "Owner Keys",
+      "type": "object"
+    },
+    "version": {
+      "const": "L4_CLOCK_QUALIFICATION_TRUST_V1",
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "version",
+    "owner_keys",
+    "capture_keys"
+  ],
+  "title": "TrustStore",
+  "type": "object"
+}

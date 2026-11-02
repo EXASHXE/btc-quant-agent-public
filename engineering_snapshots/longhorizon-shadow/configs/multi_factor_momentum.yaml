@@ -1,0 +1,23 @@
+schema_version: 0.7.0
+market: PERPETUAL
+universe:
+- BTCUSDT
+- ETHUSDT
+- SOLUSDT
+benchmark: BTCUSDT
+scenario: mixed
+bars: 240
+seed: 7
+dataset: synthetic
+name: multi_factor_momentum
+strategies:
+- id: multi_factor_momentum
+factors:
+- id: TREND_STRENGTH
+  weight: 1
+- id: ADX
+  weight: 1
+- id: RELATIVE_STRENGTH
+  weight: 2
+- id: RELATIVE_VOLUME
+  weight: 0.5

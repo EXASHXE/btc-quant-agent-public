@@ -1,0 +1,28 @@
+schema_version: 0.7.0
+market: PERPETUAL
+universe:
+- BTCUSDT
+- ETHUSDT
+- SOLUSDT
+benchmark: BTCUSDT
+scenario: mixed
+bars: 240
+seed: 7
+dataset: synthetic
+name: multi_strategy_regime
+strategies:
+- id: trend_breakout
+  regimes:
+  - TREND_UP
+  - TREND_DOWN
+  priority: 2
+- id: bollinger_reversion
+  regimes:
+  - RANGE
+  priority: 1
+- id: shock_reversal
+  regimes:
+  - DELEVERAGING_SHOCK
+  priority: 3
+entry:
+  region_bps: 150

@@ -1,0 +1,4 @@
+configs:
+- trend_breakout.yaml
+- bollinger_reversion.yaml
+- multi_strategy_regime.yaml

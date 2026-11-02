@@ -1,0 +1,18 @@
+schema_version: 0.7.0
+market: PERPETUAL
+universe:
+- BTCUSDT
+- ETHUSDT
+- SOLUSDT
+benchmark: BTCUSDT
+scenario: mixed
+bars: 240
+seed: 7
+dataset: synthetic
+name: ml_lightgbm
+strategies:
+- id: multi_factor_momentum
+ml:
+  family: lightgbm
+  seed: 7
+  epochs: 1

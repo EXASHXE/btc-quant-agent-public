@@ -1,0 +1,1883 @@
+{
+  "version": "L4-ENDPOINT-MATRIX-1",
+  "reviewed_date_utc": "2026-10-29",
+  "source_observations": "NONE; documentation only",
+  "owner_grant": "ABSENT",
+  "global_network_mode": "DISABLED",
+  "canonical_head": "5bf8d6bb1f8265b27c48fc1d838880e926d77e9e",
+  "rejected_references": [
+    "COIN-M dapi/dstream facts are not used for USD-M",
+    "Stale Binance individual-stream URL redirected to homepage; current catalog/public reference used"
+  ],
+  "endpoints": [
+    {
+      "id": "binance_usdm_exchange_info",
+      "provider": "binance",
+      "host": "https://fapi.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "USD_M",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/fapi/v1/exchangeInfo",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "symbols": "contract identity/status/filter objects",
+        "rateLimits": "weight caps declared by venue; not yet observed",
+        "serverTime": "IGNORE; not clock probe"
+      },
+      "timestamp_field": null,
+      "timestamp_semantics": "STATIC_METADATA_RECEIVE_TTL",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "ALL_METADATA"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 3600000,
+      "weight_formula": "FIXED_1",
+      "documented_rate_limits": {
+        "requests": 2400,
+        "window_seconds": 60,
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 3600,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "INSTRUMENT_AND_RISK_CONTRACT"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#exchange-information",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "OFFLINE_SCHEMA_REVIEWED",
+      "enabled_in_proposal": true
+    },
+    {
+      "id": "binance_usdm_server_time",
+      "provider": "binance",
+      "host": "https://fapi.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "USD_M",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/fapi/v1/time",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "serverTime": "server clock ms"
+      },
+      "timestamp_field": "serverTime",
+      "timestamp_semantics": "SERVER_CLOCK_SAMPLE",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "ALL_METADATA"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 3600000,
+      "weight_formula": "FIXED_1",
+      "documented_rate_limits": {
+        "requests": 2400,
+        "window_seconds": 60,
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 300,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "UNIVERSE_OR_CLOCK_CONTEXT"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#check-server-time",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "OFFLINE_SCHEMA_REVIEWED",
+      "enabled_in_proposal": true
+    },
+    {
+      "id": "binance_usdm_bbo_ws",
+      "provider": "binance",
+      "host": "wss://fstream.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "USD_M",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "WS",
+      "endpoint": "/public/ws/{symbol}@bookTicker",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "e": "event type bookTicker",
+        "s": "symbol",
+        "st": "1=UM,2=CM identity discriminator",
+        "u": "order book update ID; not contiguous BBO sequence",
+        "E": "event time ms",
+        "T": "transaction time ms",
+        "b": "best bid USDT/base",
+        "B": "native bid quantity; requires contract unit proof",
+        "a": "best ask USDT/base",
+        "A": "native ask quantity; requires contract unit proof"
+      },
+      "timestamp_field": "E",
+      "timestamp_semantics": "EVENT_TIME_WITH_SEPARATE_TRANSACTION_T",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "Event driven / real time; no guaranteed message rate or full liquidity",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 5000,
+      "weight_formula": "WS_NOT_REST",
+      "documented_rate_limits": {
+        "requests": 2400,
+        "window_seconds": 60,
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 0,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "QUOTE_LEASE",
+        "CAPACITY",
+        "USER_POSITION_RISK"
+      ],
+      "bytes_per_message_estimate": 700,
+      "messages_per_symbol_second_estimate": 5,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-streams/public#individual-symbol-book-ticker-streams",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED",
+        "connection_reference_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/websocket-market-streams/Connect"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "OFFLINE_SCHEMA_REVIEWED",
+      "enabled_in_proposal": true
+    },
+    {
+      "id": "binance_usdm_bbo_rest",
+      "provider": "binance",
+      "host": "https://fapi.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "USD_M",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/fapi/v1/ticker/bookTicker",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "symbol": "symbol",
+        "bidPrice": "USDT/base",
+        "bidQty": "native base/contract quantity to verify",
+        "askPrice": "USDT/base",
+        "askQty": "native base/contract quantity to verify",
+        "time": "transaction time ms in current docs; exact deployed shape UNVERIFIED"
+      },
+      "timestamp_field": "time",
+      "timestamp_semantics": "TRANSACTION_TIME_DOCUMENTED_DEPLOYED_RESPONSE_UNVERIFIED",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 5000,
+      "weight_formula": "BOOK_SINGLE_2_ALL_5",
+      "documented_rate_limits": {
+        "requests": 2400,
+        "window_seconds": 60,
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 0,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "QUOTE_LEASE",
+        "CAPACITY",
+        "USER_POSITION_RISK"
+      ],
+      "bytes_per_message_estimate": 700,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#symbol-order-book-ticker",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED",
+        "weight_header_warning": "X-MBX-USED-WEIGHT-1M is documented inaccurate for this endpoint; local counters remain authoritative/conservative"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "UNVERIFIED_NATIVE",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "binance_usdm_klines_rest",
+      "provider": "binance",
+      "host": "https://fapi.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "USD_M",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/fapi/v1/klines",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "[0]": "bar open UTC ms",
+        "[1:5]": "OHLC USDT/base",
+        "[5]": "volume native unit requires verification",
+        "[6]": "bar close UTC ms",
+        "[7]": "quote volume USDT",
+        "[9]": "taker buy base volume",
+        "[10]": "taker buy quote volume"
+      },
+      "timestamp_field": "[6]",
+      "timestamp_semantics": "CANDLE_CLOSE_TIME_NOT_EXECUTABLE_QUOTE",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "Query response; completion/repair only",
+      "completion_rule": "Closed bar flag plus exact UTC interval boundary and post-completion receive; never infer quote from close",
+      "freshness_ttl_ms": 2000,
+      "weight_formula": "KLINE_LIMIT_TIERS",
+      "documented_rate_limits": {
+        "requests": 2400,
+        "window_seconds": 60,
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 0,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "CLOSED_1M_5M",
+        "EMA20_EMA40",
+        "ATR14",
+        "ADX14",
+        "ER20",
+        "PRIOR_60_PROXY",
+        "BETA_200",
+        "FROZEN_UNIVERSE"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#klinecandlestick-data",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "OFFLINE_SCHEMA_REVIEWED",
+      "enabled_in_proposal": true
+    },
+    {
+      "id": "binance_usdm_klines_ws",
+      "provider": "binance",
+      "host": "wss://fstream.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "USD_M",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "WS",
+      "endpoint": "/market/ws/{symbol}@kline_{interval}",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "E": "candidate event time ms",
+        "s": "symbol",
+        "k.t": "open ms",
+        "k.T": "close ms",
+        "k.i": "1m/5m",
+        "k.x": "closed flag",
+        "k.o/h/l/c": "OHLC",
+        "k.v": "native volume",
+        "k.q": "quote volume"
+      },
+      "timestamp_field": "E",
+      "timestamp_semantics": "UNKNOWN",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Closed bar flag plus exact UTC interval boundary and post-completion receive; never infer quote from close",
+      "freshness_ttl_ms": 2000,
+      "weight_formula": "WS_NOT_REST",
+      "documented_rate_limits": {
+        "requests": 2400,
+        "window_seconds": 60,
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true
+      },
+      "websocket": {
+        "channels_per_symbol": 2,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 0,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "CLOSED_1M_5M",
+        "EMA20_EMA40",
+        "ATR14",
+        "ADX14",
+        "ER20",
+        "PRIOR_60_PROXY",
+        "BETA_200",
+        "FROZEN_UNIVERSE"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 8,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-streams/market#klinecandlestick-streams",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": false,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "UNVERIFIED_NATIVE",
+      "enabled_in_proposal": true
+    },
+    {
+      "id": "binance_usdm_oi",
+      "provider": "binance",
+      "host": "https://fapi.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "USD_M",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/fapi/v1/openInterest",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "symbol": "symbol",
+        "openInterest": "native OI; BASE unit not proven by the field label alone",
+        "time": "transaction time ms"
+      },
+      "timestamp_field": "time",
+      "timestamp_semantics": "TRANSACTION_TIME",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "Point query; native effective OI update cadence UNKNOWN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 120000,
+      "weight_formula": "FIXED_1",
+      "documented_rate_limits": {
+        "requests": 2400,
+        "window_seconds": 60,
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 60,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "OI_CONTEXT_SHOCK_WATCH_ONLY"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#open-interest",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "UNVERIFIED_NATIVE",
+      "enabled_in_proposal": true
+    },
+    {
+      "id": "binance_usdm_premium",
+      "provider": "binance",
+      "host": "https://fapi.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "USD_M",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/fapi/v1/premiumIndex",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "symbol": "symbol",
+        "markPrice": "USDT/base",
+        "indexPrice": "USDT/base",
+        "lastFundingRate": "rate per settlement snapshot, not cash",
+        "nextFundingTime": "future settlement UTC ms",
+        "time": "generic Time label; publish/event authority UNKNOWN"
+      },
+      "timestamp_field": "time",
+      "timestamp_semantics": "UNKNOWN",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 3600000,
+      "weight_formula": "PREMIUM_SINGLE_1_ALL_10",
+      "documented_rate_limits": {
+        "requests": 2400,
+        "window_seconds": 60,
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 60,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "UNIVERSE_OR_CLOCK_CONTEXT"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#mark-price",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": false,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "SOURCE_CLOCK_BLOCKED",
+      "enabled_in_proposal": true
+    },
+    {
+      "id": "binance_usdm_funding_info",
+      "provider": "binance",
+      "host": "https://fapi.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "USD_M",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/fapi/v1/fundingInfo",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "symbol": "only adjusted symbols; absence does not prove cadence",
+        "fundingIntervalHours": "hours for returned adjusted instruments",
+        "adjustedFundingRateCap": "rate cap",
+        "adjustedFundingRateFloor": "rate floor"
+      },
+      "timestamp_field": null,
+      "timestamp_semantics": "STATIC_METADATA_RECEIVE_TTL",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "ALL_METADATA"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 300000,
+      "weight_formula": "FIXED_0",
+      "documented_rate_limits": {
+        "requests": 500,
+        "window_seconds": 300,
+        "shared_group": "fundingInfo_and_fundingRate",
+        "ceiling_verification": "VERIFIED_DOC_SHARED_500_PER_5_MIN_IP"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 300,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "FUNDING_CADENCE_MARK_RISK"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#get-funding-rate-info",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "OFFLINE_SCHEMA_REVIEWED",
+      "enabled_in_proposal": true
+    },
+    {
+      "id": "binance_usdm_mark_ws",
+      "provider": "binance",
+      "host": "wss://fstream.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "USD_M",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "WS",
+      "endpoint": "/market/ws/{symbol}@markPrice@1s",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "E": "candidate event time",
+        "s": "symbol",
+        "p": "mark price",
+        "i": "index price",
+        "r": "funding rate snapshot",
+        "T": "next funding time"
+      },
+      "timestamp_field": "E",
+      "timestamp_semantics": "UNKNOWN",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "Candidate 1s; exact current channel semantics must be rechecked",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 300000,
+      "weight_formula": "WS_NOT_REST",
+      "documented_rate_limits": {
+        "requests": 2400,
+        "window_seconds": 60,
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 0,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "FUNDING_CADENCE_MARK_RISK"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 1,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-streams/market#mark-price-stream",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": false,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "UNVERIFIED_NATIVE",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "binance_usdm_turnover",
+      "provider": "binance",
+      "host": "https://fapi.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "USD_M",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/fapi/v1/ticker/24hr",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "symbol": "symbol",
+        "quoteVolume": "rolling 24h quote turnover",
+        "volume": "rolling 24h native volume",
+        "openTime": "rolling-window start ms",
+        "closeTime": "window close ms, not execution time"
+      },
+      "timestamp_field": "closeTime",
+      "timestamp_semantics": "ROLLING_WINDOW_END_TIME",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 3600000,
+      "weight_formula": "TICKER_SINGLE_1_ALL_40",
+      "documented_rate_limits": {
+        "requests": 2400,
+        "window_seconds": 60,
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 300,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "UNIVERSE_OR_CLOCK_CONTEXT"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#24hr-ticker-price-change-statistics",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "OFFLINE_SCHEMA_REVIEWED",
+      "enabled_in_proposal": true
+    },
+    {
+      "id": "binance_spot_exchange_info",
+      "provider": "binance",
+      "host": "https://api.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "SPOT",
+      "instrument_contract": "SPOT_BASE_USDT",
+      "transport": "REST",
+      "endpoint": "/api/v3/exchangeInfo",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "symbols": "SPOT statuses/filter rules",
+        "rateLimits": "spot-specific caps"
+      },
+      "timestamp_field": null,
+      "timestamp_semantics": "STATIC_METADATA_RECEIVE_TTL",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "ALL_METADATA"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 3600000,
+      "weight_formula": "UNKNOWN",
+      "documented_rate_limits": {
+        "requests": null,
+        "window_seconds": null,
+        "ceiling_verification": "UNKNOWN_NOT_BORROWED_FROM_USD_M"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 5,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 20,
+        "pong_deadline_seconds": 60,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 3600,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "INSTRUMENT_AND_RISK_CONTRACT"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/docs/binance-spot-api-docs/rest-api/general-endpoints",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "UNVERIFIED_NATIVE",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "binance_spot_klines",
+      "provider": "binance",
+      "host": "https://api.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "SPOT",
+      "instrument_contract": "SPOT_BASE_USDT",
+      "transport": "REST",
+      "endpoint": "/api/v3/klines",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "[0]": "open ms",
+        "[1:5]": "OHLC USDT/base",
+        "[5]": "base volume",
+        "[6]": "close ms",
+        "[7]": "quote volume"
+      },
+      "timestamp_field": "[6]",
+      "timestamp_semantics": "CANDLE_CLOSE_TIME_NOT_EXECUTABLE_QUOTE",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Closed bar flag plus exact UTC interval boundary and post-completion receive; never infer quote from close",
+      "freshness_ttl_ms": 2000,
+      "weight_formula": "UNKNOWN",
+      "documented_rate_limits": {
+        "requests": null,
+        "window_seconds": null,
+        "ceiling_verification": "UNKNOWN_NOT_BORROWED_FROM_USD_M"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 5,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 20,
+        "pong_deadline_seconds": 60,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 0,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "CLOSED_1M_5M",
+        "EMA20_EMA40",
+        "ATR14",
+        "ADX14",
+        "ER20",
+        "PRIOR_60_PROXY",
+        "BETA_200",
+        "FROZEN_UNIVERSE"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/docs/binance-spot-api-docs/rest-api/market-data-endpoints",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "UNVERIFIED_NATIVE",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "binance_spot_bbo",
+      "provider": "binance",
+      "host": "wss://stream.binance.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "SPOT",
+      "instrument_contract": "SPOT_BASE_USDT",
+      "transport": "WS",
+      "endpoint": "/ws/{symbol}@bookTicker",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "u": "update ID",
+        "s": "symbol",
+        "b": "bid",
+        "B": "bid quantity",
+        "a": "ask",
+        "A": "ask quantity"
+      },
+      "timestamp_field": null,
+      "timestamp_semantics": "UNKNOWN",
+      "instrument_rules": {
+        "required_status": "TRADING",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "PRICE_FILTER.tickSize",
+        "lot_rule": "LOT_SIZE.stepSize and minQty",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 5000,
+      "weight_formula": "WS_NOT_REST",
+      "documented_rate_limits": {
+        "requests": null,
+        "window_seconds": null,
+        "ceiling_verification": "UNKNOWN_NOT_BORROWED_FROM_USD_M"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": 5,
+        "max_streams_per_connection": 1024,
+        "connection_lifetime_seconds": 86400,
+        "ping_interval_seconds": 20,
+        "pong_deadline_seconds": 60,
+        "subscription_requests_per_hour": null,
+        "connect_requests_per_second": null,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 0,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "QUOTE_LEASE",
+        "CAPACITY",
+        "USER_POSITION_RISK"
+      ],
+      "bytes_per_message_estimate": 700,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/change-log",
+        "clock_semantics_reviewed": false,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED"
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.binance.com/en/terms",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "SOURCE_CLOCK_BLOCKED",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "okx_swap_instruments",
+      "provider": "okx",
+      "host": "https://openapi.okx.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "OKX_SWAP",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/api/v5/public/instruments",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "instId": "BASE-USDT-SWAP versus BASE-USDT",
+        "instType": "SWAP/SPOT",
+        "state": "live",
+        "ctVal": "contract multiplier",
+        "ctValCcy": "multiplier currency",
+        "tickSz": "tick",
+        "lotSz": "lot",
+        "minSz": "minimum quantity"
+      },
+      "timestamp_field": null,
+      "timestamp_semantics": "STATIC_METADATA_RECEIVE_TTL",
+      "instrument_rules": {
+        "required_status": "live",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "tickSz",
+        "lot_rule": "lotSz and minSz",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "ALL_METADATA"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 3600000,
+      "weight_formula": "UNKNOWN",
+      "documented_rate_limits": {
+        "requests": null,
+        "window_seconds": null,
+        "ceiling_verification": "UNKNOWN_NOT_BORROWED_FROM_USD_M"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": null,
+        "max_streams_per_connection": null,
+        "connection_lifetime_seconds": null,
+        "ping_interval_seconds": null,
+        "pong_deadline_seconds": null,
+        "subscription_requests_per_hour": 480,
+        "connect_requests_per_second": 3,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 3600,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "INSTRUMENT_AND_RISK_CONTRACT"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://www.okx.com/docs-v5/en/#public-data-rest-api-instruments",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://www.okx.com/docs-v5/log_en/",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED",
+        "retrieval_limit": "Official search extracts reviewed; full HTML unavailable (web size limit and direct documentation 403). Exact quotas/clock authority stay unverified."
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.okx.com/help/terms-of-service",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "UNVERIFIED_NATIVE",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "okx_swap_server_time",
+      "provider": "okx",
+      "host": "https://openapi.okx.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "OKX_SWAP",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/api/v5/public/time",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "ts": "server time ms"
+      },
+      "timestamp_field": "ts",
+      "timestamp_semantics": "SERVER_CLOCK_SAMPLE",
+      "instrument_rules": {
+        "required_status": "live",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "tickSz",
+        "lot_rule": "lotSz and minSz",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "ALL_METADATA"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 3600000,
+      "weight_formula": "UNKNOWN",
+      "documented_rate_limits": {
+        "requests": null,
+        "window_seconds": null,
+        "ceiling_verification": "UNKNOWN_NOT_BORROWED_FROM_USD_M"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": null,
+        "max_streams_per_connection": null,
+        "connection_lifetime_seconds": null,
+        "ping_interval_seconds": null,
+        "pong_deadline_seconds": null,
+        "subscription_requests_per_hour": 480,
+        "connect_requests_per_second": 3,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 300,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "UNIVERSE_OR_CLOCK_CONTEXT"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://www.okx.com/docs-v5/en/#public-data-rest-api-server_time",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://www.okx.com/docs-v5/log_en/",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED",
+        "retrieval_limit": "Official search extracts reviewed; full HTML unavailable (web size limit and direct documentation 403). Exact quotas/clock authority stay unverified."
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.okx.com/help/terms-of-service",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "UNVERIFIED_NATIVE",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "okx_swap_candles",
+      "provider": "okx",
+      "host": "https://openapi.okx.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "OKX_SWAP",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/api/v5/market/candles",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "ts": "bar open ms",
+        "o/h/l/c": "OHLC",
+        "vol": "contracts for derivatives",
+        "volCcy": "base quantity",
+        "volCcyQuote": "quote quantity",
+        "confirm": "completed indicator"
+      },
+      "timestamp_field": "ts",
+      "timestamp_semantics": "CANDLE_OPEN_TIME_REQUIRES_CONFIRMED_CLOSE",
+      "instrument_rules": {
+        "required_status": "live",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "tickSz",
+        "lot_rule": "lotSz and minSz",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Closed bar flag plus exact UTC interval boundary and post-completion receive; never infer quote from close",
+      "freshness_ttl_ms": 2000,
+      "weight_formula": "UNKNOWN",
+      "documented_rate_limits": {
+        "requests": null,
+        "window_seconds": null,
+        "ceiling_verification": "UNKNOWN_NOT_BORROWED_FROM_USD_M"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": null,
+        "max_streams_per_connection": null,
+        "connection_lifetime_seconds": null,
+        "ping_interval_seconds": null,
+        "pong_deadline_seconds": null,
+        "subscription_requests_per_hour": 480,
+        "connect_requests_per_second": 3,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 0,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "CLOSED_1M_5M",
+        "EMA20_EMA40",
+        "ATR14",
+        "ADX14",
+        "ER20",
+        "PRIOR_60_PROXY",
+        "BETA_200",
+        "FROZEN_UNIVERSE"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://www.okx.com/docs-v5/en/#public-data-rest-api-candles",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://www.okx.com/docs-v5/log_en/",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED",
+        "retrieval_limit": "Official search extracts reviewed; full HTML unavailable (web size limit and direct documentation 403). Exact quotas/clock authority stay unverified."
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.okx.com/help/terms-of-service",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "UNVERIFIED_NATIVE",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "okx_swap_tickers",
+      "provider": "okx",
+      "host": "https://openapi.okx.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "OKX_SWAP",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/api/v5/market/tickers",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "instId": "instrument",
+        "bidPx/askPx": "prices",
+        "bidSz/askSz": "native quantities",
+        "ts": "data generation/update timestamp; engine event authority UNKNOWN",
+        "volCcy24h": "base or quote semantics must be verified per market"
+      },
+      "timestamp_field": "ts",
+      "timestamp_semantics": "UNKNOWN",
+      "instrument_rules": {
+        "required_status": "live",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "tickSz",
+        "lot_rule": "lotSz and minSz",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 3600000,
+      "weight_formula": "UNKNOWN",
+      "documented_rate_limits": {
+        "requests": null,
+        "window_seconds": null,
+        "ceiling_verification": "UNKNOWN_NOT_BORROWED_FROM_USD_M"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": null,
+        "max_streams_per_connection": null,
+        "connection_lifetime_seconds": null,
+        "ping_interval_seconds": null,
+        "pong_deadline_seconds": null,
+        "subscription_requests_per_hour": 480,
+        "connect_requests_per_second": 3,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 0,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "UNIVERSE_OR_CLOCK_CONTEXT"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://www.okx.com/docs-v5/en/#public-data-rest-api-tickers",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://www.okx.com/docs-v5/log_en/",
+        "clock_semantics_reviewed": false,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED",
+        "retrieval_limit": "Official search extracts reviewed; full HTML unavailable (web size limit and direct documentation 403). Exact quotas/clock authority stay unverified."
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.okx.com/help/terms-of-service",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "SOURCE_CLOCK_BLOCKED",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "okx_swap_oi",
+      "provider": "okx",
+      "host": "https://openapi.okx.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "OKX_SWAP",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/api/v5/public/open-interest",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "instId": "SWAP instrument",
+        "oi": "contracts",
+        "oiCcy": "base currency quantity",
+        "ts": "data update timestamp; exact semantics must be qualified"
+      },
+      "timestamp_field": "ts",
+      "timestamp_semantics": "UNKNOWN",
+      "instrument_rules": {
+        "required_status": "live",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "tickSz",
+        "lot_rule": "lotSz and minSz",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 120000,
+      "weight_formula": "UNKNOWN",
+      "documented_rate_limits": {
+        "requests": null,
+        "window_seconds": null,
+        "ceiling_verification": "UNKNOWN_NOT_BORROWED_FROM_USD_M"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": null,
+        "max_streams_per_connection": null,
+        "connection_lifetime_seconds": null,
+        "ping_interval_seconds": null,
+        "pong_deadline_seconds": null,
+        "subscription_requests_per_hour": 480,
+        "connect_requests_per_second": 3,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 60,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "OI_CONTEXT_SHOCK_WATCH_ONLY"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://www.okx.com/docs-v5/en/#public-data-rest-api-oi",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://www.okx.com/docs-v5/log_en/",
+        "clock_semantics_reviewed": false,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED",
+        "retrieval_limit": "Official search extracts reviewed; full HTML unavailable (web size limit and direct documentation 403). Exact quotas/clock authority stay unverified."
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.okx.com/help/terms-of-service",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "SOURCE_CLOCK_BLOCKED",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "okx_swap_funding",
+      "provider": "okx",
+      "host": "https://openapi.okx.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "OKX_SWAP",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "REST",
+      "endpoint": "/api/v5/public/funding-rate",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "instId": "SWAP instrument",
+        "fundingRate": "snapshot rate",
+        "fundingTime": "settlement timestamp",
+        "nextFundingTime": "next settlement timestamp",
+        "ts": "data generation timestamp"
+      },
+      "timestamp_field": "ts",
+      "timestamp_semantics": "UNKNOWN",
+      "instrument_rules": {
+        "required_status": "live",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "tickSz",
+        "lot_rule": "lotSz and minSz",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 300000,
+      "weight_formula": "UNKNOWN",
+      "documented_rate_limits": {
+        "requests": null,
+        "window_seconds": null,
+        "ceiling_verification": "UNKNOWN_NOT_BORROWED_FROM_USD_M"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": null,
+        "max_streams_per_connection": null,
+        "connection_lifetime_seconds": null,
+        "ping_interval_seconds": null,
+        "pong_deadline_seconds": null,
+        "subscription_requests_per_hour": 480,
+        "connect_requests_per_second": 3,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 60,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "FUNDING_CADENCE_MARK_RISK"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://www.okx.com/docs-v5/en/#public-data-rest-api-funding",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://www.okx.com/docs-v5/log_en/",
+        "clock_semantics_reviewed": false,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED",
+        "retrieval_limit": "Official search extracts reviewed; full HTML unavailable (web size limit and direct documentation 403). Exact quotas/clock authority stay unverified."
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.okx.com/help/terms-of-service",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "SOURCE_CLOCK_BLOCKED",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "okx_swap_bbo_ws",
+      "provider": "okx",
+      "host": "wss://ws.okx.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "OKX_SWAP",
+      "instrument_contract": "USDT_LINEAR_PERPETUAL",
+      "transport": "WS",
+      "endpoint": "/ws/v5/public channel=bbo-tbt instId={symbol}",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "arg.instId": "exact SWAP identity",
+        "bids/asks": "top-of-book snapshot native contract sizes",
+        "ts": "data generation timestamp; not assumed matching-engine time",
+        "seqId": "sequence where returned"
+      },
+      "timestamp_field": "ts",
+      "timestamp_semantics": "UNKNOWN",
+      "instrument_rules": {
+        "required_status": "live",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "tickSz",
+        "lot_rule": "lotSz and minSz",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "Official guidance: bbo-tbt snapshots nominally 10ms on change; no guaranteed fill",
+      "completion_rule": "Independent complete response/update; not an observed fill",
+      "freshness_ttl_ms": 5000,
+      "weight_formula": "WS_NOT_REST",
+      "documented_rate_limits": {
+        "requests": null,
+        "window_seconds": null,
+        "ceiling_verification": "UNKNOWN_NOT_BORROWED_FROM_USD_M"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": null,
+        "max_streams_per_connection": null,
+        "connection_lifetime_seconds": null,
+        "ping_interval_seconds": null,
+        "pong_deadline_seconds": null,
+        "subscription_requests_per_hour": 480,
+        "connect_requests_per_second": 3,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 0,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "QUOTE_LEASE",
+        "CAPACITY",
+        "USER_POSITION_RISK"
+      ],
+      "bytes_per_message_estimate": 700,
+      "messages_per_symbol_second_estimate": 10,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-ws-order-book-channel",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://www.okx.com/docs-v5/log_en/",
+        "clock_semantics_reviewed": false,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED",
+        "retrieval_limit": "Official search extracts reviewed; full HTML unavailable (web size limit and direct documentation 403). Exact quotas/clock authority stay unverified."
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.okx.com/help/terms-of-service",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "SOURCE_CLOCK_BLOCKED",
+      "enabled_in_proposal": false
+    },
+    {
+      "id": "okx_spot_candles",
+      "provider": "okx",
+      "host": "https://openapi.okx.com",
+      "region": "OWNER_REGION_UNSPECIFIED_GLOBAL_DOC_HOST_ONLY",
+      "market": "OKX_SPOT",
+      "instrument_contract": "SPOT_BASE_USDT",
+      "transport": "REST",
+      "endpoint": "/api/v5/market/candles",
+      "authentication": "PUBLIC",
+      "native_fields_units": {
+        "instId": "BASE-USDT SPOT",
+        "ts": "bar open ms",
+        "confirm": "completed flag",
+        "vol": "base volume",
+        "volCcyQuote": "quote volume"
+      },
+      "timestamp_field": "ts",
+      "timestamp_semantics": "CANDLE_OPEN_TIME_REQUIRES_CONFIRMED_CLOSE",
+      "instrument_rules": {
+        "required_status": "live",
+        "contract_multiplier": "Native contract/quantity unit qualification required; never inferred from precision",
+        "tick_rule": "tickSz",
+        "lot_rule": "lotSz and minSz",
+        "min_notional": "MIN_NOTIONAL.notional if returned; absent remains UNKNOWN",
+        "trading_contract_check": "Exact provider, linear USDT-settled perpetual or separately granted SPOT; reject COIN-M and st=2",
+        "request_scope": "PER_SYMBOL"
+      },
+      "native_cadence": "UNKNOWN_OR_EVENT_DRIVEN",
+      "completion_rule": "Closed bar flag plus exact UTC interval boundary and post-completion receive; never infer quote from close",
+      "freshness_ttl_ms": 2000,
+      "weight_formula": "UNKNOWN",
+      "documented_rate_limits": {
+        "requests": null,
+        "window_seconds": null,
+        "ceiling_verification": "UNKNOWN_NOT_BORROWED_FROM_USD_M"
+      },
+      "websocket": {
+        "channels_per_symbol": 1,
+        "incoming_controls_per_second": null,
+        "max_streams_per_connection": null,
+        "connection_lifetime_seconds": null,
+        "ping_interval_seconds": null,
+        "pong_deadline_seconds": null,
+        "subscription_requests_per_hour": 480,
+        "connect_requests_per_second": 3,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover"
+      },
+      "proposed_cadence_seconds": 0,
+      "failover_policy": "DISABLED by default. Separate exact grant and budget for REST repair/fallback; no automatic host/market substitution",
+      "l23_features": [
+        "CLOSED_1M_5M",
+        "EMA20_EMA40",
+        "ATR14",
+        "ADX14",
+        "ER20",
+        "PRIOR_60_PROXY",
+        "BETA_200",
+        "FROZEN_UNIVERSE"
+      ],
+      "bytes_per_message_estimate": 900,
+      "messages_per_symbol_second_estimate": 0,
+      "storage_estimate_status": "UNOBSERVED_ENGINEERING_ASSUMPTION_NOT_NATIVE_MEASUREMENT",
+      "retention": {
+        "recommended_raw_hours": 36,
+        "proposed_normalized_hours": 168,
+        "owner_approved": false,
+        "requires_explicit_byte_quota": true,
+        "24h_alternative": "EARLIEST_RAW_NOT_RETAINED; checksummed prefix and normalized parity only"
+      },
+      "documentation": {
+        "reference_url": "https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-candlesticks",
+        "reviewed_date_utc": "2026-10-29",
+        "version": "Current official rendered documentation at review time; no pinned vendor release",
+        "change_log_url": "https://www.okx.com/docs-v5/log_en/",
+        "clock_semantics_reviewed": true,
+        "native_feed_observed": false,
+        "review_qualification": "Official documentation facts only. Live schema/cadence/quality and actual IP ceiling remain UNVERIFIED",
+        "retrieval_limit": "Official search extracts reviewed; full HTML unavailable (web size limit and direct documentation 403). Exact quotas/clock authority stay unverified."
+      },
+      "permission_terms_review": {
+        "reference_url": "https://www.okx.com/help/terms-of-service",
+        "result": "PUBLIC_DOCUMENTATION_IS_NOT_ACCESS_AUTHORIZATION; OWNER_REGION_AND_PERMITTED_USE_UNVERIFIED",
+        "region_host_eligibility": "UNKNOWN; timezone is not legal residence",
+        "owner_grant": "ABSENT",
+        "private_or_authenticated_access": "FORBIDDEN"
+      },
+      "status": "UNVERIFIED_NATIVE",
+      "enabled_in_proposal": false
+    }
+  ]
+}

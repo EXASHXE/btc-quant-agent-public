@@ -1,0 +1,639 @@
+from __future__ import annotations
+
+import hashlib
+import math
+import os
+import time
+from dataclasses import replace
+from typing import Any
+
+from ..config import AppConfig
+from ..data.binance import BinancePublicClient
+from ..domain import Direction, Signal, SignalStatus
+from ..engine import QuantEngine
+from ..research_registry import RegistryError, load_registry
+from ..storage import Repository
+from .binance_signed import BinanceSignedClient
+from .environment import (
+    ACCEPTED_EXECUTION_WRITE_AUTHORITY,
+    CURRENT_EXECUTION_POLICY,
+    ActionClassification,
+    ExecutionEnvironmentAuthority,
+    validate_execution_environment_preflight,
+)
+from .guard import ExecutionBlocked, ExecutionGuard
+from .models import ClosePlan, ExecutionMode, ExecutionPlan, OrderReceipt
+
+
+def _floor_to(value: float, increment: float) -> float:
+    if increment <= 0:
+        raise ExecutionBlocked("exchange filter increment is unavailable")
+    return math.floor((value + 1e-12) / increment) * increment
+
+
+def _ceil_to(value: float, increment: float) -> float:
+    if increment <= 0:
+        raise ExecutionBlocked("exchange filter increment is unavailable")
+    return math.ceil((value - 1e-12) / increment) * increment
+
+
+class ExecutionService:
+    def __init__(
+        self,
+        config: AppConfig,
+        repository: Repository,
+        public_client: BinancePublicClient,
+        signed_client: BinanceSignedClient | None = None,
+    ):
+        self.config = config
+        self.repository = repository
+        self.public_client = public_client
+        self.guard = ExecutionGuard(config.execution)
+        self._injected_signed_client = signed_client
+
+    def status(self) -> dict[str, Any]:
+        mode = ExecutionMode(self.config.execution.mode)
+        credentials_present = (
+            self.guard.credentials_present() if mode != ExecutionMode.DISABLED else False
+        )
+        live_armed = mode != ExecutionMode.LIVE or (
+            self.config.execution.allow_live
+            and os.getenv("BTC_QUANT_LIVE_CONFIRM") == "I_UNDERSTAND_REAL_ORDERS"
+        )
+        ready = mode == ExecutionMode.PAPER or (
+            mode in {ExecutionMode.TESTNET, ExecutionMode.LIVE}
+            and credentials_present
+            and live_armed
+            and CURRENT_EXECUTION_POLICY != "RESEARCH_DISABLED_V1"
+        )
+        try:
+            registry = load_registry()
+            registry_gate = "PASS" if registry.qualified_direction_engine_count else "BLOCKED"
+            qualified = registry.qualified_direction_engine_count
+        except RegistryError:
+            registry_gate = "FAIL_CLOSED"
+            qualified = 0
+        ready = ready and qualified > 0
+        return {
+            "mode": mode.value,
+            "order_submission_enabled": ready,
+            "auto_execute": self.config.execution.auto_execute,
+            "allow_live": self.config.execution.allow_live,
+            "credentials_present": credentials_present,
+            "max_notional_usdt": self.config.execution.max_notional_usdt,
+            "max_leverage": self.config.execution.max_leverage,
+            "max_daily_loss_usdt": self.config.execution.max_daily_loss_usdt,
+            "protective_orders_required": self.config.execution.require_protective_orders,
+            "research_registry_gate": registry_gate,
+            "qualified_direction_engine": "NONE",
+            "qualified_direction_engine_count": qualified,
+            "runtime_actionability": (
+                "OPPORTUNITY_ONLY" if registry_gate != "FAIL_CLOSED" else "NO_OPPORTUNITY"
+            ),
+            "execution_policy": CURRENT_EXECUTION_POLICY,
+            "execution_write_authority": (
+                "NONE" if ACCEPTED_EXECUTION_WRITE_AUTHORITY is None else "ACCEPTED"
+            ),
+        }
+
+    def _assert_signal_registry_actionable(self, _signal_id: str) -> None:
+        try:
+            registry = load_registry()
+            active = registry.get("active_direction_engine")
+        except RegistryError as exc:
+            raise ExecutionBlocked("RESEARCH_REGISTRY_NOT_ACTIONABLE") from exc
+        if not active.actionable or registry.qualified_direction_engine_count == 0:
+            raise ExecutionBlocked("RESEARCH_REGISTRY_NOT_ACTIONABLE")
+
+    def _signed_client(self) -> BinanceSignedClient:
+        if (
+            CURRENT_EXECUTION_POLICY == "RESEARCH_DISABLED_V1"
+            and ACCEPTED_EXECUTION_WRITE_AUTHORITY is None
+        ):
+            raise ExecutionBlocked(
+                "RESEARCH_DISABLED_V1: signed Binance client is not authorized"
+            )
+        if self._injected_signed_client:
+            return self._injected_signed_client
+        key_name, secret_name = self.guard.credential_names()
+        api_key = os.getenv(key_name, "")
+        api_secret = os.getenv(secret_name, "")
+        mode = ExecutionMode(self.config.execution.mode)
+        base_url = (
+            self.config.execution.testnet_base_url
+            if mode == ExecutionMode.TESTNET
+            else self.config.data.rest_base_url
+        )
+        return BinanceSignedClient(
+            base_url,
+            api_key,
+            api_secret,
+            self.config.execution.recv_window_ms,
+            self.config.data.request_timeout_seconds,
+        )
+
+    def refresh_signal_state(self, signal_id: str, now_ms: int | None = None) -> Signal:
+        signal = self.repository.get_signal(signal_id)
+        if signal is None:
+            raise KeyError(f"unknown signal: {signal_id}")
+        if signal.data_health != "OK":
+            raise ExecutionBlocked("signal data_health is not OK")
+        current = now_ms if now_ms is not None else self.public_client.server_time_ms()
+        if current > signal.expires_at_ms:
+            self.repository.update_signal_status(signal_id, SignalStatus.EXPIRED)
+            raise ExecutionBlocked("signal TTL expired during execution revalidation")
+        try:
+            candles_15m = self.public_client.klines(
+                signal.symbol, "15m", self.config.data.history_limit_15m
+            )
+            candles_1h = self.public_client.klines(
+                signal.symbol, "1h", self.config.data.history_limit_1h
+            )
+            candles_4h = self.public_client.klines(
+                signal.symbol, "4h", self.config.data.history_limit_4h
+            )
+        except Exception as exc:
+            raise ExecutionBlocked(f"failed to refresh market state: {exc}") from exc
+        if not candles_15m:
+            raise ExecutionBlocked("latest closed 15m market state is unavailable")
+        if candles_15m[-1].close_time_ms > signal.data_timestamp_ms:
+            reason = QuantEngine(self.config).invalidation_reason(
+                signal, candles_4h, candles_1h, candles_15m, current
+            )
+            if reason is not None:
+                status = (
+                    SignalStatus.EXPIRED if reason == "TTL_EXPIRED" else SignalStatus.INVALIDATED
+                )
+                if status == SignalStatus.INVALIDATED:
+                    self.repository.invalidate_signal(signal_id, reason)
+                else:
+                    self.repository.update_signal_status(signal_id, status)
+                raise ExecutionBlocked(f"signal failed execution revalidation: {reason}")
+        refreshed = self.repository.get_signal(signal_id)
+        assert refreshed is not None
+        if refreshed.status != SignalStatus.ACTIVE:
+            raise ExecutionBlocked("signal is no longer ACTIVE")
+        return refreshed
+
+    def build_entry_plan(self, signal_id: str, now_ms: int | None = None) -> ExecutionPlan:
+        self._assert_signal_registry_actionable(signal_id)
+        current = now_ms if now_ms is not None else int(time.time() * 1000)
+        signal = self.refresh_signal_state(signal_id, current)
+        filters = self.public_client.symbol_filters(signal.symbol)
+        tick = filters["tick_size"]
+        legal_low = _ceil_to(signal.entry_low, tick)
+        legal_high = _floor_to(signal.entry_high, tick)
+        if legal_low > legal_high:
+            raise ExecutionBlocked("entry range contains no legal exchange tick")
+        midpoint = (signal.entry_low + signal.entry_high) / 2.0
+        entry = (
+            _floor_to(midpoint, tick)
+            if signal.direction == Direction.LONG
+            else _ceil_to(midpoint, tick)
+        )
+        entry = min(max(entry, legal_low), legal_high)
+        stop = (
+            _floor_to(signal.stop_loss, tick)
+            if signal.direction == Direction.LONG
+            else _ceil_to(signal.stop_loss, tick)
+        )
+        take_profit = (
+            _floor_to(signal.take_profit, tick)
+            if signal.direction == Direction.LONG
+            else _ceil_to(signal.take_profit, tick)
+        )
+        if signal.direction == Direction.LONG:
+            risk_distance, reward_distance = entry - stop, take_profit - entry
+        else:
+            risk_distance, reward_distance = stop - entry, entry - take_profit
+        if risk_distance <= 0 or reward_distance <= 0:
+            raise ExecutionBlocked("rounded SL/TP geometry is invalid")
+        friction_rate = (
+            signal.estimated_fee_usdt
+            + signal.estimated_slippage_usdt
+            + signal.estimated_funding_usdt
+        ) / signal.recommended_notional
+        rounded_loss_rate = risk_distance / entry + friction_rate
+        risk_capped_notional = min(
+            signal.recommended_notional, signal.max_loss_usdt / rounded_loss_rate
+        )
+        quantity = _floor_to(risk_capped_notional / entry, filters["step_size"])
+        notional = quantity * entry
+        if quantity < filters["min_quantity"] or notional < filters["min_notional"]:
+            raise ExecutionBlocked("risk-sized order is below exchange minimum filters")
+        cost_scale = notional / signal.recommended_notional
+        friction = friction_rate * signal.recommended_notional * cost_scale
+        estimated_max_loss = notional * risk_distance / entry + friction
+        rounded_reward = notional * reward_distance / entry - friction
+        rounded_rr_net = rounded_reward / estimated_max_loss
+        if estimated_max_loss > signal.max_loss_usdt + 1e-9:
+            raise ExecutionBlocked("rounded plan exceeds immutable signal risk budget")
+        if rounded_rr_net < self.config.strategy.rr_min:
+            raise ExecutionBlocked("rounded plan RR is below strategy minimum")
+        created = current
+        plan_id = hashlib.sha256(f"entry:{signal.signal_id}:{created}".encode()).hexdigest()[:20]
+        authority = ExecutionEnvironmentAuthority.from_config(self.config.execution)
+        unsigned = ExecutionPlan(
+            plan_id=plan_id,
+            signal_id=signal.signal_id,
+            symbol=signal.symbol,
+            direction=signal.direction,
+            mode=ExecutionMode(self.config.execution.mode),
+            order_type=self.config.execution.entry_order_type.upper(),
+            quantity=quantity,
+            entry_price=entry,
+            stop_price=stop,
+            take_profit_price=take_profit,
+            notional_usdt=notional,
+            leverage=min(int(signal.display_leverage), self.config.execution.max_leverage),
+            validation_status=signal.validation_status,
+            created_at_ms=created,
+            expires_at_ms=min(
+                signal.expires_at_ms,
+                created + self.config.execution.plan_ttl_seconds * 1000,
+            ),
+            signal_expires_at_ms=signal.expires_at_ms,
+            rounded_rr_net=rounded_rr_net,
+            estimated_max_loss_usdt=estimated_max_loss,
+            plan_hash="",
+            execution_environment_id=authority.environment_id,
+            credential_namespace_id=authority.credential_namespace_id,
+            account_authority_id=authority.account_authority_id,
+        )
+        plan = replace(unsigned, plan_hash=unsigned.calculated_hash())
+        self.repository.save_execution_plan("ENTRY", plan.as_dict())
+        return plan
+
+    def submit_entry(
+        self,
+        plan_id: str,
+        confirmation_hash: str,
+        automatic: bool = False,
+        now_ms: int | None = None,
+    ) -> OrderReceipt:
+        raw_plan = self.repository.get_execution_plan(plan_id)
+        if raw_plan is None or raw_plan["kind"] != "ENTRY":
+            raise KeyError(f"unknown entry plan: {plan_id}")
+        if raw_plan["status"] != "PREPARED":
+            raise ExecutionBlocked(f"entry plan is already {raw_plan['status']}")
+        plan = ExecutionPlan.from_dict(raw_plan["payload"])
+        current = now_ms if now_ms is not None else int(time.time() * 1000)
+
+        # Shared offline preflight (P01-P16)
+        authority = validate_execution_environment_preflight(
+            plan=plan,
+            config=self.config,
+            action=ActionClassification.ENTRY_SUBMIT,
+            now_ms=current,
+        )
+
+        self.refresh_signal_state(plan.signal_id, current)
+        mode = ExecutionMode(self.config.execution.mode)
+        open_positions = 0
+        daily_loss = self.repository.daily_realized_loss_usdt(current)
+
+        if mode in {ExecutionMode.TESTNET, ExecutionMode.LIVE}:
+            client = self._signed_client()
+            dual_side = client.position_mode().get("dualSidePosition")
+            if dual_side is True or str(dual_side).lower() == "true":
+                raise ExecutionBlocked("hedge mode is enabled; phase two requires ONE_WAY mode")
+            open_positions = sum(
+                1 for item in client.positions() if abs(float(item.get("positionAmt", 0.0))) > 0
+            )
+            day_start = current - current % 86_400_000
+            exchange_pnl = client.realized_pnl(day_start)
+            daily_loss = max(daily_loss, abs(min(exchange_pnl, 0.0)))
+
+        self.guard.validate_entry(
+            plan,
+            confirmation_hash,
+            current,
+            open_positions,
+            daily_loss,
+            automatic,
+        )
+
+        if plan.order_type == "MARKET":
+            signal = self.repository.get_signal(plan.signal_id)
+            if signal is None:
+                raise ExecutionBlocked("source signal no longer exists")
+            current_mark = self.public_client.mark_price(plan.symbol)
+            if not signal.entry_low <= current_mark <= signal.entry_high:
+                raise ExecutionBlocked("MARKET entry is outside the immutable signal entry range")
+
+        if mode == ExecutionMode.PAPER:
+            raw = {
+                "orderId": f"paper-{plan.plan_id}",
+                "status": "FILLED",
+                "executedPrice": plan.entry_price,
+                "paper": True,
+            }
+        else:
+            client = self._signed_client()
+            try:
+                client.change_margin_type(plan.symbol, self.config.execution.margin_type)
+            except Exception as exc:
+                if "-4046" not in str(exc):
+                    raise
+            client.change_leverage(plan.symbol, plan.leverage)
+            params: dict[str, Any] = {
+                "symbol": plan.symbol,
+                "side": "BUY" if plan.direction == Direction.LONG else "SELL",
+                "type": plan.order_type,
+                "quantity": plan.quantity,
+                "newClientOrderId": f"bqa-{plan.plan_id}",
+            }
+            if plan.order_type == "LIMIT":
+                params.update({"price": plan.entry_price, "timeInForce": "GTC"})
+            raw = client.place_order(**params)
+
+        receipt = OrderReceipt(
+            plan_id=plan.plan_id,
+            role="ENTRY",
+            order_id=str(raw.get("orderId", raw.get("clientOrderId", "unknown"))),
+            status=str(raw.get("status", "NEW")),
+            raw=raw,
+            plan_hash=plan.plan_hash,
+            mode=mode,
+            execution_environment_id=authority.environment_id,
+            credential_namespace_id=authority.credential_namespace_id,
+            account_authority_id=authority.account_authority_id,
+            symbol=plan.symbol,
+            submitted_at_ms=current,
+            client_order_id=str(raw.get("clientOrderId", f"bqa-{plan.plan_id}")),
+        )
+        self.repository.save_execution_order(receipt.as_dict())
+        self.repository.update_execution_plan_status(plan.plan_id, "SUBMITTED")
+        return receipt
+
+    def reconcile(self, plan_id: str, now_ms: int | None = None) -> dict[str, Any]:
+        raw_plan = self.repository.get_execution_plan(plan_id)
+        if raw_plan is None or raw_plan["kind"] != "ENTRY":
+            raise KeyError(f"unknown entry plan: {plan_id}")
+        plan = ExecutionPlan.from_dict(raw_plan["payload"])
+        current = now_ms if now_ms is not None else int(time.time() * 1000)
+
+        entry = self.repository.latest_execution_order(plan_id, "ENTRY")
+        receipt_payload = entry["payload"] if entry is not None else None
+
+        # Preflight validates plan, receipt, and capability (ASTRA-B-04 direct closure)
+        authority = validate_execution_environment_preflight(
+            plan=plan,
+            config=self.config,
+            receipt=receipt_payload,
+            action=ActionClassification.RECONCILE,
+            now_ms=current,
+        )
+
+        if entry is None:
+            raise ExecutionBlocked("entry has not been submitted")
+
+        mode = ExecutionMode(self.config.execution.mode)
+        if mode == ExecutionMode.DISABLED:
+            raise ExecutionBlocked("execution.mode=disabled")
+
+        if mode == ExecutionMode.PAPER:
+            paper_receipts: list[dict[str, Any]] = []
+            for role, trigger in (
+                ("STOP", plan.stop_price),
+                ("TAKE_PROFIT", plan.take_profit_price),
+            ):
+                paper_receipt = OrderReceipt(
+                    plan_id=plan.plan_id,
+                    role=role,
+                    order_id=f"paper-{role.lower()}-{plan.plan_id}",
+                    status="NEW",
+                    raw={"paper": True, "triggerPrice": trigger},
+                    plan_hash=plan.plan_hash,
+                    mode=mode,
+                    execution_environment_id=authority.environment_id,
+                    credential_namespace_id=authority.credential_namespace_id,
+                    account_authority_id=authority.account_authority_id,
+                    symbol=plan.symbol,
+                    submitted_at_ms=current,
+                    client_order_id=f"paper-{role.lower()}-{plan.plan_id}",
+                )
+                self.repository.save_execution_order(paper_receipt.as_dict())
+                paper_receipts.append(paper_receipt.as_dict())
+            self.repository.update_execution_plan_status(plan.plan_id, "PROTECTED")
+            return {"status": "PROTECTED", "plan_id": plan_id, "orders": paper_receipts}
+
+        client = self._signed_client()
+        current_order = client.query_order(plan.symbol, entry["order_id"])
+        order_status = str(current_order.get("status", "UNKNOWN"))
+        if (
+            order_status in {"NEW", "PENDING_NEW"}
+            and int(time.time() * 1000) > plan.signal_expires_at_ms
+        ):
+            cancelled = client.cancel_order(plan.symbol, entry["order_id"])
+            self.repository.update_execution_plan_status(plan.plan_id, "CANCELLED_EXPIRED")
+            return {"status": "CANCELLED_EXPIRED", "plan_id": plan_id, "order": cancelled}
+        if order_status not in {"FILLED", "PARTIALLY_FILLED"}:
+            return {"status": current_order.get("status", "UNKNOWN"), "plan_id": plan_id}
+        if order_status == "PARTIALLY_FILLED":
+            client.cancel_order(plan.symbol, entry["order_id"])
+        existing_stop = self.repository.latest_execution_order(plan_id, "STOP")
+        existing_take_profit = self.repository.latest_execution_order(plan_id, "TAKE_PROFIT")
+        if existing_stop and existing_take_profit:
+            return {"status": "PROTECTED", "plan_id": plan_id}
+        exit_side = "SELL" if plan.direction == Direction.LONG else "BUY"
+        common = {
+            "algoType": "CONDITIONAL",
+            "symbol": plan.symbol,
+            "side": exit_side,
+            "closePosition": "true",
+            "workingType": "MARK_PRICE",
+            "priceProtect": "TRUE",
+        }
+        receipts: list[dict[str, Any]] = []
+        try:
+            for role, order_type, trigger in (
+                ("STOP", "STOP_MARKET", plan.stop_price),
+                ("TAKE_PROFIT", "TAKE_PROFIT_MARKET", plan.take_profit_price),
+            ):
+                if self.repository.latest_execution_order(plan_id, role):
+                    continue
+                raw = client.place_protective_order(**common, type=order_type, triggerPrice=trigger)
+                protective_receipt = OrderReceipt(
+                    plan_id=plan.plan_id,
+                    role=role,
+                    order_id=str(raw.get("algoId", raw.get("orderId", "unknown"))),
+                    status=str(raw.get("algoStatus", raw.get("status", "NEW"))),
+                    raw=raw,
+                    plan_hash=plan.plan_hash,
+                    mode=mode,
+                    execution_environment_id=authority.environment_id,
+                    credential_namespace_id=authority.credential_namespace_id,
+                    account_authority_id=authority.account_authority_id,
+                    symbol=plan.symbol,
+                    submitted_at_ms=current,
+                    client_order_id=str(raw.get("clientOrderId", "")),
+                )
+                self.repository.save_execution_order(protective_receipt.as_dict())
+                receipts.append(protective_receipt.as_dict())
+        except Exception:
+            if self.config.execution.require_protective_orders:
+                for receipt in receipts:
+                    try:
+                        client.cancel_protective_order(plan.symbol, receipt["order_id"])
+                    except Exception as cancel_error:  # noqa: BLE001
+                        self.repository.record_event(
+                            "protective_cancel_failed",
+                            {
+                                "plan_id": plan.plan_id,
+                                "order_id": receipt["order_id"],
+                                "error": str(cancel_error),
+                            },
+                        )
+                client.place_order(
+                    symbol=plan.symbol,
+                    side=exit_side,
+                    type="MARKET",
+                    quantity=plan.quantity,
+                    reduceOnly="true",
+                    newClientOrderId=f"bqa-failsafe-{plan.plan_id}",
+                )
+                self.repository.update_execution_plan_status(plan.plan_id, "FAILSAFE_CLOSED")
+            raise
+        self.repository.update_execution_plan_status(plan.plan_id, "PROTECTED")
+        return {"status": "PROTECTED", "plan_id": plan_id, "orders": receipts}
+
+    def prepare_close(self, symbol: str, now_ms: int | None = None) -> ClosePlan:
+        mode = ExecutionMode(self.config.execution.mode)
+        if mode != ExecutionMode.PAPER and CURRENT_EXECUTION_POLICY == "RESEARCH_DISABLED_V1":
+            raise ExecutionBlocked(
+                "RESEARCH_DISABLED_V1: signed position query for close preparation is not authorized"
+            )
+        self.guard.risk_reducing_gate(mode)
+        if mode == ExecutionMode.PAPER:
+            raise ExecutionBlocked("paper close requires a simulated fill and is not inferred")
+        positions = self._signed_client().positions(symbol.upper())
+        position = next(
+            (item for item in positions if abs(float(item.get("positionAmt", 0.0))) > 0),
+            None,
+        )
+        if position is None:
+            raise ExecutionBlocked("no open position")
+        amount = float(position["positionAmt"])
+        created = now_ms if now_ms is not None else int(time.time() * 1000)
+        authority = ExecutionEnvironmentAuthority.from_config(self.config.execution)
+        plan_id = hashlib.sha256(f"close:{symbol}:{created}".encode()).hexdigest()[:20]
+        unsigned = ClosePlan(
+            plan_id=plan_id,
+            symbol=symbol.upper(),
+            mode=mode,
+            side="SELL" if amount > 0 else "BUY",
+            quantity=abs(amount),
+            created_at_ms=created,
+            expires_at_ms=created + self.config.execution.plan_ttl_seconds * 1000,
+            plan_hash="",
+            execution_environment_id=authority.environment_id,
+            credential_namespace_id=authority.credential_namespace_id,
+            account_authority_id=authority.account_authority_id,
+        )
+        plan = replace(unsigned, plan_hash=unsigned.calculated_hash())
+        self.repository.save_execution_plan("CLOSE", plan.as_dict())
+        return plan
+
+    def submit_close(
+        self, plan_id: str, confirmation_hash: str, now_ms: int | None = None
+    ) -> OrderReceipt:
+        raw_plan = self.repository.get_execution_plan(plan_id)
+        if raw_plan is None or raw_plan["kind"] != "CLOSE":
+            raise KeyError(f"unknown close plan: {plan_id}")
+        if raw_plan["status"] != "PREPARED":
+            raise ExecutionBlocked(f"close plan is already {raw_plan['status']}")
+        plan = ClosePlan.from_dict(raw_plan["payload"])
+        current = now_ms if now_ms is not None else int(time.time() * 1000)
+
+        authority = validate_execution_environment_preflight(
+            plan=plan,
+            config=self.config,
+            action=ActionClassification.SUBMIT_CLOSE,
+            now_ms=current,
+        )
+
+        self.guard.validate_close(plan, confirmation_hash, current)
+        raw = self._signed_client().place_order(
+            symbol=plan.symbol,
+            side=plan.side,
+            type="MARKET",
+            quantity=plan.quantity,
+            reduceOnly="true",
+            newClientOrderId=f"bqa-close-{plan.plan_id}",
+        )
+        receipt = OrderReceipt(
+            plan_id=plan.plan_id,
+            role="CLOSE",
+            order_id=str(raw.get("orderId", "unknown")),
+            status=str(raw.get("status", "NEW")),
+            raw=raw,
+            plan_hash=plan.plan_hash,
+            mode=plan.mode,
+            execution_environment_id=authority.environment_id,
+            credential_namespace_id=authority.credential_namespace_id,
+            account_authority_id=authority.account_authority_id,
+            symbol=plan.symbol,
+            submitted_at_ms=current,
+            client_order_id=f"bqa-close-{plan.plan_id}",
+        )
+        self.repository.save_execution_order(receipt.as_dict())
+        self.repository.update_execution_plan_status(plan.plan_id, "SUBMITTED")
+        return receipt
+
+    def cancel_entry(
+        self, plan_id: str, confirmation_hash: str, now_ms: int | None = None
+    ) -> dict[str, Any]:
+        raw_plan = self.repository.get_execution_plan(plan_id)
+        if raw_plan is None or raw_plan["kind"] != "ENTRY":
+            raise KeyError(f"unknown entry plan: {plan_id}")
+        plan = ExecutionPlan.from_dict(raw_plan["payload"])
+        entry = self.repository.latest_execution_order(plan_id, "ENTRY")
+        if entry is None:
+            raise ExecutionBlocked("entry has not been submitted")
+
+        current = now_ms if now_ms is not None else int(time.time() * 1000)
+
+        # Preflight validates plan, receipt, and capability
+        validate_execution_environment_preflight(
+            plan=plan,
+            config=self.config,
+            receipt=entry["payload"],
+            action=ActionClassification.CANCEL_ENTRY,
+            now_ms=current,
+        )
+
+        self.guard.validate_cancel(plan, confirmation_hash)
+        if plan.mode == ExecutionMode.PAPER:
+            self.repository.update_execution_plan_status(plan.plan_id, "CANCELLED")
+            return {"orderId": entry["order_id"], "status": "CANCELED", "paper": True}
+        return self._signed_client().cancel_order(plan.symbol, entry["order_id"])
+
+    def auto_submit(self, signal: Signal) -> OrderReceipt:
+        plan = self.build_entry_plan(signal.signal_id)
+        return self.submit_entry(plan.plan_id, plan.plan_hash, automatic=True)
+
+    def reconcile_open_plans(self) -> list[dict[str, Any]]:
+        mode = ExecutionMode(self.config.execution.mode)
+        if mode == ExecutionMode.DISABLED:
+            return []
+        if mode != ExecutionMode.PAPER and CURRENT_EXECUTION_POLICY == "RESEARCH_DISABLED_V1":
+            # Under research-disabled authority, do not fan out into repeated signed attempts.
+            # Return an explicit blocked/no-op operational result with zero signed client calls.
+            # Do not silently label blocked reconciliation as success.
+            open_ids = self.repository.open_entry_plan_ids()
+            return [
+                {
+                    "plan_id": pid,
+                    "status": "BLOCKED",
+                    "error": "RESEARCH_DISABLED_V1: signed reconciliation is not authorized",
+                }
+                for pid in open_ids
+            ]
+        output: list[dict[str, Any]] = []
+        for plan_id in self.repository.open_entry_plan_ids():
+            try:
+                output.append(self.reconcile(plan_id))
+            except Exception as exc:  # noqa: BLE001 - reconcile all plans independently
+                output.append({"plan_id": plan_id, "status": "ERROR", "error": str(exc)})
+        return output

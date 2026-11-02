@@ -1,0 +1,266 @@
+{
+  "$defs": {
+    "GrantBody": {
+      "additionalProperties": false,
+      "properties": {
+        "account_or_order_operations": {
+          "const": false,
+          "title": "Account Or Order Operations",
+          "type": "boolean"
+        },
+        "authorization_reference": {
+          "pattern": "^OWNER-V070-L4-SESSION02-[A-Z0-9_-]+$",
+          "title": "Authorization Reference",
+          "type": "string"
+        },
+        "auxiliary_bytes": {
+          "const": 4294967296,
+          "title": "Auxiliary Bytes",
+          "type": "integer"
+        },
+        "canonical_documentation_head": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Canonical Documentation Head",
+          "type": "string"
+        },
+        "clock_contract": {
+          "const": "L4_CLOCK_DOMAIN_V2",
+          "title": "Clock Contract",
+          "type": "string"
+        },
+        "connections": {
+          "const": 1,
+          "title": "Connections",
+          "type": "integer"
+        },
+        "controls_per_second": {
+          "const": 2,
+          "title": "Controls Per Second",
+          "type": "integer"
+        },
+        "documentation_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Documentation Fingerprint",
+          "type": "string"
+        },
+        "end_utc_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Utc Ms",
+          "type": "integer"
+        },
+        "endpoint_fields": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Endpoint Fields",
+          "type": "object"
+        },
+        "endpoint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Endpoint Ids",
+          "type": "array"
+        },
+        "external_notifications": {
+          "const": false,
+          "title": "External Notifications",
+          "type": "boolean"
+        },
+        "issued_utc_ms": {
+          "exclusiveMinimum": 0,
+          "title": "Issued Utc Ms",
+          "type": "integer"
+        },
+        "market": {
+          "const": "USD_M_USDT_LINEAR_PERPETUAL",
+          "title": "Market",
+          "type": "string"
+        },
+        "max_offset_uncertainty_ms": {
+          "const": 100,
+          "title": "Max Offset Uncertainty Ms",
+          "type": "integer"
+        },
+        "max_probe_age_ms": {
+          "const": 300000,
+          "title": "Max Probe Age Ms",
+          "type": "integer"
+        },
+        "normalized_retention_hours": {
+          "const": 168,
+          "title": "Normalized Retention Hours",
+          "type": "integer"
+        },
+        "output_path": {
+          "title": "Output Path",
+          "type": "string"
+        },
+        "permitted_use": {
+          "const": "OWNER_CONFIRMED_PERSONAL_NONCOMMERCIAL_PUBLIC_READONLY",
+          "title": "Permitted Use",
+          "type": "string"
+        },
+        "provider": {
+          "const": "binance",
+          "title": "Provider",
+          "type": "string"
+        },
+        "raw_bytes": {
+          "const": 8589934592,
+          "title": "Raw Bytes",
+          "type": "integer"
+        },
+        "raw_retention_hours": {
+          "const": 36,
+          "title": "Raw Retention Hours",
+          "type": "integer"
+        },
+        "reconnects_per_hour": {
+          "const": 3,
+          "title": "Reconnects Per Hour",
+          "type": "integer"
+        },
+        "rest_weight_per_minute": {
+          "const": 60,
+          "title": "Rest Weight Per Minute",
+          "type": "integer"
+        },
+        "retry_reserve_weight_per_minute": {
+          "const": 10,
+          "title": "Retry Reserve Weight Per Minute",
+          "type": "integer"
+        },
+        "session_id": {
+          "const": "L4-NATIVE-CLOCK-V2-SESSION02-20261030",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "source_sha256_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256 Fingerprint",
+          "type": "string"
+        },
+        "start_utc_ms": {
+          "exclusiveMinimum": 0,
+          "title": "Start Utc Ms",
+          "type": "integer"
+        },
+        "startup_independent_probes": {
+          "const": 2,
+          "title": "Startup Independent Probes",
+          "type": "integer"
+        },
+        "startup_probe_gap_ms": {
+          "const": 10,
+          "title": "Startup Probe Gap Ms",
+          "type": "integer"
+        },
+        "subscriptions": {
+          "const": 3,
+          "title": "Subscriptions",
+          "type": "integer"
+        },
+        "subsequent_probe_interval_ms": {
+          "const": 120000,
+          "title": "Subsequent Probe Interval Ms",
+          "type": "integer"
+        },
+        "symbols": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Symbols",
+          "type": "array"
+        },
+        "time_calls_per_minute": {
+          "const": 2,
+          "title": "Time Calls Per Minute",
+          "type": "integer"
+        },
+        "version": {
+          "const": "L4_SESSION02_GRANT_V1",
+          "title": "Version",
+          "type": "string"
+        },
+        "wall_jump_ms": {
+          "const": 50,
+          "title": "Wall Jump Ms",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "session_id",
+        "authorization_reference",
+        "provider",
+        "market",
+        "permitted_use",
+        "symbols",
+        "endpoint_ids",
+        "endpoint_fields",
+        "output_path",
+        "issued_utc_ms",
+        "start_utc_ms",
+        "end_utc_ms",
+        "source_sha256_fingerprint",
+        "canonical_documentation_head",
+        "documentation_fingerprint",
+        "clock_contract",
+        "wall_jump_ms",
+        "max_offset_uncertainty_ms",
+        "max_probe_age_ms",
+        "startup_independent_probes",
+        "startup_probe_gap_ms",
+        "subsequent_probe_interval_ms",
+        "rest_weight_per_minute",
+        "retry_reserve_weight_per_minute",
+        "time_calls_per_minute",
+        "controls_per_second",
+        "connections",
+        "subscriptions",
+        "reconnects_per_hour",
+        "raw_retention_hours",
+        "normalized_retention_hours",
+        "raw_bytes",
+        "auxiliary_bytes",
+        "external_notifications",
+        "account_or_order_operations"
+      ],
+      "title": "GrantBody",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "grant": {
+      "$ref": "#/$defs/GrantBody"
+    },
+    "key_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Key Id",
+      "type": "string"
+    },
+    "signature_algorithm": {
+      "const": "Ed25519",
+      "title": "Signature Algorithm",
+      "type": "string"
+    },
+    "signature_base64": {
+      "title": "Signature Base64",
+      "type": "string"
+    }
+  },
+  "required": [
+    "grant",
+    "key_id",
+    "signature_algorithm",
+    "signature_base64"
+  ],
+  "title": "GrantEnvelope",
+  "type": "object"
+}

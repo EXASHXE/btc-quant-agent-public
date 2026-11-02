@@ -1,0 +1,495 @@
+{
+  "canonical_head": "f6db786fcb464ea642f249a5fc1da8e15e07da00",
+  "clock_remediation_note": "Existing official semantic review retained. Latest canonical handoff read; no native reread or source-quality qualification.",
+  "controlled_egress_authority": "OWNER-V070-L4-EGRESS-GATEWAY-20261030",
+  "dynamic_ip_ceiling": "exchangeInfo.rateLimits authoritative; one bounded approved metadata bootstrap weight 1, no other source request until positive REQUEST_WEIGHT cap checked",
+  "endpoints": [
+    {
+      "documentation_reference": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-streams/public#individual-symbol-book-ticker-streams",
+      "endpoint": "/public/ws/{symbol}@bookTicker",
+      "fields": [
+        "e",
+        "s",
+        "st",
+        "u",
+        "E",
+        "T",
+        "b",
+        "B",
+        "a",
+        "A"
+      ],
+      "freshness_ttl_ms": 5000,
+      "host": "wss://fstream.binance.com",
+      "id": "binance_usdm_bbo_ws",
+      "method": "WSS",
+      "native_fields_units": {
+        "A": "native ask quantity; requires contract unit proof",
+        "B": "native bid quantity; requires contract unit proof",
+        "E": "event time ms",
+        "T": "transaction time ms",
+        "a": "best ask USDT/base",
+        "b": "best bid USDT/base",
+        "e": "event type bookTicker",
+        "s": "symbol",
+        "st": "1=UM,2=CM identity discriminator",
+        "u": "order book update ID; not contiguous BBO sequence"
+      },
+      "native_observed": false,
+      "proposed_cadence_seconds": 0,
+      "rate_limits": {
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true,
+        "requests": 2400,
+        "window_seconds": 60
+      },
+      "source_qualification": "DOCUMENTATION_ONLY; UNKNOWN native units/clock remain context-only, never ACTION",
+      "timestamp_field": "E",
+      "timestamp_semantics": "EVENT_TIME_WITH_SEPARATE_TRANSACTION_T",
+      "websocket": {
+        "channels_per_symbol": 1,
+        "connect_requests_per_second": null,
+        "connection_lifetime_seconds": 86400,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover",
+        "subscription_requests_per_hour": null
+      },
+      "weight_formula": "WS_NOT_REST"
+    },
+    {
+      "documentation_reference": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#exchange-information",
+      "endpoint": "/fapi/v1/exchangeInfo",
+      "fields": [
+        "symbols",
+        "rateLimits",
+        "serverTime"
+      ],
+      "freshness_ttl_ms": 3600000,
+      "host": "https://fapi.binance.com",
+      "id": "binance_usdm_exchange_info",
+      "method": "GET",
+      "native_fields_units": {
+        "rateLimits": "weight caps declared by venue; not yet observed",
+        "serverTime": "IGNORE; not clock probe",
+        "symbols": "contract identity/status/filter objects"
+      },
+      "native_observed": false,
+      "proposed_cadence_seconds": 3600,
+      "rate_limits": {
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true,
+        "requests": 2400,
+        "window_seconds": 60
+      },
+      "source_qualification": "DOCUMENTATION_ONLY; UNKNOWN native units/clock remain context-only, never ACTION",
+      "timestamp_field": null,
+      "timestamp_semantics": "STATIC_METADATA_RECEIVE_TTL",
+      "websocket": {
+        "channels_per_symbol": 1,
+        "connect_requests_per_second": null,
+        "connection_lifetime_seconds": 86400,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover",
+        "subscription_requests_per_hour": null
+      },
+      "weight_formula": "FIXED_1"
+    },
+    {
+      "documentation_reference": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#get-funding-rate-info",
+      "endpoint": "/fapi/v1/fundingInfo",
+      "fields": [
+        "symbol",
+        "fundingIntervalHours",
+        "adjustedFundingRateCap",
+        "adjustedFundingRateFloor"
+      ],
+      "freshness_ttl_ms": 300000,
+      "host": "https://fapi.binance.com",
+      "id": "binance_usdm_funding_info",
+      "method": "GET",
+      "native_fields_units": {
+        "adjustedFundingRateCap": "rate cap",
+        "adjustedFundingRateFloor": "rate floor",
+        "fundingIntervalHours": "hours for returned adjusted instruments",
+        "symbol": "only adjusted symbols; absence does not prove cadence"
+      },
+      "native_observed": false,
+      "proposed_cadence_seconds": 300,
+      "rate_limits": {
+        "ceiling_verification": "VERIFIED_DOC_SHARED_500_PER_5_MIN_IP",
+        "requests": 500,
+        "shared_group": "fundingInfo_and_fundingRate",
+        "window_seconds": 300
+      },
+      "source_qualification": "DOCUMENTATION_ONLY; UNKNOWN native units/clock remain context-only, never ACTION",
+      "timestamp_field": null,
+      "timestamp_semantics": "STATIC_METADATA_RECEIVE_TTL",
+      "websocket": {
+        "channels_per_symbol": 1,
+        "connect_requests_per_second": null,
+        "connection_lifetime_seconds": 86400,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover",
+        "subscription_requests_per_hour": null
+      },
+      "weight_formula": "FIXED_0"
+    },
+    {
+      "documentation_reference": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#klinecandlestick-data",
+      "endpoint": "/fapi/v1/klines",
+      "fields": [
+        "[0]",
+        "[1:5]",
+        "[5]",
+        "[6]",
+        "[7]",
+        "[9]",
+        "[10]"
+      ],
+      "freshness_ttl_ms": 2000,
+      "host": "https://fapi.binance.com",
+      "id": "binance_usdm_klines_rest",
+      "method": "GET",
+      "native_fields_units": {
+        "[0]": "bar open UTC ms",
+        "[10]": "taker buy quote volume",
+        "[1:5]": "OHLC USDT/base",
+        "[5]": "volume native unit requires verification",
+        "[6]": "bar close UTC ms",
+        "[7]": "quote volume USDT",
+        "[9]": "taker buy base volume"
+      },
+      "native_observed": false,
+      "proposed_cadence_seconds": 0,
+      "rate_limits": {
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true,
+        "requests": 2400,
+        "window_seconds": 60
+      },
+      "source_qualification": "DOCUMENTATION_ONLY; UNKNOWN native units/clock remain context-only, never ACTION",
+      "timestamp_field": "[6]",
+      "timestamp_semantics": "CANDLE_CLOSE_TIME_NOT_EXECUTABLE_QUOTE",
+      "websocket": {
+        "channels_per_symbol": 1,
+        "connect_requests_per_second": null,
+        "connection_lifetime_seconds": 86400,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover",
+        "subscription_requests_per_hour": null
+      },
+      "weight_formula": "KLINE_LIMIT_TIERS"
+    },
+    {
+      "documentation_reference": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-streams/market#klinecandlestick-streams",
+      "endpoint": "/market/ws/{symbol}@kline_{interval}",
+      "fields": [
+        "E",
+        "s",
+        "k.t",
+        "k.T",
+        "k.i",
+        "k.x",
+        "k.o/h/l/c",
+        "k.v",
+        "k.q"
+      ],
+      "freshness_ttl_ms": 2000,
+      "host": "wss://fstream.binance.com",
+      "id": "binance_usdm_klines_ws",
+      "method": "WSS",
+      "native_fields_units": {
+        "E": "candidate event time ms",
+        "k.T": "close ms",
+        "k.i": "1m/5m",
+        "k.o/h/l/c": "OHLC",
+        "k.q": "quote volume",
+        "k.t": "open ms",
+        "k.v": "native volume",
+        "k.x": "closed flag",
+        "s": "symbol"
+      },
+      "native_observed": false,
+      "proposed_cadence_seconds": 0,
+      "rate_limits": {
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true,
+        "requests": 2400,
+        "window_seconds": 60
+      },
+      "source_qualification": "DOCUMENTATION_ONLY; UNKNOWN native units/clock remain context-only, never ACTION",
+      "timestamp_field": "E",
+      "timestamp_semantics": "EVENT_TIME",
+      "websocket": {
+        "channels_per_symbol": 2,
+        "connect_requests_per_second": null,
+        "connection_lifetime_seconds": 86400,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover",
+        "subscription_requests_per_hour": null
+      },
+      "weight_formula": "WS_NOT_REST"
+    },
+    {
+      "documentation_reference": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#open-interest",
+      "endpoint": "/fapi/v1/openInterest",
+      "fields": [
+        "symbol",
+        "openInterest",
+        "time"
+      ],
+      "freshness_ttl_ms": 120000,
+      "host": "https://fapi.binance.com",
+      "id": "binance_usdm_oi",
+      "method": "GET",
+      "native_fields_units": {
+        "openInterest": "native OI; BASE unit not proven by the field label alone",
+        "symbol": "symbol",
+        "time": "transaction time ms"
+      },
+      "native_observed": false,
+      "proposed_cadence_seconds": 60,
+      "rate_limits": {
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true,
+        "requests": 2400,
+        "window_seconds": 60
+      },
+      "source_qualification": "DOCUMENTATION_ONLY; UNKNOWN native units/clock remain context-only, never ACTION",
+      "timestamp_field": "time",
+      "timestamp_semantics": "TRANSACTION_TIME",
+      "websocket": {
+        "channels_per_symbol": 1,
+        "connect_requests_per_second": null,
+        "connection_lifetime_seconds": 86400,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover",
+        "subscription_requests_per_hour": null
+      },
+      "weight_formula": "FIXED_1"
+    },
+    {
+      "documentation_reference": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#mark-price",
+      "endpoint": "/fapi/v1/premiumIndex",
+      "fields": [
+        "symbol",
+        "markPrice",
+        "indexPrice",
+        "lastFundingRate",
+        "nextFundingTime",
+        "time"
+      ],
+      "freshness_ttl_ms": 3600000,
+      "host": "https://fapi.binance.com",
+      "id": "binance_usdm_premium",
+      "method": "GET",
+      "native_fields_units": {
+        "indexPrice": "USDT/base",
+        "lastFundingRate": "rate per settlement snapshot, not cash",
+        "markPrice": "USDT/base",
+        "nextFundingTime": "future settlement UTC ms",
+        "symbol": "symbol",
+        "time": "generic Time label; publish/event authority UNKNOWN"
+      },
+      "native_observed": false,
+      "proposed_cadence_seconds": 60,
+      "rate_limits": {
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true,
+        "requests": 2400,
+        "window_seconds": 60
+      },
+      "source_qualification": "DOCUMENTATION_ONLY; UNKNOWN native units/clock remain context-only, never ACTION",
+      "timestamp_field": "time",
+      "timestamp_semantics": "UNKNOWN",
+      "websocket": {
+        "channels_per_symbol": 1,
+        "connect_requests_per_second": null,
+        "connection_lifetime_seconds": 86400,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover",
+        "subscription_requests_per_hour": null
+      },
+      "weight_formula": "PREMIUM_SINGLE_1_ALL_10"
+    },
+    {
+      "documentation_reference": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#check-server-time",
+      "endpoint": "/fapi/v1/time",
+      "fields": [
+        "serverTime"
+      ],
+      "freshness_ttl_ms": 3600000,
+      "host": "https://fapi.binance.com",
+      "id": "binance_usdm_server_time",
+      "method": "GET",
+      "native_fields_units": {
+        "serverTime": "server clock ms"
+      },
+      "native_observed": false,
+      "proposed_cadence_seconds": 300,
+      "rate_limits": {
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true,
+        "requests": 2400,
+        "window_seconds": 60
+      },
+      "source_qualification": "DOCUMENTATION_ONLY; UNKNOWN native units/clock remain context-only, never ACTION",
+      "timestamp_field": "serverTime",
+      "timestamp_semantics": "SERVER_CLOCK_SAMPLE",
+      "websocket": {
+        "channels_per_symbol": 1,
+        "connect_requests_per_second": null,
+        "connection_lifetime_seconds": 86400,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover",
+        "subscription_requests_per_hour": null
+      },
+      "weight_formula": "FIXED_1"
+    },
+    {
+      "documentation_reference": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#24hr-ticker-price-change-statistics",
+      "endpoint": "/fapi/v1/ticker/24hr",
+      "fields": [
+        "symbol",
+        "quoteVolume",
+        "volume",
+        "openTime",
+        "closeTime"
+      ],
+      "freshness_ttl_ms": 3600000,
+      "host": "https://fapi.binance.com",
+      "id": "binance_usdm_turnover",
+      "method": "GET",
+      "native_fields_units": {
+        "closeTime": "window close ms, not execution time",
+        "openTime": "rolling-window start ms",
+        "quoteVolume": "rolling 24h quote turnover",
+        "symbol": "symbol",
+        "volume": "rolling 24h native volume"
+      },
+      "native_observed": false,
+      "proposed_cadence_seconds": 300,
+      "rate_limits": {
+        "ceiling_verification": "DOC_EXAMPLE_2400_WEIGHT_PER_MINUTE_NOT_OBSERVED_IP_CAP",
+        "ip_ceiling_requires_future_authorized_exchangeInfo_check": true,
+        "requests": 2400,
+        "window_seconds": 60
+      },
+      "source_qualification": "DOCUMENTATION_ONLY; UNKNOWN native units/clock remain context-only, never ACTION",
+      "timestamp_field": "closeTime",
+      "timestamp_semantics": "ROLLING_WINDOW_END_TIME",
+      "websocket": {
+        "channels_per_symbol": 1,
+        "connect_requests_per_second": null,
+        "connection_lifetime_seconds": 86400,
+        "incoming_controls_per_second": 10,
+        "max_streams_per_connection": 1024,
+        "ping_interval_seconds": 180,
+        "pong_deadline_seconds": 600,
+        "reconnect_gap_policy": "Invalidate quote lease; new epoch, distinct good updates and explicit gap/warmup evidence; no automatic source failover",
+        "subscription_requests_per_hour": null
+      },
+      "weight_formula": "TICKER_SINGLE_1_ALL_40"
+    }
+  ],
+  "native_review_note": "Prior official native facts retained with original review time; runtime must recheck official documents through strict target TLS before any market request.",
+  "no_action_without_complete_evidence": true,
+  "official_review_complete": true,
+  "owner_attestation_only": true,
+  "review_meaning": "Current primary API docs/changelog inspected; known semantics and explicit unknowns recorded. No source quality or venue permission inferred.",
+  "reviewed_utc": "2026-10-29T16:00:33.980174+00:00",
+  "runtime_document_checks": [
+    {
+      "path": "/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data",
+      "required_tokens": [
+        "/fapi/v1/exchangeInfo",
+        "/fapi/v1/time",
+        "/fapi/v1/klines",
+        "/fapi/v1/openInterest",
+        "/fapi/v1/premiumIndex",
+        "/fapi/v1/fundingInfo",
+        "/fapi/v1/ticker/24hr",
+        "fundingIntervalHours",
+        "Transaction time",
+        "REQUEST_WEIGHT",
+        "[1,100)",
+        "[100, 500)",
+        "[500, 1000]"
+      ]
+    },
+    {
+      "path": "/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-streams/public",
+      "required_tokens": [
+        "bookTicker",
+        "event time",
+        "transaction time",
+        "UM",
+        "CM",
+        "/public/"
+      ]
+    },
+    {
+      "path": "/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-streams/market",
+      "required_tokens": [
+        "Kline/Candlestick",
+        "Event time",
+        "Kline start time",
+        "Kline close time",
+        "/market/",
+        "1m",
+        "5m"
+      ]
+    },
+    {
+      "path": "/en/docs/products/derivatives-trading-usds-futures/websocket-market-streams/Connect",
+      "required_tokens": [
+        "/public",
+        "/market",
+        "24 hours",
+        "10 incoming messages per second",
+        "1024",
+        "3 minutes",
+        "10 minute"
+      ]
+    },
+    {
+      "path": "/en/docs/products/derivatives-trading-usds-futures/change-log",
+      "required_tokens": [
+        "Change Log",
+        "2026"
+      ]
+    }
+  ],
+  "runtime_documentation_policy": "Local reviewed baseline; no mandatory human website network probe. Native exchangeInfo dynamically validates supported rules/status/filters/rateLimits only; independent clocks/units/quote gates remain.",
+  "unknowns": [
+    "premiumIndex.time is generic Time, not verified publish authority",
+    "fundingInfo absence is not proof of default cadence",
+    "OI/native size units not automatically promoted to BASE",
+    "account margin/leverage/position evidence absent"
+  ],
+  "version": "L4-PUBLIC-ENDPOINT-REVIEW-1"
+}
