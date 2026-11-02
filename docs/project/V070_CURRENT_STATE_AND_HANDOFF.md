@@ -1,5 +1,10 @@
 # v0.7.0 Current State and New-Chat Handoff
 
+## 2026-11-02 09:43 Asia/Shanghai — Session04 offline Codex dispatch lock correction
+
+Initial scoped Codex PID 441888 exited BLOCKED without changes because the outer Controller flock already held /tmp/l4-p0-crossphase.dispatch.lock and the worker incorrectly attempted to reacquire that same non-reentrant lock. Controller independently verified lock available after exit; no native requests/source changes in failed attempt. Mandate amended to identify the outer exclusive owner and check for independent competing writers without reacquiring its own lock. New single Codex PID 442239 launched under the same outer flock, active at 2026-11-02 09:43 local time. Updated exact mandate: l4-readonly-source-canary-01/artifacts/controller_dispatch/V070_SESSION04_INSTRUMENTED_NATIVE_AND_LONG_HANDOFF_OFFLINE_20261102.md. Correct log: V070_SESSION04_HANDOFF_CODEX_EXEC_R2.log. Existing Session03 and Owner signing trust remain immutable. This is OFFLINE preparation ONLY, not live trial approval or success. Do not report task finished before checking its actual final receipt.
+
+
 ## 2026-11-02 09:35 Asia/Shanghai — Owner accepted Source PARTIAL, Dashboard OFFLINE READY; Session04 prep dispatched
 
 Controller independently inspected latest local acceptance and final reports:
