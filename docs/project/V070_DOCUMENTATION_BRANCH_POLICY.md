@@ -1,4 +1,9 @@
 # v0.7.0 Canonical Documentation Branch Policy
+
+## Current Source-to-Advisory checkpoint (2026-11-02)
+
+New live status and next approval dependency are in [Source-to-Advisory Closure Status](V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md). That document and the [latest handoff](V070_CURRENT_STATE_AND_HANDOFF.md) supersede historical Foundation and old L4 task-card status descriptions for current planning; they do **not** retroactively alter sealed evidence or authorization. Updates on this branch are docs only, not live grants, code integration or worker execution.
+
 Owner decision: 2026-10-28. Active canonical remote documentation branch: **docs/engineering**.
 
 ## Sole source of documentation
@@ -15,7 +20,8 @@ Owner decision: 2026-10-28. Active canonical remote documentation branch: **docs
 - [Independent ChatGPT role](../roles/V070_CHATGPT_STRATEGIC_ADVISOR.md)
 - [Roadmap](V070_ADVISORY_ROADMAP.md)
 - [Current state](V070_CURRENT_STATE_AND_HANDOFF.md)
-- [Foundation task](V070_ADVISORY_FOUNDATION_TASK.md)
+- [Current Source-to-Advisory closure](V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md)
+- [Historical Foundation task](V070_ADVISORY_FOUNDATION_TASK.md)
 - [ChatGPT strategic advisor startup](V070_CHATGPT_NEW_CHAT_START.md)
 - [Controller 0-C startup](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md)
 

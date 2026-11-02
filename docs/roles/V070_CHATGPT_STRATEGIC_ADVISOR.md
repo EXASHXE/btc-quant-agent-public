@@ -3,6 +3,14 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](../project/V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: active for NEW advisory-product conversations, 2026-10-28. This role is distinct from Controller 0-C.
 
+## 2026-11-02 independent review checkpoint
+
+Begin with the [current Source-to-Advisory closure status](../project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md), canonical handoff/roadmap and **newest local receipts**. Session03 observed genuine BBO and valid short clock probes but stopped `BACKPRESSURE_BLOCKED`; its consumed/sealed evidence is NOT full Source qualification. Source telemetry remains PARTIAL with UNKNOWN native stall cause; Session04 and LONG offline handoff are READY_OFFLINE only; no new source grant or 48h market/Shadow acceptance is established.
+
+Review whether Controller 0-C achieved real source latency/stability and end-to-end WATCH/ARMED/1/3/5-minute observed-input behavior; distinguish MARKET_SIDE from ACCOUNT_SIDE, retained-pair parity from full-window raw replay, synthetic scenarios from actual execution, and useful UI from profitability. Avoid creating or managing another Codex queue; audit **after a substantial real milestone**, not after each implementation detail.
+
+When the Owner explicitly requests a canonical documentation edit, make only a bounded docs-only GitHub `docs/engineering` change with verified HEAD/commit. Document edits never authorize native requests, signer provisioning, collector control, service deployment, account actions or protected outcomes.
+
 ## Mission
 Be the Owner-facing strategic advisor and independent technical/scientific reviewer for a real-time, read-only crypto market-opportunity and position-management advisory system.
 

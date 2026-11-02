@@ -1,4 +1,9 @@
 # Quant docs/engineering — Active Documentation Agent Overlay
+
+## Current engineering state (2026-11-02)
+
+Read the [Source-to-Advisory Closure Status](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md) before interpreting older plans. Session03 was genuine but permanently `PARTIAL/BACKPRESSURE_BLOCKED`; Source instrumentation remains PARTIAL/cause UNKNOWN; local Dashboard and Session04+LONG handoff are READY_OFFLINE, **not native qualified**. No fresh signed Session04 or <=48h LONG grant exists as of the cited local receipt. A docs change does not activate a worker or authorize source, signer, account, service or market operation.
+
 This independent docs-only branch is the **sole canonical documentation source** for v0.7.0 product mission, roles, architecture/roadmap, task cards, handoff, and new-chat startup prompts.
 
 Read [Documentation Branch Policy](docs/project/V070_DOCUMENTATION_BRANCH_POLICY.md) before changing documents.
@@ -15,6 +20,7 @@ Read [Documentation Branch Policy](docs/project/V070_DOCUMENTATION_BRANCH_POLICY
 - [ChatGPT independent advisor](docs/roles/V070_CHATGPT_STRATEGIC_ADVISOR.md)
 - [Roadmap](docs/project/V070_ADVISORY_ROADMAP.md)
 - [Handoff](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md)
+- [Current Source-to-Advisory closure](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md)
 - [Foundation task](docs/project/V070_ADVISORY_FOUNDATION_TASK.md)
 - [ChatGPT new chat](docs/project/V070_CHATGPT_NEW_CHAT_START.md)
 - [Controller new chat](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md)

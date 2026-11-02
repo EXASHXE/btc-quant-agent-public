@@ -1,5 +1,13 @@
 # Engineering documentation — docs/engineering
 
+## Latest v0.7.0 status (2026-11-02)
+
+- **Current controlling summary:** [Source-to-Advisory closure](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md), [Roadmap](docs/project/V070_ADVISORY_ROADMAP.md) and [Current Handoff](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md).
+- Session03 genuine BBO capture was consumed/sealed `PARTIAL/BACKPRESSURE_BLOCKED` (9,153 frames, 5,246 short-clock-qualified quotes); Source/Shadow qualification remains false. Source runtime telemetry is delivered but the original native stall cause remains unresolved.
+- Session04 plus LONG V2 handoff is `READY_OFFLINE_HANDOFF` according to 2026-11-02 10:19 local report, and reused Dashboard is READY_OFFLINE. New diagnostic-only native Session04 and <=48h Source+Shadow each require separate exact Owner authorization; there is no implied service deployment or economic Alpha.
+- Controller 0-C owns the only engineering delivery queue. Full history remains below, but dated recent closure evidence controls the next operational gate.
+
+
 ## Remote-only external review packs
 
 - [Independent Opus v0.7.0 review pack — 2026-10-28](https://github.com/EXASHXE/btc-quant-agent-public/tree/review/opus-v070-independent-20261028/reviews/opus-v070-20261028) — dated public project brief, research evidence summary, implementation snapshot, source catalogue, and unconstrained strategy/architecture review prompt. This branch is **only a reviewer snapshot**; current canonical docs stay on docs/engineering. Raw protected data and uncommitted local patches are not published.
@@ -19,7 +27,8 @@ Start with [Documentation Branch Policy](docs/project/V070_DOCUMENTATION_BRANCH_
 - [ChatGPT strategic advisor role](docs/roles/V070_CHATGPT_STRATEGIC_ADVISOR.md)
 - [Current advisory roadmap](docs/project/V070_ADVISORY_ROADMAP.md)
 - [Verified state and handoff](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md)
-- [Current Foundation task](docs/project/V070_ADVISORY_FOUNDATION_TASK.md)
+- [Historical Foundation task](docs/project/V070_ADVISORY_FOUNDATION_TASK.md)
+- [Current Source-to-Advisory closure](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md)
 - [New ChatGPT strategic-advisor prompt](docs/project/V070_CHATGPT_NEW_CHAT_START.md)
 - [New Controller 0-C prompt](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md)
 

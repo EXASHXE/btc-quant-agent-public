@@ -1,5 +1,16 @@
 # v0.7.0 Advisory Delivery Roadmap
 
+## 2026-11-02 10:19 Asia/Shanghai — Current A/B/C gate (Session04 and LONG offline handoff delivered)
+
+**A: Source Runtime + targeted native diagnostic — READY_OFFLINE_HANDOFF, NATIVE BLOCKED.** Session04 offline instrumentation/independent grant, default-deny finite launcher and predeclared quality thresholds are delivered (598 Source affected pass). Earlier Source Runtime profiling remains PARTIAL with UNKNOWN native stall root cause; no validated production performance fix. Consumed Session03 was authentic `BACKPRESSURE_BLOCKED` (9,153 frames; 5,246 short-clock-qualified BBO); `SOURCE_QUALIFIED=false`. Controller must obtain an explicit *diagnostic-only reliability amendment* and a NEW exact Owner-signed session/output/trust/UTC/fingerprint before operator-initiated <=180s collection. Even a clean BBO-only diagnostic does not automatically establish full Source readiness.
+
+**B: One separately authorized <=48h Source + concurrent local Shadow — OFFLINE READY, NATIVE BLOCKED.** LONG V2 verified Session04 qualification handoff contract is offline-built (147 LONG affected pass). Independent Owner/capture-auditor trusts, exact LONG grant, fresh <=300s native clock, bounded real multi-feed ingestion and subsequent 1/3/5min price observations remain unqualified. Reuse existing latest.json/HTML dashboard during the authorized same finite session, beginning at actually admitted feature warmup rather than creating a third UI. Raw 36h retention cannot imply full 48h raw replay; report separately. BTC/ETH/SOL cannot satisfy >=10 cross-sectional rank, and unknown account data must remain a separate veto.
+
+**C: Prospective usefulness and cost — PLANNED.** Evaluate market-side WATCH/ARMED/invalidations, 1/3/5min delayed opportunity survival and structural exit management using genuine future qualified observations; count censored/UNKNOWNs. Do not claim fills, notifications, Alpha or net PnL.
+
+**Roles and pacing:** Controller 0-C owns one coherent non-conflicting long-running Codex queue and accepts milestones. Strategic Advisor audits after major delivered phases on request. Owner alone can authorize new source sessions/signers/windows/retention, deployment, alerts, account or protected access. No automatic native launch; no return to legacy microstructure or broad historical search. Current [closure status](V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md) supersedes historical stages below.
+
+
 ## 2026-11-02 — Accelerated A/B/C acceptance update, existing dashboard reused
 
 A Source hot-path offline instrumentation PASSED with 561 affected PASS, 3 inherited separate known-red FAIL, all original 306 Session03 files preserved, no new market calls; no SQL performance candidate promoted and native root cause remains UNKNOWN. Therefore A runtime FIX remains PARTIAL, next live test not authorized. Exact Source fingerprint 90c62d26492822595dd0b2a8f58f9a1b0198e3244d337bc3e4aa92c42e43971e.

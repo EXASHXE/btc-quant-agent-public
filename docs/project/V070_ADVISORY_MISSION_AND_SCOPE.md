@@ -3,6 +3,12 @@
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: Owner direction reflected 2026-10-28. Documentation-only planning baseline; not deployed system status.
 
+## Current practical closure criterion (2026-11-02)
+
+The first useful product milestone is a **genuine** qualified public-source-to-local-Shadow loop: admitted market fields and immutable replay, deterministic strategy/position state and source vetoes, WATCH/ARMED/market-side readiness, quote expiry/cancellation, and real subsequently received prices for 1/3/5-minute response scenarios. Publish local-only snapshots before economic validation where authorized. A synthetic dashboard, a valid short clock/BBO sample, or a modeled fill does not establish a continuous online product.
+
+The latest Session03 run is `PARTIAL/BACKPRESSURE_BLOCKED`, Source instrumentation remains `PARTIAL`, while Session04/LONG handoff and Dashboard reuse are **offline ready only**. See [current closure status](V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md). Native Session04 requires its own explicit diagnostic amendment and signer/window; LONG <=48h source + Shadow requires another independent grant and fresh <=300s native clock. Keep 50ms clock jump and queue-128 failsafes; do not restart legacy microstructure collection or spend time expanding unproven strategy counts. Genuine source quality, market-side strategy qualification, account readiness and economic value are distinct acceptance tiers.
+
 ## What we optimize
 Deliver timely, trustworthy and actionable crypto trading-opportunity advice. The system detects market conditions, proposes a **symbol / direction / entry zone / confirmation / structural invalidation / initial stop / target or trailing policy**, tracks an unfilled plan, then tracks a real position only after user-reported or separately authorized verified fills. Alerts explain evidence changes and recommend HOLD, TIGHTEN_STOP, TAKE_PARTIAL_PROFIT, REDUCE, EXIT, CANCEL or RECONCILE.
 
