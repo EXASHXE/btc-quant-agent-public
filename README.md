@@ -1,5 +1,16 @@
 # Engineering documentation — docs/engineering
 
+## Current Quant v0.7.0 advisory checkpoint — 2026-11-02
+
+**Read first:** [Session04 receipt discrepancy](docs/project/V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md) · [Gemini/Claude convergence](docs/project/V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md) · [Status](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md) · [Roadmap](docs/project/V070_ADVISORY_ROADMAP.md) · [Handoff](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md).
+
+Owner reports a completed Session04 authorization/native diagnostic; latest independently inspected local 11:37 record is non-authorizing `READY_FOR_OWNER_SIGNING` with zero native requests. A superseding signed native receipt has not been verified. Next: Controller 0-C first reconciles actual evidence, then plans/allocates an offline Route B unified Source→L23→Shadow vertical-slice task, not an automatic live run.
+
+[Start independent 1-A](prompts/v0.7/V070_NEW_CHAT_1A.md) · [Start Controller 0-C](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md).
+
+---
+
+
 ## Latest v0.7.0 status (2026-11-02)
 
 - **Current controlling summary:** [Source-to-Advisory closure](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md), [Roadmap](docs/project/V070_ADVISORY_ROADMAP.md) and [Current Handoff](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md).

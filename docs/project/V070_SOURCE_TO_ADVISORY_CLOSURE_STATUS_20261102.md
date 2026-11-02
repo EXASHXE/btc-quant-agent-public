@@ -1,5 +1,12 @@
 # Quant v0.7.0 — Source-to-Advisory Closure Status (2026-11-02)
 
+> **2026-11-02 ~14:58 Asia/Shanghai — evidence reconciliation supersedes the earlier 10:19 checkpoint below.** The Owner reports that Session04 signing closure and a single native diagnostic have completed. However, the latest independently inspected local signed-authorization closure receipt dated **11:37** says **`READY_FOR_OWNER_SIGNING`**, actual signature/window absent, no reservation, **native_request_count=0**, native outcomes `NOT_RUN`, and Source/Shadow qualification false. A later accepted real diagnostic has **not been verified**. Read [Session04 evidence reconciliation](V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md); Controller 0-C must search read-only for any superseding genuine receipt **before** assigning a new native trial. Do not translate a completed non-authorizing signing PACKAGE into a completed signed native trial.
+
+> **Current strategic recommendation — Route B:** unify divergent Session04 Source and LONG Shadow code in one isolated reviewable integration worktree; baseline and narrowly repair SQLite/Journal hot-path lock coupling; preserve zero silent data loss, budget semantics, 128 hard queue and 50ms clock hard stop; one BTC/ETH/SOL `trend_pullback` market-side Watch/Armed/survival path with existing dashboard. Gemini and Claude agreed on the minimum vertical slice, but neither review proves the native root cause. Claude was unable to inspect Python code, while Gemini reports code inspection. New reports, tests and native grants remain separate evidence/authority gates. See [convergence decision](V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md).
+
+---
+
+
 > Canonical: GitHub `docs/engineering`. Verified point-in-time local evidence as of **2026-11-02 10:19 Asia/Shanghai**. This document is NOT permission to access public market feeds, sign a grant, run a collector, send alerts, deploy, or trade. Re-read [handoff](V070_CURRENT_STATE_AND_HANDOFF.md) and actual current receipts before any dispatch.
 
 ## Product mission and three closure milestones

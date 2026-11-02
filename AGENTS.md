@@ -1,5 +1,14 @@
 # Quant docs/engineering — Active Documentation Agent Overlay
 
+## v0.7.0 current 2026-11-02 handoff (docs/engineering only)
+
+Use [Session04 evidence reconciliation](docs/project/V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md), [dual-review convergence](docs/project/V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md), [current state](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md), [roadmap](docs/project/V070_ADVISORY_ROADMAP.md), [roles](docs/roles/V070_ADVISORY_AGENT_ROLES.md), [1-A new-chat](prompts/v0.7/V070_NEW_CHAT_1A.md), and [0-C new-chat](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md).
+
+Owner reports Session04 native completion; latest inspected local acceptance says `READY_FOR_OWNER_SIGNING / NOT_RUN`. Controller must reconcile with a newer genuine report before stage advancement. Route B is a proposed, offline-first, unified Source→Shadow MVP, NOT a new native grant. Do not start workers or collectors from documentation.
+
+---
+
+
 ## Current engineering state (2026-11-02)
 
 Read the [Source-to-Advisory Closure Status](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md) before interpreting older plans. Session03 was genuine but permanently `PARTIAL/BACKPRESSURE_BLOCKED`; Source instrumentation remains PARTIAL/cause UNKNOWN; local Dashboard and Session04+LONG handoff are READY_OFFLINE, **not native qualified**. No fresh signed Session04 or <=48h LONG grant exists as of the cited local receipt. A docs change does not activate a worker or authorize source, signer, account, service or market operation.

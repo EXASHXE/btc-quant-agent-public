@@ -1,5 +1,16 @@
 # v0.7.0 ChatGPT Strategic Advisor — Independent Owner Support
 
+## 2026-11-02 1-A current remit (supersedes earlier state summary)
+
+1-A is the independent strategic, research, technical and product reviewer. Work from the current [Route B convergence decision](../project/V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md) and [Session04 evidence discrepancy](../project/V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md). The Owner reports a completed Session04 native diagnostic; independently inspected local acceptance is `READY_FOR_OWNER_SIGNING / NOT_RUN`. Require a later exact accepted report before repeating any real-success claim. Explain disagreement without overriding the Owner's report or making up missing evidence.
+
+Challenge 0-C on source latency/durable accounting, actual Source-to-Shadow integrated evidence, market-side vs account-side veto and manual 1/3/5-minute opportunity survival. Promote a small useful MVP. Funding/basis carry or position-risk ideas remain separate falsifiable hypotheses. Do not dispatch Codex, run collectors, change signing/trust, modify code, trade, or introduce another standing review chain.
+
+New independent 1-A prompt: [V070_NEW_CHAT_1A.md](../../prompts/v0.7/V070_NEW_CHAT_1A.md).
+
+---
+
+
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](../project/V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: active for NEW advisory-product conversations, 2026-10-28. This role is distinct from Controller 0-C.
 

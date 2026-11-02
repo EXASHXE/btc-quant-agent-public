@@ -1,5 +1,16 @@
 # v0.7.0 Product Mission — Real-Time Opportunity & Position Advisory
 
+## 2026-11-02 product decision update
+
+The near-term product is a deterministic **market-side opportunity survival and risk advisory** for a human responding in roughly 1–5 minutes. A single trustworthy WATCH/ARMED candidate with price zone, no-chase cap, structural stop, expiry, current source health, and genuinely subsequently received quote checks is a more meaningful first objective than a larger indicator library or hypothetical net PnL. If no event qualifies, `NO_SETUP` and exact veto/funnel accounting are valid outputs.
+
+Owner-reported Session04 completion remains unverified against the most recent local `READY_FOR_OWNER_SIGNING / native NOT_RUN` acceptance; do not silently claim a live pass. Use [current evidence check](V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md).
+
+Keep market-side eligibility separate from >=10-universe cross-sectional rank and account capital/margin/order controls. Do not weaken actual account hard veto or invent ten-member ranks. Funding/basis carry and user-reported position risk are worthwhile **research/product backlog hypotheses**, not deployed strategies or alpha. Keep automated trading, account access, live notifications and economic claims separately unauthorized.
+
+---
+
+
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: Owner direction reflected 2026-10-28. Documentation-only planning baseline; not deployed system status.
 

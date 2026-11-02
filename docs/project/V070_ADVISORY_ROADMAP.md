@@ -1,5 +1,22 @@
 # v0.7.0 Advisory Delivery Roadmap
 
+## 2026-11-02 ~14:58 Asia/Shanghai — CONTROLLING Route B: critical-path acceleration
+
+**Before dispatch:** reconcile Owner-reported completed Session04 with latest locally accepted `READY_FOR_OWNER_SIGNING / NOT_RUN` receipt. Consult [evidence check](V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md). Avoid duplicating or restarting a consumed real run.
+
+- **M1 / OFFLINE:** ONE cohesive authorized isolated Codex workstream: integrate Session04 instrumentation with LONG/Shadow/L23; profile and minimally repair BudgetGuard/Journal transactions, prune/index/connection and disk fsync tails with strict deterministic input/replay/crash tests; reconcile fixed vs granted bar windows and verified /public + /market wiring; demonstrate one `trend_pullback` 3-symbol WATCH/ARMED/veto → genuine-post-observation 1/3/5m-shaped replay → existing dashboard. MARKET_SIDE conditional observations and ACCOUNT_VETO are separate. Synthetic-shaped offline proof is never native acceptance. Propose but do not execute pre-session closed-bar REST warmup until new source window/fields/PIT approval.
+- **M2 / NATIVE DIAGNOSTIC:** If 0-C authenticates a NEWER completed signed Session04 report, review the actual stop/latency/clock/queue/replay result and do NOT repeat it. Otherwise a distinct exact Owner-signed ≤180s diagnostic-only one-shot may be proposed only after specific approval and frozen code/trust/source fingerprint. A BBO-only success is not Source+Shadow acceptance.
+- **M3 / BOUNDED MULTI-FEED:** New separately signed LONG grant, authentic capture attestation and fresh ≤300s independent native clock. First finite real Source+concurrent Shadow, truthful 1/3/5m quote revalidation and local UI; decide whether ≤48h extension is justified. Do not treat 36h raw retention as complete 48h raw replay.
+
+**Not now:** full asyncio rewrite, latest-wins frame conflation, deferred per-message durable WS charging, clock-epoch auto recovery, 24h historical attestation extension, third UI, ten-symbol rank fabrication, 21-playbook activation, new historical PRIMARY or protected-data access. Evaluate these changes separately with evidence and explicit permission when required.
+
+**Scientific/Product parallel:** build an Opportunity Survival Meter first, keep one directional playbook as a falsifiable engineering demonstration rather than proven Alpha. Research funding/basis carry and user-reported position-risk copilot separately; neither may block M1.
+
+Read [independent review convergence](V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md) before dispatch.
+
+---
+
+
 ## 2026-11-02 10:19 Asia/Shanghai — Current A/B/C gate (Session04 and LONG offline handoff delivered)
 
 **A: Source Runtime + targeted native diagnostic — READY_OFFLINE_HANDOFF, NATIVE BLOCKED.** Session04 offline instrumentation/independent grant, default-deny finite launcher and predeclared quality thresholds are delivered (598 Source affected pass). Earlier Source Runtime profiling remains PARTIAL with UNKNOWN native stall root cause; no validated production performance fix. Consumed Session03 was authentic `BACKPRESSURE_BLOCKED` (9,153 frames; 5,246 short-clock-qualified BBO); `SOURCE_QUALIFIED=false`. Controller must obtain an explicit *diagnostic-only reliability amendment* and a NEW exact Owner-signed session/output/trust/UTC/fingerprint before operator-initiated <=180s collection. Even a clean BBO-only diagnostic does not automatically establish full Source readiness.

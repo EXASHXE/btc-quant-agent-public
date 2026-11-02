@@ -1,5 +1,18 @@
 # v0.7.0 Current State and New-Chat Handoff
 
+## 2026-11-02 ~14:58 Asia/Shanghai — Dual-review convergence and disputed Session04 completion (CURRENT)
+
+**Authoritative new planning references:** [architecture/research convergence](V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md) and [Session04 evidence reconciliation](V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md).
+
+The Owner reports a completed Session04 signed-authorization and one native diagnostic. Yet the newest local record independently inspected, `SESSION04_AUTHORIZATION_CLOSURE_FINAL.md` / `SESSION04_AUTHORIZATION_CLOSURE_ACCEPTANCE.json` at 11:37 Asia/Shanghai, states `READY_FOR_OWNER_SIGNING`, signature and future UTC window missing, trust empty, no session output, **native_requests=0**, outcome `NOT_RUN`. **DO NOT upgrade current native status until 0-C locates and authenticates a newer signed/accepted receipt.** Older 10:19 offline results below remain historical. Preserve Session03's 306 sealed files.
+
+Gemini and Claude independently favored Route B: one isolated integrated Source/L23/LONG/Shadow/dashboard vertical slice. Source per-WS-message SQLite transactions and `PublicJournal._write()` lengthy lock-held compression/space/fsync were independently verified as code-level fragility, not conclusive original-native stall attribution. Source and LONG snapshots are separate; review branch `review/v070-source-shadow-docs-20261102` only promotes navigable LONG code and documents, NOT an executable merge. Rank minimum 10 filters `selected` but `PublicEngine.discover()` still seeds `WATCH` from candidates: distinguish market-side survival from account/rank eligibility. LONG endpoint catalog already declares two separate /public and /market WS routes and grant permits 2 connections; test actual wiring. Fixed Source bar START/END vs dynamic LONG start/end must be reconciled.
+
+**Next action owner:** Controller 0-C only. First reconcile Session04 receipt discrepancy; then prepare one cohesive offline Codex task for isolated integration, measured narrow hot-path repair, one-playbook 1/3/5m revalidation and existing dashboard. No auto native run; next signed grant/window remains separately authorized if no newer valid Session04 evidence is found. A successful short BBO-only diagnostic is not multi-feed Source/Shadow qualification. Keep Source/Shadow/economic evidence claims exact and no account/trade automation. Initial Controller prompt: [0-C](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md); separate [1-A](../../prompts/v0.7/V070_NEW_CHAT_1A.md).
+
+---
+
+
 ## 2026-11-02 10:19 Asia/Shanghai — Session04/LONG OFFLINE handoff accepted; live still blocked
 
 This dated checkpoint supersedes the 09:43 active-worker entry below. The latest local `l4-readonly-source-canary-01/SESSION04_AND_LONG_HANDOFF_PREP_FINAL.md` / `SESSION04_AND_LONG_HANDOFF_PREP_ACCEPTANCE.json` reports `READY_OFFLINE_HANDOFF` at 2026-11-02T02:19:35Z. The scoped Codex PID 442239 was no longer present at the following read-only check; do not treat this as a permanent process-state assertion. **No new native market request, signed grant, trusted key provisioning, alert, order or deploy.**

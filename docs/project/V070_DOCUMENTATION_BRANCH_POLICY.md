@@ -1,5 +1,14 @@
 # v0.7.0 Canonical Documentation Branch Policy
 
+## 2026-11-02 convergence release — documentation-only
+
+`docs/engineering` remains the sole canonical writable roadmap/role/handoff/prompt branch. A new owner-requested documentation refresh references [Route B decision](V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md), [Session04 receipt discrepancy](V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md), [Controller 0-C new-chat](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md), and [1-A new-chat](../../prompts/v0.7/V070_NEW_CHAT_1A.md).
+
+Public review branch `review/v070-source-shadow-docs-20261102` is a static, unintegrated navigational code projection; it is not a second documentation authority or runnable merged product. Code and actual local acceptance must be checked separately. Never publish signing keys, grants, private material or native evidence merely to make reviewer browsing easier.
+
+---
+
+
 ## Current Source-to-Advisory checkpoint (2026-11-02)
 
 New live status and next approval dependency are in [Source-to-Advisory Closure Status](V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md). That document and the [latest handoff](V070_CURRENT_STATE_AND_HANDOFF.md) supersede historical Foundation and old L4 task-card status descriptions for current planning; they do **not** retroactively alter sealed evidence or authorization. Updates on this branch are docs only, not live grants, code integration or worker execution.

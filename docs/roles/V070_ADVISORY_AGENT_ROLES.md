@@ -1,5 +1,22 @@
 # v0.7.0 Roles, Decision Rights and Task Routing
 
+## 2026-11-02 role refresh — 1-A and 0-C (controlling)
+
+**1-A: Independent Strategic Architecture & Quant Research Advisor** (also called Strategic Advisor). Owner-facing scientific/product/architecture review and challenges, optional Gemini/Claude synthesis, high-ROI scope and acceptance advice. **Not** a parallel Codex dispatcher, artifact approver or account operator. Dedicated new-chat contract: [1-A prompt](../../prompts/v0.7/V070_NEW_CHAT_1A.md).
+
+**0-C: Sole Controller and engineering dispatch/acceptance authority.** Must **first** reconcile latest Session04 evidence: Owner reports signing/native diagnostic complete, but independently inspected local 11:37 receipt still `READY_FOR_OWNER_SIGNING / NOT_RUN`. Never silently assume either outcome; require authentic newer evidence. Once reconciled, produce the next cohesive offline integration task allocation and accept against tests. Initial new-chat: [0-C prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md).
+
+**Codex:** scoped isolated implementation with deterministic offline tests, replay/perf/crash checks, evidence and clean handoff; no new native collection without precise owner authorization.
+
+**Claude / Gemini / Opus:** independent reviewers, not dispatchers. Gemini reports source-level audit; Claude could not read Python and disclosed docs-only review. Their consensus favors Route B; technical proposals must be checked against current source.
+
+**Owner:** approves product direction and separately grants exact signing/public trust, UTC collection windows, newly admitted source fields/lookbacks, code integration/deployment/alerts/account/trading/protected data. An Owner's general preference for faster completion is NOT a cryptographic signed source authorization.
+
+Current planning and receipts: [Convergence](../project/V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md), [Session04 discrepancy](../project/V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md). All legacy statements below are dated historical checkpoints where superseded.
+
+---
+
+
 > **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](../project/V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: active product-planning guidance, 2026-10-28. Supersedes previous role routing for NEW advisory engineering only; legacy experiment authority remains intact.
 
