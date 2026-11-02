@@ -1,5 +1,14 @@
 # v0.7.0 Advisory Delivery Roadmap
 
+## 2026-11-02 — Accelerated A/B/C acceptance update, existing dashboard reused
+
+A Source hot-path offline instrumentation PASSED with 561 affected PASS, 3 inherited separate known-red FAIL, all original 306 Session03 files preserved, no new market calls; no SQL performance candidate promoted and native root cause remains UNKNOWN. Therefore A runtime FIX remains PARTIAL, next live test not authorized. Exact Source fingerprint 90c62d26492822595dd0b2a8f58f9a1b0198e3244d337bc3e4aa92c42e43971e.
+
+B existing local Dashboard reuse and schema adaptation is READY_OFFLINE, 131 unique PASS, LONG fingerprint ecbf57822d2c463eb82ead613d986b87897b0cbcc3f95dbc2a1980d461755e46. Reuse LONG snapshot/save_dashboard, earlier Support Observability synthetic HTML/schema and Strategy Readiness gate matrix. 48h native Source+Shadow and 1/3/5m actual prospective evidence remain BLOCKED. Never rebuild a third UI, conflate 3-symbol rank with >=10, or infer account readiness.
+
+Controller dispatched exactly one non-native preparation Codex for versioned distinct Session04 source diagnostic launcher, offline dry-run/preflight, and authenticated LONG Clock V2 eligibility handoff. Existing Session03 is consumed and cannot be retried. A NEW distinct Owner-approved exact signed native grant/window/trust is required; if current contract admits native only after a performance fix, a separate explicit Owner approval of diagnostic-only trial is required. The offline task may not self-authorize source requests or 48h. Preserve <=300s authentic fresh LONG clock, 50ms sticky stop, quotas/retention and three-level qualification.
+
+
 ## 2026-11-02 — Owner accelerated Source-to-Advisory closure (controlling plan)
 
 Mission: observable reliable real read-only public-source → concurrent local Shadow → prospective 1/3/5-minute human-executability → MVP; no legacy A/B lines, microstructure collector, new historical strategy campaigns, Alpha or account-write claims.
