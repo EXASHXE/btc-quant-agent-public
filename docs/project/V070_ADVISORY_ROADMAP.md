@@ -1,3 +1,90 @@
+# Program A release convergence — 2026-11-06 — Advisory Roadmap
+
+## Controller 0-C scoped acceptance — 2026-11-07
+
+Program A is **ACCEPT_OFFLINE_RC_SCOPED**, independently revalidated for this continuation:
+179 final tests PASS with zero failures/errors/skips, 81 code hashes, 137 report hashes and
+188 selected original inputs preserved. Code manifest SHA256:
+`83b41944b43e29351c9f650ceb5d81b73d4134f367752b0552c3f5399e70f2c4`;
+report manifest SHA256:
+`56d8ce82c11becb6da5b79945a0205b78137c3edfaad613ebb75d3b2e7e044c0`.
+The executable release remains isolated; this documentation publication does not merge or deploy code.
+
+Controller acceptance covers reproducible synthetic S1 positive/NO_SETUP decisions, persistent
+market-side Shadow, replay/restart and the existing local dashboard. It does not establish native
+Source, Shadow advisory or economic qualification. Account remains UNKNOWN/VETO. Original Session04
+is NOT_RUN; no candle endpoint, retrospective warmup or signed native window is authorized here.
+
+Exactly one isolated Program B engineering worker is authorized under
+`V070-LT-PROGRAM-B-QUALIFIED-SOURCE-SHADOW-01`. Controller independently accepts its offline product.
+Real native candle capture requires its own exact authenticated source grant, trusted public keys,
+controlled egress, original-target TLS, qualified clocks and unused finite output. Program C evaluator
+implementation requires a separate Controller dispatch; no study, holdout or economic claim is started.
+
+
+Controller 0-C alone dispatches and independently accepts. `docs/engineering` is the sole
+future planning documentation authority. The review branch is a static navigation projection,
+not an executable merge. Program A is Controller-accepted OFFLINE_SCOPED; this documentation grants no
+native session, account access, trade, alert, deployment or automatic successor authority.
+
+Current scope: cryptocurrency advisory for intraday 4–24h and multi-day 1–5d horizons,
+with completed UTC-aligned 4H/1D decisions, optional causally available 1H confirmation,
+and approximately one or two scheduled user reviews daily (00:00 / 12:00 UTC).
+S1 `trend_pullback` is the only RC strategy. S2 breakout/retest and S3 failed-breakout/reversal
+remain RESEARCH_ONLY and disabled. Old aliases, playbooks and historical snapshots do not activate them.
+
+Source qualified **FALSE**; Shadow advisory qualified **FALSE**; Account **UNKNOWN/VETO**;
+economically validated **FALSE**. Synthetic positive eligibility is not native qualification,
+execution, profitability, OOS or Alpha. Market requests, orders, external alerts and deployments
+under Program A are zero. No signed native session, private grant/key or protected dataset is included.
+
+The isolated chain is synthetic closed-bar adapter → daily/4H causal features → S1 or NO_SETUP →
+ex-ante risk plan → durable market-side Shadow episode → existing local HTML/snapshot → later
+synthetic observation → explicit frozen Program C handoff. The inherited LT-A positive compiler
+remains disabled; the new compiler is explicitly `PROGRAM_A_S1_CAUSAL_V1`, snapshot V1.
+
+## Release convergence sequence
+
+1. **Program A:** one isolated offline S1 vertical slice, deterministic positive and NO_SETUP,
+   causal source/feature clocks, immutable ex-ante risk geometry, append-only persistence,
+   replay/restart, existing local dashboard, failure controls and release-workload evidence.
+   This RC has Controller-accepted scoped offline status; it is not deployed or native-qualified.
+2. **Program B interface:** LT-A's `LT_B_FROZEN_HANDOFF_V1` digest is preserved. Program A
+   implements its bounded synthetic adapter/compiler/storage proof with a separately versioned
+   RC schema and migration tests. Genuine native source correctness, seven-day availability,
+   venue access, independently authenticated grants and source qualification remain separate
+   unexecuted gates. The original M1B150/s requirement is not silently replaced by this workload.
+3. **Program C interface only:** freeze source-neutral opportunities, planned/executable/modeled
+   after-cost R, complete outcome taxonomy, costs/delay, matched null/first-passage controls,
+   clustering, uncertainty and independent-sample/power gates. No research worker, economic
+   experiment, restricted-data read, holdout or PRIMARY registration is authorized by this handoff.
+
+Reviews occur once or twice daily. Entry validity does not reset on replay or review. Missing,
+stale, revised or unordered inputs withhold new eligibility; visible corrections cancel dependent
+open episodes. No chase, missed entry, expiry, invalidation, no-fill and time stop are explicit.
+Ambiguous OHLC barrier ordering remains UNKNOWN, and incomplete futures remain censored/insufficient.
+
+The original queue128, sticky 50ms wall-discontinuity stop and per-frame accounting remain intact
+where retained. High-rate BBO acquisition is outside this RC's active path. A finite low-rate
+fixture benchmark does not establish sustainable native throughput or advisory qualification.
+Older urgent 1/3/5-minute, tick-entry and broad strategy-catalog plans below are historical.
+
+## Active references
+
+- [Current state and handoff](V070_CURRENT_STATE_AND_HANDOFF.md)
+- [Roadmap](V070_ADVISORY_ROADMAP.md)
+- [Mission and scope](V070_ADVISORY_MISSION_AND_SCOPE.md)
+- [Swing product and research contract](V070_SWING_PRODUCT_AND_RESEARCH_CONTRACT_20261106.md)
+
+Finite engineering measurement: 30 runs, 14,760 admitted synthetic receipts, zero admitted loss/duplicate decisions; processing P99 1460.311 ms. Modeled close latency adds the declared synthetic availability delay. This is not a native qualification.
+
+---
+
+# HISTORICAL / OUT_OF_ACTIVE_SCOPE — original public body preserved
+
+Everything below is retained historical evidence. Its original current/next/active wording
+does not authorize work or supersede the Program A scope above. Original bytes follow unchanged.
+
 # v0.7.0 Advisory Delivery Roadmap
 
 ## 2026-11-02 ~14:58 Asia/Shanghai — CONTROLLING Route B: critical-path acceleration

@@ -1,3 +1,91 @@
+# Program A release convergence — 2026-11-06 — Current State And Handoff
+
+## Controller 0-C scoped acceptance — 2026-11-07
+
+Program A is **ACCEPT_OFFLINE_RC_SCOPED**, independently revalidated for this continuation:
+179 final tests PASS with zero failures/errors/skips, 81 code hashes, 137 report hashes and
+188 selected original inputs preserved. Code manifest SHA256:
+`83b41944b43e29351c9f650ceb5d81b73d4134f367752b0552c3f5399e70f2c4`;
+report manifest SHA256:
+`56d8ce82c11becb6da5b79945a0205b78137c3edfaad613ebb75d3b2e7e044c0`.
+The executable release remains isolated; this documentation publication does not merge or deploy code.
+
+Controller acceptance covers reproducible synthetic S1 positive/NO_SETUP decisions, persistent
+market-side Shadow, replay/restart and the existing local dashboard. It does not establish native
+Source, Shadow advisory or economic qualification. Account remains UNKNOWN/VETO. Original Session04
+is NOT_RUN; no candle endpoint, retrospective warmup or signed native window is authorized here.
+
+Exactly one isolated Program B engineering worker is authorized under
+`V070-LT-PROGRAM-B-QUALIFIED-SOURCE-SHADOW-01`. Controller independently accepts its offline product.
+Real native candle capture requires its own exact authenticated source grant, trusted public keys,
+controlled egress, original-target TLS, qualified clocks and unused finite output. Program C evaluator
+implementation requires a separate Controller dispatch; no study, holdout or economic claim is started.
+
+
+Controller 0-C alone dispatches and independently accepts. `docs/engineering` is the sole
+future planning documentation authority. The review branch is a static navigation projection,
+not an executable merge. Program A is Controller-accepted OFFLINE_SCOPED; this documentation grants no
+native session, account access, trade, alert, deployment or automatic successor authority.
+
+Current scope: cryptocurrency advisory for intraday 4–24h and multi-day 1–5d horizons,
+with completed UTC-aligned 4H/1D decisions, optional causally available 1H confirmation,
+and approximately one or two scheduled user reviews daily (00:00 / 12:00 UTC).
+S1 `trend_pullback` is the only RC strategy. S2 breakout/retest and S3 failed-breakout/reversal
+remain RESEARCH_ONLY and disabled. Old aliases, playbooks and historical snapshots do not activate them.
+
+Source qualified **FALSE**; Shadow advisory qualified **FALSE**; Account **UNKNOWN/VETO**;
+economically validated **FALSE**. Synthetic positive eligibility is not native qualification,
+execution, profitability, OOS or Alpha. Market requests, orders, external alerts and deployments
+under Program A are zero. No signed native session, private grant/key or protected dataset is included.
+
+The isolated chain is synthetic closed-bar adapter → daily/4H causal features → S1 or NO_SETUP →
+ex-ante risk plan → durable market-side Shadow episode → existing local HTML/snapshot → later
+synthetic observation → explicit frozen Program C handoff. The inherited LT-A positive compiler
+remains disabled; the new compiler is explicitly `PROGRAM_A_S1_CAUSAL_V1`, snapshot V1.
+
+## Current evidence and next gate
+
+LT-A is Controller-accepted **OFFLINE_SCOPED only**, not a canonical-published product or native
+integration. Program A independently matched its 48 code and 79 report hashes plus the 56-file
+original allowlist. Its authoritative `audit/acceptance_validation/tests.xml` has 105 PASS,
+0 FAIL/ERROR/SKIP; the earlier 95-test file is superseded and is not added to this total.
+
+The Program A isolated operator workflow has executed a genuine-in-simulator BTC positive
+market-side episode and ETH/SOL NO_SETUP counterparts, persisted state, rendered the existing
+HTML dashboard, reloaded it read-only, and retained the original episode status on replay.
+A separate flat-candle screen reports all NO_SETUP. Every screen carries a SYNTHETIC watermark.
+Entry, buffered structural stop, preobservable fixed targets, planned R, expiry, reasons, gaps,
+review time and account veto remain visible; no holdings, fills or profits are fabricated.
+
+The release package's A0–A9 receipts, final JUnit, operator files and SHA256 manifests are the
+reviewable implementation evidence. Program A's worker recommendation is not Controller acceptance.
+Local Git identities and host process/outer-lock ownership are partially hidden by the sandbox;
+that limitation is recorded, and allowlisted original hashes are rechecked after work.
+
+Original M1/M1B Source remains PARTIAL; the M1B150/s/checkpoint qualification is unchanged and
+the original native stall cause is UNKNOWN. Host E0 six TLS passes are Controller-supplied
+context, not an original Session04 native run: Session04 remains NOT_RUN, with no signed Owner
+grant/trust asserted here. Sealed historical native receipts and all negative evidence remain intact.
+
+**Single next gate:** Controller 0-C independently accepts or rejects the isolated Program B
+closed-candle Source -> S1 -> Shadow -> existing Dashboard product. Native candle admission remains
+a separate exact signed gate; code release remains separate from documentation. No Program C
+worker or economic experiment is automatically dispatched.
+
+## Active references
+
+- [Current state and handoff](V070_CURRENT_STATE_AND_HANDOFF.md)
+- [Roadmap](V070_ADVISORY_ROADMAP.md)
+- [Mission and scope](V070_ADVISORY_MISSION_AND_SCOPE.md)
+- [Swing product and research contract](V070_SWING_PRODUCT_AND_RESEARCH_CONTRACT_20261106.md)
+
+---
+
+# HISTORICAL / OUT_OF_ACTIVE_SCOPE — original public body preserved
+
+Everything below is retained historical evidence. Its original current/next/active wording
+does not authorize work or supersede the Program A scope above. Original bytes follow unchanged.
+
 # v0.7.0 Current State and New-Chat Handoff
 
 ## 2026-11-02 ~14:58 Asia/Shanghai — Dual-review convergence and disputed Session04 completion (CURRENT)
