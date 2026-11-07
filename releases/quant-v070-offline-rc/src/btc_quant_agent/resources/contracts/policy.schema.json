@@ -1,0 +1,105 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "decision_timeframes": {
+      "default": [
+        "4H",
+        "1D"
+      ],
+      "items": {
+        "enum": [
+          "4H",
+          "1D"
+        ],
+        "type": "string"
+      },
+      "title": "Decision Timeframes",
+      "type": "array"
+    },
+    "market_timeframes": {
+      "default": [
+        "1H",
+        "4H",
+        "1D"
+      ],
+      "items": {
+        "enum": [
+          "1H",
+          "4H",
+          "1D"
+        ],
+        "type": "string"
+      },
+      "title": "Market Timeframes",
+      "type": "array"
+    },
+    "max_availability_delay_ms": {
+      "default": 300000,
+      "exclusiveMinimum": 0,
+      "maximum": 300000,
+      "title": "Max Availability Delay Ms",
+      "type": "integer"
+    },
+    "minimum_history_bars": {
+      "default": 60,
+      "minimum": 40,
+      "title": "Minimum History Bars",
+      "type": "integer"
+    },
+    "native_acquisition": {
+      "const": false,
+      "default": false,
+      "title": "Native Acquisition",
+      "type": "boolean"
+    },
+    "notifications": {
+      "const": false,
+      "default": false,
+      "title": "Notifications",
+      "type": "boolean"
+    },
+    "one_hour_role": {
+      "const": "OPTIONAL_NON_URGENT_CONFIRMATION",
+      "default": "OPTIONAL_NON_URGENT_CONFIRMATION",
+      "title": "One Hour Role",
+      "type": "string"
+    },
+    "orders": {
+      "const": false,
+      "default": false,
+      "title": "Orders",
+      "type": "boolean"
+    },
+    "private_accounts": {
+      "const": false,
+      "default": false,
+      "title": "Private Accounts",
+      "type": "boolean"
+    },
+    "review_hours_utc": {
+      "default": [
+        0,
+        12
+      ],
+      "items": {
+        "type": "integer"
+      },
+      "title": "Review Hours Utc",
+      "type": "array"
+    },
+    "source_gate": {
+      "const": "LOW_RATE_CLOSED_BAR_V1",
+      "default": "LOW_RATE_CLOSED_BAR_V1",
+      "title": "Source Gate",
+      "type": "string"
+    },
+    "version": {
+      "const": "V070_SWING_ADVISORY_V1",
+      "default": "V070_SWING_ADVISORY_V1",
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "title": "SwingPolicy",
+  "type": "object"
+}

@@ -1,0 +1,529 @@
+{
+  "$defs": {
+    "costs": {
+      "additionalProperties": false,
+      "properties": {
+        "assumed_notional_quote": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "available_capacity_quote": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "calibration": {
+          "const": "UNCALIBRATED_SYNTHETIC_DEFAULT"
+        },
+        "carrying_bps_per_day": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "entry_fee_mode": {
+          "enum": [
+            "MAKER",
+            "TAKER"
+          ]
+        },
+        "entry_slippage_bps": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "exit_fee_mode": {
+          "enum": [
+            "MAKER",
+            "TAKER"
+          ]
+        },
+        "exit_slippage_bps": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "financing_bps_per_day": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "funding_bps_per_cadence": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "funding_cadence_hours": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "impact_bps_at_reference": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "instrument_multiplier": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "instrument_tick": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "instrument_type": {
+          "const": "LINEAR_QUOTE_BASE"
+        },
+        "known_at_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "maker_fee_each_side_bps": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "reference_notional_quote": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "spread_round_trip_bps": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "taker_fee_each_side_bps": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "unit": {
+          "const": "BPS_OF_QUOTE_NOTIONAL"
+        }
+      },
+      "required": [
+        "assumed_notional_quote",
+        "available_capacity_quote",
+        "calibration",
+        "carrying_bps_per_day",
+        "entry_fee_mode",
+        "entry_slippage_bps",
+        "exit_fee_mode",
+        "exit_slippage_bps",
+        "financing_bps_per_day",
+        "funding_bps_per_cadence",
+        "funding_cadence_hours",
+        "impact_bps_at_reference",
+        "instrument_multiplier",
+        "instrument_tick",
+        "instrument_type",
+        "known_at_ms",
+        "maker_fee_each_side_bps",
+        "reference_notional_quote",
+        "spread_round_trip_bps",
+        "taker_fee_each_side_bps",
+        "unit"
+      ],
+      "type": "object"
+    },
+    "episode": {
+      "additionalProperties": false,
+      "properties": {
+        "administrative_censor_ms": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "causal_prefix_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "costs": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/costs"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coverage_end_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "coverage_start_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "decision_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "decision_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "direction": {
+          "enum": [
+            "LONG",
+            "SHORT"
+          ]
+        },
+        "entry_premise": {
+          "const": "CONDITIONAL_ONLY_NOT_A_FILL"
+        },
+        "entry_region": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "episode_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "execution_buffer": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "expiry_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "fixed_preobservable_target_zones": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "fixture_name": {
+          "type": "string"
+        },
+        "holding_horizon_hours": {
+          "maximum": 120,
+          "minimum": 4,
+          "type": "integer"
+        },
+        "interval_hours": {
+          "enum": [
+            1,
+            4,
+            24
+          ]
+        },
+        "path": {
+          "items": {
+            "$ref": "#/$defs/fact"
+          },
+          "type": "array"
+        },
+        "price_unit": {
+          "const": "USDT_PER_BASE"
+        },
+        "regime": {
+          "enum": [
+            "TREND_UP",
+            "TREND_DOWN"
+          ]
+        },
+        "reviewed_ms": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "right_censored": {
+          "type": "boolean"
+        },
+        "row_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "scheduled_review_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "source_facts": {
+          "items": {
+            "$ref": "#/$defs/fact"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "source_kind": {
+          "enum": [
+            "SOURCE_SYNTHETIC",
+            "NATIVE_UNQUALIFIED",
+            "NATIVE_QUALIFIED"
+          ]
+        },
+        "source_manifest_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "source_path_id": {
+          "type": "string"
+        },
+        "strategy_version": {
+          "const": "PROGRAM_A_S1_CAUSAL_V1"
+        },
+        "structural_stop": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "symbol": {
+          "enum": [
+            "BTCUSDT",
+            "ETHUSDT",
+            "SOLUSDT"
+          ]
+        },
+        "trigger_close_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "volatility_bucket": {
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH"
+          ]
+        },
+        "volatility_buffer": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "administrative_censor_ms",
+        "causal_prefix_sha256",
+        "costs",
+        "coverage_end_ms",
+        "coverage_start_ms",
+        "decision_digest",
+        "decision_ms",
+        "direction",
+        "entry_premise",
+        "entry_region",
+        "episode_id",
+        "execution_buffer",
+        "expiry_ms",
+        "fixed_preobservable_target_zones",
+        "fixture_name",
+        "holding_horizon_hours",
+        "interval_hours",
+        "path",
+        "price_unit",
+        "regime",
+        "reviewed_ms",
+        "right_censored",
+        "row_sha256",
+        "scheduled_review_ms",
+        "source_facts",
+        "source_kind",
+        "source_manifest_sha256",
+        "source_path_id",
+        "strategy_version",
+        "structural_stop",
+        "symbol",
+        "trigger_close_ms",
+        "volatility_bucket",
+        "volatility_buffer"
+      ],
+      "type": "object"
+    },
+    "fact": {
+      "additionalProperties": false,
+      "properties": {
+        "available_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "close": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "closed": {
+          "const": true
+        },
+        "durable_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "end_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "fact_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "high": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "interval_hours": {
+          "enum": [
+            1,
+            4,
+            24
+          ]
+        },
+        "low": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "open": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "open_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "price_unit": {
+          "const": "USDT_PER_BASE"
+        },
+        "received_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "revision": {
+          "const": 0
+        },
+        "source_event_ms": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "symbol": {
+          "enum": [
+            "BTCUSDT",
+            "ETHUSDT",
+            "SOLUSDT"
+          ]
+        }
+      },
+      "required": [
+        "available_ms",
+        "close",
+        "closed",
+        "durable_ms",
+        "end_ms",
+        "fact_sha256",
+        "high",
+        "interval_hours",
+        "low",
+        "open",
+        "open_ms",
+        "price_unit",
+        "received_ms",
+        "revision",
+        "source_event_ms",
+        "symbol"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:quant:program-c:source-neutral-episode-export:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "control_pool": {
+      "items": {
+        "$ref": "#/$defs/episode"
+      },
+      "type": "array"
+    },
+    "episodes": {
+      "items": {
+        "$ref": "#/$defs/episode"
+      },
+      "type": "array"
+    },
+    "evaluation_asof_ms": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "export_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "historical_bounded": {
+      "const": false
+    },
+    "native_admission": {
+      "description": "No external native admissions enabled under this frozen offline protocol",
+      "type": "null"
+    },
+    "no_setup_decision_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "protocol_sha256": {
+      "const": "5f6a4c583b79d7e04af54aa1c6a321e888e3041598edbdf6f0a53d744ec17429"
+    },
+    "schema_version": {
+      "const": "C_SOURCE_NEUTRAL_EPISODE_EXPORT_V1"
+    },
+    "source_kind": {
+      "enum": [
+        "SOURCE_SYNTHETIC",
+        "NATIVE_UNQUALIFIED",
+        "NATIVE_QUALIFIED"
+      ]
+    },
+    "synthetic_manifest": {
+      "properties": {
+        "clock": {
+          "const": "FABRICATED_2030_UTC"
+        },
+        "generator_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "meaning": {
+          "type": "string"
+        },
+        "origin": {
+          "const": "FABRICATED_QA_NO_MARKET_DATA"
+        },
+        "seed": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "origin",
+        "seed",
+        "clock"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "control_pool",
+    "episodes",
+    "evaluation_asof_ms",
+    "export_sha256",
+    "historical_bounded",
+    "native_admission",
+    "no_setup_decision_count",
+    "protocol_sha256",
+    "schema_version",
+    "source_kind",
+    "synthetic_manifest"
+  ],
+  "title": "Program C source-neutral V1 (Python validator additionally enforces clocks, hashes, authority and geometry)",
+  "type": "object"
+}

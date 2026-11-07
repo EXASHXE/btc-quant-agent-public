@@ -1,0 +1,1135 @@
+{
+  "content_root_sha256": "aca2f0c5ebf677614a467367035883d442c2d88fea8e3362cc24b2f3810279e7",
+  "exclusions": [
+    "Original workspaces, protected research and holdout",
+    "Owner/auditor trust, signatures and private grants",
+    "Native raw evidence",
+    "Runtime reports, SQLite, HTML and large generated datasets",
+    "Dependency binaries, virtualenvs, caches and build output"
+  ],
+  "file_count": 224,
+  "files": [
+    {
+      "bytes": 119,
+      "path": ".gitignore",
+      "sha256": "c543b480214d0168cc17631581df0262adde19352a587c17c5b482cb60614571"
+    },
+    {
+      "bytes": 4087,
+      "path": "README_OPERATOR.md",
+      "sha256": "2106720eb28d65f4b93046cb8110ab806ad5152be02cfaf26baa7c0269548a63"
+    },
+    {
+      "bytes": 341,
+      "path": "audit/original_verifier.json",
+      "sha256": "483fb01f0acd864ac02cf375b851817ef9869f095dcc1e29717cb790d517cdbb"
+    },
+    {
+      "bytes": 724,
+      "path": "configs/trend_pullback.yaml",
+      "sha256": "348f9a3d92c8351490a156153856a32ee751414e90f2f8c029bd1e8b82de0cba"
+    },
+    {
+      "bytes": 4726,
+      "path": "contracts/active_scope.json",
+      "sha256": "ea55cb41d726bb4c4c5ce4c26f9dae9528a159d0bc5e8aced3ac1e3721ac029c"
+    },
+    {
+      "bytes": 3114,
+      "path": "contracts/b_program_c_episode_export_v1.json",
+      "sha256": "bae6f31848af7d22e6dcdafe3ad9a31a37e32eace75018ae16bac02c8e0690fe"
+    },
+    {
+      "bytes": 1473,
+      "path": "contracts/b_shadow_state_v1.json",
+      "sha256": "cde6840978cc36764a903ed6bde460005979d32ac496b75874db2e5efcb2ad3b"
+    },
+    {
+      "bytes": 12048,
+      "path": "contracts/c_source_neutral_episode_export_v1.json",
+      "sha256": "d7f13ea07ccbea2eb91f3df3e5aa05ddbcfe152bd924a9d5f589c6b4b43ef78a"
+    },
+    {
+      "bytes": 3548,
+      "path": "contracts/low_rate_source_gate.json",
+      "sha256": "04baa3b35e9a75fd37efca325a6cc57e871eb6245f0301974485a7dc775112f0"
+    },
+    {
+      "bytes": 10692,
+      "path": "contracts/lt_b_frozen_handoff_v1.json",
+      "sha256": "f91190345f334ebef571aa292ee26a7d85951f3ee702f23a110f5a6e0529fbb3"
+    },
+    {
+      "bytes": 3269,
+      "path": "contracts/opportunity.schema.json",
+      "sha256": "73ccedbac3c8485cfc23721a0e98240bafaec0c5bac9ac97a7d2d6d4a2f8073d"
+    },
+    {
+      "bytes": 2218,
+      "path": "contracts/policy.schema.json",
+      "sha256": "da9d0530642904469a3577c006528f3868991f677ed7e84a836c6cb20fa4cf67"
+    },
+    {
+      "bytes": 7046,
+      "path": "contracts/program_c_evaluation_v1.json",
+      "sha256": "f30380f0bb0ce2c96b495500d66f4a702ccb6f075090ba03ecaa8188b6b982ad"
+    },
+    {
+      "bytes": 9018,
+      "path": "contracts/rc_v1.json",
+      "sha256": "0487e72fe8c655ee457d6779e9e9c7b98630d279d955a6e0f3793534dbdc1d13"
+    },
+    {
+      "bytes": 6758,
+      "path": "contracts/snapshot.schema.json",
+      "sha256": "f4b799da518843d492852cf2905d402e757bac2d57907a7c0f5c3c9e50567a05"
+    },
+    {
+      "bytes": 3235,
+      "path": "contracts/state_model.json",
+      "sha256": "880ce174db6a3d119df0b8dd33870f136b84c69c71e85090601859888f7bd1ca"
+    },
+    {
+      "bytes": 1065,
+      "path": "fixtures/SYNTHETIC_FIXTURE_MANIFEST.json",
+      "sha256": "a6943656078650c69a354f73ba9bd58fee401f634f51e0f775b1b1177fb7fb95"
+    },
+    {
+      "bytes": 256200,
+      "path": "fixtures/SYNTHETIC_all_no_setup_v1.jsonl",
+      "sha256": "1df13faad725bb92ff0d92342ff5d0aac93f21dc71297fe51c0c850942429b2d"
+    },
+    {
+      "bytes": 262204,
+      "path": "fixtures/SYNTHETIC_mixed_v1.jsonl",
+      "sha256": "55c02e0b3bb238fb03dbe4cfa63efd519e2ae5fc8c8d844cc726bbf89f93fcf5"
+    },
+    {
+      "bytes": 275728,
+      "path": "fixtures/SYNTHETIC_positive_v1.jsonl",
+      "sha256": "a846b8907c336ded0d2a98d9e0d7a21ba3378fea83492c107c7f5aceffa4b498"
+    },
+    {
+      "bytes": 8550,
+      "path": "fixtures/adverse_jump_gap.json",
+      "sha256": "49527be5acc2a6bfd7b8b52090fe6d906a11fe06101cf26872a8648b7da1ea34"
+    },
+    {
+      "bytes": 760,
+      "path": "fixtures/all_no_setup.json",
+      "sha256": "a56311273f5b3837fca549ec99a95885abe74751b2e7e734f400f6b2f9f7e686"
+    },
+    {
+      "bytes": 8554,
+      "path": "fixtures/both_hit_same_bar.json",
+      "sha256": "1da4dbea4a81c3e04acebd1c3c5083a19617a429ad0b140fe09df6b43275c10f"
+    },
+    {
+      "bytes": 8548,
+      "path": "fixtures/clock_drift.json",
+      "sha256": "23382b9e56c930df2841555440b9d4deaa162f4a00f6ebb83dd93730ec36bc84"
+    },
+    {
+      "bytes": 8555,
+      "path": "fixtures/corrected_revision.json",
+      "sha256": "01b248b894f2e78876df9a39ecc8d1a4993f821fab4e2fff3d1446b3cac57227"
+    },
+    {
+      "bytes": 7715,
+      "path": "fixtures/cost_unknown.json",
+      "sha256": "7bb34fa18a5adb3b3c9b162ac002fbbe006988b023d3f5fbad20c7d765570e65"
+    },
+    {
+      "bytes": 7968,
+      "path": "fixtures/coverage_1D_5d.json",
+      "sha256": "2288d023bd6096f2345047d92c3bd8bd211a9c0189fb65c363d8c1a812f97758"
+    },
+    {
+      "bytes": 10925,
+      "path": "fixtures/coverage_4H_24h.json",
+      "sha256": "57da9b39be7e6c667e4f2d4ab678470542d8150092711ee89e46819e182a8fee"
+    },
+    {
+      "bytes": 8558,
+      "path": "fixtures/delayed_missed_entry.json",
+      "sha256": "4b9c4519f46826fce6a97bd0eccd3da7e616307b72829f43db4e07060ff5f9d1"
+    },
+    {
+      "bytes": 9144,
+      "path": "fixtures/duplicate_bars.json",
+      "sha256": "eff3506f6614cfbd5b0b3f13c822f1790fbfc26449534b2815f08682ada678f0"
+    },
+    {
+      "bytes": 8562,
+      "path": "fixtures/entry_exit_order_ambiguous.json",
+      "sha256": "68da79ed59b40db96dc9f913051f3af429287ae0a6bb236c51d35ff8f53aa6bc"
+    },
+    {
+      "bytes": 8561,
+      "path": "fixtures/fee_spread_stress.json",
+      "sha256": "776c4d663b28dd1c028e4c4265ef44b5b19dfa66f902449b0f1f52a485735b97"
+    },
+    {
+      "bytes": 8559,
+      "path": "fixtures/future_leaking_receipt.json",
+      "sha256": "d2548cf84b70cdb7d94b3e781c23f2f1b9bf33cee41144fd47960e9820adaba1"
+    },
+    {
+      "bytes": 8562,
+      "path": "fixtures/historical_bounded_embargo.json",
+      "sha256": "c1930293a1baf399030fad43785b2e8f9dd66057ba3dc3ca5804cfcf16e874bc"
+    },
+    {
+      "bytes": 4999,
+      "path": "fixtures/insufficient_horizon.json",
+      "sha256": "0f121bdf53676341467ac06012c2331ce1e275209da26d483c2c5b1319794d5c"
+    },
+    {
+      "bytes": 8560,
+      "path": "fixtures/late_entry_full_horizon.json",
+      "sha256": "060e35da94d27a861a8676b26a22e0e109543d19ee89d9c86b21fd9f0e41d5a2"
+    },
+    {
+      "bytes": 6196,
+      "path": "fixtures/late_entry_insufficient_horizon.json",
+      "sha256": "9c8c36bcf726750ae51c4b14141416723ebcd6d6c8df29f8822cfea4cdde0429"
+    },
+    {
+      "bytes": 7960,
+      "path": "fixtures/missing_interval.json",
+      "sha256": "78f91b5a154f872fce60314c349ae1c3abf10a11ef5bd00fc72279096829bcdc"
+    },
+    {
+      "bytes": 8623,
+      "path": "fixtures/native_string_not_authority.json",
+      "sha256": "25dfe97fe0143a8b34b68e54901bdda41ab1f7fdccd6160993ebd7d98fe73525"
+    },
+    {
+      "bytes": 8546,
+      "path": "fixtures/open_bar.json",
+      "sha256": "0dd7513311b21bee54b347ab51aaf9ce346b85166b65335e12d350945fc90357"
+    },
+    {
+      "bytes": 24177,
+      "path": "fixtures/overlapping_multi_symbol_shock.json",
+      "sha256": "52a4cdcb907e354e21a115120a4e2108fe75a4838df6fdb8f01dbbeb926fd14d"
+    },
+    {
+      "bytes": 8554,
+      "path": "fixtures/precise_time_stop.json",
+      "sha256": "27d51ea7a0b5f423d8a71f90693904231793502f71191a9ed9938f9c70b00df8"
+    },
+    {
+      "bytes": 8554,
+      "path": "fixtures/review_inside_bar.json",
+      "sha256": "62b43bc96177384c1b8fdce05a2585f528b97006c26fa3a836149f9ca2c1badd"
+    },
+    {
+      "bytes": 5002,
+      "path": "fixtures/right_censoring.json",
+      "sha256": "44ac0e97649234b0ce082746eb65fd50c9b446de83cd487026c4f2f3c2af375a"
+    },
+    {
+      "bytes": 8554,
+      "path": "fixtures/stale_observation.json",
+      "sha256": "44857f211229890f474ccd27391c2761e830bdf81b91fa7db165bfdea6224dda"
+    },
+    {
+      "bytes": 8546,
+      "path": "fixtures/stop_first.json",
+      "sha256": "6011ed68141a806f7b1ac41a9253834ec523df728ec7b35d43d35e71173ae848"
+    },
+    {
+      "bytes": 8755,
+      "path": "fixtures/suite.json",
+      "sha256": "bd2a3ed1d9bd987ed9d60c02fc33e67453910cf7a191bba462eb790ba2b5d70a"
+    },
+    {
+      "bytes": 5601,
+      "path": "fixtures/three_hours_cannot_prove_5d.json",
+      "sha256": "b4f93e079470c5bec859bbe6bc6d6f25f50d7c32f337fbd480d1100c437ae0ff"
+    },
+    {
+      "bytes": 8543,
+      "path": "fixtures/unfilled_entry.json",
+      "sha256": "704e7f87eace6b78e918ce1a53dd23300f382437511d4b88214be8cecd86a930"
+    },
+    {
+      "bytes": 8559,
+      "path": "fixtures/unqualified_source.json",
+      "sha256": "d967fd773c393030ed578e92cdeff0dcc459b0a8ba28a4620d68557dd6e4506f"
+    },
+    {
+      "bytes": 92924,
+      "path": "fixtures/winning_unambiguous.json",
+      "sha256": "665df792c5bb76d90636b8f297f06d08e9d28ef72a7bb31e4e7c3f663a856311"
+    },
+    {
+      "bytes": 8461,
+      "path": "frozen_protocol.json",
+      "sha256": "5aa437518d6adda6c956d25f709a6b9003513bfd17b0d54fd30d736c0113ccd4"
+    },
+    {
+      "bytes": 67874,
+      "path": "inputs/B_decision_snapshot.original.json",
+      "sha256": "0c88ec1ac62752beb973fb6aba00bed2874af4ede162d017f2d7bcc24c3f3c2e"
+    },
+    {
+      "bytes": 67591,
+      "path": "inputs/B_episode_export.original.json",
+      "sha256": "c80f5095e7d3237f7a80c1b33a157a0ee2790f887e63430b9936b612a86b657f"
+    },
+    {
+      "bytes": 3114,
+      "path": "inputs/B_episode_schema.original.json",
+      "sha256": "bae6f31848af7d22e6dcdafe3ad9a31a37e32eace75018ae16bac02c8e0690fe"
+    },
+    {
+      "bytes": 7046,
+      "path": "inputs/B_evaluation_contract.original.json",
+      "sha256": "f30380f0bb0ce2c96b495500d66f4a702ccb6f075090ba03ecaa8188b6b982ad"
+    },
+    {
+      "bytes": 66799,
+      "path": "inputs/B_row.original.json",
+      "sha256": "317c466a2e43217c1d2d7f65ad75e707b672d01ec878d1f84d093a3692221551"
+    },
+    {
+      "bytes": 1481,
+      "path": "pyproject.toml",
+      "sha256": "d8e70a57ebf5f2e23730eeb33a40c927d66918cb5cfa72ecda60ce8422c6f020"
+    },
+    {
+      "bytes": 54,
+      "path": "src/btc_quant_agent/__init__.py",
+      "sha256": "6b77383ee872b422c2a76c63668273971229ef50db2fddb0237d77c8f818b455"
+    },
+    {
+      "bytes": 48,
+      "path": "src/btc_quant_agent/__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
+    },
+    {
+      "bytes": 190,
+      "path": "src/btc_quant_agent/api.py",
+      "sha256": "88ac5238cfc21a12d36dde481768110bc453687cceb578044e055d3207ce202a"
+    },
+    {
+      "bytes": 108,
+      "path": "src/btc_quant_agent/cli.py",
+      "sha256": "3602979d9efa490e064d2a7098d277c66ece4c9921ec2fd6b617e7df2dec2b38"
+    },
+    {
+      "bytes": 84,
+      "path": "src/btc_quant_agent/decision/__init__.py",
+      "sha256": "62632cbeda2a845ba7c57f5b469dc28b207c2ed838979850d7a9c5fc458495fa"
+    },
+    {
+      "bytes": 8235,
+      "path": "src/btc_quant_agent/decision/models.py",
+      "sha256": "b1e4c758ef95750ba8c28080636e398ca4fcb2e9e2b96b2c6405deda8ae129fa"
+    },
+    {
+      "bytes": 8889,
+      "path": "src/btc_quant_agent/domain.py",
+      "sha256": "31568bd5affb3fe22451236ccbd6b4a9550905b7d31a30d25a73a69a73329640"
+    },
+    {
+      "bytes": 5066,
+      "path": "src/btc_quant_agent/indicators.py",
+      "sha256": "144936ba1557d7be49340dc16c2f90c70666ce0da3ec32ead7e3b35a6ebffffe"
+    },
+    {
+      "bytes": 89,
+      "path": "src/btc_quant_agent/market_watch/__init__.py",
+      "sha256": "ffea4cb20e883432b0db0841b24a87f0882c6d793324f7048fe91da6f686a976"
+    },
+    {
+      "bytes": 11645,
+      "path": "src/btc_quant_agent/market_watch/config.py",
+      "sha256": "b554c3b40892367e6bf28c8fd0d97bebbde007ef32cb12c558d69e1cdce0c677"
+    },
+    {
+      "bytes": 32366,
+      "path": "src/btc_quant_agent/market_watch/domain.py",
+      "sha256": "b3b16be518af77c08f087e2c8265e4f0fc82e369564aa59b21b95fb85556151d"
+    },
+    {
+      "bytes": 7578,
+      "path": "src/btc_quant_agent/market_watch/foundation.py",
+      "sha256": "df063c403e5058c73145eed8a0237f32bf8b4b9edb2b36a67eefdf4ec68b9446"
+    },
+    {
+      "bytes": 103,
+      "path": "src/btc_quant_agent/platform/__init__.py",
+      "sha256": "db4bfbb41798494c6d696e24249b55437fd480edb478f8000a332737f65f42a4"
+    },
+    {
+      "bytes": 30,
+      "path": "src/btc_quant_agent/platform/__main__.py",
+      "sha256": "6d8b7d7846a845059d7a3107143f11131f63c5511d669b44085b15ec5e3d2279"
+    },
+    {
+      "bytes": 83,
+      "path": "src/btc_quant_agent/platform/canary/__init__.py",
+      "sha256": "665ef367e9240fbaa0bcc82427aad37deca1e6c7f3ef9fb48247e41c835303ba"
+    },
+    {
+      "bytes": 19108,
+      "path": "src/btc_quant_agent/platform/canary/clock_domain.py",
+      "sha256": "24a4283442d7a7cd563a548a84cdad048783e83b6ede8ed574a3f6ece7ef93c7"
+    },
+    {
+      "bytes": 7718,
+      "path": "src/btc_quant_agent/platform/canary/clocks.py",
+      "sha256": "208db6a57f8bcd361c1c91971b610cdcd16bd6798342bf0a739eb619c5a455ba"
+    },
+    {
+      "bytes": 9439,
+      "path": "src/btc_quant_agent/platform/cli.py",
+      "sha256": "fb073b477dddf7b6427364a9416c221ac78723ae815ed515e0d6f15f01854c69"
+    },
+    {
+      "bytes": 9750,
+      "path": "src/btc_quant_agent/platform/config.py",
+      "sha256": "3dd0af0e9447cc97bfe806d92a00f45709b7b2a849f874b7e17dd20f5ea704e3"
+    },
+    {
+      "bytes": 15347,
+      "path": "src/btc_quant_agent/platform/core.py",
+      "sha256": "39a2cabf22837800dfcbc59724be868856056f888e84d83c3ba01fc6fad53b8c"
+    },
+    {
+      "bytes": 2936,
+      "path": "src/btc_quant_agent/platform/evaluation_adapter.py",
+      "sha256": "db9f1c81b67bdcf9f9a1f68a9b1f4f96ff28d9483f4617fe3d3d6808aeaa7c5c"
+    },
+    {
+      "bytes": 23094,
+      "path": "src/btc_quant_agent/platform/factors.py",
+      "sha256": "290d1b882244858a229fda9727f19cb15c8800aa7b569838c8cadb4d1bcffa47"
+    },
+    {
+      "bytes": 5603,
+      "path": "src/btc_quant_agent/platform/native_preflight.py",
+      "sha256": "3f40108003b0252e02dc5cd6be241772435511071c344c8312397c9fa9d5c800"
+    },
+    {
+      "bytes": 1500,
+      "path": "src/btc_quant_agent/platform/owner_verifier.py",
+      "sha256": "cb94927e903a40c87022234c03a37600dec5617b97f9f0997d99b2a832cf58d5"
+    },
+    {
+      "bytes": 21906,
+      "path": "src/btc_quant_agent/platform/program_c_export.py",
+      "sha256": "bc0d03e3dc99abb50c9d141deed312a9c040345900b2f74dced304cdac09a3f4"
+    },
+    {
+      "bytes": 10745,
+      "path": "src/btc_quant_agent/platform/qualified_source.py",
+      "sha256": "5ba8e3164bbbf31af13023afe832b2f8eb9814cbc8db33bf9d56ebc7137d3adc"
+    },
+    {
+      "bytes": 9438,
+      "path": "src/btc_quant_agent/platform/rc_dashboard.py",
+      "sha256": "c34cecd9f8d5a9b3973b20905ba530ac2cfafa9f6ef6295388843fb549845336"
+    },
+    {
+      "bytes": 5690,
+      "path": "src/btc_quant_agent/platform/rc_fixture.py",
+      "sha256": "f19c5f3ac6baed87d88385502d4517b0c6ef5fe15e4b541e7d7b67bdfde3127e"
+    },
+    {
+      "bytes": 5209,
+      "path": "src/btc_quant_agent/platform/rc_models.py",
+      "sha256": "ddaa9a3e9165dcf02ffa8ca1ddc075a9bf679480577eec6424eee39006fb4088"
+    },
+    {
+      "bytes": 8267,
+      "path": "src/btc_quant_agent/platform/rc_observe.py",
+      "sha256": "608e678048c8dab17f1ff083c88eab600c08aa4883000f4c1c943d10786a6b25"
+    },
+    {
+      "bytes": 12249,
+      "path": "src/btc_quant_agent/platform/rc_operator.py",
+      "sha256": "bb1fbc1651d17c4e8f8d29bbceb4038ccb8a17d1c49619baa668ddab6ae5d66a"
+    },
+    {
+      "bytes": 5406,
+      "path": "src/btc_quant_agent/platform/rc_source.py",
+      "sha256": "2c7784393cf07108dcc3c046dcfc7233c56bbbc97415325c95e0c0876ee8b8b9"
+    },
+    {
+      "bytes": 28145,
+      "path": "src/btc_quant_agent/platform/rc_store.py",
+      "sha256": "9cc0b37c42ba6b863bedfd1167a6be139da7f9df109b50a50c977b2add1afa10"
+    },
+    {
+      "bytes": 7637,
+      "path": "src/btc_quant_agent/platform/rc_strategy.py",
+      "sha256": "e3b29aa85609ae919dbd30d35f1090723a0bf58a75acb5aac458af245dd44044"
+    },
+    {
+      "bytes": 1154,
+      "path": "src/btc_quant_agent/platform/regime.py",
+      "sha256": "40ae6679c3275fa0398afbe8ab79ba6023802bd7a276fb6d38954915808e1011"
+    },
+    {
+      "bytes": 6034,
+      "path": "src/btc_quant_agent/platform/reporting.py",
+      "sha256": "341a4eab6b4048f71518c6e59e5228584cede9e985dce8e4327c01fee6df46fd"
+    },
+    {
+      "bytes": 2695,
+      "path": "src/btc_quant_agent/platform/strategies.py",
+      "sha256": "f92bb56d0ca6fc1a74abe71b71428c69eca024ebfb728e2883141df3d410433f"
+    },
+    {
+      "bytes": 15146,
+      "path": "src/btc_quant_agent/platform/swing.py",
+      "sha256": "f822aac6aa8f07c30153a1de1cd734b26efe1d3aaf5d1556613beb76b7c19ddb"
+    },
+    {
+      "bytes": 3435,
+      "path": "src/btc_quant_agent/platform/swing_store.py",
+      "sha256": "4e1cd933d8b9677eff491bb0b1cd896094727e4e3bfde208474011dba11789bb"
+    },
+    {
+      "bytes": 2304,
+      "path": "src/btc_quant_agent/platform/swing_view.py",
+      "sha256": "ee260f2c605a2f12e988a8590cd528fe6215cf195191d2d0d8ab5a0d967b7911"
+    },
+    {
+      "bytes": 1592,
+      "path": "src/btc_quant_agent/platform/ui.py",
+      "sha256": "08548b378ddfb8f01fa80f246cd0a186be954f96638ef663926f2654bed02d1c"
+    },
+    {
+      "bytes": 3900,
+      "path": "src/btc_quant_agent/platform/unified_cli.py",
+      "sha256": "c25179d4c4f1d0e84d306d4252bff9c5da23e664e70f7cee3bbebf1f85c1a731"
+    },
+    {
+      "bytes": 724,
+      "path": "src/btc_quant_agent/resources/configs/trend_pullback.yaml",
+      "sha256": "348f9a3d92c8351490a156153856a32ee751414e90f2f8c029bd1e8b82de0cba"
+    },
+    {
+      "bytes": 4726,
+      "path": "src/btc_quant_agent/resources/contracts/active_scope.json",
+      "sha256": "ea55cb41d726bb4c4c5ce4c26f9dae9528a159d0bc5e8aced3ac1e3721ac029c"
+    },
+    {
+      "bytes": 3114,
+      "path": "src/btc_quant_agent/resources/contracts/b_program_c_episode_export_v1.json",
+      "sha256": "bae6f31848af7d22e6dcdafe3ad9a31a37e32eace75018ae16bac02c8e0690fe"
+    },
+    {
+      "bytes": 1473,
+      "path": "src/btc_quant_agent/resources/contracts/b_shadow_state_v1.json",
+      "sha256": "cde6840978cc36764a903ed6bde460005979d32ac496b75874db2e5efcb2ad3b"
+    },
+    {
+      "bytes": 12048,
+      "path": "src/btc_quant_agent/resources/contracts/c_source_neutral_episode_export_v1.json",
+      "sha256": "d7f13ea07ccbea2eb91f3df3e5aa05ddbcfe152bd924a9d5f589c6b4b43ef78a"
+    },
+    {
+      "bytes": 3548,
+      "path": "src/btc_quant_agent/resources/contracts/low_rate_source_gate.json",
+      "sha256": "04baa3b35e9a75fd37efca325a6cc57e871eb6245f0301974485a7dc775112f0"
+    },
+    {
+      "bytes": 10692,
+      "path": "src/btc_quant_agent/resources/contracts/lt_b_frozen_handoff_v1.json",
+      "sha256": "f91190345f334ebef571aa292ee26a7d85951f3ee702f23a110f5a6e0529fbb3"
+    },
+    {
+      "bytes": 3269,
+      "path": "src/btc_quant_agent/resources/contracts/opportunity.schema.json",
+      "sha256": "73ccedbac3c8485cfc23721a0e98240bafaec0c5bac9ac97a7d2d6d4a2f8073d"
+    },
+    {
+      "bytes": 2218,
+      "path": "src/btc_quant_agent/resources/contracts/policy.schema.json",
+      "sha256": "da9d0530642904469a3577c006528f3868991f677ed7e84a836c6cb20fa4cf67"
+    },
+    {
+      "bytes": 7046,
+      "path": "src/btc_quant_agent/resources/contracts/program_c_evaluation_v1.json",
+      "sha256": "f30380f0bb0ce2c96b495500d66f4a702ccb6f075090ba03ecaa8188b6b982ad"
+    },
+    {
+      "bytes": 9018,
+      "path": "src/btc_quant_agent/resources/contracts/rc_v1.json",
+      "sha256": "0487e72fe8c655ee457d6779e9e9c7b98630d279d955a6e0f3793534dbdc1d13"
+    },
+    {
+      "bytes": 6758,
+      "path": "src/btc_quant_agent/resources/contracts/snapshot.schema.json",
+      "sha256": "f4b799da518843d492852cf2905d402e757bac2d57907a7c0f5c3c9e50567a05"
+    },
+    {
+      "bytes": 3235,
+      "path": "src/btc_quant_agent/resources/contracts/state_model.json",
+      "sha256": "880ce174db6a3d119df0b8dd33870f136b84c69c71e85090601859888f7bd1ca"
+    },
+    {
+      "bytes": 1065,
+      "path": "src/btc_quant_agent/resources/fixtures/SYNTHETIC_FIXTURE_MANIFEST.json",
+      "sha256": "a6943656078650c69a354f73ba9bd58fee401f634f51e0f775b1b1177fb7fb95"
+    },
+    {
+      "bytes": 256200,
+      "path": "src/btc_quant_agent/resources/fixtures/SYNTHETIC_all_no_setup_v1.jsonl",
+      "sha256": "1df13faad725bb92ff0d92342ff5d0aac93f21dc71297fe51c0c850942429b2d"
+    },
+    {
+      "bytes": 262204,
+      "path": "src/btc_quant_agent/resources/fixtures/SYNTHETIC_mixed_v1.jsonl",
+      "sha256": "55c02e0b3bb238fb03dbe4cfa63efd519e2ae5fc8c8d844cc726bbf89f93fcf5"
+    },
+    {
+      "bytes": 275728,
+      "path": "src/btc_quant_agent/resources/fixtures/SYNTHETIC_positive_v1.jsonl",
+      "sha256": "a846b8907c336ded0d2a98d9e0d7a21ba3378fea83492c107c7f5aceffa4b498"
+    },
+    {
+      "bytes": 8550,
+      "path": "src/btc_quant_agent/resources/fixtures/adverse_jump_gap.json",
+      "sha256": "49527be5acc2a6bfd7b8b52090fe6d906a11fe06101cf26872a8648b7da1ea34"
+    },
+    {
+      "bytes": 760,
+      "path": "src/btc_quant_agent/resources/fixtures/all_no_setup.json",
+      "sha256": "a56311273f5b3837fca549ec99a95885abe74751b2e7e734f400f6b2f9f7e686"
+    },
+    {
+      "bytes": 8554,
+      "path": "src/btc_quant_agent/resources/fixtures/both_hit_same_bar.json",
+      "sha256": "1da4dbea4a81c3e04acebd1c3c5083a19617a429ad0b140fe09df6b43275c10f"
+    },
+    {
+      "bytes": 8548,
+      "path": "src/btc_quant_agent/resources/fixtures/clock_drift.json",
+      "sha256": "23382b9e56c930df2841555440b9d4deaa162f4a00f6ebb83dd93730ec36bc84"
+    },
+    {
+      "bytes": 8555,
+      "path": "src/btc_quant_agent/resources/fixtures/corrected_revision.json",
+      "sha256": "01b248b894f2e78876df9a39ecc8d1a4993f821fab4e2fff3d1446b3cac57227"
+    },
+    {
+      "bytes": 7715,
+      "path": "src/btc_quant_agent/resources/fixtures/cost_unknown.json",
+      "sha256": "7bb34fa18a5adb3b3c9b162ac002fbbe006988b023d3f5fbad20c7d765570e65"
+    },
+    {
+      "bytes": 7968,
+      "path": "src/btc_quant_agent/resources/fixtures/coverage_1D_5d.json",
+      "sha256": "2288d023bd6096f2345047d92c3bd8bd211a9c0189fb65c363d8c1a812f97758"
+    },
+    {
+      "bytes": 10925,
+      "path": "src/btc_quant_agent/resources/fixtures/coverage_4H_24h.json",
+      "sha256": "57da9b39be7e6c667e4f2d4ab678470542d8150092711ee89e46819e182a8fee"
+    },
+    {
+      "bytes": 8558,
+      "path": "src/btc_quant_agent/resources/fixtures/delayed_missed_entry.json",
+      "sha256": "4b9c4519f46826fce6a97bd0eccd3da7e616307b72829f43db4e07060ff5f9d1"
+    },
+    {
+      "bytes": 9144,
+      "path": "src/btc_quant_agent/resources/fixtures/duplicate_bars.json",
+      "sha256": "eff3506f6614cfbd5b0b3f13c822f1790fbfc26449534b2815f08682ada678f0"
+    },
+    {
+      "bytes": 8562,
+      "path": "src/btc_quant_agent/resources/fixtures/entry_exit_order_ambiguous.json",
+      "sha256": "68da79ed59b40db96dc9f913051f3af429287ae0a6bb236c51d35ff8f53aa6bc"
+    },
+    {
+      "bytes": 8561,
+      "path": "src/btc_quant_agent/resources/fixtures/fee_spread_stress.json",
+      "sha256": "776c4d663b28dd1c028e4c4265ef44b5b19dfa66f902449b0f1f52a485735b97"
+    },
+    {
+      "bytes": 8559,
+      "path": "src/btc_quant_agent/resources/fixtures/future_leaking_receipt.json",
+      "sha256": "d2548cf84b70cdb7d94b3e781c23f2f1b9bf33cee41144fd47960e9820adaba1"
+    },
+    {
+      "bytes": 8562,
+      "path": "src/btc_quant_agent/resources/fixtures/historical_bounded_embargo.json",
+      "sha256": "c1930293a1baf399030fad43785b2e8f9dd66057ba3dc3ca5804cfcf16e874bc"
+    },
+    {
+      "bytes": 4999,
+      "path": "src/btc_quant_agent/resources/fixtures/insufficient_horizon.json",
+      "sha256": "0f121bdf53676341467ac06012c2331ce1e275209da26d483c2c5b1319794d5c"
+    },
+    {
+      "bytes": 8560,
+      "path": "src/btc_quant_agent/resources/fixtures/late_entry_full_horizon.json",
+      "sha256": "060e35da94d27a861a8676b26a22e0e109543d19ee89d9c86b21fd9f0e41d5a2"
+    },
+    {
+      "bytes": 6196,
+      "path": "src/btc_quant_agent/resources/fixtures/late_entry_insufficient_horizon.json",
+      "sha256": "9c8c36bcf726750ae51c4b14141416723ebcd6d6c8df29f8822cfea4cdde0429"
+    },
+    {
+      "bytes": 7960,
+      "path": "src/btc_quant_agent/resources/fixtures/missing_interval.json",
+      "sha256": "78f91b5a154f872fce60314c349ae1c3abf10a11ef5bd00fc72279096829bcdc"
+    },
+    {
+      "bytes": 8623,
+      "path": "src/btc_quant_agent/resources/fixtures/native_string_not_authority.json",
+      "sha256": "25dfe97fe0143a8b34b68e54901bdda41ab1f7fdccd6160993ebd7d98fe73525"
+    },
+    {
+      "bytes": 8546,
+      "path": "src/btc_quant_agent/resources/fixtures/open_bar.json",
+      "sha256": "0dd7513311b21bee54b347ab51aaf9ce346b85166b65335e12d350945fc90357"
+    },
+    {
+      "bytes": 24177,
+      "path": "src/btc_quant_agent/resources/fixtures/overlapping_multi_symbol_shock.json",
+      "sha256": "52a4cdcb907e354e21a115120a4e2108fe75a4838df6fdb8f01dbbeb926fd14d"
+    },
+    {
+      "bytes": 8554,
+      "path": "src/btc_quant_agent/resources/fixtures/precise_time_stop.json",
+      "sha256": "27d51ea7a0b5f423d8a71f90693904231793502f71191a9ed9938f9c70b00df8"
+    },
+    {
+      "bytes": 8554,
+      "path": "src/btc_quant_agent/resources/fixtures/review_inside_bar.json",
+      "sha256": "62b43bc96177384c1b8fdce05a2585f528b97006c26fa3a836149f9ca2c1badd"
+    },
+    {
+      "bytes": 5002,
+      "path": "src/btc_quant_agent/resources/fixtures/right_censoring.json",
+      "sha256": "44ac0e97649234b0ce082746eb65fd50c9b446de83cd487026c4f2f3c2af375a"
+    },
+    {
+      "bytes": 8554,
+      "path": "src/btc_quant_agent/resources/fixtures/stale_observation.json",
+      "sha256": "44857f211229890f474ccd27391c2761e830bdf81b91fa7db165bfdea6224dda"
+    },
+    {
+      "bytes": 8546,
+      "path": "src/btc_quant_agent/resources/fixtures/stop_first.json",
+      "sha256": "6011ed68141a806f7b1ac41a9253834ec523df728ec7b35d43d35e71173ae848"
+    },
+    {
+      "bytes": 8755,
+      "path": "src/btc_quant_agent/resources/fixtures/suite.json",
+      "sha256": "bd2a3ed1d9bd987ed9d60c02fc33e67453910cf7a191bba462eb790ba2b5d70a"
+    },
+    {
+      "bytes": 5601,
+      "path": "src/btc_quant_agent/resources/fixtures/three_hours_cannot_prove_5d.json",
+      "sha256": "b4f93e079470c5bec859bbe6bc6d6f25f50d7c32f337fbd480d1100c437ae0ff"
+    },
+    {
+      "bytes": 8543,
+      "path": "src/btc_quant_agent/resources/fixtures/unfilled_entry.json",
+      "sha256": "704e7f87eace6b78e918ce1a53dd23300f382437511d4b88214be8cecd86a930"
+    },
+    {
+      "bytes": 8559,
+      "path": "src/btc_quant_agent/resources/fixtures/unqualified_source.json",
+      "sha256": "d967fd773c393030ed578e92cdeff0dcc459b0a8ba28a4620d68557dd6e4506f"
+    },
+    {
+      "bytes": 92924,
+      "path": "src/btc_quant_agent/resources/fixtures/winning_unambiguous.json",
+      "sha256": "665df792c5bb76d90636b8f297f06d08e9d28ef72a7bb31e4e7c3f663a856311"
+    },
+    {
+      "bytes": 2222,
+      "path": "src/btc_quant_agent/structure.py",
+      "sha256": "9b6446733404d88419fd1434188f475f135df79d8773b5872055db22259b2c36"
+    },
+    {
+      "bytes": 109,
+      "path": "src/program_c/__init__.py",
+      "sha256": "0fdfd3b8e97cc45bcbeebb48933ac77e51bc358d48f861f2ae40a7ea68bf1b2b"
+    },
+    {
+      "bytes": 48,
+      "path": "src/program_c/__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
+    },
+    {
+      "bytes": 6235,
+      "path": "src/program_c/cli.py",
+      "sha256": "5d059488e9c453763d3c01e80d8466a0a1c932c5b6da36527914b5eb5bfcc204"
+    },
+    {
+      "bytes": 4779,
+      "path": "src/program_c/costs.py",
+      "sha256": "56e68aa725b55a081fcf68f7c10d39798b938c520c0131b758694fd0435d7357"
+    },
+    {
+      "bytes": 11397,
+      "path": "src/program_c/engine.py",
+      "sha256": "c9cf74a2a4be31fdec7408cff7352eff3f5e497a10aacf7ac77a957cecb53539"
+    },
+    {
+      "bytes": 8550,
+      "path": "src/program_c/fixtures/adverse_jump_gap.json",
+      "sha256": "49527be5acc2a6bfd7b8b52090fe6d906a11fe06101cf26872a8648b7da1ea34"
+    },
+    {
+      "bytes": 760,
+      "path": "src/program_c/fixtures/all_no_setup.json",
+      "sha256": "a56311273f5b3837fca549ec99a95885abe74751b2e7e734f400f6b2f9f7e686"
+    },
+    {
+      "bytes": 8554,
+      "path": "src/program_c/fixtures/both_hit_same_bar.json",
+      "sha256": "1da4dbea4a81c3e04acebd1c3c5083a19617a429ad0b140fe09df6b43275c10f"
+    },
+    {
+      "bytes": 8548,
+      "path": "src/program_c/fixtures/clock_drift.json",
+      "sha256": "23382b9e56c930df2841555440b9d4deaa162f4a00f6ebb83dd93730ec36bc84"
+    },
+    {
+      "bytes": 8555,
+      "path": "src/program_c/fixtures/corrected_revision.json",
+      "sha256": "01b248b894f2e78876df9a39ecc8d1a4993f821fab4e2fff3d1446b3cac57227"
+    },
+    {
+      "bytes": 7715,
+      "path": "src/program_c/fixtures/cost_unknown.json",
+      "sha256": "7bb34fa18a5adb3b3c9b162ac002fbbe006988b023d3f5fbad20c7d765570e65"
+    },
+    {
+      "bytes": 7968,
+      "path": "src/program_c/fixtures/coverage_1D_5d.json",
+      "sha256": "2288d023bd6096f2345047d92c3bd8bd211a9c0189fb65c363d8c1a812f97758"
+    },
+    {
+      "bytes": 10925,
+      "path": "src/program_c/fixtures/coverage_4H_24h.json",
+      "sha256": "57da9b39be7e6c667e4f2d4ab678470542d8150092711ee89e46819e182a8fee"
+    },
+    {
+      "bytes": 8558,
+      "path": "src/program_c/fixtures/delayed_missed_entry.json",
+      "sha256": "4b9c4519f46826fce6a97bd0eccd3da7e616307b72829f43db4e07060ff5f9d1"
+    },
+    {
+      "bytes": 9144,
+      "path": "src/program_c/fixtures/duplicate_bars.json",
+      "sha256": "eff3506f6614cfbd5b0b3f13c822f1790fbfc26449534b2815f08682ada678f0"
+    },
+    {
+      "bytes": 8562,
+      "path": "src/program_c/fixtures/entry_exit_order_ambiguous.json",
+      "sha256": "68da79ed59b40db96dc9f913051f3af429287ae0a6bb236c51d35ff8f53aa6bc"
+    },
+    {
+      "bytes": 8561,
+      "path": "src/program_c/fixtures/fee_spread_stress.json",
+      "sha256": "776c4d663b28dd1c028e4c4265ef44b5b19dfa66f902449b0f1f52a485735b97"
+    },
+    {
+      "bytes": 8559,
+      "path": "src/program_c/fixtures/future_leaking_receipt.json",
+      "sha256": "d2548cf84b70cdb7d94b3e781c23f2f1b9bf33cee41144fd47960e9820adaba1"
+    },
+    {
+      "bytes": 8562,
+      "path": "src/program_c/fixtures/historical_bounded_embargo.json",
+      "sha256": "c1930293a1baf399030fad43785b2e8f9dd66057ba3dc3ca5804cfcf16e874bc"
+    },
+    {
+      "bytes": 4999,
+      "path": "src/program_c/fixtures/insufficient_horizon.json",
+      "sha256": "0f121bdf53676341467ac06012c2331ce1e275209da26d483c2c5b1319794d5c"
+    },
+    {
+      "bytes": 8560,
+      "path": "src/program_c/fixtures/late_entry_full_horizon.json",
+      "sha256": "060e35da94d27a861a8676b26a22e0e109543d19ee89d9c86b21fd9f0e41d5a2"
+    },
+    {
+      "bytes": 6196,
+      "path": "src/program_c/fixtures/late_entry_insufficient_horizon.json",
+      "sha256": "9c8c36bcf726750ae51c4b14141416723ebcd6d6c8df29f8822cfea4cdde0429"
+    },
+    {
+      "bytes": 7960,
+      "path": "src/program_c/fixtures/missing_interval.json",
+      "sha256": "78f91b5a154f872fce60314c349ae1c3abf10a11ef5bd00fc72279096829bcdc"
+    },
+    {
+      "bytes": 8623,
+      "path": "src/program_c/fixtures/native_string_not_authority.json",
+      "sha256": "25dfe97fe0143a8b34b68e54901bdda41ab1f7fdccd6160993ebd7d98fe73525"
+    },
+    {
+      "bytes": 8546,
+      "path": "src/program_c/fixtures/open_bar.json",
+      "sha256": "0dd7513311b21bee54b347ab51aaf9ce346b85166b65335e12d350945fc90357"
+    },
+    {
+      "bytes": 24177,
+      "path": "src/program_c/fixtures/overlapping_multi_symbol_shock.json",
+      "sha256": "52a4cdcb907e354e21a115120a4e2108fe75a4838df6fdb8f01dbbeb926fd14d"
+    },
+    {
+      "bytes": 8554,
+      "path": "src/program_c/fixtures/precise_time_stop.json",
+      "sha256": "27d51ea7a0b5f423d8a71f90693904231793502f71191a9ed9938f9c70b00df8"
+    },
+    {
+      "bytes": 8554,
+      "path": "src/program_c/fixtures/review_inside_bar.json",
+      "sha256": "62b43bc96177384c1b8fdce05a2585f528b97006c26fa3a836149f9ca2c1badd"
+    },
+    {
+      "bytes": 5002,
+      "path": "src/program_c/fixtures/right_censoring.json",
+      "sha256": "44ac0e97649234b0ce082746eb65fd50c9b446de83cd487026c4f2f3c2af375a"
+    },
+    {
+      "bytes": 8554,
+      "path": "src/program_c/fixtures/stale_observation.json",
+      "sha256": "44857f211229890f474ccd27391c2761e830bdf81b91fa7db165bfdea6224dda"
+    },
+    {
+      "bytes": 8546,
+      "path": "src/program_c/fixtures/stop_first.json",
+      "sha256": "6011ed68141a806f7b1ac41a9253834ec523df728ec7b35d43d35e71173ae848"
+    },
+    {
+      "bytes": 8755,
+      "path": "src/program_c/fixtures/suite.json",
+      "sha256": "bd2a3ed1d9bd987ed9d60c02fc33e67453910cf7a191bba462eb790ba2b5d70a"
+    },
+    {
+      "bytes": 5601,
+      "path": "src/program_c/fixtures/three_hours_cannot_prove_5d.json",
+      "sha256": "b4f93e079470c5bec859bbe6bc6d6f25f50d7c32f337fbd480d1100c437ae0ff"
+    },
+    {
+      "bytes": 8543,
+      "path": "src/program_c/fixtures/unfilled_entry.json",
+      "sha256": "704e7f87eace6b78e918ce1a53dd23300f382437511d4b88214be8cecd86a930"
+    },
+    {
+      "bytes": 8559,
+      "path": "src/program_c/fixtures/unqualified_source.json",
+      "sha256": "d967fd773c393030ed578e92cdeff0dcc459b0a8ba28a4620d68557dd6e4506f"
+    },
+    {
+      "bytes": 92924,
+      "path": "src/program_c/fixtures/winning_unambiguous.json",
+      "sha256": "665df792c5bb76d90636b8f297f06d08e9d28ef72a7bb31e4e7c3f663a856311"
+    },
+    {
+      "bytes": 8461,
+      "path": "src/program_c/frozen_protocol.json",
+      "sha256": "5aa437518d6adda6c956d25f709a6b9003513bfd17b0d54fd30d736c0113ccd4"
+    },
+    {
+      "bytes": 67874,
+      "path": "src/program_c/inputs/B_decision_snapshot.original.json",
+      "sha256": "0c88ec1ac62752beb973fb6aba00bed2874af4ede162d017f2d7bcc24c3f3c2e"
+    },
+    {
+      "bytes": 67591,
+      "path": "src/program_c/inputs/B_episode_export.original.json",
+      "sha256": "c80f5095e7d3237f7a80c1b33a157a0ee2790f887e63430b9936b612a86b657f"
+    },
+    {
+      "bytes": 3114,
+      "path": "src/program_c/inputs/B_episode_schema.original.json",
+      "sha256": "bae6f31848af7d22e6dcdafe3ad9a31a37e32eace75018ae16bac02c8e0690fe"
+    },
+    {
+      "bytes": 7046,
+      "path": "src/program_c/inputs/B_evaluation_contract.original.json",
+      "sha256": "f30380f0bb0ce2c96b495500d66f4a702ccb6f075090ba03ecaa8188b6b982ad"
+    },
+    {
+      "bytes": 66799,
+      "path": "src/program_c/inputs/B_row.original.json",
+      "sha256": "317c466a2e43217c1d2d7f65ad75e707b672d01ec878d1f84d093a3692221551"
+    },
+    {
+      "bytes": 4390,
+      "path": "src/program_c/integrity.py",
+      "sha256": "7f2ea598c65cd361b69a5b08a104e56007268b7429fc1c9c557bd9008b7ff76a"
+    },
+    {
+      "bytes": 8237,
+      "path": "src/program_c/protocol.py",
+      "sha256": "69fd8dbb7c954b1508d4e1adaab13915650fc3510e500910bb43f01696ae0fa2"
+    },
+    {
+      "bytes": 5123,
+      "path": "src/program_c/reporting.py",
+      "sha256": "ed37698d24776723b897a37f2379f5c32bdc1db7b279394a8dea2c769a31f3db"
+    },
+    {
+      "bytes": 14861,
+      "path": "src/program_c/statistics.py",
+      "sha256": "eff5c969ff956aa90bff9e8460ed94ba5bfec66ff35d010d960a0b2ae8ca6258"
+    },
+    {
+      "bytes": 20258,
+      "path": "src/program_c/validation.py",
+      "sha256": "983fcd05e3894fc3606dfed7fea5f925baf886e60e31fa2145236515eb547aa8"
+    },
+    {
+      "bytes": 354,
+      "path": "tests/conftest.py",
+      "sha256": "8b8b4d98ee24b74ff87afad93c780f4add44dc3c39a60397663242f288919c58"
+    },
+    {
+      "bytes": 647,
+      "path": "tests/evaluator/conftest.py",
+      "sha256": "4eb9e53bdf0f2e827a7176a815cba5d63a354fb8794931c53eba860d63b2414d"
+    },
+    {
+      "bytes": 4516,
+      "path": "tests/evaluator/test_cli.py",
+      "sha256": "2c83d30f68d778325559694b49cdd89ecfd2d59faf094d5811a427c119dd2365"
+    },
+    {
+      "bytes": 4001,
+      "path": "tests/evaluator/test_costs.py",
+      "sha256": "0a0b0d39df82a9f6e3f9d0054a537d948bd098f16fe7ac220cfb4e0a14267dac"
+    },
+    {
+      "bytes": 8235,
+      "path": "tests/evaluator/test_engine.py",
+      "sha256": "a73dc205701e1be89e120f9b60352244368c54b84567e6d58ade4d28341df938"
+    },
+    {
+      "bytes": 5900,
+      "path": "tests/evaluator/test_statistics.py",
+      "sha256": "4854a7fc116e6ac445184a6994281efcba10b3fec69408ccd4496eebdbea5162"
+    },
+    {
+      "bytes": 7136,
+      "path": "tests/evaluator/test_validation.py",
+      "sha256": "4e2e9b29c58eab5a868fe94d1b5cd7068f723b614ece660307437883f46be447"
+    },
+    {
+      "bytes": 841,
+      "path": "tests/rc/conftest.py",
+      "sha256": "ac0e751e96393ec427fa30adaf7f65b161bd4eb920400c1eac464d3a97e072e9"
+    },
+    {
+      "bytes": 8634,
+      "path": "tests/rc/test_causal.py",
+      "sha256": "53454a7f5a255f578acf3f9bc18914db03c2bb71da5db470aaca4a14b03a03f7"
+    },
+    {
+      "bytes": 3019,
+      "path": "tests/rc/test_d_integration.py",
+      "sha256": "831d1d95c26769a249499476fc82c89ad12e8ee625c75990ef3a8cd3ddb518e2"
+    },
+    {
+      "bytes": 6449,
+      "path": "tests/rc/test_d_preflight.py",
+      "sha256": "78a67b2591d84e655afb8003d1517359fe763922c82f727bd9cf52a14c546270"
+    },
+    {
+      "bytes": 8491,
+      "path": "tests/rc/test_manual_operator.py",
+      "sha256": "0aa7ea56d4def810263b8133bc37efd9bf95ba428e6f8123c5a13afa5efa3196"
+    },
+    {
+      "bytes": 4587,
+      "path": "tests/rc/test_observation_dashboard.py",
+      "sha256": "32007bc7b9d63e32dcf15c5914c66a2e15c8848bda6be20701028bd2f9357651"
+    },
+    {
+      "bytes": 11659,
+      "path": "tests/rc/test_persistence.py",
+      "sha256": "4937d118c9e545f870fe7266dfe3e9bb1ce307aba683cf76dce5b83e3f63c10a"
+    },
+    {
+      "bytes": 4118,
+      "path": "tests/rc/test_program_c_export.py",
+      "sha256": "94bf7c2310e9795238aea73c344ded171ed0fc4b92601f038fe163702584e01a"
+    },
+    {
+      "bytes": 8795,
+      "path": "tests/rc/test_qualified_source.py",
+      "sha256": "1a3719da2eda7038ec75b863006d768390521a0c4ea4f6236448c7dad1bed627"
+    },
+    {
+      "bytes": 18768,
+      "path": "tests/swing/test_contract.py",
+      "sha256": "a265fc06d286040671122120bac4871d3dc86e8d0661f84282e76b52bfd19393"
+    },
+    {
+      "bytes": 1732,
+      "path": "tests/swing/test_delivery.py",
+      "sha256": "c4fe593665c8f871648d8df41912eb00a80d13c3e9daf07b163400a5f88b6650"
+    },
+    {
+      "bytes": 1751,
+      "path": "tests/test_structure.py",
+      "sha256": "721800aae902d2cf416c9ac1a470ae856137eebd42ef18c36c92868cf894dc09"
+    },
+    {
+      "bytes": 9180,
+      "path": "tools/build_release.py",
+      "sha256": "ec71fc3fd3bcf3ff5bfadc82bf781b8c08bf8cf8e94f6db0dca92bc5890149a4"
+    },
+    {
+      "bytes": 12392,
+      "path": "tools/make_fixtures.py",
+      "sha256": "7a62388c48b76fbc1e8a792cad10daea26ac743d485bfff8ccc79d569428b7e5"
+    },
+    {
+      "bytes": 368,
+      "path": "tools/offline_pytest.py",
+      "sha256": "c9b0c9ec9450e991457c782093c810a7297fb56fd70502e1894b90feae853cfa"
+    },
+    {
+      "bytes": 4391,
+      "path": "tools/operator_acceptance.py",
+      "sha256": "f6df51bcd3310c1ecaf355ac0b3fbd08371caea286683ec23a960827406bc7ae"
+    },
+    {
+      "bytes": 3830,
+      "path": "tools/package_candidate.py",
+      "sha256": "c46cab11c538421545ae581086e9af488bfa56bf6b29c7686c3eeaed8c3e7b08"
+    },
+    {
+      "bytes": 601,
+      "path": "tools/rc.py",
+      "sha256": "67bb5f3378f7138ee79a02f15e057f99aee3bc18887736f552400baf6ff1839a"
+    },
+    {
+      "bytes": 6255,
+      "path": "tools/rc_benchmark.py",
+      "sha256": "965b4f0091ad8e984f88e44d461ade5c0f3e835465f64e8ac10a7e5339de4f8b"
+    },
+    {
+      "bytes": 4039,
+      "path": "tools/swing_benchmark.py",
+      "sha256": "9d08b489f0ff47c41e93e26e1679c26db0a34ed248a448b058da0e413f5c6687"
+    },
+    {
+      "bytes": 1490,
+      "path": "tools/verify_release.py",
+      "sha256": "6c639a581affce4bf0fb0751baca12c06e546e8bbbb56f018c8767366fc88f34"
+    }
+  ],
+  "fixtures": "Finite explicitly synthetic offline QA fixtures only",
+  "schema": "D_EXACT_PUBLIC_CODE_MANIFEST_V1"
+}

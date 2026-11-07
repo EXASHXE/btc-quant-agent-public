@@ -1,0 +1,155 @@
+{
+  "additionalProperties": false,
+  "description": "Ex-ante contract only; a caller cannot activate another strategy or assert a fill.",
+  "properties": {
+    "account_status": {
+      "default": "UNKNOWN",
+      "enum": [
+        "UNKNOWN",
+        "VETO",
+        "NOT_REQUESTED"
+      ],
+      "title": "Account Status",
+      "type": "string"
+    },
+    "atr_buffer": {
+      "exclusiveMinimum": 0,
+      "title": "Atr Buffer",
+      "type": "number"
+    },
+    "available_ms": {
+      "title": "Available Ms",
+      "type": "integer"
+    },
+    "cost_assumption": {
+      "minLength": 1,
+      "title": "Cost Assumption",
+      "type": "string"
+    },
+    "direction": {
+      "enum": [
+        "LONG",
+        "SHORT"
+      ],
+      "title": "Direction",
+      "type": "string"
+    },
+    "entry_region": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Entry Region",
+      "type": "array"
+    },
+    "execution_buffer": {
+      "exclusiveMinimum": 0,
+      "title": "Execution Buffer",
+      "type": "number"
+    },
+    "expires_ms": {
+      "title": "Expires Ms",
+      "type": "integer"
+    },
+    "holding_hours": {
+      "default": 24,
+      "maximum": 120,
+      "minimum": 8,
+      "title": "Holding Hours",
+      "type": "integer"
+    },
+    "planned_after_cost_r": {
+      "exclusiveMinimum": 0,
+      "title": "Planned After Cost R",
+      "type": "number"
+    },
+    "planned_cost_per_unit": {
+      "minimum": 0,
+      "title": "Planned Cost Per Unit",
+      "type": "number"
+    },
+    "regime": {
+      "enum": [
+        "TREND_UP",
+        "TREND_DOWN"
+      ],
+      "title": "Regime",
+      "type": "string"
+    },
+    "review_deadline_ms": {
+      "title": "Review Deadline Ms",
+      "type": "integer"
+    },
+    "risk_factors": {
+      "default": [
+        "PLANNED_PAYOFF_IS_NOT_EXECUTABLE_OR_REALIZED"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "title": "Risk Factors",
+      "type": "array"
+    },
+    "setup_close_ms": {
+      "title": "Setup Close Ms",
+      "type": "integer"
+    },
+    "strategy": {
+      "const": "trend_pullback",
+      "default": "trend_pullback",
+      "title": "Strategy",
+      "type": "string"
+    },
+    "structural_invalidation": {
+      "exclusiveMinimum": 0,
+      "title": "Structural Invalidation",
+      "type": "number"
+    },
+    "structural_observed_ms": {
+      "title": "Structural Observed Ms",
+      "type": "integer"
+    },
+    "symbol": {
+      "enum": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "title": "Symbol",
+      "type": "string"
+    },
+    "target_zones": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Target Zones",
+      "type": "array"
+    }
+  },
+  "required": [
+    "symbol",
+    "direction",
+    "regime",
+    "setup_close_ms",
+    "available_ms",
+    "structural_observed_ms",
+    "entry_region",
+    "structural_invalidation",
+    "atr_buffer",
+    "execution_buffer",
+    "target_zones",
+    "planned_after_cost_r",
+    "planned_cost_per_unit",
+    "cost_assumption",
+    "review_deadline_ms",
+    "expires_ms"
+  ],
+  "title": "Opportunity",
+  "type": "object"
+}

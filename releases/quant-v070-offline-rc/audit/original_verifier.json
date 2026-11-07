@@ -1,0 +1,9 @@
+{
+  "functions": [
+    "signed_bytes",
+    "verify_signature"
+  ],
+  "mode": "verbatim function extraction; type-only forward annotations; local fail-closed exception",
+  "path": "l4-readonly-source-canary-01/src/btc_quant_agent/platform/canary/session02.py",
+  "sha256": "87a89acd40e016173ceb0bfda61ce9180a50d874b921589069a4ebf3403ce7ad"
+}

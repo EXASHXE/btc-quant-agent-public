@@ -1,0 +1,171 @@
+{
+  "authority": "Controller 0-C acceptance PENDING; this freezes an implementation interface only",
+  "bar_contract": {
+    "availability_sla_ms": 300000,
+    "boundaries": "UTC-aligned half-open [open,end), close_time_ms=end-1; explicit completed flag mandatory",
+    "clock_order": "bar_end <= source_event_ms <= received_ms <= available_ms <= durable_ms <= decision_ms <= scheduled_review_ms < expires_ms",
+    "duplicates": "Exact immutable receipt replay deduplicated before decision; content conflict under same identity hard stop",
+    "gaps": "Every interval in admitted prefix must exist; no forward-fill. Missing/unsorted input fails closed. 1H absent is optional; supplied malformed 1H blocks confirmation, not a standalone signal.",
+    "intervals_ms": {
+      "1D": 86400000,
+      "1H": 3600000,
+      "4H": 14400000
+    },
+    "prefix": "As-of both end<=trigger and durable<=decision. Latest mandatory 4H and 1D end=floor(trigger/interval)*interval. No sorting of input to conceal out-of-order; adapters admit ascending per series.",
+    "revisions": "Append revision with new availability and increasing revision. Multiple visible revisions veto a new candidate and cancel dependent open episode. Future revision cannot mutate earlier decision.",
+    "stale": "decision-trigger>300000 or missing latest expected close => DATA_UNAVAILABLE; stale display never arms",
+    "warmup": {
+      "1D": 60,
+      "4H": 60,
+      "optional_1H_if_supplied": 2
+    }
+  },
+  "frozen_on": "2026-11-06",
+  "observation": {
+    "authority": "SYNTHETIC later path classification only; no fills/executions or realized PnL",
+    "outcomes": [
+      "TARGET_FIRST",
+      "STOP_FIRST",
+      "TIME_STOP",
+      "NO_FILL",
+      "MISSED_ENTRY",
+      "AMBIGUOUS_OHLC_ORDER_UNKNOWN",
+      "MISSING_COVERAGE",
+      "RIGHT_CENSORED",
+      "INSUFFICIENT_FUTURE_HORIZON"
+    ],
+    "rule": "Only bars opened after decision, received/available by observation as-of; contiguous required horizon, conservative ambiguous entry/exit ordering UNKNOWN. Quote evidence is explicitly simulated; no assumed fill from a touch.",
+    "separation": "Append observation evidence separately; never rewrite ex-ante decision or infer economic validation"
+  },
+  "package": "active_project/src/btc_quant_agent",
+  "persistence": {
+    "bounds": {
+      "backfill_batch_bars": 4096,
+      "database_max_bytes": 67108864,
+      "pending_queue": 128,
+      "sqlite_busy_timeout_ms": 1000
+    },
+    "historical_guards": "Unmodified frozen guard references outside import path; sticky 50ms stop, queue128 and per-frame accounting unchanged. No BBO acquisition retained on active path.",
+    "identity": "source_id+venue+symbol+interval+open+revision; immutable raw bytes and normalized hash bound by receipt hash",
+    "lifecycle": "L23 frozen anchors/CAS revision/time-regression/terminal-immutability invariants adapted without minute bars, notifications, orders or capacity reservations",
+    "replay": "Identical normalized as-of receipts/config/clocks => byte-identical canonical decision digest; replay never resets episode status",
+    "reuse": "DecisionStore.connect with synchronous FULL; transaction binds source receipts, original LT-A negative/account-veto snapshot, RC decision, prefix/watermark, initial Shadow episode",
+    "snapshot": "Adapt existing write_snapshot/save_dashboard using existing ui.page/reporting.document/table and fsync temp+replace+directory fsync; immutable decision file precedes latest pointers. Restart verifies DB and republishes partial latest snapshots."
+  },
+  "product": "V070_PROGRAM_A_OFFLINE_RC_V1",
+  "program_b": {
+    "compatibility": "No changes to original ClosedBar, Opportunity, decide, evaluate or B contract. RC snapshot is explicitly versioned and old snapshots never activate it.",
+    "copy": "active_project/contracts/lt_b_frozen_handoff_v1.json",
+    "decision": "Implement bounded synthetic adapter/compiler/replay proof under new RC V1; native qualification remains FALSE",
+    "schema": "LT_B_FROZEN_HANDOFF_V1",
+    "sha256": "f91190345f334ebef571aa292ee26a7d85951f3ee702f23a110f5a6e0529fbb3"
+  },
+  "safety": {
+    "account": "ACCOUNT_UNKNOWN/ACCOUNT_VETO",
+    "alerts": 0,
+    "deployments": 0,
+    "economically_validated": false,
+    "market_requests": 0,
+    "new_primary_experiments": 0,
+    "orders": 0,
+    "shadow_advisory_qualified": false,
+    "source_qualified": false,
+    "worker_successors": 0
+  },
+  "schema": "V070_PROGRAM_A_INTEGRATION_CONTRACT_V1",
+  "snapshot_schema": "V070_PROGRAM_A_SNAPSHOT_V1",
+  "strategy": {
+    "account": "Always ACCOUNT_UNKNOWN/ACCOUNT_VETO; no account model, actual holdings, execution or probability inferred",
+    "cost_method": "2*max(entry,all target zones)*(fee+slippage)/10000 + entry*(spread+funding_carry*holding_days)/10000; adverse projection, no favorable credit or executable-R claim",
+    "costs_bps": {
+      "fee_each_side": 5.0,
+      "funding_and_carry_per_day": 3.0,
+      "slippage_each_side": 5.0,
+      "spread_round_trip": 4.0
+    },
+    "entry": "Worst-entry region from current closed 4H recovery and EMA10: min(EMA10,close)-0.05ATR to max(EMA10,close)+0.05ATR; no current quote claim",
+    "entry_validity_hours": 24,
+    "episode_identity": "SHA256(product,strategy version,symbol,setup trigger,causal prefix hash); review/restart do not reset setup age",
+    "holding_hours": {
+      "compiled_default": 24,
+      "intraday_range": [
+        4,
+        24
+      ],
+      "multi_day_range": [
+        24,
+        120
+      ]
+    },
+    "id": "trend_pullback",
+    "kernel": "Reuse platform.strategies.direction with FeaturePipeline on the strictly available 4H prefix",
+    "market_states": [
+      "NO_SETUP",
+      "WATCH",
+      "ARMED",
+      "DATA_UNAVAILABLE",
+      "SOURCE_BLOCKED"
+    ],
+    "planned_R": "Disclose gross and conservative modeled after-cost geometry; eligible labels among 2R/3R/4R only when nearest fixed target supports threshold",
+    "regime": "Daily and 4H EMA10/EMA30 order with EMA30 slope over 3 bars; same direction mandatory. ADX14 and ATR14 disclosed diagnostics, not fitted probabilities.",
+    "retired": "S2/S3 RESEARCH_ONLY. No dynamic registry, legacy aliases/API or historical snapshot activation. Original evaluate remains disabled.",
+    "reviews_utc": [
+      0,
+      12
+    ],
+    "stop": "Most recent lag-confirmed protective pivot plus 0.15ATR and (spread+slippage) price buffer; never move stop to force R",
+    "structure": "Reuse confirmed_pivots(left=2,right=2). Long requires last two confirmed lows rising; short requires last two confirmed highs falling. Confirmation ends and availability must precede setup decision.",
+    "targets": "Fixed preobservable confirmed pivot zones strictly beyond entry. Nearest overhead/underfoot zone must itself pass after-cost 2R; cannot skip obstruction to force 3R/4R.",
+    "terminal_lifecycle": [
+      "NO_CHASE",
+      "MISSED_ENTRY",
+      "INVALIDATED",
+      "EXPIRED",
+      "CANCELED",
+      "NO_FILL",
+      "TIME_STOP"
+    ],
+    "version": "PROGRAM_A_S1_CAUSAL_V1"
+  },
+  "versioning": "No breaking change to this frozen interface; any new schema requires explicit version and migration tests",
+  "workload_predeclaration": {
+    "benchmark": "30 finite 3-symbol close/decision batches, 9 coincident closes, bounded backfill, SQLite writer contention, crash and restart; report counts and P50/P95/P99/max",
+    "clock_measurement": "Synthetic close/source-delay clocks plus perf_counter_ns elapsed pipeline+durable storage. Report modeled total and actual processing separately; no native timing qualification.",
+    "coincident_close_burst_bars": 9,
+    "exclusions": "Finite offline storage/processing workload; not sustained native capacity, seven-day source qualification, M1B150/s, economics, OOS or Alpha",
+    "exposure": "SYNTHETIC_ONLY",
+    "fixture": "80 synthetic days generated from 1H bars, 4H/1D aggregated; explicitly constructed trend/pullback end plus flat negative counterpart",
+    "hardware": {
+      "cpu_count": 16,
+      "machine": "x86_64",
+      "python": "3.12.3",
+      "release": "6.6.87.2-microsoft-standard-WSL2",
+      "system": "Linux",
+      "versions": {
+        "PyYAML": "6.0.1",
+        "numpy": "2.4.4",
+        "pandas": "3.0.2",
+        "pydantic": "2.13.3",
+        "pytest": "9.0.3",
+        "ruff": "0.17.0"
+      }
+    },
+    "normal_arrivals": "3 1H bars/hour + 3 4H bars/4h + 3 1D bars/day; offline replay in batches<=4096",
+    "repair_limit": "At most TWO narrow implementation/test repair rounds after initial RC baseline; unresolved critical defect => PARTIAL_INTEGRATION",
+    "reviews_per_day": 2,
+    "seed": 7061106,
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT"
+    ],
+    "thresholds_ms": {
+      "available_to_decision_max": 10000,
+      "available_to_decision_p99": 2000,
+      "close_to_decision_max": 300000,
+      "restart_max": 300000
+    },
+    "zero_admitted_loss": true,
+    "zero_duplicate_decisions": true
+  }
+}

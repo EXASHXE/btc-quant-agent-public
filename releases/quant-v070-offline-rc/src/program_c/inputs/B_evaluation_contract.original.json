@@ -1,0 +1,132 @@
+{
+  "account": "ACCOUNT_UNKNOWN/ACCOUNT_VETO",
+  "active_rc_strategy": {
+    "id": "trend_pullback",
+    "version": "PROGRAM_A_S1_CAUSAL_V1"
+  },
+  "authority": "Controller 0-C must separately dispatch/authorize any evaluator; no C worker launched",
+  "challengers": {
+    "S2": {
+      "hypothesis": "Completed 4H/1D break of an already confirmed zone, later retest and completed-bar acceptance; separately frozen causal clocks and structural invalidation",
+      "id": "breakout_retest",
+      "status": "RESEARCH_ONLY_DISABLED"
+    },
+    "S3": {
+      "hypothesis": "Meaningful completed 4H/1D failed break and later recovery/rejection; separately frozen causal failure/invalidation evidence",
+      "id": "failed_breakout_reversal",
+      "status": "RESEARCH_ONLY_DISABLED"
+    }
+  },
+  "clock_rule": "Use only immutable source facts available and durable by decision; pivots bind confirmation availability. Revisions version/cancel, never rewrite ex-ante decisions. Observation coverage starts after decision; initial partial-bar gap must be explicit.",
+  "cost_parameters": {
+    "native_defaults": "UNKNOWN; source/venue-specific evidence required. No favorable funding credit without admissible evidence.",
+    "required": [
+      "fee_each_side_bps",
+      "spread_bps_by_time",
+      "slippage_bps_or_impact_curve",
+      "funding_rate_and_cadence_known_at",
+      "carrying_cost",
+      "adverse_jump_scenario",
+      "review_time_delay_distribution",
+      "entry_capacity",
+      "exit_capacity",
+      "instrument_tick_and_multiplier"
+    ],
+    "sensitivity": "Predeclare base/adverse scenarios and delay at the scheduled 00/12 UTC reviews; 4\u201324h and 1\u20135d horizons. Freeze before outcome access; retain all scenarios, no best-case selection.",
+    "synthetic_defaults": "A1_FROZEN_INTEGRATION_CONTRACT.json strategy.costs_bps, explicitly uncalibrated simulator assumptions"
+  },
+  "economically_validated": false,
+  "evaluation_design": {
+    "clustering": "Cluster overlapping episodes across BTC/ETH/SOL by common market shock and UTC time block; report independent cluster counts, not duplicated cost/delay rows",
+    "controls": [
+      "S1 fixed predeclared control",
+      "matched no-edge first-passage baseline",
+      "randomized admissible entry-time control preserving clusters",
+      "no-setup opportunity denominator"
+    ],
+    "future_research_statuses": [
+      "RESEARCH_CANDIDATE",
+      "INSUFFICIENT_SUPPORT",
+      "REJECTED",
+      "PROSPECTIVE_TEST_READY"
+    ],
+    "matched_null": "Source-, symbol-, regime-, volatility-, timestamp-, cost-, review-delay-, holding-horizon- and censoring-matched no-edge/first-passage controls, with the same observation and entry model",
+    "minimum_gates": {
+      "additional_power_gate": "A prospective 80% power calculation for a predeclared practical effect and 95% uncertainty target must also pass; count floors alone do not establish adequate power",
+      "if_unmet": "INSUFFICIENT_SUPPORT; no VALIDATED/Alpha/OOS label",
+      "independent_clusters_per_declared_symbol_direction_cell": 50,
+      "independent_episode_clusters_per_strategy_horizon_family": 200,
+      "independent_utc_weeks": 40
+    },
+    "report": [
+      "coverage and all opportunity denominators",
+      "planned vs executable vs modeled after-cost R",
+      "no-fill/missed/censored/unknown counts",
+      "MAE/MFE only with sufficient ordered evidence",
+      "cluster-adjusted uncertainty",
+      "cost/delay sensitivity",
+      "first-passage control difference"
+    ],
+    "uncertainty": "Predeclare cluster/bootstrap or valid dependence-aware intervals, censoring treatment, multiple-comparison correction and power/MDE plan; report effect and interval against matched controls",
+    "unit": "Immutable opportunity episode; parameter/cost/delay scenario rows from the same episode are NOT independent samples"
+  },
+  "opportunity_fields": [
+    "episode_id",
+    "strategy_version",
+    "symbol",
+    "direction",
+    "regime",
+    "source_type",
+    "source_manifest_sha256",
+    "causal_prefix_sha256",
+    "bar_interval_convention",
+    "source_event_ms",
+    "received_ms",
+    "available_ms",
+    "durable_ms",
+    "decision_ms",
+    "scheduled_review_ms",
+    "review_delay_ms",
+    "entry_region",
+    "structural_stop",
+    "volatility_buffer",
+    "execution_buffer",
+    "fixed_preobservable_target_zones",
+    "expiry_ms",
+    "holding_horizon_hours",
+    "account_veto",
+    "rule_reasons",
+    "coverage_gaps"
+  ],
+  "outcome_taxonomy": {
+    "AMBIGUOUS_OHLC_ORDER_UNKNOWN": "Same unordered OHLC contains entry and exit or both barriers; do not choose a favorable ordering",
+    "INSUFFICIENT_FUTURE_HORIZON": "Not enough later admissible evidence yet; never promote to success/failure",
+    "MISSED_ENTRY": "Observed price left entry region without admissible entry condition; no chase or assumed fill",
+    "MISSING_COVERAGE": "Missing/gapped/revised or otherwise inadmissible observation path; never impute neutral return",
+    "NO_FILL": "No modeled entry condition before expiry in complete declared observation window; no actual fill assertion",
+    "RIGHT_CENSORED": "Declared observation stop before a required horizon; retain in denominator with censoring method",
+    "STOP_FIRST": "Stop condition first under same declared coverage; not a realized loss",
+    "TARGET_FIRST": "Target condition after declared hypothetical entry condition, before stop, with ordered sufficient coverage; not a fill or realized gain",
+    "TIME_STOP": "Full holding horizon after modeled entry condition with neither barrier observed"
+  },
+  "prohibitions": [
+    "No restricted 2024+ research or FINAL_HOLDOUT reads",
+    "No new PRIMARY registration or consumption",
+    "No historical economic experiment under this mandate",
+    "No assumed OOS, profitability or Alpha",
+    "No S2/S3 config/registry/API/CLI activation",
+    "No worker dispatch, native requests, account calls, orders or alerts"
+  ],
+  "risk_measurements": {
+    "executable_R": "NULL/UNKNOWN absent later admissible executable bid/ask, capacity, instrument units, cost/funding schedules and entry/exit evidence; candle touch is insufficient",
+    "hypothetical_after_cost_R": "Explicit model output under frozen fee/spread/slippage/funding/carry/jump/review-delay assumptions; keep separate from executable or realized results",
+    "planned_R": "Ex-ante geometric reward/risk at worst entry-region boundary and frozen structural stop/target; no fills or outcomes",
+    "probability": "No assumed 50% win rate for 3R/4R. Planned payoff and rule confidence are not probabilities or expected return.",
+    "risk_denominator": "Freeze initial adverse per-unit risk and cost projection before outcomes. Do not tighten stop or select distant target after observing outcomes to force 2R/3R/4R."
+  },
+  "schema": "PROGRAM_C_OPPORTUNITY_EVALUATION_HANDOFF_V1",
+  "shadow_advisory_qualified": false,
+  "source_neutral": true,
+  "source_qualified": false,
+  "status": "FROZEN_CONTRACT_ONLY_NOT_EXECUTED"
+}

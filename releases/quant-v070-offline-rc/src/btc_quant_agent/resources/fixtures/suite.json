@@ -1,0 +1,262 @@
+{
+  "clock": "FABRICATED_2030_UTC",
+  "fixtures": [
+    {
+      "expected_outcomes": [
+        "TARGET_FIRST"
+      ],
+      "expected_validation": "VALID",
+      "name": "winning_unambiguous",
+      "path": "fixtures/winning_unambiguous.json",
+      "sha256": "665df792c5bb76d90636b8f297f06d08e9d28ef72a7bb31e4e7c3f663a856311"
+    },
+    {
+      "expected_outcomes": [
+        "STOP_FIRST"
+      ],
+      "expected_validation": "VALID",
+      "name": "stop_first",
+      "path": "fixtures/stop_first.json",
+      "sha256": "6011ed68141a806f7b1ac41a9253834ec523df728ec7b35d43d35e71173ae848"
+    },
+    {
+      "expected_outcomes": [
+        "TIME_STOP"
+      ],
+      "expected_validation": "VALID",
+      "name": "precise_time_stop",
+      "path": "fixtures/precise_time_stop.json",
+      "sha256": "27d51ea7a0b5f423d8a71f90693904231793502f71191a9ed9938f9c70b00df8"
+    },
+    {
+      "expected_outcomes": [
+        "NO_FILL"
+      ],
+      "expected_validation": "VALID",
+      "name": "unfilled_entry",
+      "path": "fixtures/unfilled_entry.json",
+      "sha256": "704e7f87eace6b78e918ce1a53dd23300f382437511d4b88214be8cecd86a930"
+    },
+    {
+      "expected_outcomes": [
+        "MISSED_ENTRY"
+      ],
+      "expected_validation": "VALID",
+      "name": "delayed_missed_entry",
+      "path": "fixtures/delayed_missed_entry.json",
+      "sha256": "4b9c4519f46826fce6a97bd0eccd3da7e616307b72829f43db4e07060ff5f9d1"
+    },
+    {
+      "expected_outcomes": [
+        "AMBIGUOUS_OHLC_ORDER_UNKNOWN"
+      ],
+      "expected_validation": "VALID",
+      "name": "both_hit_same_bar",
+      "path": "fixtures/both_hit_same_bar.json",
+      "sha256": "1da4dbea4a81c3e04acebd1c3c5083a19617a429ad0b140fe09df6b43275c10f"
+    },
+    {
+      "expected_outcomes": [
+        "AMBIGUOUS_OHLC_ORDER_UNKNOWN"
+      ],
+      "expected_validation": "VALID",
+      "name": "entry_exit_order_ambiguous",
+      "path": "fixtures/entry_exit_order_ambiguous.json",
+      "sha256": "68da79ed59b40db96dc9f913051f3af429287ae0a6bb236c51d35ff8f53aa6bc"
+    },
+    {
+      "expected_outcomes": [
+        "MISSING_COVERAGE"
+      ],
+      "expected_validation": "VALID",
+      "name": "missing_interval",
+      "path": "fixtures/missing_interval.json",
+      "sha256": "78f91b5a154f872fce60314c349ae1c3abf10a11ef5bd00fc72279096829bcdc"
+    },
+    {
+      "expected_outcomes": [
+        "RIGHT_CENSORED"
+      ],
+      "expected_validation": "VALID",
+      "name": "right_censoring",
+      "path": "fixtures/right_censoring.json",
+      "sha256": "44ac0e97649234b0ce082746eb65fd50c9b446de83cd487026c4f2f3c2af375a"
+    },
+    {
+      "expected_outcomes": [
+        "INSUFFICIENT_FUTURE_HORIZON"
+      ],
+      "expected_validation": "VALID",
+      "name": "insufficient_horizon",
+      "path": "fixtures/insufficient_horizon.json",
+      "sha256": "0f121bdf53676341467ac06012c2331ce1e275209da26d483c2c5b1319794d5c"
+    },
+    {
+      "expected_outcomes": [],
+      "expected_validation": "FUTURE_RECEIPT_AFTER_ASOF",
+      "name": "future_leaking_receipt",
+      "path": "fixtures/future_leaking_receipt.json",
+      "sha256": "d2548cf84b70cdb7d94b3e781c23f2f1b9bf33cee41144fd47960e9820adaba1"
+    },
+    {
+      "expected_outcomes": [],
+      "expected_validation": "REVISION_REQUIRES_NEW_VERSION",
+      "name": "corrected_revision",
+      "path": "fixtures/corrected_revision.json",
+      "sha256": "01b248b894f2e78876df9a39ecc8d1a4993f821fab4e2fff3d1446b3cac57227"
+    },
+    {
+      "expected_outcomes": [
+        "TIME_STOP"
+      ],
+      "expected_validation": "VALID",
+      "name": "overlapping_multi_symbol_shock",
+      "path": "fixtures/overlapping_multi_symbol_shock.json",
+      "sha256": "52a4cdcb907e354e21a115120a4e2108fe75a4838df6fdb8f01dbbeb926fd14d"
+    },
+    {
+      "expected_outcomes": [
+        "TARGET_FIRST"
+      ],
+      "expected_validation": "VALID",
+      "name": "fee_spread_stress",
+      "path": "fixtures/fee_spread_stress.json",
+      "sha256": "776c4d663b28dd1c028e4c4265ef44b5b19dfa66f902449b0f1f52a485735b97"
+    },
+    {
+      "expected_outcomes": [
+        "STOP_FIRST"
+      ],
+      "expected_validation": "VALID",
+      "name": "adverse_jump_gap",
+      "path": "fixtures/adverse_jump_gap.json",
+      "sha256": "49527be5acc2a6bfd7b8b52090fe6d906a11fe06101cf26872a8648b7da1ea34"
+    },
+    {
+      "expected_outcomes": [
+        "TARGET_FIRST"
+      ],
+      "expected_validation": "VALID",
+      "name": "cost_unknown",
+      "path": "fixtures/cost_unknown.json",
+      "sha256": "7bb34fa18a5adb3b3c9b162ac002fbbe006988b023d3f5fbad20c7d765570e65"
+    },
+    {
+      "expected_outcomes": [],
+      "expected_validation": "HISTORICAL_BOUNDED_EMBARGO",
+      "name": "historical_bounded_embargo",
+      "path": "fixtures/historical_bounded_embargo.json",
+      "sha256": "c1930293a1baf399030fad43785b2e8f9dd66057ba3dc3ca5804cfcf16e874bc"
+    },
+    {
+      "expected_outcomes": [],
+      "expected_validation": "VALID",
+      "name": "all_no_setup",
+      "path": "fixtures/all_no_setup.json",
+      "sha256": "a56311273f5b3837fca549ec99a95885abe74751b2e7e734f400f6b2f9f7e686"
+    },
+    {
+      "expected_outcomes": [],
+      "expected_validation": "OPEN_BAR_FORBIDDEN",
+      "name": "open_bar",
+      "path": "fixtures/open_bar.json",
+      "sha256": "0dd7513311b21bee54b347ab51aaf9ce346b85166b65335e12d350945fc90357"
+    },
+    {
+      "expected_outcomes": [],
+      "expected_validation": "DUPLICATE_OR_UNORDERED_BARS",
+      "name": "duplicate_bars",
+      "path": "fixtures/duplicate_bars.json",
+      "sha256": "eff3506f6614cfbd5b0b3f13c822f1790fbfc26449534b2815f08682ada678f0"
+    },
+    {
+      "expected_outcomes": [],
+      "expected_validation": "STALE_OBSERVATION",
+      "name": "stale_observation",
+      "path": "fixtures/stale_observation.json",
+      "sha256": "44857f211229890f474ccd27391c2761e830bdf81b91fa7db165bfdea6224dda"
+    },
+    {
+      "expected_outcomes": [],
+      "expected_validation": "CLOCK_DRIFT",
+      "name": "clock_drift",
+      "path": "fixtures/clock_drift.json",
+      "sha256": "23382b9e56c930df2841555440b9d4deaa162f4a00f6ebb83dd93730ec36bc84"
+    },
+    {
+      "expected_outcomes": [
+        "TARGET_FIRST"
+      ],
+      "expected_validation": "VALID",
+      "name": "coverage_4H_24h",
+      "path": "fixtures/coverage_4H_24h.json",
+      "sha256": "57da9b39be7e6c667e4f2d4ab678470542d8150092711ee89e46819e182a8fee"
+    },
+    {
+      "expected_outcomes": [
+        "TARGET_FIRST"
+      ],
+      "expected_validation": "VALID",
+      "name": "coverage_1D_5d",
+      "path": "fixtures/coverage_1D_5d.json",
+      "sha256": "2288d023bd6096f2345047d92c3bd8bd211a9c0189fb65c363d8c1a812f97758"
+    },
+    {
+      "expected_outcomes": [
+        "INSUFFICIENT_FUTURE_HORIZON"
+      ],
+      "expected_validation": "VALID",
+      "name": "three_hours_cannot_prove_5d",
+      "path": "fixtures/three_hours_cannot_prove_5d.json",
+      "sha256": "b4f93e079470c5bec859bbe6bc6d6f25f50d7c32f337fbd480d1100c437ae0ff"
+    },
+    {
+      "expected_outcomes": [],
+      "expected_validation": "NATIVE_ADMISSION_UNAVAILABLE",
+      "name": "native_string_not_authority",
+      "path": "fixtures/native_string_not_authority.json",
+      "sha256": "25dfe97fe0143a8b34b68e54901bdda41ab1f7fdccd6160993ebd7d98fe73525"
+    },
+    {
+      "expected_outcomes": [
+        "SOURCE_UNQUALIFIED"
+      ],
+      "expected_validation": "VALID",
+      "name": "unqualified_source",
+      "path": "fixtures/unqualified_source.json",
+      "sha256": "d967fd773c393030ed578e92cdeff0dcc459b0a8ba28a4620d68557dd6e4506f"
+    },
+    {
+      "expected_outcomes": [
+        "TIME_STOP"
+      ],
+      "expected_validation": "VALID",
+      "name": "late_entry_full_horizon",
+      "path": "fixtures/late_entry_full_horizon.json",
+      "sha256": "060e35da94d27a861a8676b26a22e0e109543d19ee89d9c86b21fd9f0e41d5a2"
+    },
+    {
+      "expected_outcomes": [
+        "INSUFFICIENT_FUTURE_HORIZON"
+      ],
+      "expected_validation": "VALID",
+      "name": "late_entry_insufficient_horizon",
+      "path": "fixtures/late_entry_insufficient_horizon.json",
+      "sha256": "9c8c36bcf726750ae51c4b14141416723ebcd6d6c8df29f8822cfea4cdde0429"
+    },
+    {
+      "expected_outcomes": [
+        "AMBIGUOUS_OHLC_ORDER_UNKNOWN"
+      ],
+      "expected_validation": "VALID",
+      "name": "review_inside_bar",
+      "path": "fixtures/review_inside_bar.json",
+      "sha256": "62b43bc96177384c1b8fdce05a2585f528b97006c26fa3a836149f9ca2c1badd"
+    }
+  ],
+  "manifest_sha256": "141afb5ac1a1435bafdeba716e470a22ca8ec533c8744da46f9236fd4083706b",
+  "protocol_sha256": "5f6a4c583b79d7e04af54aa1c6a321e888e3041598edbdf6f0a53d744ec17429",
+  "schema_version": "C_FABRICATED_FIXTURE_SUITE_V1",
+  "seed": 70001,
+  "source": "FABRICATED_QA_NO_MARKET_DATA"
+}
