@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quant-advisory-platform"
+version = "0.7.0"
+description = "Isolated offline low-frequency swing advisory contract build"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26,<3", "pandas>=2,<4", "PyYAML>=6,<7", "pydantic>=2.10,<3"]
+
+[project.optional-dependencies]
+ml = ["scikit-learn>=1.5", "lightgbm>=4"]
+deep = ["torch>=2.5"]
+public = ["httpx==0.28.1", "httpcore==1.0.9", "websockets==16.1.1", "cryptography==45.0.7"]
+dev = ["pytest>=8", "ruff>=0.9", "mypy>=1.15"]
+
+[project.scripts]
+quant = "btc_quant_agent.platform.unified_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["btc_quant_agent*", "program_c*"]
+exclude = ["*.resources", "*.resources.*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "tests", "tools"]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+[tool.mypy]
+files = ["src/btc_quant_agent/platform/swing.py", "src/btc_quant_agent/platform/swing_store.py", "src/btc_quant_agent/platform/swing_view.py"]
+follow_imports = "silent"
+ignore_missing_imports = true
+check_untyped_defs = true
+
+[tool.setuptools.package-data]
+btc_quant_agent = ["resources/configs/*.yaml", "resources/contracts/*.json", "resources/fixtures/*.json", "resources/fixtures/*.jsonl"]
+program_c = ["frozen_protocol.json", "fixtures/*.json", "inputs/*.json"]
