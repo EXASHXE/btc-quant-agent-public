@@ -2,6 +2,8 @@
 
 **Date:** 2026-11-09. **Controller:** 0-C. **Status:** Owner priorities adopted; stages are planned, not falsely marked released. [Handoff Home](V070_HANDOFF_HOME_20261109.md).
 
+> **POST-Q0 DELIVERY UPDATE — 2026-11-09:** All three Q0A/B/C workers completed. Q0A: 67 PASS/11 SKIP; 120021.7979ms strict process timeout failed, current Source still BLOCKED, 45 generated parent caches require reconciliation. Q0B: 100 worker-reported PASS and 209 SHA verified; Q0C: 37 worker-reported PASS and 24 SHA verified. Q0B/C formal Controller acceptance and Q0D integration are not complete. **Owner requires PROMPT FIRST and fresh approval before any task, even offline worker/tests.** [Updated bootstrap](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0_POST_DELIVERY_READONLY.md).
+
 ## North star and invariant
 
 A bounded read-only market monitoring engine should find genuinely actionable **2–12h** opportunities, with eligible manual overnight extension up to 24h, and notify the Owner using Feishu while the plan remains valid for a **5–10 minute** human response. No account credentials, orders or auto trades. Time and source evidence are independent of strategy attractiveness.
@@ -16,10 +18,10 @@ Eligible Universe → admitted market data → 4H regime/structure → 1H setup 
 
 | Stage | Priority | Workstream / owner | Acceptance / stop |
 | --- | --- | --- | --- |
-| **Q0-A** | P0 | 0-C oversees accepted S offline base; bounded Source/clock/custody remedy | Independent current/retention anchor, external provenance, no-follow/race checks, whole-process deadline and explicit rights; SOURCE_BLOCKED until proven |
-| **Q0-B** | P0 | Q0B worker delivered; 0-C independent acceptance pending | New MTF S1, correct completed 1H/15m causality, watch/ready and 1H-only control, 100-worker-test claim independently reproduced |
-| **Q0-C** | P0 | Q0C worker delivered; 0-C independent acceptance pending | Durable mock Feishu outbox, TTL, idempotency, UNKNOWN_DELIVERY, 5–10m actionability; no real delivery |
-| **Q0-D** | P0 | Integration worker after Q0B/Q0C admission and source interfaces review | One synthetic, end-to-end Source→MTF→outbox→Shadow→HTML run with restart/anti-duplicate, negative/partial-failure paths |
+| **Q0-A / Q0A2 proposed** | P0 | Q0A worker finished; next improvement requires fresh Owner approval | JUnit 67 PASS/11 SKIP, full-process 120s exceeded by 21.8ms; current/retention, provenance and fixed NTFS writer/race still blocked; 45 `.pyc` incident |
+| **Q0-B** | P0 | Q0B worker finished; independent 209 SHA verified; separate formal 0-C acceptance pending | 100 tests worker-reported, NOT independently rerun; synthetic-only 1H/15m |
+| **Q0-C** | P0 | Q0C worker finished; independent 24 SHA verified; formal 0-C acceptance pending | 37 tests worker-reported, NOT independently rerun; mock provider only |
+| **Q0-D proposed** | P0 | Full task prompt only; **no worker authorized** | After separate Q0B/C scoped acceptance and fresh Owner approval, synthetic Source→MTF→outbox→Shadow→HTML with restart, anti-duplicate and negative paths |
 | **Q1** | P0 | 0-C approves new finite real Source and actual Feishu channel separately | Real signed-off 3-symbol Source→genuine plan/NO_SETUP; real Feishu provider acceptance evidence and accurate statuses; no account action |
 | **Q2** | P0/P1 | Liquid universe & bounded scheduler | 10 symbols first, then ~20, optional 50; official quota weight, cache/recovery/isolated per-symbol failure and 5-minute candidate revalidation |
 | **Q3** | P1 | Regime/multi-strategy study | Trend×volatility with hysteresis; S1 only production candidate; S2/S3/S4 research-only |
