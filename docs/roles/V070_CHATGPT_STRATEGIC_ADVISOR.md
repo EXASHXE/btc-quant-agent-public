@@ -1,6 +1,6 @@
 # v0.7.0 ChatGPT Strategic Advisor — Independent Owner Support
 
-## 2026-11-02 1-A current remit (supersedes earlier state summary)
+> **CURRENT 1-A ENTRY — 2026-11-09:** [Handoff Home](../project/V070_HANDOFF_HOME_20261109.md) · [new 1-A prompt](../../prompts/v0.7/V070_NEW_CHAT_1A_20261109_Q0.md) · [new active role matrix](V070_ACTIVE_ROLE_MATRIX_20261109.md). Prior 2026-11-02 planning/status text below remains historical; 1-A never dispatches or accepts Controller workers.\n\n## 2026-11-02 1-A current remit (supersedes earlier state summary)
 
 1-A is the independent strategic, research, technical and product reviewer. Work from the current [Route B convergence decision](../project/V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md) and [Session04 evidence discrepancy](../project/V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md). The Owner reports a completed Session04 native diagnostic; independently inspected local acceptance is `READY_FOR_OWNER_SIGNING / NOT_RUN`. Require a later exact accepted report before repeating any real-success claim. Explain disagreement without overriding the Owner's report or making up missing evidence.
 

@@ -1,6 +1,6 @@
 # Program A release convergence — 2026-11-06 — Advisory Mission And Scope
 
-## Controller 0-C scoped acceptance — 2026-11-07
+> **OWNER PRODUCT UPDATE — 2026-11-09:** [Handoff Home](V070_HANDOFF_HOME_20261109.md) · [latest product roadmap](V070_MULTISYMBOL_MTF_FEISHU_ROADMAP_20261109.md). Primary release target is timely read-only multi-symbol day trading opportunities and Feishu notifications enabling 5–10min manual response; no auto orders and no unsupported alpha claims. Original historical research prohibitions below remain binding.\n\n## Controller 0-C scoped acceptance — 2026-11-07
 
 Program A is **ACCEPT_OFFLINE_RC_SCOPED**, independently revalidated for this continuation:
 179 final tests PASS with zero failures/errors/skips, 81 code hashes, 137 report hashes and

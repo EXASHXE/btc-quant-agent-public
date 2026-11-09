@@ -1,6 +1,6 @@
 > **2026-11-09 CURRENT POINTER:** See [V070_STATUS_AND_HANDOFF_20261109.md](V070_STATUS_AND_HANDOFF_20261109.md) for the newer verified status and Owner-requested MVP direction. This historical body remains unchanged below; newer dated status supersedes conflicting forward planning, not evidence.
 
-# Program A release convergence — 2026-11-06 — Current State And Handoff
+> **LATEST STATUS — 2026-11-09:** [Handoff Home](V070_HANDOFF_HOME_20261109.md) · [Q0 verified/pending state](V070_STATUS_AND_WORKPACKAGES_20261109_Q0.md) · [MVP roadmap](V070_MULTISYMBOL_MTF_FEISHU_ROADMAP_20261109.md). The older status narrative below is historical and does NOT negate S scoped acceptance or Q0B/Q0C new worker deliveries.\n\n# Program A release convergence — 2026-11-06 — Current State And Handoff
 
 ## Controller 0-C scoped acceptance — 2026-11-07
 

@@ -1,11 +1,12 @@
-# Quant v0.7.0 — ChatGPT 1-A New Conversation Entry
+# Quant v0.7.0 — New Conversation Start / 2026-11-09 Q0
 
-**Canonical:** docs/engineering. Updated 2026-11-02.
+**Authoritative starting page:** [Quant v0.7.0 Handoff Home](V070_HANDOFF_HOME_20261109.md).
 
-Copy the COMPLETE English instruction in [V070_NEW_CHAT_1A.md](../../prompts/v0.7/V070_NEW_CHAT_1A.md) into a new ChatGPT conversation for **1-A**, the independent strategic architecture/quant research advisor. It instructs the assistant to respond in Chinese and keeps the agent independent from Controller 0-C.
+- **[New Controller 0-C — full startup prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0.md)**: sole engineering dispatcher and independent acceptance authority, especially newly delivered Q0B MTF and Q0C Feishu outbox, Program S offline-only Source closure.
+- **[New 1-A Independent Strategic Advisor — full startup prompt](../../prompts/v0.7/V070_NEW_CHAT_1A_20261109_Q0.md)**: independent architecture/product/science challenger, no Codex dispatch or real data permissions.
 
-For new **0-C**, use [V070_NEW_CHAT_CONTROLLER_0C.md](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md). The Controller's first turn is verification, next-phase planning and copyable Codex allocations, NOT automatic execution.
+Read [current evidence](V070_STATUS_AND_WORKPACKAGES_20261109_Q0.md), [new roadmap](V070_MULTISYMBOL_MTF_FEISHU_ROADMAP_20261109.md) and [active roles](../roles/V070_ACTIVE_ROLE_MATRIX_20261109.md) before using either prompt.
 
-Begin with current [Session04 evidence reconciliation](V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md), [dual-review strategy/architecture decision](V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md), [handoff](V070_CURRENT_STATE_AND_HANDOFF.md) and [roadmap](V070_ADVISORY_ROADMAP.md). The Owner reports Session04 completion, but the latest inspected local report remains READY_FOR_OWNER_SIGNING / NOT_RUN; only a newer authenticated receipt can reconcile the discrepancy.
+Current Owner product objective: bounded real multi-symbol 2–12h crypto opportunities using 4H market state, completed 1H setup, completed 15m entry confirmation, fresh 5m/quote validation and real Feishu notification after separately verified channel authorization, with 5–10min manual response. No automated orders.
 
-Docs are not live grant or market-source authorization. Never treat the public code review branch as a merged executable, a simulated dashboard as a live product, or market-side suitability as account-side entry permission.
+Current evidence is not live-ready. S Windows handoff accepted offline historical audit only; Q0B and Q0C worker-delivered pending 0-C independent acceptance; Source and Shadow strict qualification false, C economically insufficient. Do not use old 2026-11-02 Session04 start prompts as controlling Q0 stage instructions.

@@ -1,6 +1,6 @@
 # v0.7.0 Canonical Documentation Branch Policy
 
-## 2026-11-02 convergence release — documentation-only
+> **LATEST CANONICAL HANDOFF — 2026-11-09:** [Handoff Home](V070_HANDOFF_HOME_20261109.md) · [updated roles](../roles/V070_ACTIVE_ROLE_MATRIX_20261109.md) · [new 0-C prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0.md). This branch REMAINS DOCUMENTATION-ONLY; the separate review/v070-q0-s-mtf-feishu-offline-20261109 code export is neither merged executable code nor a second documentation authority. Branch policy below remains in force.\n\n## 2026-11-02 convergence release — documentation-only
 
 `docs/engineering` remains the sole canonical writable roadmap/role/handoff/prompt branch. A new owner-requested documentation refresh references [Route B decision](V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md), [Session04 receipt discrepancy](V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md), [Controller 0-C new-chat](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md), and [1-A new-chat](../../prompts/v0.7/V070_NEW_CHAT_1A.md).
 

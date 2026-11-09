@@ -1,6 +1,6 @@
 > **2026-11-09 CURRENT POINTER:** See [V070_INTRADAY_MVP_ACCELERATION_PLAN_20261109.md](V070_INTRADAY_MVP_ACCELERATION_PLAN_20261109.md) for the newer verified status and Owner-requested MVP direction. This historical body remains unchanged below; newer dated status supersedes conflicting forward planning, not evidence.
 
-# Program A release convergence — 2026-11-06 — Advisory Roadmap
+> **ACTIVE Q0 ROADMAP — 2026-11-09:** [New multi-symbol 4H/1H/15m + Feishu roadmap](V070_MULTISYMBOL_MTF_FEISHU_ROADMAP_20261109.md) · [Handoff Home](V070_HANDOFF_HOME_20261109.md). Older 1–2 manual reviews/day and 4H-only entry strategy passages below are superseded product planning, not erased historical tests.\n\n# Program A release convergence — 2026-11-06 — Advisory Roadmap
 
 ## Controller 0-C scoped acceptance — 2026-11-07
 

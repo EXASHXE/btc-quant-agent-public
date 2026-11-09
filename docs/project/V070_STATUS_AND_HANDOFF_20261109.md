@@ -1,6 +1,6 @@
 # Quant v0.7.0 — Verified Status and Owner Handoff (2026-11-09)
 
-> Canonical dated planning update for \`docs/engineering\`. This supersedes older *planning/status interpretations* where they conflict, but does not alter historical sealed results, implementation manifests, or legal permissions. Controller 0-C is the sole engineering dispatcher and acceptance authority.
+> **SUPERSEDING Q0 STATE — later on 2026-11-09:** [New status ledger](V070_STATUS_AND_WORKPACKAGES_20261109_Q0.md) · [Handoff Home](V070_HANDOFF_HOME_20261109.md). This earlier A–P snapshot precedes the 0-C scoped S decision and Q0B/Q0C worker deliveries; older planned cadence is superseded, earlier historical evidence remains valid.\n\n> Canonical dated planning update for \`docs/engineering\`. This supersedes older *planning/status interpretations* where they conflict, but does not alter historical sealed results, implementation manifests, or legal permissions. Controller 0-C is the sole engineering dispatcher and acceptance authority.
 
 ## Executive assessment
 

@@ -1,6 +1,6 @@
 # Quant v0.7.0 — Intraday MVP Acceleration Roadmap (2026-11-09)
 
-**Status:** Proposed Owner product direction and Controller 0-C next execution contract. Not a representation that code has already been changed or native source admitted.
+> **SUPERSEDING MULTI-SYMBOL NOTIFICATION PLAN — 2026-11-09:** [New MTF+Feishu roadmap](V070_MULTISYMBOL_MTF_FEISHU_ROADMAP_20261109.md) · [Handoff Home](V070_HANDOFF_HOME_20261109.md). Prior 1H-only and twice-daily manual review assumptions below are obsolete; preserve them as dated planning history.\n\n**Status:** Proposed Owner product direction and Controller 0-C next execution contract. Not a representation that code has already been changed or native source admitted.
 
 ## Product boundary
 

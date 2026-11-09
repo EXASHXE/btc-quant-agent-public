@@ -1,6 +1,6 @@
 # Engineering documentation — docs/engineering
 
-## Current Quant v0.7.0 advisory checkpoint — 2026-11-02
+> **CURRENT Q0 HANDOFF — 2026-11-09:** [Start here: Handoff Home](docs/project/V070_HANDOFF_HOME_20261109.md) · [Current Status](docs/project/V070_STATUS_AND_WORKPACKAGES_20261109_Q0.md) · [Q0 Roadmap](docs/project/V070_MULTISYMBOL_MTF_FEISHU_ROADMAP_20261109.md) · [0-C new chat](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0.md) · [1-A new chat](prompts/v0.7/V070_NEW_CHAT_1A_20261109_Q0.md). Old 2026-11-02 snapshots below are historical, not current operational evidence. S is Controller-accepted **offline-only**; Q0B/Q0C await independent Controller acceptance; live Source/Feishu not authorized.\n\n## Current Quant v0.7.0 advisory checkpoint — 2026-11-02
 
 **Read first:** [Session04 receipt discrepancy](docs/project/V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md) · [Gemini/Claude convergence](docs/project/V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md) · [Status](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md) · [Roadmap](docs/project/V070_ADVISORY_ROADMAP.md) · [Handoff](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md).
 

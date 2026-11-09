@@ -1,6 +1,6 @@
 # v0.7.0 Roles, Decision Rights and Task Routing
 
-## 2026-11-02 role refresh — 1-A and 0-C (controlling)
+> **CURRENT ACTIVE ROLE MATRIX — 2026-11-09:** [See the authoritative Q0 roles and dispatch authority](V070_ACTIVE_ROLE_MATRIX_20261109.md), [Controller 0-C role](V070_CONTROLLER_0C_ROLE_20261109.md), and [Handoff Home](../project/V070_HANDOFF_HOME_20261109.md). S was independently accepted offline-only; Q0B/Q0C newly delivered and pending independent Controller acceptance. Older 2026-11-02 Session04 instructions below are historical.\n\n## 2026-11-02 role refresh — 1-A and 0-C (controlling)
 
 **1-A: Independent Strategic Architecture & Quant Research Advisor** (also called Strategic Advisor). Owner-facing scientific/product/architecture review and challenges, optional Gemini/Claude synthesis, high-ROI scope and acceptance advice. **Not** a parallel Codex dispatcher, artifact approver or account operator. Dedicated new-chat contract: [1-A prompt](../../prompts/v0.7/V070_NEW_CHAT_1A.md).
 
