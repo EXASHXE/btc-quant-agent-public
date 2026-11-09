@@ -1,3 +1,5 @@
+> **2026-11-09 CURRENT POINTER:** See [V070_STATUS_AND_HANDOFF_20261109.md](V070_STATUS_AND_HANDOFF_20261109.md) for the newer verified status and Owner-requested MVP direction. This historical body remains unchanged below; newer dated status supersedes conflicting forward planning, not evidence.
+
 # Program A release convergence — 2026-11-06 — Current State And Handoff
 
 ## Controller 0-C scoped acceptance — 2026-11-07
