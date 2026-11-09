@@ -2,6 +2,10 @@
 
 **Status basis:** latest local Controller/worker receipts read on 2026-11-09; all status changes after this snapshot must be independently rechecked. Start at [Handoff Home](V070_HANDOFF_HOME_20261109.md). This is a dated planning/evidence summary, NOT a substitute for sealed local receipts or a code integration decision.
 
+> **LATEST READ-ONLY AUDIT — 2026-11-09 16:48 +08:00:** Q0A, Q0B, Q0C workers all ended with exit 0. Independently read: Q0A JUnit 67 PASS/11 SKIP, SHA 54/54; Q0B SHA 209/209 with worker-reported 100 PASS; Q0C SHA 24/24 with worker-reported 37 PASS. **No independent test rerun for Q0B/C and no separate formal Controller acceptance yet.** Q0A native full-process QA took **120021.7979ms >120000ms**, so the strict timeout failed; current Source remains BLOCKED. Q0A imports wrote 45 out-of-scope parent `.pyc` caches, not cleaned; Program O sealed 332 code SHA256 matches remain intact. No new Binance request or Feishu send.
+>
+> **NEW OWNER EXECUTION RULE:** Offer only prompts; no new worker, test/script, scan, deploy, document/code write or scheduler without fresh explicit Owner permission. Latest [0-C prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0_POST_DELIVERY_READONLY.md). Older standing offline approval is no longer valid.
+
 ## Product objective
 
 Read-only, bounded scheduled multi-symbol crypto opportunity monitoring, primarily 2–12h trades, optional explicitly planned overnight up to 24h. Signals: 4H market regime, 1H setup, completed 15m entry trigger, fresh quote/5m check. Alert using Feishu only after strict state and channel eligibility; Owner handles execution manually in about 5–10 minutes. No account access or auto trading.
@@ -51,3 +55,16 @@ This export's local code roots are worktrees and artifact directories, not unifi
 ## Next 0-C decision
 
 Resolve pending Q0B/Q0C acceptance first, then dispatch a bounded integration compatibility check and targeted S technical closure, subject to active locks and current status. Keep source rights and actual external channel delivery gated. See [roadmap](V070_MULTISYMBOL_MTF_FEISHU_ROADMAP_20261109.md) and [0-C new-chat prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0.md).
+
+
+## Q0 after-delivery evidence reconciliation (newer than the original table)
+
+| Task | Completed evidence | Still blocked |
+| --- | --- | --- |
+| **Q0A** | Worker exit 0, 67 PASS / 11 SKIP in read-only inspected JUnit, 24 source +30 report SHA verified | 120s process-level timeout **FAILED (120021.7979ms)**; independent trusted present-time/source/retention, fixed NTFS producer/race proof, scope incident 45 parent `.pyc`. SOURCE_BLOCKED |
+| **Q0B** | Worker exit 0, 100 worker-reported tests, independently verified 209/209 SHA | Separate 0-C acceptance and Q0D integration pending; no real 1H/15m market admission |
+| **Q0C** | Worker exit 0, 37 worker-reported tests, independently verified 24/24 SHA | Separate 0-C acceptance and real webhook/recipient/provider contract pending; P95=19s synthetic only |
+
+Independent read-only check confirmed 332/332 original Program O code-file SHA unchanged, despite the 45 newly created bytecode cache files; no cleanup was authorized or performed. Reported suite results are not represented as fresh independent execution.
+
+**Execution policy:** Controller may perform bounded read-only progress checks when asked, but future offline tests and worker dispatches must be proposed as prompts and await precise Owner approval. The new bootstrap is [here](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0_POST_DELIVERY_READONLY.md).
