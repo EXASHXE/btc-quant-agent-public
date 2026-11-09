@@ -1,0 +1,34 @@
+{
+  "CURRENT_MANUAL_REVIEW": "SOURCE_BLOCKED",
+  "J_canonical_policy_sha256": "340c3c2b0f7788203b8fdcab36b74fdd982a4d3d7e276b03a69fe681511707ba",
+  "J_outer_schema": "J_OPERATIONAL_ACCESS_V1",
+  "authenticity_claim": "TLS channel and hash-chain integrity; not exchange signed data or a legal licence",
+  "canonical_policy_sha256": "e47dcef0e116c7f9696165c55084170dd7025cdcfc116d5e7b7b4abfa52c3981",
+  "capture_source_sha256": "5d4354bdea40318dbaabcf70816fc8b40e32031dd643dd2eae3bbf42b4386d2c",
+  "policy": {
+    "boot_identity": "NATIVE_GUID_AND_KERNEL_BOOT_EPOCH_NO_FALLBACK",
+    "consumer_current": "REFUSE_WITHOUT_INDEPENDENT_CURRENT_ANCHOR",
+    "host": "fapi.binance.com",
+    "max_requests": 24,
+    "max_retention_hours": 24,
+    "max_seconds": 120,
+    "max_weight": 40,
+    "method": "GET",
+    "proxy": "EXPLICIT_127.0.0.1_CONNECT_ONLY",
+    "routes": [
+      "/fapi/v1/exchangeInfo",
+      "/fapi/v1/klines",
+      "/fapi/v1/time"
+    ],
+    "schema": "S_WINDOWS_PUBLIC_CAPTURE_V1",
+    "strict_utc": false,
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT"
+    ]
+  },
+  "public_raw_import": "SOURCE_BLOCKED_PENDING_INDEPENDENT_WINDOWS_RETENTION_ANCHOR",
+  "real_Access_or_Owner_authority_created": false,
+  "schema": "S_ACCESS_PROFILE_CONTRACT_V1"
+}

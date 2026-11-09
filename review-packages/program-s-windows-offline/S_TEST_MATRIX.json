@@ -1,0 +1,56 @@
+{
+  "C_all154_including_prior_six_workspace_cases": "PASS, workspace-local basetemp, unchanged protocol",
+  "Ruff": "All checks passed!\n",
+  "WSL_actual_NTFS_DrvFS_included": {
+    "ERROR": 0,
+    "FAIL": 0,
+    "PASS": 11,
+    "SKIP": 0,
+    "report": "audit/S_WSL_RELEASE_FINAL.xml"
+  },
+  "Windows_actual_original10_plus_new16": {
+    "ERROR": 0,
+    "FAIL": 0,
+    "PASS": 26,
+    "SKIP": 0,
+    "command_and_exit": "audit/S_WINDOWS_EXECUTION_RECEIPT.json",
+    "log": "audit/S_WINDOWS_INDEPENDENT_FINAL.log"
+  },
+  "compile": "PASS audit/S_compile.log",
+  "counts_not_summed_as_historical_or_genuine_evidence": true,
+  "exchange_requests": 0,
+  "fresh_O_domains": [
+    {
+      "cases": 478,
+      "domain": "product",
+      "report": "regression_input/audit/O_product_domain_tests.xml"
+    },
+    {
+      "cases": 154,
+      "domain": "c",
+      "report": "regression_input/audit/O_c_domain_tests.xml"
+    },
+    {
+      "cases": 36,
+      "domain": "mvp",
+      "report": "regression_input/audit/O_mvp_domain_tests.xml"
+    },
+    {
+      "cases": 4,
+      "domain": "rc",
+      "report": "regression_input/audit/O_rc_domain_tests.xml"
+    }
+  ],
+  "fresh_O_unique": {
+    "ERROR": 0,
+    "FAIL": 0,
+    "PASS": 672,
+    "SKIP": 0
+  },
+  "initial_failure_receipts_preserved": [
+    "audit/S_WINDOWS_RELEASE_FINAL.log",
+    "audit/S_NATIVE_DEMO_initial_failure.log",
+    "audit/S_WSL_fixture_errors.xml",
+    "audit/S_BUILD_initial_failure.log"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:quant:q0b:transport:Q0B_TRANSPORT_RECEIPT_V2",
+  "title": "Unadmitted synthetic transport receipt; never time or trading authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "request_id", "response_sha256", "received_ms", "available_ms", "exchange_lower_ms", "provenance", "live_time_authority"],
+  "properties": {
+    "schema": {"const": "Q0B_TRANSPORT_RECEIPT_V2"},
+    "request_id": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "response_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "received_ms": {"type": "integer", "minimum": 0},
+    "available_ms": {"type": "integer", "minimum": 0},
+    "exchange_lower_ms": {"type": "integer", "minimum": 0},
+    "provenance": {"const": "SYNTHETIC_Q0B_V2"},
+    "live_time_authority": {"const": false}
+  },
+  "$defs": {
+    "klineRow": {
+      "description": "Binance-shaped fixture only: openTime, OHLCV strings/numbers, inclusive closeTime, 5 unused fields. Full identity/time/OHLC checks belong to source admission.",
+      "type": "array", "minItems": 12, "maxItems": 12,
+      "prefixItems": [{"type": "integer"}, {}, {}, {}, {}, {}, {"type": "integer"}]
+    },
+    "quotePayload": {
+      "type": "object", "additionalProperties": false,
+      "required": ["symbol", "bidPrice", "askPrice", "bidQty", "askQty", "time"],
+      "properties": {"symbol": {"type": "string"}, "bidPrice": {}, "askPrice": {}, "bidQty": {}, "askQty": {}, "time": {"type": "integer"}}
+    }
+  }
+}

@@ -1,0 +1,545 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:quant:q0c:alert-event:v1",
+  "title": "Q0C offline notification event V1",
+  "description": "Producer-independent future S1_INTRADAY_MTF_V2 snapshot. UTC epoch seconds. Events confer no live authority.",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "Q0C_ALERT_EVENT_V1"
+        },
+        "strategy": {
+          "const": "S1_INTRADAY_MTF_V2"
+        },
+        "episode_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "transition_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "channel": {
+          "const": "FEISHU_MOCK"
+        },
+        "eligible_at": {
+          "type": "number",
+          "minimum": 1
+        },
+        "expires_at": {
+          "type": "number",
+          "minimum": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "account_status": {
+          "enum": [
+            "UNKNOWN",
+            "VETO"
+          ]
+        },
+        "watermark": {
+          "$ref": "#/$defs/watermark"
+        },
+        "dashboard_url": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "event_type": {
+          "enum": [
+            "ENTRY_READY",
+            "WATCH",
+            "SETUP_READY",
+            "INVALIDATED",
+            "EXPIRED"
+          ]
+        },
+        "symbol": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "side": {
+          "enum": [
+            "LONG",
+            "SHORT"
+          ]
+        },
+        "regime_4h": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "admitted": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "value",
+            "admitted"
+          ],
+          "additionalProperties": false
+        },
+        "setup_1h": {
+          "$ref": "#/$defs/bar"
+        },
+        "confirmation_15m": {
+          "$ref": "#/$defs/bar"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "plan": {
+          "$ref": "#/$defs/plan"
+        },
+        "candidate_expires_at": {
+          "type": "number",
+          "minimum": 1
+        },
+        "invalidation": {
+          "type": "object",
+          "properties": {
+            "condition": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000
+            },
+            "triggered": {
+              "type": "boolean"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000
+            }
+          },
+          "required": [
+            "condition",
+            "triggered",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "human_delay": {
+          "$ref": "#/$defs/human_delay"
+        }
+      },
+      "required": [
+        "contract_version",
+        "strategy",
+        "episode_id",
+        "transition_id",
+        "channel",
+        "eligible_at",
+        "expires_at",
+        "source",
+        "account_status",
+        "watermark",
+        "dashboard_url",
+        "event_type",
+        "symbol",
+        "side",
+        "regime_4h",
+        "setup_1h",
+        "confirmation_15m",
+        "quote",
+        "plan",
+        "candidate_expires_at",
+        "invalidation",
+        "human_delay"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "Q0C_ALERT_EVENT_V1"
+        },
+        "strategy": {
+          "const": "S1_INTRADAY_MTF_V2"
+        },
+        "episode_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "transition_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "channel": {
+          "const": "FEISHU_MOCK"
+        },
+        "eligible_at": {
+          "type": "number",
+          "minimum": 1
+        },
+        "expires_at": {
+          "type": "number",
+          "minimum": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "account_status": {
+          "enum": [
+            "UNKNOWN",
+            "VETO"
+          ]
+        },
+        "watermark": {
+          "$ref": "#/$defs/watermark"
+        },
+        "dashboard_url": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "event_type": {
+          "const": "SYSTEM_DEGRADED"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "contract_version",
+        "strategy",
+        "episode_id",
+        "transition_id",
+        "channel",
+        "eligible_at",
+        "expires_at",
+        "source",
+        "account_status",
+        "watermark",
+        "dashboard_url",
+        "event_type",
+        "reason"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$defs": {
+    "source": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "observed_at": {
+          "type": "number",
+          "minimum": 1
+        },
+        "received_at": {
+          "type": "number",
+          "minimum": 1
+        },
+        "trusted": {
+          "type": "boolean"
+        },
+        "admitted": {
+          "type": "boolean"
+        },
+        "quality": {
+          "enum": [
+            "GOOD",
+            "DEGRADED",
+            "REJECTED"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "observed_at",
+        "received_at",
+        "trusted",
+        "admitted",
+        "quality"
+      ],
+      "additionalProperties": false
+    },
+    "watermark": {
+      "type": "object",
+      "properties": {
+        "synthetic": {
+          "type": "boolean"
+        },
+        "test": {
+          "type": "boolean"
+        },
+        "label": {
+          "const": "SYNTHETIC / TEST ONLY"
+        }
+      },
+      "required": [
+        "synthetic",
+        "test",
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "bar": {
+      "type": "object",
+      "properties": {
+        "completed": {
+          "type": "boolean"
+        },
+        "valid": {
+          "type": "boolean"
+        },
+        "closed_at": {
+          "type": "number",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "completed",
+        "valid",
+        "closed_at"
+      ],
+      "additionalProperties": false
+    },
+    "quote": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "number",
+          "minimum": 1e-08
+        },
+        "as_of": {
+          "type": "number",
+          "minimum": 1
+        },
+        "received_at": {
+          "type": "number",
+          "minimum": 1
+        },
+        "trusted": {
+          "type": "boolean"
+        },
+        "current": {
+          "type": "boolean"
+        },
+        "gate_passed": {
+          "type": "boolean"
+        },
+        "path_admitted": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "price",
+        "as_of",
+        "received_at",
+        "trusted",
+        "current",
+        "gate_passed",
+        "path_admitted"
+      ],
+      "additionalProperties": false
+    },
+    "model": {
+      "type": "object",
+      "properties": {
+        "entry_reference": {
+          "type": "number",
+          "minimum": 1e-08
+        },
+        "fee_bps_round_trip": {
+          "type": "number",
+          "minimum": 0
+        },
+        "slippage_bps_round_trip": {
+          "type": "number",
+          "minimum": 0
+        },
+        "min_after_cost_r": {
+          "type": "number",
+          "minimum": 1e-08
+        },
+        "assumptions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "entry_reference",
+        "fee_bps_round_trip",
+        "slippage_bps_round_trip",
+        "min_after_cost_r",
+        "assumptions"
+      ],
+      "additionalProperties": false
+    },
+    "tp": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "number",
+          "minimum": 1e-08
+        },
+        "weight": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "required": [
+        "price",
+        "weight",
+        "rationale"
+      ],
+      "additionalProperties": false
+    },
+    "plan": {
+      "type": "object",
+      "properties": {
+        "entry_area": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 1e-08
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "hard_stop": {
+          "type": "number",
+          "minimum": 1e-08
+        },
+        "take_profits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tp"
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "after_cost_r": {
+          "type": "number",
+          "minimum": 1e-08
+        },
+        "model": {
+          "$ref": "#/$defs/model"
+        }
+      },
+      "required": [
+        "entry_area",
+        "hard_stop",
+        "take_profits",
+        "after_cost_r",
+        "model"
+      ],
+      "additionalProperties": false
+    },
+    "human_delay": {
+      "type": "object",
+      "properties": {
+        "min_seconds": {
+          "const": 300
+        },
+        "max_seconds": {
+          "const": 600
+        },
+        "assessed_at": {
+          "type": "number",
+          "minimum": 1
+        },
+        "valid_until": {
+          "type": "number",
+          "minimum": 1
+        },
+        "feasible": {
+          "type": "boolean"
+        },
+        "worst_entry_at_5m": {
+          "type": "number",
+          "minimum": 1e-08
+        },
+        "worst_entry_at_10m": {
+          "type": "number",
+          "minimum": 1e-08
+        },
+        "after_cost_r_at_5m": {
+          "type": "number",
+          "minimum": 1e-08
+        },
+        "after_cost_r_at_10m": {
+          "type": "number",
+          "minimum": 1e-08
+        },
+        "assumptions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "min_seconds",
+        "max_seconds",
+        "assessed_at",
+        "valid_until",
+        "feasible",
+        "worst_entry_at_5m",
+        "worst_entry_at_10m",
+        "after_cost_r_at_5m",
+        "after_cost_r_at_10m",
+        "assumptions"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "x-semantics": {
+    "states": [
+      "QUEUED",
+      "ATTEMPTED",
+      "PROVIDER_ACCEPTED",
+      "FAILED",
+      "UNKNOWN_DELIVERY"
+    ],
+    "idempotency": [
+      "strategy",
+      "episode_id",
+      "event_type",
+      "transition_id",
+      "channel",
+      "contract_version"
+    ],
+    "candidate_terminal": [
+      "INVALIDATED",
+      "EXPIRED"
+    ],
+    "terminal_snapshot": "Historical quote and plan retained; fresh trusted transition receipt required. expires_at is notification TTL; candidate_expires_at is candidate validity.",
+    "human_delay": "ENTRY_READY requires modelled 300/600s feasibility from dispatch, entry area and after-cost R floor. Assumptions, never guarantees.",
+    "after_cost_r_formula": "(sum(weight * directional(TP - entry)) - entry * (round_trip_fee_bps + round_trip_slippage_bps)/10000) / (abs(entry - stop) + same_cost)",
+    "future_slo": {
+      "objective": "P95 <= 120 seconds",
+      "from": "eligible_at",
+      "to": "provider acceptance observation",
+      "status": "FUTURE SLO ONLY; synthetic measurements are not live evidence"
+    },
+    "authority": "Offline only. No live transport. Separate implementation and scoped Owner approval required."
+  }
+}

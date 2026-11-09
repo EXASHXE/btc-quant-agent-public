@@ -1,0 +1,75 @@
+{
+  "mission": "V070-Q0C-FEISHU-DURABLE-ALERT-OFFLINE-01",
+  "generated_at_utc": "2026-11-09T08:21:14.510927+00:00",
+  "status": "OFFLINE_VALIDATION_ONLY_CONTROLLER_ACCEPTANCE_PENDING",
+  "runtime": {
+    "python": "3.12.3",
+    "dependencies": "Python stdlib only",
+    "platform": "Linux"
+  },
+  "unit_tests": {
+    "command": "python3 -m unittest -q",
+    "tests_run": 37,
+    "failures": 0,
+    "errors": 0,
+    "exit_code": 0,
+    "elapsed_seconds": 2.207
+  },
+  "network_policy": {
+    "external_requests": 0,
+    "real_feishu_messages": 0,
+    "test_guard": "socket construction, DNS, connect/connect_ex, UDP send and bind blocked; in-memory transport only"
+  },
+  "coverage": [
+    "HTTP 200 nonzero/malformed provider code",
+    "ambiguous post-send timeout: UNKNOWN/no replay",
+    "proven no-delivery retry/throttle/backoff/attempt/expiry bounds",
+    "secret rejection/injection failure/redaction/local OpenSSL vector",
+    "queued restart/accepted duplicate/inflight crash recovery",
+    "persistent cooldown/rate cap/degraded cooldown",
+    "forward/backward clock discontinuity and during-send quarantine",
+    "stale source/quote/signal, completed bars, quality and path admission",
+    "candidate INVALIDATED/EXPIRED, terminal supersession, VETO safety notifications",
+    "LONG/SHORT stop/TP/after-cost R, 1-3 targets, 300/600s conservative delay gate",
+    "synthetic watermark/live rejection and card examples",
+    "explicit feedback/denominator/idempotency",
+    "synthetic nearest-rank latency P95",
+    "slow secret injection TTL and during-getter clock jump block submission"
+  ],
+  "synthetic_latency_simulation": {
+    "origin": "SYNTHETIC_TEST_ONLY",
+    "future_slo_seconds": 120,
+    "samples": 20,
+    "p95_seconds": 19.0,
+    "denominator": "provider-accepted ENTRY_READY only; failures/unknowns reported separately",
+    "live_claim": false
+  },
+  "synthetic_latency_population_metrics": {
+    "origin": "SYNTHETIC_TEST_ONLY",
+    "states": {
+      "QUEUED": 0,
+      "ATTEMPTED": 0,
+      "PROVIDER_ACCEPTED": 20,
+      "FAILED": 0,
+      "UNKNOWN_DELIVERY": 0
+    },
+    "admitted_distinct": 20,
+    "attempted_distinct_denominator": 20,
+    "provider_accepted_numerator": 20,
+    "feedback_numerator": 0,
+    "feedback_denominator": 20,
+    "human_read_inferred": false,
+    "attempts_including_retries": 20
+  },
+  "future_slo": {
+    "objective": "P95 <= 120s eligible signal to provider ACCEPTED",
+    "status": "FUTURE_SLO_ONLY",
+    "production_or_real_world_claim": false
+  },
+  "independent_review": "Read-only outbox/contract review; during-send clock observation isolation corrected and regression tested.",
+  "limits": [
+    "single active dispatcher per database required",
+    "mock evidence only; no provider or callback compatibility validation",
+    "no live transport, authority, deployment, scheduler or real Source admission"
+  ]
+}

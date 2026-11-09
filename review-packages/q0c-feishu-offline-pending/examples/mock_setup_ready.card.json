@@ -1,0 +1,21 @@
+{
+  "msg_type": "interactive",
+  "card": {
+    "header": {
+      "template": "orange",
+      "title": {
+        "tag": "plain_text",
+        "content": "[SYNTHETIC TEST] SETUP_READY"
+      }
+    },
+    "elements": [
+      {
+        "tag": "div",
+        "text": {
+          "tag": "plain_text",
+          "content": "SYNTHETIC / TEST ONLY — 离线模拟，禁止据此交易\n状态：SETUP_READY\nEpisode: synthetic-episode-001\nAccount: UNKNOWN\nProvider acceptance ≠ human read / acknowledgement\nTESTUSDT LONG\n4H: BULLISH\n1H completed: True\n15m completed: False\nEntry area: [99, 101]\nHard stop: 95\nTP(s): [{\"price\": 115, \"weight\": 1, \"rationale\": \"synthetic prior resistance\"}]\nPlanned after-cost R: 2.8\nModel assumptions: {\"assumptions\": \"Synthetic fixed bps; no fill/liquidity guarantee; hypothetical resistance.\", \"entry_reference\": 100, \"fee_bps_round_trip\": 10, \"min_after_cost_r\": 2, \"slippage_bps_round_trip\": 10}\n5–10 min human delay: {\"min_seconds\": 300, \"max_seconds\": 600, \"assessed_at\": 1800000000.0, \"valid_until\": 1800001200.0, \"feasible\": true, \"worst_entry_at_5m\": 100.5, \"worst_entry_at_10m\": 101, \"after_cost_r_at_5m\": 2.4, \"after_cost_r_at_10m\": 2.2, \"assumptions\": \"Synthetic bounded path stays in entry area for 600s; no live prediction.\"}\nCandidate expiry UTC epoch: 1800001200.0\nInvalidation: {\"condition\": \"price crosses hard stop or setup invalidates\", \"reason\": \"not triggered\", \"triggered\": false}\nNotification expiry UTC epoch: 1800000120.0\nDashboard: https://dashboard.invalid/synthetic/episode-001"
+        }
+      }
+    ]
+  }
+}

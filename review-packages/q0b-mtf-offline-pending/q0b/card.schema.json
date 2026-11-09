@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:quant:q0b:card:S1_INTRADAY_MTF_V2",
+  "title": "S1_INTRADAY_MTF_V2 synthetic offline card",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["symbol", "asof_ms", "arm", "state", "reasons", "candidate_id", "plan", "diagnostics", "schema", "synthetic_only", "realized_r"],
+  "properties": {
+    "symbol": {"type": "string"},
+    "asof_ms": {"type": "integer", "minimum": 0},
+    "arm": {"enum": ["MTF_15M", "CONTROL_1H_ONLY"]},
+    "state": {"enum": ["NO_SETUP", "WATCH", "ENTRY_READY", "INVALIDATED", "EXPIRED", "SOURCE_BLOCKED", "DATA_UNAVAILABLE", "UNKNOWN"]},
+    "reasons": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "candidate_id": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "schema": {"const": "S1_INTRADAY_MTF_V2"},
+    "synthetic_only": {"const": true},
+    "realized_r": {"type": "null"},
+    "diagnostics": {"type": ["object", "null"]},
+    "plan": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": ["direction", "setup_end_ms", "setup_available_ms", "entry_region", "worst_entry", "confirmation_level", "structural_invalidation", "hard_stop", "targets", "target_evidence", "atr14_1h", "atr_buffer", "entry_expires_ms", "holding_hours_from_hypothetical_fill", "planned_extension_hours", "absolute_holding_deadline_ms", "warnings", "economics"],
+          "properties": {
+            "direction": {"enum": ["LONG", "SHORT"]},
+            "entry_region": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number", "exclusiveMinimum": 0}},
+            "targets": {"type": "array", "minItems": 2, "maxItems": 3, "uniqueItems": true, "items": {"type": "number", "exclusiveMinimum": 0}},
+            "target_evidence": {"type": "array", "minItems": 2},
+            "hard_stop": {"type": "number", "exclusiveMinimum": 0},
+            "holding_hours_from_hypothetical_fill": {"type": "integer", "minimum": 2, "maximum": 12},
+            "planned_extension_hours": {"type": ["integer", "null"], "minimum": 3, "maximum": 24},
+            "absolute_holding_deadline_ms": {"type": "null"},
+            "economics": {
+              "type": "object",
+              "required": ["planned_gross_r_by_tp", "scenarios", "realized_r", "capacity_status", "account_authorization", "execution_claim"],
+              "properties": {"realized_r": {"type": "null"}, "execution_claim": {"const": false}}
+            },
+            "review_actionability": {
+              "type": "object",
+              "required": ["price", "source", "review_ms", "response_minutes", "respond_by_ms", "ready_valid_until_ms", "future_price_guaranteed", "instruction"],
+              "properties": {"response_minutes": {"type": "integer", "minimum": 5, "maximum": 10}, "future_price_guaranteed": {"const": false}}
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"state": {"const": "ENTRY_READY"}}},
+      "then": {"properties": {"candidate_id": {"type": "string"}, "plan": {"type": "object", "required": ["review_actionability"]}}},
+      "else": {"properties": {"plan": {"not": {"type": "object", "required": ["review_actionability"]}}}}
+    }
+  ]
+}

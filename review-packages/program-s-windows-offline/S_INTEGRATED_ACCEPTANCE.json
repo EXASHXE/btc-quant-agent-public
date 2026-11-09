@@ -1,0 +1,75 @@
+{
+  "C154_workspace_correct": true,
+  "Current_manual_review": "SOURCE_BLOCKED",
+  "ECONOMICALLY_VALIDATED": false,
+  "N_deleted_raw_used_or_restored": false,
+  "OS_service_reboot_deploy_merge_successor_actions": 0,
+  "Public_raw_import": "SOURCE_BLOCKED_NO_INDEPENDENT_CURRENT_WINDOWS_RETENTION_ANCHOR",
+  "R_original12_verified": true,
+  "S2_S3": "RESEARCH_ONLY_DISABLED",
+  "SHADOW_QUALIFIED": false,
+  "SOURCE_QUALIFIED": false,
+  "W32Time_actual": {
+    "query_exit": 2147943462,
+    "registry_ntp_server": "time.windows.com,0x9",
+    "registry_type": "NTP",
+    "service_stopped_or_unavail": true,
+    "status_error": "",
+    "status_text_unqualified": "\u53d1\u751f\u4e0b\u5217\u9519\u8bef: \u670d\u52a1\u5c1a\u672a\u542f\u52a8\u3002 (0x80070426)\n",
+    "strict_utc_qualified": false,
+    "supported": true,
+    "synchronization_status_interpretation": "RAW_STATUS_ONLY_NOT_STRICT_UTC"
+  },
+  "WSL_final_with_native_NTFS_DrvFS": {
+    "ERROR": 0,
+    "FAIL": 0,
+    "PASS": 11,
+    "SKIP": 0
+  },
+  "Windows_QA_CONNECT_requests": 14,
+  "Windows_QA_weight": 17,
+  "Windows_native_unittest_final": {
+    "ERROR": 0,
+    "FAIL": 0,
+    "PASS": 26,
+    "SKIP": 0
+  },
+  "account": "ACCOUNT_UNKNOWN/ACCOUNT_VETO",
+  "account_order_trade_transfer_alert_operations": 0,
+  "actual_Binance_GET_requests": 0,
+  "actual_sqlite_files": [
+    "artifacts/SYNTHETIC_NTFS_HISTORY_AUDIT_c4d08f44d55d/handoff_ledger.sqlite"
+  ],
+  "actual_venue_TLS_or_region_access_verified": false,
+  "all_operator_evidence": "SYNTHETIC_HISTORY_AUDIT_NON_ACTIONABLE",
+  "build": {
+    "SOURCE_DATE_EPOCH": 1767225600,
+    "new_dependencies": 0,
+    "scope": "Windows stdlib capture; WSL audit requires accepted Quant O environment",
+    "sha256": "342858143142d3ba3a745b91dbbb4277cfdfd20d7e75d84d03e6faaac133d8f3",
+    "two_byte_identical_builds": true,
+    "wheel": "release/quant_windows_handoff-0.7.0.post1-py3-none-any.whl"
+  },
+  "controller_acceptance": "PENDING_CONTROLLER_0C",
+  "crossphase_lock_released": true,
+  "frozen_C": "SOURCE_CLASS_INVALID / INSUFFICIENT_SUPPORT",
+  "genuine_Access_or_new_Owner_authorization_created": false,
+  "native_windows_clock_QPC_elapsed_ms": 120025,
+  "native_windows_clock_samples": 1195,
+  "new_scoped_O_regression": {
+    "ERROR": 0,
+    "FAIL": 0,
+    "PASS": 672,
+    "SKIP": 0
+  },
+  "operator_output": "artifacts/SYNTHETIC_NTFS_HISTORY_AUDIT_c4d08f44d55d",
+  "recommendation": "Controller may accept/reject offline Windows-control/history-audit subset; do not authorize whole genuine live workflow until remaining engineering and authority gates are closed.",
+  "remaining_blockers": [
+    "Authentic current rights/cache/access assessment and new exact Owner authorization, not fabricated by worker",
+    "Independent Windows current retention/review consumer anchor; current/public inputs refused",
+    "Independent trusted external bundle digest/authentic provenance; self-consistent SHA chain alone is not authentication",
+    "Producer directory/reparse race review and full-process120s hard stop including blocking disk I/O remain incomplete"
+  ],
+  "strict_UTC_qualified": false,
+  "worker_terminal_state": "S_PARTIAL"
+}

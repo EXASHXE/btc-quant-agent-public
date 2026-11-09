@@ -1,0 +1,26 @@
+{
+  "contract_version": "Q0C_ALERT_EVENT_V1",
+  "strategy": "S1_INTRADAY_MTF_V2",
+  "episode_id": "system:offline-source:001",
+  "transition_id": "degraded-001",
+  "event_type": "SYSTEM_DEGRADED",
+  "channel": "FEISHU_MOCK",
+  "eligible_at": 1800000000.0,
+  "expires_at": 1800000120.0,
+  "source": {
+    "name": "OFFLINE_FIXTURE",
+    "observed_at": 1800000000.0,
+    "received_at": 1800000000.0,
+    "trusted": true,
+    "admitted": true,
+    "quality": "DEGRADED"
+  },
+  "account_status": "UNKNOWN",
+  "watermark": {
+    "synthetic": true,
+    "test": true,
+    "label": "SYNTHETIC / TEST ONLY"
+  },
+  "dashboard_url": "https://dashboard.invalid/synthetic/episode-001",
+  "reason": "Synthetic source delay"
+}

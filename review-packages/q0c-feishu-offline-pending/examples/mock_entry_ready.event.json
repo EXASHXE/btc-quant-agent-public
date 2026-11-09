@@ -1,0 +1,90 @@
+{
+  "contract_version": "Q0C_ALERT_EVENT_V1",
+  "strategy": "S1_INTRADAY_MTF_V2",
+  "episode_id": "synthetic-episode-001",
+  "transition_id": "entry_ready-001",
+  "event_type": "ENTRY_READY",
+  "channel": "FEISHU_MOCK",
+  "eligible_at": 1800000000.0,
+  "expires_at": 1800000120.0,
+  "source": {
+    "name": "OFFLINE_FIXTURE",
+    "observed_at": 1800000000.0,
+    "received_at": 1800000000.0,
+    "trusted": true,
+    "admitted": true,
+    "quality": "GOOD"
+  },
+  "account_status": "UNKNOWN",
+  "watermark": {
+    "synthetic": true,
+    "test": true,
+    "label": "SYNTHETIC / TEST ONLY"
+  },
+  "dashboard_url": "https://dashboard.invalid/synthetic/episode-001",
+  "symbol": "TESTUSDT",
+  "side": "LONG",
+  "regime_4h": {
+    "value": "BULLISH",
+    "admitted": true
+  },
+  "setup_1h": {
+    "completed": true,
+    "valid": true,
+    "closed_at": 1799999400.0
+  },
+  "confirmation_15m": {
+    "completed": true,
+    "valid": true,
+    "closed_at": 1799999970.0
+  },
+  "quote": {
+    "price": 100,
+    "as_of": 1800000000.0,
+    "received_at": 1800000000.0,
+    "trusted": true,
+    "current": true,
+    "gate_passed": true,
+    "path_admitted": true
+  },
+  "plan": {
+    "entry_area": [
+      99,
+      101
+    ],
+    "hard_stop": 95,
+    "take_profits": [
+      {
+        "price": 115,
+        "weight": 1,
+        "rationale": "synthetic prior resistance"
+      }
+    ],
+    "after_cost_r": 2.8,
+    "model": {
+      "entry_reference": 100,
+      "fee_bps_round_trip": 10,
+      "slippage_bps_round_trip": 10,
+      "min_after_cost_r": 2,
+      "assumptions": "Synthetic fixed bps; no fill/liquidity guarantee; hypothetical resistance."
+    }
+  },
+  "candidate_expires_at": 1800001200.0,
+  "invalidation": {
+    "condition": "price crosses hard stop or setup invalidates",
+    "triggered": false,
+    "reason": "not triggered"
+  },
+  "human_delay": {
+    "min_seconds": 300,
+    "max_seconds": 600,
+    "assessed_at": 1800000000.0,
+    "valid_until": 1800001200.0,
+    "feasible": true,
+    "worst_entry_at_5m": 100.5,
+    "worst_entry_at_10m": 101,
+    "after_cost_r_at_5m": 2.4,
+    "after_cost_r_at_10m": 2.2,
+    "assumptions": "Synthetic bounded path stays in entry area for 600s; no live prediction."
+  }
+}

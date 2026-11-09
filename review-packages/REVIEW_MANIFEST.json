@@ -1,0 +1,445 @@
+{
+  "schema": "V070_20261109_Q0_SOURCE_EXPORT_V1",
+  "baseline": "v070-app in ancestor review/v070-full-code-review-20261109 (O accepted offline scoped)",
+  "status": {
+    "program-s-windows-offline": "CONTROLLER_ACCEPTED_OFFLINE_HISTORICAL_AUDIT_ONLY; CURRENT_REAL_SOURCE_BLOCKED",
+    "q0b-mtf-offline-pending": "WORKER_DELIVERED_PENDING_CONTROLLER_0C_ACCEPTANCE; NO_REAL_MARKET",
+    "q0c-feishu-offline-pending": "WORKER_DELIVERED_PENDING_CONTROLLER_0C_ACCEPTANCE; MOCK_DELIVERY_ONLY"
+  },
+  "no_claims": [
+    "no native Source admission",
+    "no real Feishu message",
+    "no integration into O application",
+    "no live trading",
+    "no qualified economic research"
+  ],
+  "total_files": 71,
+  "files": [
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/README_S_OPERATOR.md",
+      "bytes": 9113,
+      "sha256": "4eb6dde6f6a9a7641fc530d39393e2fb84632d942adfa936054b777a35771814"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/S_ACCESS_CONTRACT.json",
+      "bytes": 1280,
+      "sha256": "a05119377e9da19621fee63db8ac1c005e74af1c720bdc4fac4406f0098703c7"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/S_IMPLEMENTATION_FINAL.md",
+      "bytes": 4191,
+      "sha256": "159932244e10539a41950887bce964b761e62e6cd7b3ca059a7bb3754dbc88b6"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/S_INTEGRATED_ACCEPTANCE.json",
+      "bytes": 3153,
+      "sha256": "fce28610048887d4e40e2abf8013bcc5bbcc36458e1bc39998cde7f19bea17ac"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/S_TEST_MATRIX.json",
+      "bytes": 1458,
+      "sha256": "a5142cb6d6a0f9af56abe44cb228ca7181f7baf0563f01223a9f793a1571249b"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/pyproject.toml",
+      "bytes": 599,
+      "sha256": "c209ddb2727825a77e5701be23da1fb21044c1f395621dd34bfe103504eafa66"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/tests/__init__.py",
+      "bytes": 80,
+      "sha256": "23c071320c4f22f1b4589c2dac36f453886d9235e51e787180860a2f75da9e53"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/tests/fixtures.py",
+      "bytes": 15115,
+      "sha256": "b517fc7a8dcd9550b4490fb34009b7bec825c0f9c11e96de4b5652c9db32fd0c"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/tests/test_s_consumer.py",
+      "bytes": 2213,
+      "sha256": "795c8cfc274111e08ad870524f10d296f4be34b14bd2469b1a60a967edf39b42"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/tests/test_s_hardening.py",
+      "bytes": 14849,
+      "sha256": "aba76e88539c86764863ab31fa9c33c57e51c95f7029657a18dd633687198002"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/tests/test_windows_capture_offline.py",
+      "bytes": 17220,
+      "sha256": "1f3f8dcce84eb7891dad2f28da3cae27892be930dbdd3b08c9a246e56279f56d"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/tests/test_wsl_handoff_e2e.py",
+      "bytes": 12267,
+      "sha256": "b954ecd336c96dd2c0970888e333e7e3c025919be9fcdb059f58d3b85f254038"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/tools/build_release.py",
+      "bytes": 1521,
+      "sha256": "50531f1915a2e6e7cf013909eb856cdf80e388d53d7eb86ce4b3cfcc323afcf5"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/tools/native_clock.py",
+      "bytes": 1204,
+      "sha256": "4975aa77499d6814592c7860b4627460c67ec0f1088930a515db27d1fed49771"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/tools/native_demo.py",
+      "bytes": 2308,
+      "sha256": "87774db4499d9c99929ffbb53db394abe602dde0629c4aa49535e58e8342550e"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/tools/windows_install.py",
+      "bytes": 2092,
+      "sha256": "96636093901f9b8b30c4c4752b9b9687e9f120ed4e80dc374c25afbd60539b13"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/tools/wsl_release_check.py",
+      "bytes": 2125,
+      "sha256": "1afd14722f19fd4116a3bc25c3a6c85cc63ecbfdd41e47d7c036894d3774edaa"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/win_capture/__init__.py",
+      "bytes": 749,
+      "sha256": "3bfcb2487e5bf460ff19c1809ab2544729e71124984daaf9d39dfc4683b178f3"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/win_capture/access.py",
+      "bytes": 11108,
+      "sha256": "8be7e9fef2c7c6973415f72bc19b8ac0d881cc865226d5c92c47269c87c9e8c9"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/win_capture/bundle.py",
+      "bytes": 8945,
+      "sha256": "21ca14afd9010cc1459f9b31408484139fd33eee04d7459a9b710eb9ebc983ee"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/win_capture/capture.py",
+      "bytes": 27403,
+      "sha256": "1bf28791914963680dbc0d915bf9f42899d6bf45c2466f276b754e664b6a9dfe"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/win_capture/retention.py",
+      "bytes": 1051,
+      "sha256": "ce7209a81b36daf0299a24474e828ef89667caea7a6eb477fda33fb34207f7a4"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/win_capture/transport.py",
+      "bytes": 8025,
+      "sha256": "6fa90b5c412189152b8d3036fa4d316b58c2eb197bb98ac262da492dd76d166c"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/win_capture/win_clock.py",
+      "bytes": 10699,
+      "sha256": "58ea49fb4f67d21f4e955c969efaf4845fef48ce1438c7900542bdf585d70449"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/wsl_handoff/__init__.py",
+      "bytes": 562,
+      "sha256": "cb60608b6d2e54c92b80ca5d682453be0ff0eea3cc2f7aef16307b77ab829554"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/wsl_handoff/__main__.py",
+      "bytes": 130,
+      "sha256": "a2ac315d1356d1ce2ac7d9ae75155ad5a9c6932fb4609f226dc8dbc55c65c676"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/wsl_handoff/importer.py",
+      "bytes": 38415,
+      "sha256": "d79e185afd3d306f2e9c6db83f159a4673cc88669d6ec9afdd75115bb477e344"
+    },
+    {
+      "package": "program-s-windows-offline",
+      "path": "review-packages/program-s-windows-offline/wsl_handoff/safe_audit.py",
+      "bytes": 2930,
+      "sha256": "fad7d043ab0f208ff4b82be1079795474152a5bc06558a068d960cd845b3b9c5"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/Q0B_CONTRACT.json",
+      "bytes": 10283,
+      "sha256": "4c00756744083907a896679e939e5cbeb480a35eb0e3891ee6d479dcab486d19"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/Q0B_HANDOFF.md",
+      "bytes": 7506,
+      "sha256": "b3c016a2b737c4dd723ed3581126c68eaabe61983d8417f0c27ee49246108a02"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/pyproject.toml",
+      "bytes": 1785,
+      "sha256": "cb2e413986e9fb29356322a90ade7d54af83d489050a91cf10c02ba375e6d66e"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/q0b/__init__.py",
+      "bytes": 115,
+      "sha256": "6176357bdbb27eddb99dcd90a8010b2b4bf85c74660a1d8595f4187bc278c9a3"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/q0b/__main__.py",
+      "bytes": 870,
+      "sha256": "eecff1cf6675329cb18f9096cb718642ec31038448a68c3d41a0f3e3ef523be7"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/q0b/card.schema.json",
+      "bytes": 3282,
+      "sha256": "97c65616a9d09447c9fc63bcd4540479580c55c962ec57f3075889ddafd965c0"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/q0b/examples.py",
+      "bytes": 4936,
+      "sha256": "4b2abd0d7beb356803d89723b89ea6c55fcd844d906d15c80491c21b17f876e9"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/q0b/planner.py",
+      "bytes": 6746,
+      "sha256": "9fa54a47e95ac2d705e7d9f3221ef608d4e4bf2cad5965fb1cf1e7839b0fbb7a"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/q0b/schema.py",
+      "bytes": 4101,
+      "sha256": "795d006a0ec747eb4115383cd567f533d8e6766432dc34bab7ba5cad95a7a881"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/q0b/source.py",
+      "bytes": 8715,
+      "sha256": "d66965af4bd5c4fec0c6cb1c465f60993627803c3ba11456086d460b71440980"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/q0b/strategy.py",
+      "bytes": 16663,
+      "sha256": "d2c2d582cdc4e54efd4a3f40a4834524b07bea51151699292f6810732f174783"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/q0b/transport.py",
+      "bytes": 3188,
+      "sha256": "a0bd2f9931bec0f7b9323d8742ac680fe79ea62f53dd7c705c8c3bdaf586cd16"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/q0b/transport.schema.json",
+      "bytes": 1559,
+      "sha256": "08e6d1890f8e66afaba9873d9f80e37c3aa4c8b6f1ee0ec8d6696c8314b176ad"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/requirements-q0b-test.txt",
+      "bytes": 31,
+      "sha256": "686e4a51a9f18184364238194c6afea3375b530bdf05a518a66393a13b541e37"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/tests/q0b/conftest.py",
+      "bytes": 460,
+      "sha256": "4bd8a9051cac07522575eb4af711a3b09d00a3ba2a94bf4e2521e2cc6ba23bcb"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/tests/q0b/test_contract.py",
+      "bytes": 3469,
+      "sha256": "8bdaf80816c2116b352c6f550d6b477557c02cd3e90dc5ae2cfd53dadd786a91"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/tests/q0b/test_planner_transport.py",
+      "bytes": 6695,
+      "sha256": "2c5f44dae0c012a4dfeae235dc9bbb0b61c84fa1e359f2fd5fe1ba18a672f46e"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/tests/q0b/test_source.py",
+      "bytes": 7848,
+      "sha256": "e5f80ead15d215d05be0b0f4d221361d39dd7cd5a12f026dae409f836bee1a82"
+    },
+    {
+      "package": "q0b-mtf-offline-pending",
+      "path": "review-packages/q0b-mtf-offline-pending/tests/q0b/test_strategy.py",
+      "bytes": 12726,
+      "sha256": "80bc52c6f04ad300e7906c56ee4d131afd7baf1d06c20133cc5368be683197bf"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/Q0C_EVENT_CONTRACT.json",
+      "bytes": 12415,
+      "sha256": "12d45484f63ccc40822c20f9e530c77a876a554d9edf09458501e4bf5a7b2459"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/Q0C_HANDOFF.md",
+      "bytes": 10882,
+      "sha256": "48c3c59dfcf2421a7bb04ec8c39049b33fcba1e4b8c0bcad70cd87e40fcb5472"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/Q0C_VALIDATION.json",
+      "bytes": 2885,
+      "sha256": "5438a8dfab79284faf3513c4c0c34c76ab8fb42bfd1c8d041aee3eb2eea114b5"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/alerts/__init__.py",
+      "bytes": 337,
+      "sha256": "3d443381fa0c716a4bcdf5b316349c7305c0d70639c8d403222f2610834a2fd5"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/alerts/card.py",
+      "bytes": 2837,
+      "sha256": "55e9c33e59b69ba598453713af3260f037936f8d63e7037193d0c47730adc66c"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/alerts/contract.py",
+      "bytes": 7767,
+      "sha256": "2a73fbb9e3d2e0c2edc2fcc2ceb457fc616d4e4604e334797922ec37244db7ec"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/alerts/dispatcher.py",
+      "bytes": 19207,
+      "sha256": "919603bedca79bfcf5ad5e8c947d39cc443556d47bd35fb2f9bd0f924a45d6cb"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/alerts/mock.py",
+      "bytes": 1379,
+      "sha256": "42b6920897ab819a598c64dbe5a0db109110bd7ff7ea6f0920f282f84ec2dfa8"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_entry_ready.card.json",
+      "bytes": 1633,
+      "sha256": "2609fd3373c0fee1d657054be4289309cc7e7468d5b2665312ee1145e345e76a"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_entry_ready.event.json",
+      "bytes": 2215,
+      "sha256": "a002bbe2039e7adbce31b4d61819d4cd7c078d4e5c1e3ad83b90078dc0d62c1d"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_entry_ready.signed.card.json",
+      "bytes": 1720,
+      "sha256": "42236dfa7f33f5bbd26de009fb96d876dd92c9b40d19aedecb04808ed00789e0"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_expired.card.json",
+      "bytes": 1625,
+      "sha256": "a5c34e1f58f8a40154a95a89797967b69658b09d057f414bb0a4071f678b57b7"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_expired.event.json",
+      "bytes": 2207,
+      "sha256": "1d38e4123c9997af8defe941d877f5c7d373054bb57e180320cba84c9a98f969"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_invalidated.card.json",
+      "bytes": 1653,
+      "sha256": "a961169940ba85aac02cef101ff1f3c03a8b1d60427be0f4685a4b34635e9531"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_invalidated.event.json",
+      "bytes": 2235,
+      "sha256": "2c58933ab2d9258e4d41161995090a90715eb87adee6edfe602cf7b88ea428e9"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_setup_ready.card.json",
+      "bytes": 1634,
+      "sha256": "594bd60c6c0d81b6e0e63d9b6469332d4e611e0fdfe4c46c6e8cb26d2360f24c"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_setup_ready.event.json",
+      "bytes": 2216,
+      "sha256": "06732dd877de3c94d049484c4715a71abb503dc16bb7909f8807d6061cf241c8"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_system_degraded.card.json",
+      "bytes": 690,
+      "sha256": "7119d5a5755e513d8fbca758d693928cca71d2cf9a13b4228262081b9fa9b4c3"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_system_degraded.event.json",
+      "bytes": 711,
+      "sha256": "2c8447380cb8b8f077b33e7223abf1f6380105a0466d8fda5cddb0e3a20da7d2"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_watch.card.json",
+      "bytes": 1623,
+      "sha256": "c37961e348bed1d63ca0c9d9ede620eed2d504f80d7d2dc054d44ebbb4f67017"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/examples/mock_watch.event.json",
+      "bytes": 2205,
+      "sha256": "8f30a9b59d6a5c4aa9614de087b465721e94daf1ecfd7d1d5b55163f9ec88197"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/tests/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/tests/fixtures.py",
+      "bytes": 3083,
+      "sha256": "884c873faabf7c3e1e32f4527393626739a6d17ab8dfb033ee3de7ebc1ad1f0d"
+    },
+    {
+      "package": "q0c-feishu-offline-pending",
+      "path": "review-packages/q0c-feishu-offline-pending/tests/test_alerts.py",
+      "bytes": 25927,
+      "sha256": "bad91498947cf2ffea5f2a1b7f2b18f4b788fd100032737d577e1283f8a81cb0"
+    }
+  ]
+}

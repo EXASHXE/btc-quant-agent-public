@@ -1,0 +1,21 @@
+{
+  "msg_type": "interactive",
+  "card": {
+    "header": {
+      "template": "orange",
+      "title": {
+        "tag": "plain_text",
+        "content": "[SYNTHETIC TEST] SYSTEM_DEGRADED"
+      }
+    },
+    "elements": [
+      {
+        "tag": "div",
+        "text": {
+          "tag": "plain_text",
+          "content": "SYNTHETIC / TEST ONLY — 离线模拟，禁止据此交易\n状态：SYSTEM_DEGRADED\nEpisode: system:offline-source:001\nAccount: UNKNOWN\nProvider acceptance ≠ human read / acknowledgement\n系统降级：Synthetic source delay\nNotification expiry UTC epoch: 1800000120.0\nDashboard: https://dashboard.invalid/synthetic/episode-001"
+        }
+      }
+    ]
+  }
+}
