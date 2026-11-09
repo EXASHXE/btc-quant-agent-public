@@ -1,0 +1,6 @@
+{
+  "schema": "L_S1_COMPILER_INVARIANCE_V1",
+  "original_J_file_SHA256": "54f590182f2fdaa5239f26b19b3532265f8605ff3c47da161ffb47860a204469",
+  "original_J_AST_SHA256": "757c200f03725fe9c3dc9245a572acf6bb37de0ea4d87e99b1278c488de2a906",
+  "permitted_delta": "Only optional bar_policy=None keyword and selection of that explicit V2 policy; no strategy, geometry, causal reader, or default policy change."
+}

@@ -1,0 +1,150 @@
+{
+  "S1_holding_hours": [
+    8,
+    120
+  ],
+  "acceptance_authority": "Controller 0-C",
+  "alpha_claim": false,
+  "decision_timeframes": [
+    "4H",
+    "1D"
+  ],
+  "deferred": [
+    "14-day fixed carry/R11 stop",
+    "historical USDT flow",
+    "broad ML/Transformer direction",
+    "automatic allocation/21-playbook activation"
+  ],
+  "effective_date": "2026-11-06",
+  "fail_closed_defaults": {
+    "account_veto": "VETO",
+    "expired_before_next_review": "EXPIRED / NOT_ACTIONABLE",
+    "missing_data": "DATA_UNAVAILABLE with setup_status=NO_SETUP",
+    "source_denial": "SOURCE_BLOCKED",
+    "unknown_account": "ACCOUNT_UNKNOWN",
+    "unknown_legacy_state": "HISTORICAL_FROZEN / SOURCE_BLOCKED / NOT_ACTIONABLE"
+  },
+  "forbidden_actions": [
+    "native acquisition",
+    "private account APIs",
+    "orders/trading",
+    "alerts/notifications",
+    "Owner-signing or new grant signatures",
+    "protected holdout reads",
+    "unregistered PRIMARY trials",
+    "GitHub mutation",
+    "successor/subagents",
+    "historical evidence deletion/mutation"
+  ],
+  "historical_policy": "ARCHIVED / OUT_OF_ACTIVE_SCOPE; all negative results and original receipts preserved",
+  "holding_hours": [
+    4,
+    120
+  ],
+  "implementation_location": "active_project",
+  "market_timeframes": [
+    "1H",
+    "4H",
+    "1D"
+  ],
+  "native_source_qualified": false,
+  "next_work": "LT-B integration and LT-C protocol are frozen handoffs, not executed here",
+  "one_hour_role": "OPTIONAL_NON_URGENT_CONFIRMATION; cannot independently create a decision",
+  "original_source_mutated": false,
+  "planned_R_semantics": "(nearest target payoff from worst entry in region - assumed round-trip cost) / (buffered structural loss + assumed round-trip cost); hypothetical only",
+  "product_version": "V070_SWING_ADVISORY_V1",
+  "purpose": "Low-frequency risk-aware human advisory reviewed once or twice daily",
+  "retired": [
+    "1/3/5-minute signal-survival product metric",
+    "minute-response WATCH/ARMED dispatch",
+    "tick/BBO discretionary entry",
+    "subminute scalping",
+    "market making",
+    "queue-position alpha",
+    "seconds-level reversal",
+    "R17 L2 depletion/recovery alpha",
+    "minute-no-chase as product identity",
+    "BBO throughput optimization solely for high-frequency operation"
+  ],
+  "review_hours_local_example_Asia_Hong_Kong": [
+    8,
+    20
+  ],
+  "review_hours_utc_default": [
+    0,
+    12
+  ],
+  "runtime_boundary": "Only isolated offline contract code is active; legacy acquisition, selector, bridge, execution and account modules are absent from src/",
+  "schema_version": "LT_A_ACTIVE_SCOPE_V1",
+  "shadow_qualified": false,
+  "strategies": {
+    "S1": {
+      "activation": "CONTRACT_ACTIVE_ONLY",
+      "id": "trend_pullback",
+      "integration": "LT_B_INTEGRATION_PENDING",
+      "production_positive_signals": false,
+      "requirements": [
+        "1D+4H regime",
+        "preobservable continuation/support/resistance zone",
+        "completed-bar confirmation",
+        "structural invalidation with volatility and execution buffers",
+        "late deteriorated entry veto",
+        "review-time validity"
+      ],
+      "reuse": "Existing EMA pullback condition retained verbatim"
+    },
+    "S2": {
+      "activation": "DISABLED_SECONDARY_CONTRACT",
+      "holding_hours": [
+        4,
+        120
+      ],
+      "id": "breakout_retest",
+      "requirements": [
+        "confirmed 4H/1D breakout",
+        "subsequent retest",
+        "closed-bar acceptance/rejection",
+        "no impulsive chase"
+      ],
+      "unlock": "Predeclared scientific validation and explicit Controller scope revision; no config override"
+    },
+    "S3": {
+      "activation": "DISABLED_RESEARCH_CHALLENGER",
+      "holding_hours": [
+        4,
+        72
+      ],
+      "id": "failed_breakout_recovery",
+      "requirements": [
+        "meaningful 4H/1D failure",
+        "closed-candle recovery/rejection",
+        "structural invalidation and buffers"
+      ]
+    },
+    "S4": {
+      "activation": "SHARED_FILTERS_NOT_ALPHA",
+      "executable_config_filter_whitelist": [
+        "EMA",
+        "ADX",
+        "ATR",
+        "RELATIVE_VOLUME",
+        "QUOTE_SPREAD"
+      ],
+      "filters": [
+        "trend",
+        "ATR/volatility",
+        "volume/activity",
+        "BTC regime",
+        "liquidity/spread",
+        "qualified causal funding/OI",
+        "scheduled events"
+      ],
+      "unintegrated_filters": "Funding/OI, events and cross-symbol source joins remain LT-B contracts"
+    }
+  },
+  "symbols": {
+    "BTCUSDT": "ELIGIBLE_WHEN_SEPARATELY_SOURCE_QUALIFIED",
+    "ETHUSDT": "ELIGIBLE_WHEN_SEPARATELY_SOURCE_QUALIFIED",
+    "SOLUSDT": "ELIGIBLE_WHEN_SEPARATELY_SOURCE_QUALIFIED"
+  }
+}

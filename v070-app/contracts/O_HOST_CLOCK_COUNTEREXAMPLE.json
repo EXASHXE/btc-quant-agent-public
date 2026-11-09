@@ -1,0 +1,25 @@
+{
+  "evidence": "REAL_LOCAL_HOST_COUNTERS_NO_MARKET_DATA",
+  "host_qualified": false,
+  "samples": [
+    {
+      "boot_id": "2955d6d6-98cc-4655-8194-31fb57d042bd",
+      "boottime_ms": 1651631205,
+      "control_end_ms": 1651631205,
+      "mono_after_ms": 1651631205,
+      "mono_before_ms": 1651631205,
+      "raw_ms": 1703066259,
+      "wall_ms": 1794160681375
+    },
+    {
+      "boot_id": "2955d6d6-98cc-4655-8194-31fb57d042bd",
+      "boottime_ms": 1651661178,
+      "control_end_ms": 1651661178,
+      "mono_after_ms": 1651661178,
+      "mono_before_ms": 1651661178,
+      "raw_ms": 1703098378,
+      "wall_ms": 1794160713633
+    }
+  ],
+  "source_sha256": "aecf2df868234af0bbd3b95e9aaceadd15311682d48bf6b5ddd7bfc242bcf186"
+}

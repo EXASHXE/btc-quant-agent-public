@@ -1,0 +1,165 @@
+{
+  "automatic_launch": false,
+  "dispatcher_and_acceptance": "Controller 0-C",
+  "execution_in_LT_A": false,
+  "native_acquisition_authorized": false,
+  "offline_vs_native_acceptance": {
+    "live_native": "Separate Controller grant/access/source-correctness/availability release evidence; not provided by LT-A",
+    "offline": "Synthetic causal/integrity/lifecycle/replay contracts only"
+  },
+  "planned_integrated_tests": [
+    "completed native flag, alignment, all required 1D+4H warmups and BTC as-of joins",
+    "optional 1H absence does not create urgency or standalone signal",
+    "future data and future revision mutation cannot change past decision",
+    "gap/delayed receipt/revision/duplicate/out-of-order/late period fail closed",
+    "scheduled review in 12h/24h, expiry equality, missed/no-fill, stale display",
+    "stop/target buffers from preobservable structure and conservative after-cost geometry",
+    "no positive S2/S3 activation by config, API, registry, dashboard, aliases or old playbooks",
+    "crash/restart/digest/watermark idempotence and revision cancellation",
+    "source denial, TLS failure, sticky 50ms stop, retained128queue and per-frame accounting where applicable",
+    "no account/orders/alerts and static historical labeling"
+  ],
+  "product_contract": "LT_A_ACTIVE_SCOPE_CONTRACT.json",
+  "reuse_map": [
+    {
+      "reuse": "Original EMA recovery condition retained; LT-B wraps qualified daily/4H structural context, never relabel old quote compiler",
+      "source": "platform/strategies.py:direction"
+    },
+    {
+      "reuse": "Shared OHLCV and causal pivot confirmation",
+      "source": "domain.py:Candle and structure.py:confirmed_pivots"
+    },
+    {
+      "reuse": "Canonical hashes/domain/source clocks; legacy lifecycle enums are historical data types only",
+      "source": "platform/core.py"
+    },
+    {
+      "reuse": "Causal feature cache and regime helpers; integrate dual-timeframe as-of joins explicitly",
+      "source": "platform/factors.py and platform/regime.py"
+    },
+    {
+      "reuse": "SwingPolicy, ClosedBar, Opportunity, decide and snapshot schema",
+      "source": "platform/swing.py"
+    },
+    {
+      "reuse": "Append-only offline decision seed; extend source transactions without rewriting decisions",
+      "source": "platform/swing_store.py"
+    },
+    {
+      "reuse": "Existing HTML renderer and safe static snapshot view",
+      "source": "platform/reporting.py:document/table and platform/ui.py:page"
+    },
+    {
+      "reuse": "Unmodified clock safety contracts",
+      "source": "platform/canary/clock_domain.py and clocks.py"
+    },
+    {
+      "reuse": "Original BBO queue/durable/TLS reference contracts, only if future source requires them",
+      "source": "historical_frozen/source_guards"
+    }
+  ],
+  "schema_version": "LT_B_FROZEN_HANDOFF_V1",
+  "source_quality_and_clock_contract": {
+    "TTL": "Validity/review deadline must cover next predeclared daily check. Entry validity <=5d. Human checks do not reset original setup age.",
+    "asof_join": "Latest causally available completed 1D and 4H prefixes at trigger; 1H optional; no future row leakage or relabeling ticks/minute bars as multi-day evidence",
+    "bar_interval": "UTC aligned half-open [open,end); shared Candle.close_time_ms=end-1",
+    "clock_order": "bar_end <= source_event_ms <= received_ms <= available_ms <= durable_ms <= decision_ms",
+    "decision_scheduler": "Persist close watermark; trigger once per qualified 4H/1D close after all required inputs are durable. 00UTC daily/4H coincidence coalesces to one symbol decision. 1H updates only cached optional confirmation.",
+    "dedup": "Source+venue+symbol+interval+open+revision identity; content changes under same identity fail closed",
+    "event_clock": "Join BTC regime/funding/OI/events by known-at and effective-at clocks with declared coverage; missing causal evidence is UNKNOWN/veto, never zero or assumed neutral",
+    "explicit_completion": "Native completed flag or separately audited official final-bar semantics; elapsed wall time alone does not complete a candle",
+    "gaps": "Maintain expected period ledger per venue/symbol/interval; missing, unsorted, partial or discontinuous prefix yields DATA_UNAVAILABLE; no forward-filled OHLCV",
+    "known_at": "available_ms is actual causal knowledge time, never rewritten to bar close; durable_ms is separate",
+    "out_of_order": "Buffer bounded only while restoring complete as-of prefix; no backdated newly actionable state",
+    "revisions": "Append new immutable revision and receipt identity with original availability. Do not alter a prior decision. Explicitly version revised/cancelled opportunity and preserve prior view.",
+    "source_loss": "Persist SOURCE_BLOCKED/DATA_UNAVAILABLE, retain history; no account/order/notification side effects",
+    "timestamps": "Positive integer UTC milliseconds, paired monotonic epoch and uncertainty evidence for future native use"
+  },
+  "source_release_gate": {
+    "acceptance": {
+      "availability": "At least 99.5% expected qualified closes durably available within 300s; every missing/late period produces explicit non-actionable state. Percentage never permits acting on a bad bar.",
+      "benchmark": "Predeclared seed/workload/hardware/storage, repeated low-rate/coincident-close/backfill/slow-disk/contention/crash runs; report p50/p95/p99/max, counts, loss, duplicates and CPU/disk",
+      "close_to_decision": "<= 300s after completed native close with explicit causal availability; processing SLA is not a human response deadline",
+      "correctness": "Zero fabricated bars, unresolved duplicate decisions, symbol/interval/unit mismatches or silently filled gaps; verify native completed flags and OHLCV against independently auditable source receipts",
+      "durability": "Every admitted receipt charged/committed exactly once; decision, prefix, watermark and snapshot transactionally bound; crash at each commit boundary cannot lose/duplicate admissions",
+      "receipt_to_durable": "p99 <= 2s, max <= 10s on declared hardware/filesystem with counts/repeats and injected stalls",
+      "recovery": "<= 300s after source return, subject to complete prefix, integrity and backfill caps; no signals from unresolved catch-up",
+      "safety": "Queue exhaustion, disk/quota failure, wall discontinuity, bad TLS, denial, integrity mismatch or stale/missing period hard-stop/withhold new review states"
+    },
+    "gate_version": "LOW_RATE_CLOSED_BAR_V1",
+    "high_rate_exclusion_proof": [
+      "allowlisted active src has no PublicTransport/PublicEngine/selector/bridge acquisition modules",
+      "quant entrypoint exposes offline swing commands only",
+      "frozen source guard references outside import path"
+    ],
+    "historical_M1B": "PARTIAL_MULTIPLE remains; sustained150/s and checkpoint failures not reclassified",
+    "independent_live_dependencies": [
+      "new source-specific genuine signed grant",
+      "venue/access eligibility",
+      "reviewed correct official endpoints and units",
+      "native source evidence within permitted windows",
+      "no reuse or extension of old grants",
+      "no local synthetic qualification promotion"
+    ],
+    "measurement_window": "At least seven calendar days of independently audited qualified native close events per symbol/timeframe; maintenance and denial remain in the declared denominator",
+    "retained_invariants": {
+      "BBO_queue_hard_stop": 128,
+      "TLS_CERT_REQUIRED_and_hostname": true,
+      "fail_closed": true,
+      "per_frame_durable_accounting": true,
+      "source_time_integrity": true,
+      "sticky_wall_discontinuity_ms": 50
+    },
+    "source_qualified": false,
+    "status": "FROZEN_SPEC_NOT_SOURCE_QUALIFIED",
+    "supersedes_only": "NEW swing release acceptance when old sustained BBO/high-rate components are outside the active critical path",
+    "synthetic_microbenchmark": "audit/low_rate_microbenchmark_final.json; engineering contract/store timing only, bound to final code hashes",
+    "workload": {
+      "150_per_second_required": false,
+      "BBO_required": false,
+      "coincident_close_burst_bars": 9,
+      "if_BBO_retained": "Original 128 queue, sticky 50ms wall stop, durable per-frame accounting and TLS stay binding; low-rate bars do not waive its source-specific acceptance",
+      "normal_arrivals": "3 completed 1H bars/hour, plus 3 completed 4H bars/4h and 3 completed 1D bars/day",
+      "resumption_burst_cap_bars": 4096,
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "timeframes": [
+        "1H",
+        "4H",
+        "1D"
+      ]
+    }
+  },
+  "state_model": "active_project/contracts/state_model.json",
+  "storage_replay_recovery": {
+    "LT_A_implemented": "Append-only swing_decisions, UNIQUE(symbol,trigger), synchronous FULL, digest check, idempotent identical replay, rejection of revisions and stale decisions",
+    "LT_B_remaining": "Atomic receipt/prefix/watermark/decision transactions, revision-aware source store, immutable snapshot publication with temp+fsync+replace+directory fsync, crash reconciliation",
+    "crash_tests": [
+      "before receipt commit",
+      "after receipt before decision",
+      "during watermark update",
+      "during snapshot rename",
+      "during revision/cancellation",
+      "disk full",
+      "concurrent writer"
+    ],
+    "replay": "Same persisted input prefix, product/config identity and decision clocks => identical decision digest; replay cannot touch private APIs or grants",
+    "restart": "Load last committed watermark/digest, verify prior decisions and source epoch, reconcile orphan temp files without discarding evidence; remain blocked until prefix and clocks requalify",
+    "retention": "New runtime cache: >=400 daily bars and >=90 days of 1H/4H bars per qualified symbol, plus ex-ante opportunity lifecycle. Preserve referenced receipts and all historical negative/sealed evidence indefinitely. Any future cache retention action is separately scoped and audited.",
+    "reuse": "Existing standard-library SQLite and local immutable JSON/HTML patterns; no default streaming-stack/asyncio rewrite",
+    "storage_limits": "Predeclare byte/inode limits and reserve per source; stop admission before overflow; never purge historical evidence to create space"
+  },
+  "target_pipeline": [
+    "qualified completed 1H/4H/1D candles",
+    "source correctness and causal availability",
+    "1D+4H regime",
+    "existing S1 trend_pullback",
+    "preobservable structural stop/targets and buffers",
+    "post-cost risk gate",
+    "human scheduled review lifecycle",
+    "existing local snapshot/dashboard renderer"
+  ]
+}

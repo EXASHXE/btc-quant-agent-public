@@ -1,0 +1,11 @@
+{
+  "F_Controller_decision": "ACCEPT_OFFLINE_QUALIFICATION_ENGINEERING_SCOPED_HOST_CLOCK_BLOCKED",
+  "F_Controller_receipt_sha256": "2105c03b1e063eabdcffb367156be0819293a9ee16f7fd4221762be387aff5cb",
+  "application_wheel": "quant_advisory_platform-0.7.0.post2-py3-none-any.whl",
+  "canonical_schema_sha256": "dfc1b30b3fd1400bec2b9dd178d6a059b09962aba774db3d2e9a806a2594e029",
+  "live_native_promotion_pin_installed": false,
+  "native_qualifications": false,
+  "schema": "G_REUSE_ACCEPTED_F_V1",
+  "source_sha256": "033e2bbf5544e42e33b7fbd9264f382947234c02c5d7c31e6330d8604ed20ab5",
+  "wheel_sha256": "f1461b11e72048f8140b1243195f68857af9a338bd527d20c2c36da09ccbb830"
+}

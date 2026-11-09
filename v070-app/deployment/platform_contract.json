@@ -1,0 +1,14 @@
+{
+  "schema": "G_PORTABLE_HOST_CONTRACT_V1",
+  "python_implementation": "CPython",
+  "python_version": "3.13.13",
+  "system": "Linux",
+  "machine": "x86_64",
+  "libc": "glibc",
+  "minimum_glibc": "2.39",
+  "filesystem_free_bytes_minimum": 268435456,
+  "clock_observation_seconds": 30,
+  "native_clock_policy": {"sticky_step_ms": 50, "uncertainty_ms": 100, "probe_age_seconds": 300, "refresh_seconds": 120},
+  "qualification": "Independent genuine host evidence required; compatibility or synthetic QA does not qualify a host",
+  "supported_scope": "Conservative Linux x86_64/glibc>=2.39/CPython3.13.13 wheelhouse profile; other ABI requires separately verified artifacts and tests. WSL is not automatically qualified."
+}
