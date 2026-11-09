@@ -4,11 +4,15 @@
 **Canonical documents:** GitHub [docs/engineering](https://github.com/EXASHXE/btc-quant-agent-public/tree/docs/engineering).
 **Status:** product plan ACTIVE; latest engineering deliveries have differing acceptance levels. This handoff page is the single preferred startup index for new conversations.
 
+> **NEW OWNER RULE — 2026-11-09:** Subsequent work is **PROMPT FIRST**. Without fresh explicit Owner approval for the exact action, no Codex/Gemini worker dispatch, test/script execution, live source scan, Feishu send, OS change, deployment, code edit, GitHub update or scheduled task. Previous standing offline authority is superseded. This document-only update was specifically requested.
+>
+> **CURRENT Q0 SNAPSHOT (2026-11-09 16:48 +08:00):** Q0A/B/C worker processes completed (exit 0), no Codex worker was active. Q0A: 67 PASS / 11 SKIP, SHA 54/54; native timeout 120,021.7979ms **exceeds** 120s; 45 out-of-scope parent `.pyc` files, unchanged 332 original O code hashes. Q0B: worker 100 PASS, independent 209/209 manifest hashes; Q0C: worker 37 PASS, independent 24/24 digest hashes. Q0B/C tests not independently rerun and **formal 0-C acceptances pending**. Current real Source/MTF/Feishu/Shadow remain unqualified.
+
 ## 1. Start here
 
 | Conversation | Role | New-chat bootstrap |
 | --- | --- | --- |
-| **Controller 0-C** | Sole engineering dispatcher, Controller acceptance, bounded execution and integration | **[Open full 0-C new-chat prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0.md)** |
+| **Controller 0-C** | Sole engineering dispatcher, Controller acceptance, bounded execution and integration | **[Open CURRENT 0-C new-chat prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0_POST_DELIVERY_READONLY.md)** |
 | **Strategic Advisor 1-A** | Independent Owner-facing architecture, quant-science and release challenger; not a second worker dispatcher | **[Open full 1-A new-chat prompt](../../prompts/v0.7/V070_NEW_CHAT_1A_20261109_Q0.md)** |
 
 Copy the complete relevant Markdown prompt into a *new* conversation. The new-chat prompts link back to this home and mandate checking later evidence before asserting unchanged status. Existing 2026-11-02 prompts are historical, not current Q0 starting points.
@@ -59,7 +63,7 @@ These are **public-safe unintegrated review exports**, not the canonical applica
 | Program S Windows handoff | 26 Windows, 11 WSL, 672 O tests; 1195 QPC samples over 120.025s; 14 fabricated TLS requests | Controller decision **2026-11-09 08:03 UTC: offline historical audit only**; current Source blocked |
 | Q0B intraday MTF | Worker claims 100 offline pytest with fixtures, 1H/15m WATCH/READY, 3/10/50 budgeting | **Pending independent 0-C review and integration** |
 | Q0C Feishu outbox | Worker delivered SQLite durable MOCK adapter, guarded notifications and examples | **Pending independent 0-C review; no real Feishu transport** |
-| Q0A Windows Source closure | S blockers remain; no accepted successor located at this snapshot | **Incomplete** |
+| Q0A Windows Source closure | Worker completed but strict native 120s deadline and present/source/NTFS gates fail | **SOURCE_BLOCKED; acceptance pending** |
 
 **Global:** SOURCE_QUALIFIED=false; SHADOW_QUALIFIED=false; ECONOMICALLY_VALIDATED=false; current real market advisory/alert=NOT READY; ACCOUNT_UNKNOWN/ACCOUNT_VETO. No real trading/positions/orders.
 
