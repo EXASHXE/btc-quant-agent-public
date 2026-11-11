@@ -6,6 +6,14 @@
 
 **Scope:** Binance USD-M USDT perpetual read-only; target **2–12h**, 1D context / 4H regime / 1H WATCH setup / completed 15m ENTRY_READY / 5m and quote actionability. Notify a human who may act in 5–10 minutes. Start 3 symbols, then >=10 liquid symbols. No account integration or auto-orders. Never claim positive Alpha without qualified prospective evidence.
 
+## Post-snapshot M0 Controller recheck — 2026-11-11 (local, no stage acceptance)
+
+**Newest local evidence, rechecked at ~22:54 UTC+8:** `lt-q0bc-positive-semantic-proof-01/continuation-01/` supersedes the earlier provenance-blocked worker snapshot. Controller-installed OFFLINE_MOCK approval document, trusted pins, and binding match their expected hashes; this is a truthful current Owner/Controller relay, **not** a cryptographic copy of the original Owner chat. Original execution XML shows **13/13 native semantic PASS, 13/13 real hard-exit PASS, 9 additional valid adversarial PASS**, plus **one preserved FAIL with invalid stale-4H precondition**. A separate source-valid 16→32 1H-window refetch test reaches PLAN_CONFLICT with no extra Outbox. Existing 125 Q0BC V2 + 112 Q0B + 37 Q0C + 5 authority-negative receipts were reused.
+
+**0-C M0 decision: `NEEDS_SPECIFIC_FIX`, not ACCEPT.** The independent non-author Q0R acceptance is still missing. An attempted read-only local Gemini CLI invocation returned **exit 41** (noninteractive authentication required) before the review began; do not label it dispatched, reviewed or passed. The read-only audit task is prepared at `lt-q0r-independent-acceptance-01/Q0R_REVIEW_PROMPT.md`; the local Controller decision is `controller-decisions/V070_M0_Q0R_POSITIVE_SEMANTIC_CONTROLLER_DECISION_20261111.json`. The next action is an authenticated Gemini Argon non-author Q0R review, then **one** 0-C scoped stage decision. No new Owner approval is needed for routine L0 synthetic tests.
+
+**Narrow contract decisions (interpretation only; no source/schema change):** native Q0B can consider quotes up to 60s, but actionable Q0BC eligibility/dispatch must use ≤30s and a ≤1s current gate; Q0F M1 pre-send must revalidate freshness independently. The R1.1 economics event-validator `allocation_status` overlay is a reproduced schema-only defect; the `evaluation_policy_status == OWNER_APPROVED` correction requires a separately versioned event/adapter pin activation before M1 interface promotion, with no silent alias or plan rekey. Runtime OwnerPolicyRegistry remains enforced. **SOURCE_BLOCKED; SOURCE_QUALIFIED=false; SHADOW_QUALIFIED=false; ECONOMICALLY_VALIDATED=false.** No real data, Feishu, account access or orders.
+
 ## Start here
 
 - [Latest independent review & accelerated MVP roadmap](V070_GEMINI_PREFLIGHT_REVIEW_AND_FAST_MVP_PLAN_20261111.md)
