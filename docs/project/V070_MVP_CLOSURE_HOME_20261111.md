@@ -1,5 +1,7 @@
 # Quant v0.7.0 — MVP Closure Home | 2026-11-11
 
+> **Current 1-A:** [1-A Independent Strategic Advisor](../roles/V070_CHATGPT_1A_STRATEGIC_ADVISOR.md) · [1-A New Chat](../../prompts/v0.7/V070_NEW_CHAT_1A_20261111_MVP_CLOSURE.md). **Required for all roles:** [Prompt Copy Card Standard](V070_PROMPT_COPY_CARD_STANDARD_20261111.md).
+
 **Canonical documentation branch:** docs/engineering. **Owner directive:** prioritize an operational multi-symbol read-only monitor; ChatGPT/0-C plans and accepts, Codex/Gemini execute ordinary offline engineering without repeated case-by-case requests. [Execution delegation](V070_EXECUTION_DELEGATION_POLICY_20261111.md) **supersedes** the 2026-11-09 prompt-only restriction for routine offline work.
 
 **Scope:** Binance USD-M USDT perpetual read-only; target **2–12h**, 1D context / 4H regime / 1H WATCH setup / completed 15m ENTRY_READY / 5m and quote actionability. Notify a human who may act in 5–10 minutes. Start 3 symbols, then >=10 liquid symbols. No account integration or auto-orders. Never claim positive Alpha without qualified prospective evidence.

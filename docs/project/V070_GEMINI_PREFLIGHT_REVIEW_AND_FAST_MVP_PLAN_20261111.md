@@ -1,5 +1,7 @@
 # Quant v0.7.0 — Gemini Three-Report Audit & Accelerated MVP Integration Plan
 
+> **Prompt output convention:** All Owner-facing future task/new-chat prompts use [the v0.7.0 universal full-text Copy Card](V070_PROMPT_COPY_CARD_STANDARD_20261111.md); agent task proposals are not execution evidence.
+
 **Review date:** 2026-11-11. **Status:** PLANNING / READ-ONLY EVIDENCE RECONCILIATION. **Owner priority:** fast first usable 2–12h read-only monitoring MVP, not further proliferation of control layers.
 
 **Controlling workflow:** [lean delegated execution](V070_EXECUTION_DELEGATION_POLICY_20261111.md); [MVP closure home](V070_MVP_CLOSURE_HOME_20261111.md).

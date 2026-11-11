@@ -1,5 +1,7 @@
 # Quant v0.7.0 — Active Role Matrix / MVP Acceleration (2026-11-11)
 
+> **Mandatory for every role producing prompts:** [v0.7.0 Prompt Copy Cards](../project/V070_PROMPT_COPY_CARD_STANDARD_20261111.md). Each complete task or new-chat prompt must be provided in a compact Owner-facing card with a real one-click **复制完整 Prompt** control. This includes both 0-C and 1-A, plus any other ChatGPT role drafting Codex/Gemini/Claude prompts.
+
 **Controlling role matrix:** [MVP Closure Home](../project/V070_MVP_CLOSURE_HOME_20261111.md); [Execution Delegation](../project/V070_EXECUTION_DELEGATION_POLICY_20261111.md); [0-C Role](V070_CONTROLLER_0C_ROLE_20261111.md); [New 0-C Startup](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261111_MVP_CLOSURE.md).
 
 | Actor | Accountable for | Routine delegated autonomy | Genuine external/financial boundary |

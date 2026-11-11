@@ -1,5 +1,7 @@
 # Quant v0.7.0 — New Conversation Start (2026-11-11)
 
+> **1-A updated (2026-11-11):** [Open the NEW 1-A startup prompt](../../prompts/v0.7/V070_NEW_CHAT_1A_20261111_MVP_CLOSURE.md). Older Nov09 1-A startup is a historical snapshot. Any generated prompt must be presented as a [copy-button card](V070_PROMPT_COPY_CARD_STANDARD_20261111.md).
+
 **[MVP Closure Home / current status](V070_MVP_CLOSURE_HOME_20261111.md)** is the authoritative starting page. Previous 2026-11-09 Q0 and 2026-11-02 Conversation Starters are historical for current workflow.
 
 **[New Controller 0-C — full startup prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261111_MVP_CLOSURE.md)**: delegated routine offline planning/dispatch, Codex implementation, Gemini independent audit, 0-C scoped acceptance and integrated MVP gates.

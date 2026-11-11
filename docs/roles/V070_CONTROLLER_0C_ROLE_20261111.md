@@ -1,5 +1,7 @@
 # Quant v0.7.0 — Controller 0-C | MVP Delivery Role (2026-11-11)
 
+> **Owner-facing Prompt UI:** [project-wide Copy Full Prompt cards](../project/V070_PROMPT_COPY_CARD_STANDARD_20261111.md). Every generated task, audit or new-chat prompt gets its own compact card with one real working button copying the entire exact prompt; no truncated/pseudo-copy controls.
+
 **Current controlling 0-C contract.** [MVP Closure Home](../project/V070_MVP_CLOSURE_HOME_20261111.md) · [Delegated Execution](../project/V070_EXECUTION_DELEGATION_POLICY_20261111.md) · [New-chat prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261111_MVP_CLOSURE.md).
 
 ## Role
