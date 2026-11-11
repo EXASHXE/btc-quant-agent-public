@@ -1,12 +1,13 @@
-# Quant v0.7.0 — New Conversation Start / 2026-11-09 Q0
+# Quant v0.7.0 — New Conversation Start (2026-11-11)
 
-**Authoritative starting page:** [Quant v0.7.0 Handoff Home](V070_HANDOFF_HOME_20261109.md).
+**[MVP Closure Home / current status](V070_MVP_CLOSURE_HOME_20261111.md)** is the authoritative starting page. Previous 2026-11-09 Q0 and 2026-11-02 Conversation Starters are historical for current workflow.
 
-- **[New Controller 0-C — full startup prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0.md)**: sole engineering dispatcher and independent acceptance authority, especially newly delivered Q0B MTF and Q0C Feishu outbox, Program S offline-only Source closure.
-- **[New 1-A Independent Strategic Advisor — full startup prompt](../../prompts/v0.7/V070_NEW_CHAT_1A_20261109_Q0.md)**: independent architecture/product/science challenger, no Codex dispatch or real data permissions.
+**[New Controller 0-C — full startup prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261111_MVP_CLOSURE.md)**: delegated routine offline planning/dispatch, Codex implementation, Gemini independent audit, 0-C scoped acceptance and integrated MVP gates.
 
-Read [current evidence](V070_STATUS_AND_WORKPACKAGES_20261109_Q0.md), [new roadmap](V070_MULTISYMBOL_MTF_FEISHU_ROADMAP_20261109.md) and [active roles](../roles/V070_ACTIVE_ROLE_MATRIX_20261109.md) before using either prompt.
+**[Independent 1-A Strategic Advisor](../../prompts/v0.7/V070_NEW_CHAT_1A_20261109_Q0.md)**: product, architecture and economic research challenger. Read [latest role matrix](../roles/V070_ACTIVE_ROLE_MATRIX_20261111.md) and [Gemini three-report review](V070_GEMINI_PREFLIGHT_REVIEW_AND_FAST_MVP_PLAN_20261111.md) before using its historical 2026-11-09 startup text.
 
-Current Owner product objective: bounded real multi-symbol 2–12h crypto opportunities using 4H market state, completed 1H setup, completed 15m entry confirmation, fresh 5m/quote validation and real Feishu notification after separately verified channel authorization, with 5–10min manual response. No automated orders.
+Product: Binance USD-M read-only 2–12h; 1D context / 4H regime / 1H WATCH / 15m closed entry confirmation / 5m fresh quote; 3 symbols → >=10; 5–10min human response; Feishu, forward Shadow and no autonomous trading.
 
-Current evidence is not live-ready. S Windows handoff accepted offline historical audit only; Q0B and Q0C worker-delivered pending 0-C independent acceptance; Source and Shadow strict qualification false, C economically insufficient. Do not use old 2026-11-02 Session04 start prompts as controlling Q0 stage instructions.
+**Updated Owner workflow:** Routine offline work and docs/test/agent dispatch are delegated to 0-C without per-task reapproval. Genuine real public Source and Feishu channel need a one-time externally scoped authorization; account/financial/privileged operations remain separately gated. Read [execution policy](V070_EXECUTION_DELEGATION_POLICY_20261111.md).
+
+Current: Q0BC delivered with remedial fix and non-seamed positive semantic chain still unexecuted; Source remains unqualified; Gemini Q0A2/Q0F/M2 preflight reports prepared, not implemented end-to-end. No real Feishu or qualified Shadow/Alpha.

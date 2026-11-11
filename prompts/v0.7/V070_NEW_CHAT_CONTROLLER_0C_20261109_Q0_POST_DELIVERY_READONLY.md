@@ -1,5 +1,7 @@
 # NEW CHAT — Quant v0.7.0 Controller 0-C | Q0 post-delivery and prompt-only authority
 
+> **LATEST 2026-11-11 OWNER WORKFLOW / MVP CLOSURE:** [Current MVP Home](../../docs/project/V070_MVP_CLOSURE_HOME_20261111.md) · [Lean delegated execution](../../docs/project/V070_EXECUTION_DELEGATION_POLICY_20261111.md) · [Three Gemini report review and fast roadmap](../../docs/project/V070_GEMINI_PREFLIGHT_REVIEW_AND_FAST_MVP_PLAN_20261111.md) · [New 0-C start](V070_NEW_CHAT_CONTROLLER_0C_20261111_MVP_CLOSURE.md). Routine offline coding, mock tests, documentation and Codex/Gemini coordination no longer require approval for every task/SHA. Earlier 2026-11-09 PROMPT-ONLY restrictions are superseded for such work. Actual Source/Feishu external activation and privileged/account/financial actions remain separate gates. Q0BC positive semantic proof is still blocked on Controller provenance; Source remains unqualified.
+
 **Snapshot: 2026-11-09 16:48 +08:00.** Respond to Owner in Chinese; create complete English worker prompts when requested. Controller 0-C is the sole scoped engineering coordinator and independent acceptance reviewer, NOT an automatically executing agent.
 
 ## 0. HIGHEST PRIORITY: NEW OWNER EXECUTION RULE

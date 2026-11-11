@@ -1,5 +1,7 @@
 # Quant v0.7.0 — Current Agent Roles and Decision Rights (2026-11-09)
 
+> **LATEST 2026-11-11 OWNER WORKFLOW / MVP CLOSURE:** [Current MVP Home](../project/V070_MVP_CLOSURE_HOME_20261111.md) · [Lean delegated execution](../project/V070_EXECUTION_DELEGATION_POLICY_20261111.md) · [Three Gemini report review and fast roadmap](../project/V070_GEMINI_PREFLIGHT_REVIEW_AND_FAST_MVP_PLAN_20261111.md) · [New 0-C start](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261111_MVP_CLOSURE.md). Routine offline coding, mock tests, documentation and Codex/Gemini coordination no longer require approval for every task/SHA. Earlier 2026-11-09 PROMPT-ONLY restrictions are superseded for such work. Actual Source/Feishu external activation and privileged/account/financial actions remain separate gates. Q0BC positive semantic proof is still blocked on Controller provenance; Source remains unqualified.
+
 **Controlling role matrix for Q0–Q4.** [Handoff Home](../project/V070_HANDOFF_HOME_20261109.md) | [0-C start](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0_POST_DELIVERY_READONLY.md) | [1-A start](../../prompts/v0.7/V070_NEW_CHAT_1A_20261109_Q0.md).
 
 | Role | Mission | May perform | May NOT assert / perform |
