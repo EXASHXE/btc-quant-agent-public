@@ -6,6 +6,14 @@
 
 **Scope:** Binance USD-M USDT perpetual read-only; target **2–12h**, 1D context / 4H regime / 1H WATCH setup / completed 15m ENTRY_READY / 5m and quote actionability. Notify a human who may act in 5–10 minutes. Start 3 symbols, then >=10 liquid symbols. No account integration or auto-orders. Never claim positive Alpha without qualified prospective evidence.
 
+## Q0F scoped acceptance — 2026-11-12 (after pre-send narrow fix)
+
+**Controller 0-C outcome: `ACCEPT_OFFLINE_SCOPED` for Q0F Custom Bot adapter, OFFLINE_MOCK only; previous Q0F `NEEDS_SPECIFIC_FIX` superseded.** Local Controller record: `controller-decisions/V070_Q0F_FEISHU_ADAPTER_OFFLINE_CONTROLLER_ACCEPTANCE_20261112.json`. Read-only check of supplied original records, no new tests and no agent dispatch.
+
+The `q0f_adapter/coordinator.py` post-signature gate validation previously depended on the optional `after_envelope` test hook. The worker added new no-hook slow signing and generation mutation tests; original `runs/pre_fix_repro.xml` confirms **7 failures / 8 passes**, post-fix `runs/post_fix_t1_t6.xml` confirms **15/15 passes**, full `runs/pytest_results.xml` confirms **107/107 passes**, 50 mapped logical cases, including seven hard-exit test executions (five unique crash scenarios). Controller inspected the narrow patch: `p.validate_pre_send(attempt_id)` is now unconditional after envelope construction and before Mock send; failed revalidation returns zero-call LOCAL_GATE FAILED, retryable=0. Three synthetic Mock accepted demonstration events and truthful NO_SETUP 3/10; M1 Q0BC/contract/vendor/source copies remain byte-identical; the new isolated Q0F demo does not require copying `e2e/app.py`.
+
+**Accepted only:** Feishu Card 2.0 shape, ephemeral test signing, safe credentials/response mapping, conservative notification limits, one canonical Producer/Outbox, mock transport and tests. **Not accepted:** real Feishu webhook, authorized destination/secrets, production human delivery/read, real performance SLO, R1.2 live ledger/channel or operating permission. Live adapter remains disabled; `SOURCE_BLOCKED=true`, `SOURCE_QUALIFIED=false`, `SHADOW_QUALIFIED=false`, `ECONOMICALLY_VALIDATED=false`, no Alpha/trading. Native Q0A2 Source is still `FIXED_OFFLINE_SUBSET` only and blocks M2. The next implementation priority is Source ownership, supervisor, trustworthy UTC/retention and finite five-timeframe live interface; only Owner manually dispatches worker prompts.
+
 ## Parallel W1/W2 review — 2026-11-12
 
 **Controller local read-only review:** `controller-decisions/V070_Q0A2_Q0F_PARALLEL_REVIEW_20261112.json`. No tests re-run and **no subsequent worker dispatched**.
