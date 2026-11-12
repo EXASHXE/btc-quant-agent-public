@@ -1,3 +1,5 @@
+> **2026-11-13 superseding policy:** [Gemini 4 Hydrogen conditional primary + Argon/Opus audit triage](V070_GEMINI4_HYDROGEN_EXECUTOR_MIGRATION_AND_AUDIT_TRIAGE_20261113.md). Owner prefers Hydrogen; it is **not shown in current Antigravity CLI model listing**, so Gemini 3.8 Flash remains the active fallback until an actual Hydrogen availability + local offline smoke receipt. This file is historical.
+
 # Quant v0.7.0 — Temporary Gemini Flash Primary Engineering Executor (2026-11-12)
 
 **Owner-directed temporary substitution**: Due to Codex usage-limit exhaustion, **Gemini 3.8 Flash** becomes the PRIMARY LOCAL L0 ENGINEERING IMPLEMENTER while Codex is unavailable. This does **not** change the architecture, Owner's MVP product goals, Controller 0-C acceptance authority, live-data rights, or any scientific qualification. When the exact Gemini 3.8 Flash selection is unavailable, record the actual model used and do not mislabel the executor.
