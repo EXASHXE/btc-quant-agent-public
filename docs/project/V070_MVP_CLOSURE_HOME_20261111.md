@@ -6,6 +6,20 @@
 
 **Scope:** Binance USD-M USDT perpetual read-only; target **2–12h**, 1D context / 4H regime / 1H WATCH setup / completed 15m ENTRY_READY / 5m and quote actionability. Notify a human who may act in 5–10 minutes. Start 3 symbols, then >=10 liquid symbols. No account integration or auto-orders. Never claim positive Alpha without qualified prospective evidence.
 
+## Q0A4 Source-to-E1 offline bridge review — 2026-11-12
+
+**Controller 0-C decision: `NEEDS_SPECIFIC_FIX`**, not an offline acceptance. Receipt: `controller-decisions/V070_Q0A4_OFFLINE_BRIDGE_CONTROLLER_REVIEW_20261112.json`. Gemini Flash/DeepCoder author report confirms original WSL 30/30 and Windows 29/30 with 1 honest `jsonschema` skip, 23-request/26-weight synthetic two-stage plan, three native Q0B→Q0BC `WATCH→ENTRY_READY` chains into one Mock Outbox on WSL; no genuine HTTP or Feishu. These positive receipts are preserved and do not prove that Source admission fails closed.
+
+**Independently reproduced adverse counterexamples (all offline and network-disabled):**
+1. Modify the synthetic `exchangeInfo` response HTTP status to **429** while leaving valid JSON: `collect_historical_stage` nevertheless seals Stage 1.
+2. Modify BTCUSDT `exchangeInfo.symbols[]` status to **BREAK**: Stage 1 nevertheless seals the synthetic history without checking the accepted `win_capture.capture.metadata()` instrument eligibility.
+3. Set BTCUSDT `bookTicker` HTTP status to **503** with valid quote body: Stage 2, `SnapshotFinalizer`, and `FiveTfE1Adapter` all accept and label the payload `SYNTHETIC_SOURCE_VALID`.
+4. Supply a duck-typed transport that has `qa=None` and no offline provenance (but delegates to in-memory fixture `get()`): Stage 1 accepts it. This is an L0 authority-type restriction gap; no actual live transport was invoked.
+
+**Required narrow correction:** make source response admission strict **before** persistence/use (status exactly integer 200, JSON content type and complete body, per-response size/digest/identity and explicit offline origin); validate `exchangeInfo` symbols as active USDT-M PERPETUAL contracts; enforce exact authorized `SyntheticReplayTransportV2` or a closed immutable offline transport allowlist before any call; add fail-first independent G31+ negative tests for all scenarios. Preserve Q0A3 code and the two-stage finalizer/native E1/Outbox implementation where compatible. Avoid unnecessary refactoring or historical test reruns.
+
+**Status remains:** `SOURCE_BLOCKED=true`, `SOURCE_QUALIFIED=false`, `SHADOW_QUALIFIED=false`, `ECONOMICALLY_VALIDATED=false`, no real market requests/Feishu/trading; no L1 source pilot. Owner will manually forward one narrowed Gemini Flash correction prompt; none dispatched in this review.
+
 ## Q0A3 Source fixed-offline acceptance and temporary executor — 2026-11-12
 
 **Controller 0-C: `ACCEPT_FIXED_OFFLINE_SUBSET`**, read-only inspected original Codex Q0A3 and Gemini Flash continuation receipts and code. Local decision: `controller-decisions/V070_Q0A3_SOURCE_FIXED_OFFLINE_CONTROLLER_ACCEPTANCE_20261112.json`. Review qualifier: **CONTROLLER_REVIEWED / INDEPENDENT_AGENT_AUDIT_PENDING** (no separate Argon author-independent test report yet). Original M0/M1/Q0F acceptances remain unaffected.
