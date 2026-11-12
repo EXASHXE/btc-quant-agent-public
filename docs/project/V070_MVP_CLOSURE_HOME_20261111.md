@@ -6,6 +6,14 @@
 
 **Scope:** Binance USD-M USDT perpetual read-only; target **2–12h**, 1D context / 4H regime / 1H WATCH setup / completed 15m ENTRY_READY / 5m and quote actionability. Notify a human who may act in 5–10 minutes. Start 3 symbols, then >=10 liquid symbols. No account integration or auto-orders. Never claim positive Alpha without qualified prospective evidence.
 
+## Parallel W1/W2 review — 2026-11-12
+
+**Controller local read-only review:** `controller-decisions/V070_Q0A2_Q0F_PARALLEL_REVIEW_20261112.json`. No tests re-run and **no subsequent worker dispatched**.
+
+- **W1 Q0A2:** `ACCEPT_FIXED_OFFLINE_SUBSET_NOT_SOURCE_QUALIFIED`. Local receipts: Windows 46 PASS/1 SKIP, WSL 80 PASS/19 SKIP, 6/6 synthetic process cases on each, Windows whole-process deadline 121393.3ms →115623.1ms (120s offline goal). Q0A2 hardlink/SQLite/leaf/journal custody, real supervisor/kernel I/O wedge, live five-TF+quote shape, independent current UTC/retention, and current rights/source provenance remain **STILL_BLOCKED**. No real market requests or cache cleanup. **SOURCE_BLOCKED=true** persists.
+- **W2 Q0F Gemini Flash:** original `runs/pytest_results.xml` has 92 PASS, no failures or skips (44 requirement-mapped logical cases, 5 actual subprocess crash cases), 3 Mock acceptances, one Q0BC Outbox and no live transport. Controller found one **static reproducible test gap** before scoped acceptance: `q0f_adapter/coordinator.py` checks `p.validate_pre_send(attempt_id)` **after signing/envelope build only inside `if after_envelope:` test-hook condition** (lines 343–367). Without the hook, signing-secret fetch may overrun the <=1s current gate yet `transport.send` executes (line 377). Controller verdict `NEEDS_SPECIFIC_FIX` (narrow unconditional post-envelope/pre-transport gate recheck + no-hook slow signing tests); not an observed real message leak or live send. The existing 92 tests remain genuine but do not close this specific boundary.
+- **Next workers:** Owner manually dispatches narrow Q0F Flash fix and independent Q0A2 Source native ownership/supervisor closure. **M2 real pilot is NOT READY**. Preserve `SHADOW_QUALIFIED=false`, `ECONOMICALLY_VALIDATED=false`, no Alpha or trading.
+
 ## M1 scoped acceptance — 2026-11-12 (current)
 
 **Controller decision: `ACCEPT_OFFLINE_SCOPED` — M1 2030 synthetic three-symbol E2E ONLY.** Local decision record: `controller-decisions/V070_M1_THREE_SYMBOL_SYNTHETIC_E2E_CONTROLLER_ACCEPTANCE_20261112.json`. Owner shared Codex handoff; 0-C independently inspected existing 61-case JUnit XML and exit 0, eight actual os._exit(77) case receipts and verified all eight evidence hashes, SQLite in immutable read-only mode, source-copy manifest and the narrow Q0BC diff. **No new tests were run, no subsequent agents were dispatched.**
