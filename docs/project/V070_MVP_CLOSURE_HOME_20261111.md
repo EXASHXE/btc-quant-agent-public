@@ -6,6 +6,16 @@
 
 **Scope:** Binance USD-M USDT perpetual read-only; target **2–12h**, 1D context / 4H regime / 1H WATCH setup / completed 15m ENTRY_READY / 5m and quote actionability. Notify a human who may act in 5–10 minutes. Start 3 symbols, then >=10 liquid symbols. No account integration or auto-orders. Never claim positive Alpha without qualified prospective evidence.
 
+## Q0A3 Source fixed-offline acceptance and temporary executor — 2026-11-12
+
+**Controller 0-C: `ACCEPT_FIXED_OFFLINE_SUBSET`**, read-only inspected original Codex Q0A3 and Gemini Flash continuation receipts and code. Local decision: `controller-decisions/V070_Q0A3_SOURCE_FIXED_OFFLINE_CONTROLLER_ACCEPTANCE_20261112.json`. Review qualifier: **CONTROLLER_REVIEWED / INDEPENDENT_AGENT_AUDIT_PENDING** (no separate Argon author-independent test report yet). Original M0/M1/Q0F acceptances remain unaffected.
+
+- Q0A3 Codex native Windows unit **23 PASS / 1 SKIP**, WSL **15 PASS / 9 SKIP**; actual Windows Source CLI **9/9**, WSL **8/8**; Windows 120s full-process raw fault observed **115602.3 / 115650.5ms**, no claim of uninterruptible kernel I/O bound. NTFS→WSL synthetic preserved original bytes.
+- Gemini Flash continuation completed **three previously missing artifacts** `STATUS.json`, `SOURCE_REVIEW.patch`, `evidence/COMMANDS.json`; new independent-platform *author* reconciliation units Windows **5/5**, WSL **5/5**, 20-file review patch (1664 additions / 96 removals). No real market requests, Feishu sends or source-authority changes.
+- Accepted narrow engineering: native NTFS file capability/DACL and SQLite image custody within threat model, actual CLI supervisor integration, isolated synthetic 2030 E1 five-timeframe/quote ingest and Source compatibility. **Public live Source is still not ready**: old collector is legacy 1D=80/4H=100 and partial 4H, while Q0B E1 needs five completed intervals <=64 and authentic bookTicker. Live 21-request route/weight/causality bridge, rights/region, independent UTC and original <=24h retention and current actionability are **not** qualified.
+- Temporary primary local L0 implementer is **Gemini 3.8 Flash** while Codex quota is unavailable; 0-C controls scope and acceptance, optional Gemini 4 Argon non-author audit. [Temporary Executor Policy](V070_TEMP_GEMINI_FLASH_EXECUTOR_POLICY_20261112.md). Next candidate: **Q0A4 isolated OFFLINE_2030 five-TF+bookTicker source-to-E1 bridge**; ensure real HTTP stays disabled. Follow Owner's manual worker prompt-forwarding preference; no dispatch in this Controller review.
+- Mandatory flags remain `SOURCE_BLOCKED=true`, `SOURCE_QUALIFIED=false`, `SHADOW_QUALIFIED=false`, `ECONOMICALLY_VALIDATED=false`, `ALPHA_CLAIMED=false`, `execution_authority=false`, `REAL_FEISHU_SEND=false`. M2 real pilot is **NOT READY** and L1 first real data/send scopes remain independently bounded decisions.
+
 ## Q0F scoped acceptance — 2026-11-12 (after pre-send narrow fix)
 
 **Controller 0-C outcome: `ACCEPT_OFFLINE_SCOPED` for Q0F Custom Bot adapter, OFFLINE_MOCK only; previous Q0F `NEEDS_SPECIFIC_FIX` superseded.** Local Controller record: `controller-decisions/V070_Q0F_FEISHU_ADAPTER_OFFLINE_CONTROLLER_ACCEPTANCE_20261112.json`. Read-only check of supplied original records, no new tests and no agent dispatch.
