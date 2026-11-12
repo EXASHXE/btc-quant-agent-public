@@ -6,6 +6,14 @@
 
 **Scope:** Binance USD-M USDT perpetual read-only; target **2–12h**, 1D context / 4H regime / 1H WATCH setup / completed 15m ENTRY_READY / 5m and quote actionability. Notify a human who may act in 5–10 minutes. Start 3 symbols, then >=10 liquid symbols. No account integration or auto-orders. Never claim positive Alpha without qualified prospective evidence.
 
+## Post-Flash single Argon / Opus allocation — 2026-11-13
+
+**Controller latest verified baseline:** Q0A4 `ACCEPT_OFFLINE_SCOPED` already recorded in `V070_Q0A4_SOURCE_E1_OFFLINE_CONTROLLER_ACCEPTANCE_20261113.json`; **additional independent Argon audit is PENDING**, not a missing initial Controller acceptance. Author receipts: WSL 64/64 PASS; native Windows 61 PASS / 3 SKIP (`jsonschema` missing for G29/F15/C14 Producer SQLite). Exact Q0A4 stable implementation recorded in `controller-decisions/V070_POST_FLASH_STRONG_MODEL_ALLOCATION_20261113.json`. No active relevant Agent or live market call observed at review.
+
+**Next one action:** Owner manually forwards focused `V070-Q0A4-R1-R5-INDEPENDENT-AUDIT-01` full prompt to the **one remaining Gemini Argon** non-author review. 0-C triages specific reproducible findings; Gemini 3.8 Flash executes only narrow confirmed L0 fixes if needed. **Reserve one Opus 5.5** run for `V070-OPUS55-M2-READINESS-CRITICAL-ARCHITECTURE-01` after Argon and stable Controller decision; Opus read-only audits M0/M1/Q0F/Q0A3/Q0A4 actual code and receipts. Do not spend either model on repetitive authorization documentation. [Full allocation policy](V070_POST_FLASH_STRONG_MODEL_REVIEW_SEQUENCE_20261113.md).
+
+Source `SOURCE_BLOCKED=true`, `SOURCE_QUALIFIED=false`, `SHADOW_QUALIFIED=false`, `ECONOMICALLY_VALIDATED=false`. Real three-symbol M2 pilot remains **NO-GO** without independent source rights/region/UTC/retention/observer and a separately authorized, still-disabled live Feishu R1.2 channel. Windows `jsonschema` gap is a separate disposable-offline-native dependency engineering task, not reason to undo Q0A4 synthetic acceptance. No worker dispatched.
+
 ## Q0A4 five-TF offline Source→E1 scoped acceptance — 2026-11-13
 
 **Controller 0-C: `ACCEPT_OFFLINE_SCOPED`**, supersedes previous Q0A4 `NEEDS_SPECIFIC_FIX` notices for R1–R5. Local decision: `controller-decisions/V070_Q0A4_SOURCE_E1_OFFLINE_CONTROLLER_ACCEPTANCE_20261113.json`. Review qualifier: `CONTROLLER_REVIEWED / INDEPENDENT_AGENT_AUDIT_PENDING`. Verified original Gemini 3.8 Flash R5 receipts **7 PASS / 9 FAIL pre-fix**, **16/16 PASS post-fix**, Q0A4 combined author WSL **64/64 PASS**, native Windows **61 PASS / 3 SKIP** due to missing `jsonschema` on Windows Python 3.14 (`G29`, `F15`, `C14` Producer persist; Windows NTFS custody and Q0B Engine did run). Author regressions were not rerun by Controller.
