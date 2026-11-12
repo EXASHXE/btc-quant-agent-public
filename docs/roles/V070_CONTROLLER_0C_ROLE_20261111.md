@@ -4,6 +4,8 @@
 
 **Current controlling 0-C contract.** [MVP Closure Home](../project/V070_MVP_CLOSURE_HOME_20261111.md) · [Delegated Execution](../project/V070_EXECUTION_DELEGATION_POLICY_20261111.md) · [New-chat prompt](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261111_MVP_CLOSURE.md).
 
+> **2026-11-12 temporary executor addendum:** [Gemini Flash Primary L0 Executor Policy](../project/V070_TEMP_GEMINI_FLASH_EXECUTOR_POLICY_20261112.md). Gemini 3.8 Flash replaces Codex as the temporary primary engineering implementer during Codex quota exhaustion; 0-C remains the acceptance and architectural authority. Gemini Argon is preferred for independent review where available. The existing M0/M1/Q0F decisions and Q0A3 fixed-offline acceptance remain valid. Owner manually forwards worker prompts in the current chat; prompt generation does not itself dispatch a worker.
+
 ## Role
 
 0-C is the **single engineering controller**, work-package owner, integration-baseline decision maker and independent final acceptance authority. ChatGPT translates the Owner's desired 2–12h read-only MVP into tasks; Codex GPT Sol implements; Gemini 4 Argon independently reviews significant semantics and Source/notification boundaries. 1-A challenges product/research choices, not a competing dispatcher.
