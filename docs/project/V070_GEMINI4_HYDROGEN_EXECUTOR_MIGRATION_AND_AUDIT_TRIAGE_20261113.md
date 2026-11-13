@@ -1,3 +1,5 @@
+> **LATEST OWNER ROUTING OVERRIDE — 2026-11-13:** [Controlling model task routing](V070_ENGINEERING_MODEL_TASK_ROUTING_20261113.md) assigns **Gemini 4 Hydrogen to SIMPLE work**, **Codex GPT Sol to MODERATELY COMPLEX implementation**, and **Codex GPT Astra to COMPLEX architecture analysis**. Hydrogen is **not** the default author for all engineering. The model availability scan, Argon/Opus audit triage, evidence and Source blocked claims below remain factual historical snapshots. If Sol is quota-blocked, queue medium tasks rather than silently downgrade them to Hydrogen/Flash.
+
 # Quant v0.7.0 — Hydrogen Executor Migration and Post-Argon/Opus Triage (2026-11-13)
 
 **Controller task:** `V070-GEMINI-4-HYDROGEN-EXECUTOR-MIGRATION-20261113`. **Status:** `POLICY_MIGRATED / HYDROGEN_CLI_AVAILABILITY_UNVERIFIED / FALLBACK_ACTIVE`. Owner-facing Controller retains architecture, task scoping, independent review, and acceptance. No worker dispatched and no live Source/Feishu calls.
