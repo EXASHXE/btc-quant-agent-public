@@ -33,27 +33,31 @@ Read-only Binance USDT-M USDT-perpetual 2–12h opportunity monitor, human-only 
 1D background → 4H regime → completed 1H WATCH setup → completed 15m confirmation → 5m/fresh quote actionability → one canonical Q0BC Outbox → future Feishu human alert (human may respond in 5–10 min).
 Start BTC/ETH/SOL, then >=10 qualified liquid symbols. Require usable post-confirmation entry/SL/TP, obstacle and after-cost R, quote/spread/fee/slippage/funding, no-chase/expiration, NO_SETUP vs SOURCE_BLOCKED, H5/H10 truth. No account access, trading keys, orders or auto-trading. Alpha not proven.
 
-## Reconcile latest evidence before assigning
+## Latest evidence and first critical path (2026-11-13)
 
-Check current original workspaces, Controller decisions, locks, author logs, independent findings and source:
-- controller-decisions/V070_M0_Q0R_OFFLINE_SCOPED_ACCEPTANCE_20261112.json
-- controller-decisions/V070_M1_THREE_SYMBOL_SYNTHETIC_E2E_CONTROLLER_ACCEPTANCE_20261112.json
-- controller-decisions/V070_Q0F_FEISHU_ADAPTER_OFFLINE_CONTROLLER_ACCEPTANCE_20261112.json
-- controller-decisions/V070_Q0A3_SOURCE_FIXED_OFFLINE_CONTROLLER_ACCEPTANCE_20261112.json
-- controller-decisions/V070_GEMINI4_HYDROGEN_EXECUTOR_MIGRATION_AND_AUDIT_TRIAGE_20261113.json, if present.
-- lt-q0a4-source-e1-readiness-offline-01/ current code, STATUS.json and reports.
+**Read [Q0A5 G2/G3 FIX-01 project progress](https://github.com/EXASHXE/btc-quant-agent-public/blob/docs/engineering/docs/project/V070_Q0A5_G2G3_FIX01_PROGRESS_20261113.md) first.** This supersedes the older pending-Q0A4-FIX03 and original Q0A5 Controller-findings descriptions in this startup contract. Verify original local Controller decisions, code, locks, JUnit, Shadow/Outbox DB and newer receipts before making claims.
 
-As of the Nov13 triage: M0, M1 and Q0F Controller ACCEPT_OFFLINE_SCOPED; Q0A3 ACCEPT_FIXED_OFFLINE_SUBSET. Q0A4 historical ACCEPT_OFFLINE_SCOPED does not establish safe M2 reliance after new Argon F-01 ledger/raw-evidence consistency and F-02 cross-stage clock offset-intersection findings. Windows native three Producer tests were skipped because jsonschema was unavailable. This snapshot may have been superseded; verify first.
+Relevant local paths:
+- `controller-decisions/V070_Q0A4_FIX03_SOURCE_EVIDENCE_CONTROLLER_ACCEPTANCE_20261113.json`
+- `controller-decisions/V070_Q0A5_UNIFIED_M2_OFFLINE_CONTROLLER_REVIEW_20261113.json` (**pre-FIX01 Controller review**)
+- `lt-q0a5-m2-unified-offline-01/STATUS.json` (latest worker recommendation)
+- `lt-q0a5-m2-unified-offline-01/reports/OWNER_HANDOFF_FIX01_ZH.md`
+- `lt-q0a5-m2-unified-offline-01/reports/G2G3_FAIL_FIRST_EVIDENCE.md`
+- `lt-q0a5-m2-unified-offline-01/reports/Q0A5_G2G3_CONTROLLER_FINDINGS.md`
+- `lt-q0a5-m2-unified-offline-01/runs/wsl_pytest_fix01.xml`, `runs/post_fix_g2g3_controller_cases.xml`, `runs/g2g3_fix01_wsl.json`
 
-## Routing and immediate critical path
+Current evidence: M0, M1, Q0F accepted offline; Q0A3 accepted fixed-offline subset; Q0A4 FIX03 accepted scoped offline. Q0A5's unified offline engineering exists; its previous Controller review identified C01–C03. **FIX-01 has been implemented by a worker** (reported Gemini 4 Hydrogen High, exact slug UNKNOWN): immutable scheduled slots, deterministic closed-15m cycle IDs, and Producer-owned Outbox expiry. Its receipts: **10 pre-fix failed / 1 passed; 12 targeted post-fix passed; 28/28 WSL full passed; 6 Windows passed / 22 skipped**. M1 mock regression and unified demo EXIT 0.
 
-FIRST: inspect concrete residual Source integrity defect, ask Astra for design analysis **only if unresolved architecture decisions truly require it**, otherwise route the narrow Source ledger/clock code and adversarial integration fix to **Sol** (moderate). Hydrogen may implement synthetic fixture generators, test inventory, documentation or mechanical bounded tasks not altering any Source-trust semantics. Respect Codex quota: mark PENDING_CAPACITY if Sol cannot run.
+**There is no observed 0-C post-FIX01 acceptance decision.** Current truth is `PASS_G2G3_FIX_PENDING_CONTROLLER_ACCEPTANCE`, G1 Windows native environment BLOCKED, full Q0A5 offline NOT ACCEPTED. Do not claim that the pre-fix `NEEDS_SPECIFIC_G2_G3_FIX` decision proves the new worker changes still fail.
 
-THEN: Controller skeptical independent review and one scoped decision with authentic tests and negative cases. Do not claim Q0A4 acceptance based on worker PASS alone. Native Windows Producer evidence should be completed without changing assertions or treating SKIP as PASS.
+### 0-C first action — scoped independent review, not new implementation
 
-NEXT: unified offline Q0A4→Q0BC→Q0F→Shadow one-run E2E; independently isolate global vs per-symbol faults; verify queue rate/freshness at 1 msg/s, 1-second snapshot gate, 30-second quote, UNKNOWN no blind resend, one Outbox and truthful denominator. These are Sol-tier engineering, with Astra design on actual new hard architecture questions.
-
-THEN: disabled, versioned M2 live Source/Feishu contract preparation, minimum authorized finite pilot plan with separately scoped L1 decisions. M3 >=10 symbols only after real prospective Source and provider qualification. Factor Registry/Strategy Lab stays post-MVP.
+1. Inspect the actual FIX-01 diff and current source: `e2e/shadow.py`, `win_capture/e1_five_tf_bridge.py`, `q0bc_v2/producer.py`, `q0f_adapter/scheduler.py`; compare with preserved M1/FIX03 baselines.
+2. Verify C01 missing-slot roster/count and contradictory slot protections; C02 replay idempotency and exact closed-15m identity; C03 Producer-owned expiration, transaction rollback, owner generation, TTL, attempted/UNKNOWN no-retry and idempotent audit. Use existing original fail-first and after-fix receipts, plus the minimum fresh offline independent cases needed.
+3. State whether `ACCEPT_G2G3_OFFLINE_SCOPED` or `NEEDS_SPECIFIC_FIX` is supported, with exact counterexample if not. Record a truthful Controller decision; do not self-sign workers.
+4. Keep G1 blocked until Windows 3.14 compatible offline `jsonschema` dependency and WAL tests run on **real local NTFS**, not unsupported `\\wsl.localhost` 9p. The 22 skips are not passes. Route genuine moderate cross-platform engineering to Sol when available, Hydrogen only simple preparatory work, Astra design analysis only when warranted.
+5. Reconcile full Q0A5 L0 stage, one canonical Q0BC Outbox, 1 msg/s + 1s snapshot + 30s book quote, 24/40 budget, truthful 2-accepted/1-expired mock burst and disabled R1.2. No live public Source or Feishu.
+6. Only after offline readiness and separate rights/clock/retention & Feishu destination gates, seek bounded Owner L1 decisions for genuine M2 finite pilot. Preserve all scientific/source flags.
 
 ## Required worker prompt contract
 
