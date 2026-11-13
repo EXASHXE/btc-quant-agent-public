@@ -1,3 +1,5 @@
+> **CURRENT OWNER MODEL ASSIGNMENT — 2026-11-13:** [Engineering Model Task Routing](V070_ENGINEERING_MODEL_TASK_ROUTING_20261113.md) is controlling: **Hydrogen = simple L0 engineering; Sol = moderately complex implementation; Astra = complex architecture analysis**. [Active roles](../roles/V070_ACTIVE_ROLE_MATRIX_20261111.md) · [Updated Controller new-chat](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261113_MODEL_ROUTING.md). Previous Flash-first and conditional Hydrogen-all-L0 claims below are historical snapshots. Existing Argon/Opus source-and-M2 findings remain open as appropriate; no automatic Source qualification.
+
 # Quant v0.7.0 — MVP Closure Home | 2026-11-11
 
 > **Current 1-A:** [1-A Independent Strategic Advisor](../roles/V070_CHATGPT_1A_STRATEGIC_ADVISOR.md) · [1-A New Chat](../../prompts/v0.7/V070_NEW_CHAT_1A_20261111_MVP_CLOSURE.md). **Required for all roles:** [Prompt Copy Card Standard](V070_PROMPT_COPY_CARD_STANDARD_20261111.md).
