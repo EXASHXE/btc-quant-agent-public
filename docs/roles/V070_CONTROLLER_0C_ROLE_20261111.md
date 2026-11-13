@@ -17,22 +17,26 @@ This supersedes former temporary policies that assigned all L0 engineering prima
 
 A worker is not its own independent reviewer and cannot sign Controller acceptance. Sol quota exhaustion is not an invitation to silently give its high-risk engineering scope to Hydrogen/Flash.
 
-## Project mission and accepted baseline
+## Project mission and latest evidence (2026-11-13)
 
-Binance USDT-M read-only, 2–12h intended holds; 1D context, 4H regime, completed 1H WATCH, completed 15m confirmation, completed 5m/fresh quote actionability; Feishu alerts for a human responding in 5–10 minutes; first 3 symbols then >=10 qualified liquid symbols. No private accounts, orders or autonomous trading.
+Binance USDT-M read-only, 2–12h intended holds; 1D context, 4H regime, completed 1H WATCH, completed 15m trigger, fresh 5m/quote actionability; 5–10-minute human response to eventual Feishu; 3 symbols then >=10 eligible liquid symbols. No private accounts, orders, automatic trading or demonstrated Alpha.
 
-Latest Nov13 triage documents:
-- M0 Q0BC/Q0R: ACCEPT_OFFLINE_SCOPED; M1 three-symbol synthetic E2E: ACCEPT_OFFLINE_SCOPED (61/61); Q0F adapter: ACCEPT_OFFLINE_SCOPED (107/107); Q0A3: ACCEPT_FIXED_OFFLINE_SUBSET.
-- Q0A4: historical ACCEPT_OFFLINE_SCOPED, but new Argon Source-ledger/resealed-bundle and clock-bracket findings restrict its M2 readiness; do not say Q0A4 is fully safe/qualified solely based on older acceptance. Original author WSL 64/64 and Windows 61 PASS/3 SKIP remain historical facts, not new independent test executions.
-- Real Source/Feishu/Shadow/economic Alpha: still unqualified. Preserve Program O/S accepted scope, Program C negative findings, protected history and FINAL_HOLDOUT.
+Evidence hierarchy: actual original tests and current code → independent/falsifying review → Controller stage record. A worker's `PASS` is not 0-C acceptance.
 
-## Critical path and division of labor
+- M0 Q0BC/Q0R: `ACCEPT_OFFLINE_SCOPED`; M1 three-symbol E2E: `ACCEPT_OFFLINE_SCOPED` (61/61); Q0F: `ACCEPT_OFFLINE_SCOPED` (107/107); Q0A3: `ACCEPT_FIXED_OFFLINE_SUBSET`.
+- Q0A4 FIX03: Controller `ACCEPT_OFFLINE_SCOPED_FIX03` in `controller-decisions/V070_Q0A4_FIX03_SOURCE_EVIDENCE_CONTROLLER_ACCEPTANCE_20261113.json`; this closes the original Argon ledger/clock concerns for a bounded offline scope only, never real Source.
+- Q0A5 G0/G2/G3/G4 original work exists. **Current newest worker delivery:** `V070-Q0A5-G2G3-SHADOW-CYCLE-OUTBOX-OWNERSHIP-FIX-01` fixes Shadow scheduled roster (C01), stable closed-15m cycle identity (C02), and Producer-owned expiration (C03). WSL fail-first 10 FAIL/1 PASS, targeted 12/12 PASS, full 28/28 PASS; Windows native 6 PASS/22 SKIP. M1/regression and unified mock demos EXIT 0.
+- **Latest 0-C Q0A5 decision is older** `ACCEPT_PARTIAL_L0_WORK / NEEDS_SPECIFIC_G2_G3_FIX / WINDOWS_NATIVE_BLOCKED` (`controller-decisions/V070_Q0A5_UNIFIED_M2_OFFLINE_CONTROLLER_REVIEW_20261113.json`). Do **not** interpret it as a post-fix decision; **no new post-FIX01 Controller acceptance was found**. Latest worker `STATUS.json` correctly says `PASS_G2G3_FIX_PENDING_CONTROLLER_ACCEPTANCE`.
+- G1 genuine native Windows Producer/Outbox/Shadow: blocked by missing offline `jsonschema` wheelhouse and unsupported SQLite WAL locking on `\\wsl.localhost` 9p UNC. Do not count 22 SKIPs as PASS.
 
-1. Reconcile latest local code, Controller decisions, prior Argon/Opus text/findings and original receipts. Establish the one actual P0 trust/correctness gap. Do not repeat accepted M0/M1/Q0F implementation.
-2. **Moderate / Sol when available:** narrow Q0A4 ledger/raw-response/source-clock integrity correction, independent falsification tests, then Windows Producer dependency and unified native synthetic Q0A4→Q0BC→Q0F→Shadow validation.
-3. **Simple / Hydrogen if available:** isolated test fixture generation, docs/runbook, small nonsemantic tests, mechanical changes. Never give Hydrogen the actual Source trust-boundary correction unless task is reclassified on compelling evidence and review independently justifies it.
-4. **Complex / Astra when available:** architecture analysis for cross-module Source trust, M2 finite-pilot reliability, failure/timeout/notification design, economics/causality. Ask for design options and measurable falsifiers, not a competing implementation queue.
-5. After genuine engineering fixes and validation, prepare disabled M2 real Source and Feishu interfaces, each with separate one-time L1 operating decision; M3 >=10 symbols only after finite pilot evidence. Defer full Factor Registry/Strategy Lab.
+[Current Q0A5 progress and exact receipts](../project/V070_Q0A5_G2G3_FIX01_PROGRESS_20261113.md).
+
+## Immediate 0-C critical path
+
+1. **NOW — post-FIX01 decision (Controller read-only + justified independent offline tests):** inspect exact implementation and patch (C01/C02/C03), original before/after JUnit and SQLite/cycle artifacts. Challenge missing scheduled slot, replay identity, contradictory observation, TTL/owner-generation and expiration crash/idempotency/UNKNOWN. Issue `ACCEPT_G2G3_OFFLINE_SCOPED` or `NEEDS_SPECIFIC_FIX` with one reproducer. Never self-sign based on worker summary.
+2. **NEXT — Windows G1 native parity:** construct a legitimate compatible **offline** Python 3.14 `jsonschema` environment and a real NTFS-local workspace (not 9p/UNC) if permitted. Actually execute skipped Producer/SQLite WAL tests; avoid editing assertions to force green or pretending this environment is already ready. 0-C can delegate simple dependency inventory to Hydrogen, and genuine moderately complex cross-OS integration to Sol when available.
+3. **THEN — Q0A5 full L0 bounded review:** unified Q0A4 FIX03 → Q0B → Q0BC single Outbox → Q0F Mock → isolated Shadow/HTML, 3-symbol/source quote-time cause, 1 msg/s burst, fresh 1s snapshot/30s quote and 24/40 budget. Preserve `2 mock accepted + 1 expired` truthful case; never stretch TTL, blind-retry UNKNOWN or activate disabled R1.2 to force acceptance.
+4. **LATER — M2 finite real pilot readiness and M3 >=10:** only after genuinely qualified Source rights/time/retention and distinct one-time bounded L1 public Source and Feishu scopes. Astra for complex architecture questions, Sol for moderate integration, Hydrogen only simple scope. Do not repeat accepted baselines as an approval ritual.
 
 ## Task quality and Owner workflow
 
