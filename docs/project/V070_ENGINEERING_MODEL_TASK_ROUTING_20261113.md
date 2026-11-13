@@ -45,17 +45,22 @@ For L0-M/L0-X add adversarial cases covering causality, 120-second combined run 
 
 All Owner-visible generated prompts remain subject to the [working full-text Copy Prompt card standard](V070_PROMPT_COPY_CARD_STANDARD_20261111.md), including complete untruncated payload and truthful NOT DISPATCHED state where appropriate.
 
-## 5. Current project state and critical path
+## 5. Current project state and critical path — latest 2026-11-13 FIX-01
 
-Reconcile latest local Controller decisions before every material assignment. At the 2026-11-13 triage snapshot:
+[Q0A5 G2/G3 progress and primary evidence](V070_Q0A5_G2G3_FIX01_PROGRESS_20261113.md) is the active stage report. Earlier pre-FIX03 Q0A4 and initial Q0A5 planning snapshots are historical; do not route an already completed FIX03 again.
 
-- M0 Q0BC positive semantics, M1 three-symbol synthetic E2E and Q0F adapter: Controller **ACCEPT_OFFLINE_SCOPED**. Q0A3: **ACCEPT_FIXED_OFFLINE_SUBSET**.
-- Q0A4 had historical **ACCEPT_OFFLINE_SCOPED**, subsequently restricted for M2 reliance due to **Argon F-01 ledger/raw response rederivation** and **F-02 cross-stage bracket intersection** concerns. Original author 64/64 WSL and 61 PASS/3 SKIP Windows are preserved; they do not dismiss new independent findings.
-- First needed correction is a task **routed to Sol as L0-M** for real code changes involving Source trust. Astra reviews the design only if 0-C identifies a genuine architectural choice; Hydrogen may do preparatory fixtures, test inventory or mechanical verification only.
-- Subsequent L0-M: finish native Windows three Producer skips without weakening coverage; E1 per-symbol exception isolation; unified Q0A4→Q0BC→Q0F→Shadow synthetic offline validation; fresh-gate/1 msg/s queue-drain behavior. Complex cross-module M2 architecture decisions go to Astra.
-- No automatic new Argon/Opus opportunity. Reuse reviewed findings with independent proof, not duplicate audits.
+- M0 Q0BC/Q0R, M1 three-symbol E2E and Q0F Mock have Controller `ACCEPT_OFFLINE_SCOPED`; Q0A3 `ACCEPT_FIXED_OFFLINE_SUBSET`; Q0A4 FIX03 `ACCEPT_OFFLINE_SCOPED_FIX03`. All are limited offline scopes.
+- Q0A5 unified three-symbol offline runner exists; original Controller decision `ACCEPT_PARTIAL_L0_WORK / NEEDS_SPECIFIC_G2_G3_FIX / WINDOWS_NATIVE_BLOCKED` was issued **before** the latest correction.
+- **FIX-01 engineering delivered:** C01 independent `SCAN_SLOT_SCHEDULED` Shadow denominator, C02 stable closed-bar-derived `cycle_id`, C03 Producer-authoritative expiration (no scheduler direct `UPDATE outbox`). Worker: fail-first 10 FAIL/1 PASS, targeted post-fix 12/12 PASS, WSL full 28/28 PASS, M1 EXIT 0, unified mock demo EXIT 0. Windows native 6 PASS/22 SKIP. The worker UI self-reports `Gemini 4 Hydrogen (High)` but the underlying exact model ID is unverified.
+- **Current stage state:** `PASS_G2G3_FIX_PENDING_CONTROLLER_ACCEPTANCE`. A fresh post-FIX01 0-C decision was not found when docs were updated. Worker PASS must not become automatic acceptance.
+- **G1 remains BLOCKED:** 16 Windows tests skip for missing offline `jsonschema` wheels, six more skip because SQLite WAL on `\\wsl.localhost` UNC/9p is unsupported. Verify on Windows-local NTFS with proper offline dependencies; do not count skips as pass.
+- Full Q0A5 L0 approval, genuine Source and Feishu L1, qualified Shadow/economic results are not established. Argon Q0A4 and Opus M2 reports were already consumed for their audit scopes; do not invent fresh capacity.
 
-**Invariant status:** SOURCE_BLOCKED=true; SOURCE_QUALIFIED=false; SHADOW_QUALIFIED=false; ECONOMICALLY_VALIDATED=false; ALPHA_CLAIMED=false; execution_authority=false; REAL_FEISHU_SEND=false. No authorized live source, private accounts or orders from this change. Protected history and FINAL_HOLDOUT remain restricted.
+**Next 0-C priority** is a scoped skeptical post-FIX01 review of C01/C02/C03 actual code and JUnit/SQLite evidence with replay, missing-slot, transactional crash, owner-generation, TTL and UNKNOWN falsifiers. Then finish native Windows G1 parity and the full unified offline Controller stage decision. This is primarily a **Controller acceptance task**, not another broad engineering rewrite.
+
+**Future task distribution remains:** Hydrogen SIMPLE bounded work; Sol MODERATELY COMPLEX integration, Source and Producer corrections; Astra COMPLEX architecture analysis if there is a real system-design dispute. The past FIX-01 reported Hydrogen authorship is factual, but does not override future complexity routing. Preserve one P0 work queue.
+
+**Invariant status:** SOURCE_BLOCKED=true; SOURCE_QUALIFIED=false; SHADOW_QUALIFIED=false; ECONOMICALLY_VALIDATED=false; ALPHA_CLAIMED=false; execution_authority=false; REAL_FEISHU_SEND=false. No public market/Feishu access or account/trade authority follows from these tests.
 
 ## 6. Delegation, boundaries and handoff
 
@@ -63,4 +68,4 @@ Owner's 2026-11-11 L0 delegated offline coding/test authority remains active for
 
 Separate bounded L1 Owner decisions are required for first real public market Source operating envelope and first real Feishu destination/secret/send. L2 privileged, private/account, destructive, financial and protected-history actions remain explicitly gated. No autonomous trading.
 
-**Next 0-C action:** reconcile local Argon/Opus findings and any newer Q0A4 Controller acceptance; classify the smallest remaining ledger/clock trust correction as L0-M; provide a detailed **Sol** prompt if available, otherwise mark PENDING_CAPACITY while routing only safe preparatory L0-S work to **Hydrogen** after actual availability verification. Escalate any cross-module redesign decision to **Astra**.
+**Next 0-C action:** independently review the Q0A5 G2/G3 FIX-01 worker deliverable and issue a new scoped Controller decision from actual code/tests, preserving Windows G1 BLOCKED. Then route Windows-local NTFS/offline dependency engineering to Sol where moderate, with Hydrogen limited to simple preparatory checks; Astra remains architecture lead when a genuine hard design choice arises.
