@@ -21,16 +21,17 @@ Binance USDT-M read-only, 2–12h intended holds, 1D context → 4H regime → c
 
 Review opportunity quality: WATCH timing, premature 4H veto, missed trend starts, false breakouts, post-confirmation entry/stop/TP, actual obstacle and fee-after-cost R, spread/slippage/funding, quote expiration, NO_SETUP vs SOURCE_BLOCKED, H5/H10 actionability and Shadow denominators.
 
-## Evidence baseline — always recheck
+## Evidence baseline — current latest handoff (recheck before use)
 
-- M0 Q0BC/Q0R and M1 3-symbol synthetic integrated flow have Controller ACCEPT_OFFLINE_SCOPED; Q0F mock provider ACCEPT_OFFLINE_SCOPED; Q0A3 Source native custody ACCEPT_FIXED_OFFLINE_SUBSET.
-- Q0A4 historical Controller ACCEPT_OFFLINE_SCOPED is **not** real Source qualification. Latest November 13 Argon/Opus triage raises new ledger/raw response rederivation and cross-stage clock bracket intersection concerns, so M2 reliance remains restricted until specific corrections and review. Worker WSL 64/64, Windows 61 PASS / 3 SKIP do not automatically dismiss the new findings.
-- Gemini 4 Hydrogen was absent from the previous local Antigravity CLI model listing; distinguish Owner's selected model role from actual local executable availability.
-- The latest Argon/Opus review opportunities are recorded as used in triage, not assumed still available.
-- SOURCE_BLOCKED=true, SOURCE_QUALIFIED=false, SHADOW_QUALIFIED=false, ECONOMICALLY_VALIDATED=false, ALPHA_CLAIMED=false, execution_authority=false and REAL_FEISHU_SEND=false until genuine independently authorized proof.
-- Preserve Program O/S scoped acceptance, Program C negative/inconclusive scientific results, protected history and FINAL_HOLDOUT; factor registry (69 definitions / 28 strategy entries) is future research, not established Alpha.
+- M0 Q0BC/Q0R and M1 3-symbol synthetic integrated flow are Controller `ACCEPT_OFFLINE_SCOPED`; Q0F mock provider `ACCEPT_OFFLINE_SCOPED`; Q0A3 Source fixed native custody `ACCEPT_FIXED_OFFLINE_SUBSET`.
+- Q0A4 FIX03 has Controller `ACCEPT_OFFLINE_SCOPED_FIX03` for **offline-only Source evidence**; Argon F01/F02 corrections are no longer the current blocking task. Real source rights, independent UTC, retention and qualified five-TF public ingress remain missing.
+- **Q0A5 G2/G3 Independent Controller Findings FIX-01 is now worker-complete**: immutable Shadow slot roster/denominator (C01), deterministic closed-15m scan cycle identity (C02), Q0BC Producer-owned Outbox expiration (C03). Before: **10 fail/1 pass**; after: **12/12 targeted, 28/28 WSL**, Windows **6 PASS/22 SKIP**. [Evidence and acceptance boundary](../project/V070_Q0A5_G2G3_FIX01_PROGRESS_20261113.md). The author-reported `Gemini 4 Hydrogen (High)` model slug remains UNKNOWN.
+- **No post-FIX01 Controller acceptance record was available at this update.** Prior Q0A5 Controller decision `NEEDS_SPECIFIC_G2_G3_FIX` is pre-repair. Current Worker status: `PASS_G2G3_FIX_PENDING_CONTROLLER_ACCEPTANCE`. G1 Windows native `jsonschema`/UNC SQLite WAL parity and full Q0A5 offline acceptance remain unresolved.
+- **Next highest-return 1-A recommendation:** 0-C review C01/C02/C03 original code+adversarial evidence and make one scoped decision; then fix G1 Windows native parity; then full M2 offline review; do NOT request live permissions prematurely.
+- Owner forward model routing remains Hydrogen simple, Sol moderate engineering, Astra complex architecture; historical Hydrogen cross-module FIX01 authorship does not silently change the future risk classifier. Prior Argon and Opus review opportunities were already used for their original scopes.
+- SOURCE_BLOCKED=true, SOURCE_QUALIFIED=false, SHADOW_QUALIFIED=false, ECONOMICALLY_VALIDATED=false, ALPHA_CLAIMED=false, execution_authority=false and REAL_FEISHU_SEND=false. Preserve Program O/S scope, negative Program C, protected history, FINAL_HOLDOUT and future-only Factor Registry.
 
-Always identify VERIFIED, AUTHOR_REPORTED, INDEPENDENTLY_REVIEWED, CONTROLLER_ACCEPTED, BLOCKED and UNKNOWN; original local Controller receipts and actual code supersede stale Nov11 summaries.
+Always identify VERIFIED, AUTHOR_REPORTED, INDEPENDENTLY_REVIEWED, CONTROLLER_ACCEPTED, BLOCKED and UNKNOWN. Reuse genuine latest receipts, avoid duplicating already accepted M0/M1/Q0F.
 
 ## Mandate and response contract
 
