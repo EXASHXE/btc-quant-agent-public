@@ -20,9 +20,11 @@
 | **Q0A / Source** | Time, provenance, retention, venue-rights, response admission and fail-closed Source status | No Source qualification from synthetic tests |
 | **Human recipient** | Independent manual trading decision | No orders or account operations by the Quant system |
 
-## Current verified stage scope
+## Current engineering evidence and accountable work
 
-The November 13 [Hydrogen & Argon/Opus triage](../project/V070_GEMINI4_HYDROGEN_EXECUTOR_MIGRATION_AND_AUDIT_TRIAGE_20261113.md) records M0/M1/Q0F scoped offline acceptance, Q0A3 fixed-offline subset, and historical Q0A4 scoped offline acceptance **held for M2 reliance** pending new Source ledger/clock integrity findings. Never present worker test PASS as independent acceptance, or historical acceptance as a new live qualification.
+The [Q0A5 G2/G3 FIX-01 progress report](../project/V070_Q0A5_G2G3_FIX01_PROGRESS_20261113.md) supersedes older planning snapshots for this narrow delivery. M0/M1/Q0F remain Controller `ACCEPT_OFFLINE_SCOPED`, Q0A3 `ACCEPT_FIXED_OFFLINE_SUBSET`; Q0A4 FIX03 is Controller `ACCEPT_OFFLINE_SCOPED_FIX03`. Q0A5's **C01/C02/C03 implementation is complete as a worker deliverable** but remains `PASS_G2G3_FIX_PENDING_CONTROLLER_ACCEPTANCE` (fail-first 10 FAIL/1 PASS, post-fix 12/12, WSL 28/28, Windows 6 PASS/22 SKIP). G1 Windows native dependency/WAL parity remains BLOCKED; full Q0A5/M2 offline Controller acceptance and real M2 Source/Feishu qualifications are NOT established.
+
+**Accountability:** 0-C reviews the Q0A5 `e2e/shadow.py`, `win_capture/e1_five_tf_bridge.py`, `q0bc_v2/producer.py`, `q0f_adapter/scheduler.py` fix and original evidence before issuing a new decision. The FIX-01 worker self-reported **Gemini 4 Hydrogen (High)**, exact model slug UNKNOWN. That historical delivery does **not** reassign future moderately complex Source/Producer work away from **Sol** under the Owner routing. **Hydrogen** continues for simple bounded work; **Astra** for complex architecture analysis.
 
 ## Work allocation rule
 
