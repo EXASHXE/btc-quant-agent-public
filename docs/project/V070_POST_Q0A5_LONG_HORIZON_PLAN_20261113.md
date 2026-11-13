@@ -1,3 +1,11 @@
+## Controller status update — 2026-11-13
+
+**P0 complete:** `ACCEPT_Q0A5_FULL_L0_OFFLINE_SCOPED` (local Controller decision `controller-decisions/V070_Q0A5_FULL_L0_CONTROLLER_CLOSURE_20261113.json`), built on accepted Windows G1 and WSL G2/G3. The long-horizon roadmap below is still the forward plan, but its P0 phase is CLOSED within synthetic three-symbol L0 scope. See [full closure and prioritized P1 clock/source blockers](V070_Q0A5_FULL_L0_CLOSURE_AND_P1_SOURCE_READINESS_20261113.md).
+
+**Next P1:** Source/clock trust. Windows host source observed as Local CMOS Clock with Leap=3/Stratum=0 and strict UTC unqualified; Windows localized `w32tm` decode raises UnicodeDecodeError in `win_clock.py`. Synthetic Windows/WSL semantic parity is not UTC/real public Source qualification. Transport/access/rate/capture/retention designs and two separate L1 authorization envelopes remain open. Hydrogen may handle single-file decode-only L0-S test-led repair; Sol/Astra remain leads for trust/provenance/Outbox semantic changes when capacity available. V3.8 11-case synthetic study and 69/21/7 registry are **proposals only**, not real economic validation.
+
+---
+
 # Quant v0.7.0 — Post-Q0A5 Long-Horizon Roadmap (Controller proposal, 2026-11-13)
 
 > **Status: PROPOSED ROADMAP / PROMPT-ONLY / NO EXECUTOR DISPATCH.**
