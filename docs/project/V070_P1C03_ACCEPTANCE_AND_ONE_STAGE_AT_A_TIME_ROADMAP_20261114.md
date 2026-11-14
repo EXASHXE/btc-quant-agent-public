@@ -1,3 +1,5 @@
+> **LATEST OWNER ROUTING CORRECTION — 2026-11-14:** Cancel Gemini Orchestrator **for future tasks**. Keep the **already assigned P1C04** exactly as originally scoped (**Argon + Hydrogen within that one current task**)—do not stop, restart, or reissue it. From **P1D onward**, use **Hydrogen for simple bounded engineering**, **Sol for complex engineering**, and **Sol Max only for specialist architecture when needed**. Controller 0-C alone performs independent acceptance. One stage per future handoff. The older Orchestrator references below describe the P1C04 exception only and must not be extrapolated to future phases.
+
 # Quant v0.7.0 — P1C03 Scoped Acceptance and One-Stage-At-A-Time Roadmap
 
 **Owner instruction (2026-11-14):** Only assign ONE next phase at a time. Gemini Orchestrator may coordinate **Argon (architecture/validation) + Hydrogen (bounded code/tests)**. Sol remains core-engineering escalation lead; Sol Max remains complex architecture fallback. No worker dispatch by Controller.
