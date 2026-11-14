@@ -1,35 +1,34 @@
-# Quant v0.7.0 — Active Role Matrix (Owner revision 2026-11-13)
+# Quant v0.7.0 — Active Roles and Engineering Accountability (Current 2026-11-14)
 
-**Controlling model assignment:** [Hydrogen simple / Sol moderate / Astra architecture](../project/V070_ENGINEERING_MODEL_TASK_ROUTING_20261113.md). This supersedes the 2026-11-12 temporary Flash-first allocation and the 2026-11-13 conditional Hydrogen-all-L0-primary proposal **for future assignment only**. Historical stage decisions and evidence do not change.
+> **CONTROLLING NOV14 OWNER ROLE RULE:** No future standing Gemini Orchestrator. **Gemini 4 Hydrogen = simple bounded L0 tasks**; **Codex GPT Sol = core, stateful and cross-module engineering**; **Codex GPT Sol Max = specialist architecture/review if required**; **Controller 0-C = sole task queue and acceptance authority**. The earlier Astra complex-analysis designation is historical; no role is reactivated by an old handoff. P1C04's already-executed Argon+Hydrogen implementation remains its original assigned scope, not an authorization for future orchestration.
+>
+> **Current P0:** [P1C04 cross-evidence Controller findings](../project/V070_P1C04_CONTROLLER_FINDINGS_AND_SOL_FIX01_20261114.md). **Full Q0A5 synthetic L0 accepted; P1C04 NOT accepted.** [Current audit and closure roadmap](../project/V070_PROJECT_PROGRESS_AUDIT_AND_CLOSURE_ROADMAP_20261114.md). [MVP home](../project/V070_MVP_CLOSURE_HOME_20261111.md). [0-C new chat](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261114_P1C04_CLOSURE.md) · [1-A new chat](../../prompts/v0.7/V070_NEW_CHAT_1A_20261114_P1C04_CLOSURE.md).
 
-**Mandatory prompt presentation:** [Full-text Copy Prompt Card Standard](../project/V070_PROMPT_COPY_CARD_STANDARD_20261111.md) — working "复制完整 Prompt" control for every Owner-facing new-chat/task/audit prompt, never truncated. [MVP Home](../project/V070_MVP_CLOSURE_HOME_20261111.md) · [Execution Delegation](../project/V070_EXECUTION_DELEGATION_POLICY_20261111.md) · [0-C](V070_CONTROLLER_0C_ROLE_20261111.md) · [Latest new 0-C chat](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261113_MODEL_ROUTING.md).
-
-| Role/model | Primary responsibility | Restrictions / fallback |
+| Role | Accountable work | Limit and proof boundary |
 |---|---|---|
-| **Owner** | Product goal, external L1 and privileged L2 decisions, human trading | No repeated Owner approval for routine L0 SHA/tests/docs |
-| **ChatGPT 0-C (Controller)** | Single engineering queue; classify complexity; assign, integrate, independently scrutinize and accept | Sole final Controller decision authority; no false live/source/Alpha claims |
-| **Gemini 4 Hydrogen — SIMPLE engineering** | Narrow mechanical fixes, docs, deterministic tests and fixtures, low-risk isolated modules | Requires actual local model/tool verification; never independently redesign trust, time, ledger or dispatch |
-| **Codex GPT Sol — MODERATELY COMPLEX engineering** | Multi-file code, Source/Outbox/SQLite/restart contracts, cross-OS and E2E integration | Use when quota available; on quota block mark PENDING_CAPACITY or delegate genuinely simple independent pieces to Hydrogen |
-| **Codex GPT Astra — COMPLEX architecture analysis** | Source trust, causality, high-risk state-machine and system architecture, difficult root-cause/decision tradeoffs | Design and scientific/architecture critique; 0-C chooses, Sol implements and reviewer scrutinizes; no self-acceptance |
-| **Gemini 3.8 Flash** | Backup only for SIMPLE scoped tasks if Hydrogen unavailable | No automatic promotion to Sol/Astra risk class |
-| **Gemini 4 Argon** | Non-author adversarial review when available | Nov13 triage records the Q0A4 review opportunity as used; do not assume new quota |
-| **Claude Opus 5.5** | Independent cross-module M2 review when explicitly available | Nov13 triage records M2 review opportunity as used; treat reports as findings, not acceptance |
-| **ChatGPT 1-A** | Independent strategic/product/quant-research assessment and Owner-facing recommendations | No competing worker dispatch or Controller sign-off |
-| **Q0BC V2** | Sole episode/plan/transition/eligibility/durable Outbox authority | No second Q0C V1 Dispatcher / queue |
-| **Q0F** | Card/transport/response classification; reuse Q0BC authority | Real channel disabled until separate L1 approval; provider ACK is not human read |
-| **Q0A / Source** | Time, provenance, retention, venue-rights, response admission and fail-closed Source status | No Source qualification from synthetic tests |
-| **Human recipient** | Independent manual trading decision | No orders or account operations by the Quant system |
+| **Owner** | Product priorities, separate real Source and Feishu L1 envelopes, privileged/high-impact L2 consent and human trading | Routine L0 tests, mocks, docs and SHA do not need per-action approvals |
+| **Controller 0-C** | Sole engineering dispatcher, model/tier classifier, architecture selection, cross-module baseline, skeptical code/test review and stage acceptance | Never invent Owner consent, Source qualification, Alpha, real delivery or execution permissions |
+| **Gemini 4 Hydrogen** | **SIMPLE** isolated fixtures, deterministic tests, docs, low-risk single-surface engineering | No self-acceptance, no future Orchestrator authority, no core state machine/clock/custody/Outbox changes just because patch is short |
+| **Codex GPT Sol** | **CORE** multi-file stateful work, Source/custody/retention pairing, WAL-native engineering, integration, crash/restart semantics | First next task P1C04 F01/F02 bounded correction; independent 0-C acceptance required |
+| **Codex GPT Sol Max** | Exceptional difficult architecture/provenance and high-risk design review | Specialist advice, not a parallel Controller or automatic worker |
+| **Gemini 4 Argon** | Historical P1C04 architecture/non-author reviews | Original P1C04 assignment remains evidence; **no future standing Gemini Orchestrator** |
+| **Gemini 3.8 Flash** | Optional simple-task fallback when Hydrogen is unavailable | No automatic promotion to Sol-tier work |
+| **ChatGPT 1-A** | Independent strategic/product/quant advisor, evidence-based roadmap, status challenge, full prompt proposals | No competing dispatch, no Controller acceptance or live access |
+| **Q0BC Producer** | Sole Episode/Plan/Eligibility/Transition and canonical durable Outbox writer | No second Q0C V1 dispatcher; Scheduler uses Producer-owned methods |
+| **Source / Custody** | Provenance, clock, bytes/digest/ledger/retention identity, rights and Source admission | Authentic current Source and UTC remain blocked; P1C02 WAL HOLD |
+| **Q0F / Feishu** | Mock card/transport, provider response classification and later opt-in real channel | Real Feishu disabled until its own L1 scope; provider ACK ≠ human read |
+| **Shadow / dashboard** | Independently append-only observations, immutable scan roster and true NO_SETUP denominator | Offline acceptance not forward Source qualification or positive Alpha |
 
-## Current engineering evidence and accountable work
+## Evidence state and one next task
 
-The [Q0A5 G2/G3 FIX-01 progress report](../project/V070_Q0A5_G2G3_FIX01_PROGRESS_20261113.md) supersedes older planning snapshots for this narrow delivery. M0/M1/Q0F remain Controller `ACCEPT_OFFLINE_SCOPED`, Q0A3 `ACCEPT_FIXED_OFFLINE_SUBSET`; Q0A4 FIX03 is Controller `ACCEPT_OFFLINE_SCOPED_FIX03`. Q0A5's **C01/C02/C03 implementation is complete as a worker deliverable** but remains `PASS_G2G3_FIX_PENDING_CONTROLLER_ACCEPTANCE` (fail-first 10 FAIL/1 PASS, post-fix 12/12, WSL 28/28, Windows 6 PASS/22 SKIP). G1 Windows native dependency/WAL parity remains BLOCKED; full Q0A5/M2 offline Controller acceptance and real M2 Source/Feishu qualifications are NOT established.
+- Full **Q0A5 G0–G4 three-symbol synthetic L0** Controller acceptance on 2026-11-13; Windows native 58/58; the old G1 22 SKIPs are no longer the current state.
+- P1A clock decode, P1C01 admission contract and P1C03 simulated retention accepted offline; P1C02 CustodyV2 **software-scoped with WAL hold**.
+- **P1C04 Controller decision 2026-11-14: NEEDS_SPECIFIC_FIX.** Worker Windows 272/272, 0-C WSL 270 PASS/2 Windows-only SKIP do not cover F01 foreign RetentionIndex acceptance or F02 rejected Custody retention side effects / E1 unbound input bytes. F03/F04 reporting issues must be corrected.
+- **SINGLE NEXT SOL TASK:** V070-SOL-P1C04-CROSS_EVIDENCE_BINDING_FIX01. Stop before P1D until independent scoped acceptance.
+- Source/Clock host w32tm last observed unsynchronized (Leap=3/Stratum=0/Local CMOS), no independent authenticated UTC; WAL runtime patch provenance unresolved; real Source 5TF/bookTicker, rights/region and actual Feishu still blocked.
 
-**Accountability:** 0-C reviews the Q0A5 `e2e/shadow.py`, `win_capture/e1_five_tf_bridge.py`, `q0bc_v2/producer.py`, `q0f_adapter/scheduler.py` fix and original evidence before issuing a new decision. The FIX-01 worker self-reported **Gemini 4 Hydrogen (High)**, exact model slug UNKNOWN. That historical delivery does **not** reassign future moderately complex Source/Producer work away from **Sol** under the Owner routing. **Hydrogen** continues for simple bounded work; **Astra** for complex architecture analysis.
+## Shared operating and prompt standards
 
-## Work allocation rule
+All Owner-facing new-chat/task/audit prompts must have a **working 复制完整 Prompt button copying the exact complete prompt** or a complete copyable fenced fallback. [Copy-card standard](../project/V070_PROMPT_COPY_CARD_STANDARD_20261111.md). 0-C L0 delegation is retained: no repetitive Owner SHA/test permissions. Live public Binance and Feishu require **distinct bounded L1** actions, while privileged host/account/protected-history/financial operations require distinct L2 consent. No automated trading.
 
-**Hydrogen = simple, Sol = moderately complex implementation, Astra = complex architecture analysis.** A one-line change to Source trust, retry/UNKNOWN, finance/economic gate, transaction or permission code is NOT simple by line count. 0-C checks blast radius, state-machine authority, causal safety and external dependencies before task routing. Reserve one main P0 critical path; give workers full engineering prompts with measured acceptance and non-author review on high-risk paths.
-
-L0 normal offline delegated engineering remains authorized under the Owner's 2026-11-11 policy. L1 public Binance data and live Feishu setup each require their own bounded Owner decision; L2 protected/privileged/private/account/trading actions remain disabled absent separate explicit authority.
-
-Source and science flags stay fail-closed: SOURCE_BLOCKED=true, SOURCE_QUALIFIED=false, SHADOW_QUALIFIED=false, ECONOMICALLY_VALIDATED=false, ALPHA_CLAIMED=false, execution_authority=false, REAL_FEISHU_SEND=false. Product remains Binance USDT-M read-only, 2–12h, 1D/4H/1H/15m/5m+quote, 3→>=10 symbols; no automatic orders.
+**Immutable flags:** SOURCE_BLOCKED=true; SOURCE_QUALIFIED=false; SHADOW_QUALIFIED=false; ECONOMICALLY_VALIDATED=false; ALPHA_CLAIMED=false; execution_authority=false; REAL_FEISHU_SEND=false.
