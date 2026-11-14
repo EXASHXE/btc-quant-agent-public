@@ -1,0 +1,28 @@
+# Quant v0.7.0 — P1C02 Three-Agent Reconciliation and Sol F02 V2 Work Gate (2026-11-14)
+
+**Controller 0-C decision:** `P1C02_NOT_ACCEPTED_F02_BLOCKED`. Sol's F01/F03 fixes are accepted **only as provisional progress toward final offline acceptance**. The Sol Max ADR-02 is approved only **for isolated synthetic v2 engineering under proof gates**, not as a live Source or production guarantee.
+
+**Local Controller decision:** `controller-decisions/V070_P1C02_THREE_AGENT_RECONCILIATION_20261114.json`.
+
+## Grounded handoffs
+
+- **Sol Max architecture** in `lt-solmax-p1c02-custody-adr02-01/reports/`: five reports including `SOLMAX_P1C02_CUSTODY_ADR02.md`, `SOLMAX_SOL_IMPLEMENTATION_HANDOFF.md`, and F02 12-crash/15-adversarial matrix. Design proposed (A): controlled sealed files on Windows fixed NTFS; controlled store root and prolonged handle custody; v2 SQLite phases T0 reservation, T1 durable pending, T2 single logical publication, final proof/readback before ACK and revalidation for future replay. The alternative stores canonical evidence bytes inside SQLite, but adds raw-retention challenges.
+- **Sol engineering** in `lt-p1c02-sol-controller-fix01/`: F01 recovery diagnostics blocked from replay and F03 foreign Q0A4 stage barred from cross-schema candidate verification. Existing 161 Windows native tests pass; 13 new F01/F03 pass; 4 F02 red assertions still fail on both systems. The former report's missing Astra handoff is superseded by the present **Sol Max**, not Astra, documents.
+- **Hydrogen tests** in `lt-p1c02-hydrogen-negative-tests-01/`: 27-test A/B/C/D suite, 14 GREEN and 13 RED methods (16 failure assertions) on unmodified Hydrogen original source on Windows and WSL. It was not run on Sol source by Hydrogen.
+- **Controller independent crosscheck**: Sol source copied into isolated `/tmp` directory (original untouched), Hydrogen test file and fixtures overlaid, `pytest` WSL returned **24 passed / 7 failed / 6 subtests passed**, 2.47sec, exit1. All F01/F03 and D suite cases were GREEN; only F02 failed: B01, B02, B03 4 expanded subcases, B08 race. Test method count remains 27; pytest expands subtests into 31 result nodes. Windows native not separately rerun by Controller.
+
+## Controller architecture decision and integration boundaries
+
+1. **Adopt Sol Max option A only as an isolated offline v2 engineering target**, not a declaration of trusted end-to-end commit. No in-place destructive schema migration, no changing accepted P1C01/Q0A5/P1A code or evidence. Existing v1 records can be read diagnostically, but may not become v2 trusted Source cycles by a schema label switch.
+2. A synthetic v2 commit must strictly bind capture/boot/epoch/generation/sequence/cycle and actual raw payload/bar digests to an immutable sealed bundle, with T0/PREPARE, T1/PENDING_VERIFICATION, T2/COMMITTED transitions. Cursor, immutable fingerprints and audit chain advance only at final T2 transaction. Neither T1 nor diagnostics grants replay readiness.
+3. **No false external-file/SQLite atomicity claims**. Prove NTFS ownership/pin/share/ACL assumptions on local C: native test with no elevation. If the local environment cannot enforce the design's writer isolation, implement what can be proven, fail closed on detected/ambiguous custody, report native trust gate BLOCKED instead of claiming production-grade security. On WSL use POSIX scratch regression only, no UTC or native NTFS equivalence claims. Every actual replay must inspect current sealed evidence anew.
+4. No accepted COMMITTED ACK when raw or manifest is changed/deleted after preflight, after a pending transaction or after final SQLite commit before return. Durable error states must retain consumed-slot ambiguity and protect idempotency under crashes.
+5. Merge Hydrogen **non-author** A/B/C/D test pack into Sol's isolated checkout; retain original Hydrogen evidence unchanged. Required suites: old 161 Windows native / 160+1 WSL, Sol new F01/F03, Hydrogen 27 A/B/C/D, and new v2 fault tests with true child `os._exit`, concurrent writers and WAL snapshots.
+6. **SQLite WAL engine qualification gate**: the [official SQLite WAL-reset bug documentation](https://www.sqlite.org/wal.html#the_wal_reset_bug) states affected upstream releases up to 3.51.2, with fixes in >=3.51.3 and backports 3.44.6/3.50.7. Worker evidence showed Windows 3.50.4, WSL 3.45.1. These versions alone do not establish patch provenance. First record `sqlite_version`, `sqlite_source_id()`, runtime binary and patched origin. For claimed reliable multi-process WAL tests, require a verified fixed/backported runtime. If unavailable, continue limited L0 engineering and record `SQLITE_WAL_ENGINE_NOT_QUALIFIED`; no implicit OS/Python upgrade or production durability claim.
+7. Future stages remain P1C03 offline 24h raw retention/purge simulation and P1C04 disabled local loopback/TLS mock integration. Real independent UTC, Binance current read-only L1 and real Feishu are **later separately scoped gates**.
+
+## Next task
+
+**`V070-SOL-P1C02-F02-CUSTODY-V2-IMPLEMENTATION-01`** to Codex GPT Sol. Read the five Sol Max reports, current Sol F01/F03 source, Hydrogen test pack and Controller decision, then implement and test only F02 v2 and final P1C02 offline integration in the Sol-owned isolated checkout. No agent dispatch was initiated by Controller. Final acceptance remains pending.
+
+**Authority:** `SOURCE_BLOCKED=true`; `SOURCE_QUALIFIED=false`; `SHADOW_QUALIFIED=false`; `ECONOMICALLY_VALIDATED=false`; `ALPHA_CLAIMED=false`; `execution_authority=false`; `REAL_FEISHU_SEND=false`. No live HTTP/Feishu/order operations are authorized.
