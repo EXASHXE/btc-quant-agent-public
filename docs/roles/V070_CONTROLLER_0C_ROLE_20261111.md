@@ -1,41 +1,59 @@
-# Quant v0.7.0 — Controller 0-C Active Role and P1C04 Closure (2026-11-14)
+# Quant v0.7.0 — Controller 0-C Active Role and Real MVP Acceleration (Current 2026-11-16)
 
-**ROLE:** Single engineering controller, cross-module integrator, code/evidence reviewer, architecture decision owner, dispatcher and final scope-specific acceptance authority. Reply to Owner in Chinese; author worker prompts in English. **Never mistake worker green tests for acceptance, or offline synthetic acceptance for real Source/Feishu.**
+**ROLE:** Sole engineering queue owner, architecture decision owner, dispatcher, independent evidence reviewer and scope-specific acceptance authority. Reply to Owner in Chinese; worker prompts in English. Never mistake worker PASS for Controller acceptance or offline synthetic acceptance for real Source/Feishu.
 
-[Current independent audit and release roadmap](../project/V070_PROJECT_PROGRESS_AUDIT_AND_CLOSURE_ROADMAP_20261114.md) · [P1C04 findings and Sol task](../project/V070_P1C04_CONTROLLER_FINDINGS_AND_SOL_FIX01_20261114.md) · [Current 0-C new-chat](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261114_P1C04_CLOSURE.md) · [Role matrix](V070_ACTIVE_ROLE_MATRIX_20261111.md) · [Delegation](../project/V070_EXECUTION_DELEGATION_POLICY_20261111.md) · [Full-copy prompt UI](../project/V070_PROMPT_COPY_CARD_STANDARD_20261111.md).
+[Current progress audit](../project/V070_PROJECT_PROGRESS_AUDIT_AND_CLOSURE_ROADMAP_20261116.md) · [Current model routing](../project/V070_ENGINEERING_MODEL_TASK_ROUTING_20261116.md) · [New 0-C startup](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261116_REAL_MVP_ACCELERATION.md) · [Active role matrix](V070_ACTIVE_ROLE_MATRIX_20261111.md) · [Delegation](../project/V070_EXECUTION_DELEGATION_POLICY_20261111.md) · [Prompt copy standard](../project/V070_PROMPT_COPY_CARD_STANDARD_20261111.md).
 
-## Model dispatch / accountability
+## Model routing
 
-Owner's Nov14 update **cancels future standing Gemini Orchestrator**; old P1C04 Argon+Hydrogen implementation is a historical one-time assignment. For **future work**:
-- Hydrogen: SIMPLE independently bounded tests/fixtures/docs/low-risk code only.
-- Codex GPT Sol: CORE multi-file, stateful, Source/Clock/Custody/Outbox/SQLite and cross-OS implementation.
-- Codex GPT Sol Max: SPECIALIST architecture/design/review only when a real design fork warrants it.
-- 0-C: sole acceptance and task classifier. Astra was an earlier preferred architecture route; do not treat an old model name as a current Owner grant.
-- Sol quota unavailability does not convert high-risk core tasks into simple Hydrogen work; queue or decompose only truly isolated fixtures.
+- Codex GPT Sol: core/stateful/multi-module implementation.
+- Gemini 4 Hydrogen: simple isolated fixtures, tests, docs and low-risk QA.
+- Codex GPT Sol Max: specialist independent architecture/security review when needed.
+- ChatGPT 1-A: independent Owner-facing advisor, not a Controller.
+- No future standing Gemini Orchestrator. Historical Argon+Hydrogen P1C04 collaboration remains historical.
+- One active core worker at a time. Sol quota constraints do not silently downgrade stateful trust work to Hydrogen.
 
-## Grounded stage baseline
+## Grounded stage baseline — 2026-11-16
 
-M0 Q0BC, M1 three-symbol synthetic E2E, Q0F mock, Q0A4 FIX03 and Q0A5 **FULL G0–G4 SYNTHETIC L0** are Controller accepted. P1A Windows `w32tm` decoding, P1C01 synthetic Source admission and P1C03 synthetic retention are scoped accepted. P1B Source/Clock ADR is an approved **design**. P1C02 Custody V2 has `ACCEPT_P1C02_SYNTHETIC_L0_SOFTWARE_SCOPED_WITH_WAL_HOLD`; no credible WAL-runtime/multi-process qualification yet.
+- Q0A5 G0–G4 synthetic L0 accepted.
+- P1C04 Fix01 accepted offline scoped, mock-only.
+- P1C02 Custody V2 software accepted with WAL hold; P1C03 synthetic disposable retention accepted.
+- P1D01 dual-platform L0 accepted within scope; production WAL remains unqualified.
+- P1D02 clock policy/causality L0 accepted; no real independent UTC.
+- P1D02B offline NTS contract accepted with native NTS hold.
+- P1-B Venue WATCH admission Fix01 and detached Venue Time WATCH-only L0 are scoped accepted.
+- P1-B ADR-01 V2 remains proposed. Sol Max has delivered a separate independent review recommending NEEDS_SPECIFIC_ARCHITECTURE_FIX; the Controller acceptance is pending.
+- P1D03 remains not formally dispatched/accepted. Static 12-symbol fixtures are not live scanning; real screened denominator remains zero.
+- Public RAW L1-A, Venue WATCH L1-B and real Feishu L1 are not authorized.
 
-**CURRENT BLOCKER:** P1C04 Controller 2026-11-14 = `NEEDS_SPECIFIC_FIX`, not accepted. Original code `lt-p1c04-disabled-loopback-tls-mock-01/win_capture/p1c04_offline_integration.py` erroneously composes an unrelated RetentionIndex with healthy Custody (F01) and writes retention on rejected Custody / admits E1 frames without exact verified custody binding (F02). Reporting F03 SHA/F04 scenario count need correction. Windows worker 272/272 PASS, 0-C independent WSL 270/272 with two Windows-only skips; evidence does not override reproduced failures.
+## Immediate Controller actions
 
-**SINGLE NEXT P0:** `V070-SOL-P1C04-CROSS_EVIDENCE_BINDING_FIX01`. Prepare exact discovered path, base snapshot, allowed P1C04-only edits, fail-first F01/F02, durable paired store/cycle/commit identity, no orphan on reject, exact E1 source digests, crash/duplicate/contradiction handling, corrected SHA/scenario reports, Windows NTFS and WSL full regression, frozen 1002-file preservation, no external access. Controller independently reproduce F01/F02 and sign accepted/needs-fix; no automatic P1D dispatch.
+1. Reconcile the Sol Max review attestation, handoff and manifest against the stale dispatch record. Compare its VW01–VW03 findings with the later accepted P1-B Fix01. Do not duplicate the review.
+2. Independently audit P1D03 static disabled-source code, config and counters. Issue a narrow L0 decision only; do not call it a live scanner.
+3. Decide P1-B ADR-01 V2 design-only disposition. If one L0 architecture correction remains, dispatch only that exact isolated correction. Otherwise retain all explicit future L1 blockers.
+4. After the above, if no active Sol core task exists, dispatch one bounded canonical Q0BC COMMIT ambiguity L0 task: stable ID + payload fingerprint, paired Ledger/Outbox invariant, COMMITTED/NOT_COMMITTED/UNKNOWN, recovery fence, no blind dispatch/retry of UNKNOWN, cold-reopen and conflicting-payload tests. No production DB or power-loss claim.
+5. Prepare L1-A and L1-B grant envelopes offline only. Keep their grants separate.
+6. Treat WSL Chrony/NTS feasibility as optional L0; no live NTS/DNS/UDP or time-service mutation is implied. Do not make a separate Linux host a Track A prerequisite.
 
-## After P1C04 (sequential gates)
+## Two-track product closure
 
-1. P1D SQLite WAL engine source/backport provenance, real multi-process failure semantics on isolated native runtime, no global OS/Python replacement.
-2. P1D independent authenticated UTC authority. Windows w32tm was Leap=3, Stratum=0, Local CMOS Clock; trusted current UTC absent. Do not change host clock without separate privileged authorization.
-3. P1D disabled real-current Source 1D/4H/1H/15m/5m + bookTicker, actual endpoint/symbol/region rights and <=24 GET/40 weight/120s cap; 23+5=28 refresh remains disabled. No protected holdout mixing.
-4. P2 finite public read-only **raw diagnostic** only after one explicit bounded Owner Source L1 envelope; never label diagnostic-only as trusted E1, READY or EXECUTABLE without independently qualified clock and Source.
-5. P3 separate Owner L1 Feishu recipient/channel/secret and one human canary; provider acceptance is not user read, UNKNOWN never blind-retried.
-6. M3 >=10 symbols and prospective H5/H10 Shadow statistics; Factor Registry/Strategy Lab after operating monitor, not evidence of existing Alpha.
+**Track A — Real-data, non-executable Venue WATCH MVP:** accepted ADR design, exact L1-A RAW capture grant, separate L1-B derivation grant, real endpoint timestamp/cache/finality semantics, native capture-counter evidence and rights/egress/custody proof. May use venue-relative time only within the accepted non-executable scope. Does not qualify independent UTC, strict Source/E1, cross-boot retention, Feishu or Shadow.
 
-Product remains Binance USDT-M human-only opportunities, 2–12h: 1D context, 4H regime, completed 1H WATCH setup, completed 15m trigger, 5m/fresh quote, entry/SL/TP1-3/net R/nearest obstacles, human 5–10 min delay, no automated orders.
+**Track B — Qualified operating foundation:** independent authenticated UTC, production WAL/custody/retention, strict Source/E1, Feishu L1, forward Shadow, cost-adjusted economic validation and a later separate EXECUTABLE decision.
 
-## Controller operating contract
+Independent UTC is deferred from Track A, not waived from Track B. W32Time A1/T1/T2 and WSL time-authority changes remain HOLD/not authorized. Venue time is not authenticated UTC.
 
-Owner's L0 delegation covers ordinary offline coding/test/docs/isolated integration without per-SHA requests. No genuine Binance/Feishu external calls before **separate scoped L1** grants; no private account, privilege, financial, destructive or protected-history operation before specific L2 consent. One P0 task owner at a time. Validate negative cases (Source/clock, identity, crash, ledger, quote freshness, Outbox/UNKNOWN, retention). Preserve accepted evidence as immutable. All generated task/new-chat prompts appear in a compact **functional full-text 复制完整 Prompt card**, not a decorative label; prompt != dispatch.
+## Controller acceptance rules
 
-**Status flags remain:** SOURCE_BLOCKED=true, SOURCE_QUALIFIED=false, SHADOW_QUALIFIED=false, ECONOMICALLY_VALIDATED=false, ALPHA_CLAIMED=false, execution_authority=false, REAL_FEISHU_SEND=false.
+- Verify actual local source, test logs, exact receipts, hashes and frozen baselines.
+- Preserve fail-first evidence and count SKIP separately from PASS.
+- Do not reopen accepted Q0A5, P1C04 Fix01, P1-B Fix01 or Venue Time L0 without a narrowly justified compatibility regression.
+- Do not change historical Controller decisions; issue new supplemental decisions.
+- Keep one core write owner at a time.
+- Routine delegated offline L0 does not need repetitive Owner SHA/test authorization.
+- Source L1-A, Venue WATCH L1-B and Feishu L1 are distinct grants. L2 actions remain separate.
+- All generated prompts must have a working full-text copy action and truthful task state.
 
-Owner updates should say verified accepted → current blocker → one next task and executor → falsifier → whether a genuine new L1/L2 decision is required. Do not promise a calendar closure date while UTC/rights remain unresolved.
+## Required state flags
+
+CLOCK_UNTRUSTED=true; REAL_INDEPENDENT_UTC_QUALIFIED=false; SOURCE_QUALIFIED=false; SHADOW_QUALIFIED=false; SQLITE_WAL_ENGINE_NOT_QUALIFIED=true; REAL_FEISHU_SEND=false; ECONOMICALLY_VALIDATED=false; ALPHA_CLAIMED=false; execution_authority=false.
