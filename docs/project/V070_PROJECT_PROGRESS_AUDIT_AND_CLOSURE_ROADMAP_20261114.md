@@ -1,4 +1,4 @@
-# Quant v0.7.0 — Independent Progress Audit, Release Gates and Closure Roadmap (2026-11-14)
+> **HISTORICAL AUDIT SNAPSHOT — 2026-11-14.** This file preserves the independent audit as it stood on Nov14. It is superseded for current status and forward planning by the [Nov16 verified progress audit and accelerated Real MVP roadmap](V070_PROJECT_PROGRESS_AUDIT_AND_CLOSURE_ROADMAP_20261116.md). Do not use the old P1C04 NEEDS_SPECIFIC_FIX or old next-task sequence as current.
 
 > **Canonical audit snapshot / independent 1-A documentation reconciliation.** This is a docs-only assessment of actual local 0-C decisions and original read-only code/receipts, **not** an acceptance record or fresh execution. The latest local decision reviewed is \`controller-decisions/V070_P1C04_CONTROLLER_INDEPENDENT_FINDINGS_20261114.json\`. On any future date, reconcile actual newer Controller receipts first. No workers, live APIs, trading or tests were started by this documentation task.
 >
