@@ -1,6 +1,6 @@
 # QUANT v0.8.0 — Project Home and Baseline (2026-11-18)
 
-Status: R1 SCOPED_ACCEPTED_OFFLINE_ONLY; Astra system audit accepted as architecture advisory; integrated B1 scope approved for Owner forwarding, not started.
+Status: R1 and B1 SCOPED_ACCEPTED_OFFLINE_ONLY; Astra architecture audit accepted; B2 scope approved for Owner forwarding, not started. Real Binance market/API activation remains disabled.
 Product: Personal Trading Decision Support.
 Local root: /root/workspace/project/quant-0.8.0/
 Executable code/runtime branch: v0.8.0 in EXASHXE/btc-quant-agent-public.
@@ -20,7 +20,8 @@ Canonical project documentation branch: docs/engineering. All project, role, arc
 - [R1 PUBLIC_MARKET task](../prompts/v0.8/V080_SOL62_PERSONAL_MVP_LAYER1_PUBLIC_IMPLEMENTATION_20261118.md)
 - [R2 PRIVATE_USER_DATA draft](../prompts/v0.8/V080_SOL62_PERSONAL_MVP_LAYER2_USER_DATA_DRAFT_20261118.md)
 - [R3 account/signal overlay draft](../prompts/v0.8/V080_SOL62_ACCOUNT_SIGNAL_OVERLAY_R3_DRAFT_20261118.md)
-- [B1 integrated public runtime task — Controller approved, not started](../prompts/v0.8/V080_SOL62_PUBLIC_RUNTIME_FOUNDATION_B1_20261118.md)
+- [B1 integrated public runtime task — Controller accepted offline only](../prompts/v0.8/V080_SOL62_PUBLIC_RUNTIME_FOUNDATION_B1_20261118.md)
+- [B2 integrated market decision MVP task — Controller scope approved, Owner forwarding pending](../prompts/v0.8/V080_SOL62_MARKET_DECISION_MVP_B2_20261118.md)
 - [1-A new chat](../prompts/v0.8/V080_NEW_CHAT_1A_20261118.md)
 - [0-C new chat](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md)
 
@@ -53,22 +54,26 @@ This attestation does not claim Binance legal approval, third-party legal certif
 | R1 PUBLIC_MARKET | **SCOPED_ACCEPTED_OFFLINE_ONLY** | 0-C independently reran 99 targeted and 694 full tests; 367 sealed outputs |
 | Astra full-system review | **SCOPED_ACCEPTED_ARCHITECTURE_REVIEW_ONLY** | Evidence-based architecture recommendations; not implementation authorization |
 | Narrow Stage 1A | **SUPERSEDED_FOR_FUTURE_FORWARDING / NOT_STARTED** | Original decision preserved; no overlapping workspace found |
-| **B1 PUBLIC_RUNTIME_FOUNDATION** | **SCOPE_APPROVED / AWAITING_OWNER_FORWARD** | Sol High; one consolidated offline implementation and final acceptance |
+| **B1 PUBLIC_RUNTIME_FOUNDATION** | **SCOPED_ACCEPTED_OFFLINE_ONLY** | 89 B1 + 99 inherited targeted tests independently PASS; genuine-public origin remains dormant |
 | First live public GET activation | **NOT AUTHORIZED** | Requires accepted B1 and separate completed local operating scope |
-| **B2 MARKET_DECISION_MVP** | PLANNED / NOT_DISPATCHED | Sol Extra High; market-only signal, risk card, 5/10m reprice and local journal |
+| **B2 MARKET_DECISION_MVP** | **SCOPE_APPROVED / AWAITING_OWNER_FORWARD** | Sol Extra High; one integrated offline strategy, risk card, 5/10m reprice and local journal |
 | **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | PLANNED / NOT_DISPATCHED | Sol Extra High; merge R2 + R3 offline, after stable B2 episode contracts |
 | R5 controlled expansion/notifications | PLANNED | Feishu external activation remains separately gated |
 | R6 prospective evaluation | PLANNED | Collect event denominators starting with B2; no Alpha claims |
 | Layer 3 TRADE | DISABLED | No trade key, route or worker |
 
-Original R2/R3 draft prompts remain references, not dispatched tasks. For current execution order and capability-specific gates see [Roadmap and Gates](V080_ROADMAP_AND_GATES_20261118.md).
+Original R2/R3 draft prompts remain references, not dispatched tasks. B2 is approved for Owner forwarding but has not been independently implemented or accepted. For current execution order and capability-specific gates see [Roadmap and Gates](V080_ROADMAP_AND_GATES_20261118.md).
 
 ## Controller evidence (local v0.8.0 workspace only)
 
 - R1 scoped acceptance: controller-decisions/V080_CONTROLLER_R1_LAYER1_PUBLIC_OFFLINE_SCOPED_ACCEPTANCE_20261118.json (SHA-256 32ddbab7a7244852fb6c5948c057b2063c3d01be420d50eb4046ec8696baeefa).
 - Astra architecture scoped acceptance: controller-decisions/V080_CONTROLLER_ASTRA_FULL_SYSTEM_ARCH_AUDIT_ACCEPTANCE_20261118.json (SHA-256 0213dcfc3a12419081404923c9d8112cbb532269f6fc537f2403ced9c4990663).
-- Supplemental B1 scope approval: controller-decisions/V080_CONTROLLER_SOL62_B1_PUBLIC_RUNTIME_FOUNDATION_FORWARD_APPROVAL_20261118.json. Actual Sol execution has not started at the latest local check.
+- Supplemental B1 scope approval: controller-decisions/V080_CONTROLLER_SOL62_B1_PUBLIC_RUNTIME_FOUNDATION_FORWARD_APPROVAL_20261118.json. Historical; B1 worker has since delivered and been accepted offline only.
+- **B1 offline acceptance:** controller-decisions/V080_CONTROLLER_B1_PUBLIC_RUNTIME_OFFLINE_SCOPED_ACCEPTANCE_20261118.json, SHA-256 b42ad44bc91a5fe89e7e2209ba4682ca5232d6611c5340b2b5febfe356a08cbf. B1 56 artifacts sealed, 89/89 tests independently rerun, 99/99 R1 targeted regression, all 323 Program J files verified.
+- **B2 scope approval:** controller-decisions/V080_CONTROLLER_SOL62_B2_MARKET_DECISION_MVP_FORWARD_APPROVAL_20261118.json; this is not worker execution or acceptance.
 
 ## Next action
 
-Owner forwards only the [Controller-approved B1 integrated prompt](../prompts/v0.8/V080_SOL62_PUBLIC_RUNTIME_FOUNDATION_B1_20261118.md) to GPT-6.2 Sol. Sol handles all internal B1 milestones and returns one complete evidence package for independent 0-C acceptance. No live Binance request, credential/private-account access, Feishu, or trading is authorized by this document.
+Owner may forward the [Controller-approved B2 integrated offline market decision MVP prompt](../prompts/v0.8/V080_SOL62_MARKET_DECISION_MVP_B2_20261118.md) to GPT-6.2 Sol. Its entire 4H/1H/15m/5m strategy, net-R/risk card, immutable episode, 5/10-minute reprice and local journal is one consolidated implementation package and one future independent Controller acceptance.
+
+In parallel with B2 engineering planning, the first real public scan requires a separately completed Owner-controlled operating scope and a **new reviewed real-origin binding/activation**, because the accepted B1 wheel deliberately returns LIVE_CAPABILITY_DORMANT. This activation is not authorized by B1 acceptance or B2 dispatch. R2/R3 are merged conceptually into a future B3 offline package after B2 contracts stabilize; real private Futures permission remains unproved. Layer 3 remains disabled.
