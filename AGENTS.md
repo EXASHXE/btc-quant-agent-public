@@ -46,5 +46,3 @@ A task prompt is not a Controller dispatch. The R1 prompt is pending Controller 
 
 ## Prompt integrity
 Every worker/new-chat prompt must be complete, bounded, and include exact baseline, allowed/prohibited paths, offline/mock constraints, test matrix, stop conditions, deliverables and reviewer. Do not use an excerpt as a substitute for the full task card.
-
-[executed on device: hyz-laptop (bfc916f4-e88a-469a-9999-cf08962f68ed)]

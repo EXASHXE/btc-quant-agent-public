@@ -12,5 +12,3 @@ This is a new personal-use 2–12h Binance USDⓈ-M decision-support baseline. I
 The Owner's 2026-10-24 standing public-data attestation is copied byte-identically and reused as OWNER_ATTESTED; it must not be requested again for the same scope. Private API credentials remain local and are never supplied to a model. TRADE remains disabled.
 
 \`baseline/program-j/\` is a read-only source snapshot. All new local tasks and isolated workspaces belong under this project root. The R1 task prompt is pending Controller 0-C review, not yet dispatched.
-
-[executed on device: hyz-laptop (bfc916f4-e88a-469a-9999-cf08962f68ed)]

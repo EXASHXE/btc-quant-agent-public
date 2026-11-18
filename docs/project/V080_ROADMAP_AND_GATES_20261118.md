@@ -31,5 +31,3 @@ PERSONAL_MVP uses normal OS synchronization + venue serverTime offset, configura
 
 ## No overbuilding
 Do not create new generic synthetic work merely to advance a milestone. Prioritize a working Layer 1 five-timeframe market path, then the read-only account connector, then the actual account overlay. Keep R2 and R3 sequential so each permission and accounting boundary can be reviewed independently.
-
-[executed on device: hyz-laptop (bfc916f4-e88a-469a-9999-cf08962f68ed)]

@@ -160,5 +160,3 @@ When Layer 2 is connected, match fills to signal episodes using symbol, side/pos
 ## 9. Research separation
 
 Personal evidence does not qualify Strict Source/E1, strict Shadow, protected historical data or economic validation. Preserve all old protected/holdout exclusions. Personal forward evaluation is a separate ledger and cannot be used to claim Alpha without a later explicit methodology and evidence review.
-
-[executed on device: hyz-laptop (bfc916f4-e88a-469a-9999-cf08962f68ed)]

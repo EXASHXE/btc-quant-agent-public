@@ -56,5 +56,3 @@ STRICT_RESEARCH remains unchanged. Strict Source/E1, protected historical window
 
 ## 7. Owner intent
 Reduce institutional-style process that is not necessary for a personal local tool. Do not spend the critical path on repeated rights attestations, per-request approvals, NTS certification, hardware anchors or mandatory 24-hour deletion. Do retain real data integrity, TLS, API permissions, bounded rate limits, completed candles, no-lookahead, cost-aware risk, local privacy and the no-trading boundary.
-
-[executed on device: hyz-laptop (bfc916f4-e88a-469a-9999-cf08962f68ed)]
