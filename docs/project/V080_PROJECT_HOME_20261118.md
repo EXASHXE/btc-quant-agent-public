@@ -1,6 +1,6 @@
 # QUANT v0.8.0 — Project Home and Baseline (2026-11-18)
 
-Status: Owner-directed new project baseline; Controller 0-C review pending.
+Status: R1 SCOPED_ACCEPTED_OFFLINE_ONLY; Astra system audit accepted as architecture advisory; integrated B1 scope approved for Owner forwarding, not started.
 Product: Personal Trading Decision Support.
 Local root: /root/workspace/project/quant-0.8.0/
 Executable code/runtime branch: v0.8.0 in EXASHXE/btc-quant-agent-public.
@@ -20,6 +20,7 @@ Canonical project documentation branch: docs/engineering. All project, role, arc
 - [R1 PUBLIC_MARKET task](../prompts/v0.8/V080_SOL62_PERSONAL_MVP_LAYER1_PUBLIC_IMPLEMENTATION_20261118.md)
 - [R2 PRIVATE_USER_DATA draft](../prompts/v0.8/V080_SOL62_PERSONAL_MVP_LAYER2_USER_DATA_DRAFT_20261118.md)
 - [R3 account/signal overlay draft](../prompts/v0.8/V080_SOL62_ACCOUNT_SIGNAL_OVERLAY_R3_DRAFT_20261118.md)
+- [B1 integrated public runtime task — Controller approved, not started](../prompts/v0.8/V080_SOL62_PUBLIC_RUNTIME_FOUNDATION_B1_20261118.md)
 - [1-A new chat](../prompts/v0.8/V080_NEW_CHAT_1A_20261118.md)
 - [0-C new chat](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md)
 
@@ -45,20 +46,29 @@ OWNER_STANDING_M2_AUTHORIZATION_20261024.md is preserved byte-identically. Its p
 This attestation does not claim Binance legal approval, third-party legal certification, or permission for a different region, commercial use, redistribution, private account access or trading. Program N's one-shot invocation remains consumed and must not be replayed.
 
 ## Current state — 2026-11-18
-| Workstream | State | Notes |
-|---|---|---|
-| v0.8.0 baseline | Prepared | GitHub branch and local root created |
-| Program J source baseline | Copied and hashed | 323 files, read-only snapshot |
-| Owner standing public-data attestation | Reused | OWNER_ATTESTED; no duplicate request |
-| R1 PUBLIC_MARKET | Pending 0-C review | New v0.8 task card; offline/mock implementation only |
-| R2 PRIVATE_USER_DATA | Draft | Starts only after R1 independent acceptance |
-| R3 account/signal overlay | Draft | Starts after R1 and R2 acceptance |
-| R4 local MVP vertical slice | Planned | No dispatch |
-| R5 symbol expansion / market-only alert | Planned | No dispatch |
-| R6 prospective evaluation | Planned | No profitability claim |
-| Layer 3 TRADE | Disabled | No task or key |
 
-The prior v0.7.0 dispatch record for V070-SOL62-PERSONAL-MVP-LAYER1-PUBLIC-01 says worker_execution_status=NOT_STARTED and work_root_created=false. It is historical. v0.8.0 uses a new task ID and work root; no duplicate worker is assumed to exist.
+| Workstream | Controller-reconciled state | Notes |
+|---|---|---|
+| Baseline / Program J | VERIFIED | 323 preserved files, source/code baseline pinned |
+| R1 PUBLIC_MARKET | **SCOPED_ACCEPTED_OFFLINE_ONLY** | 0-C independently reran 99 targeted and 694 full tests; 367 sealed outputs |
+| Astra full-system review | **SCOPED_ACCEPTED_ARCHITECTURE_REVIEW_ONLY** | Evidence-based architecture recommendations; not implementation authorization |
+| Narrow Stage 1A | **SUPERSEDED_FOR_FUTURE_FORWARDING / NOT_STARTED** | Original decision preserved; no overlapping workspace found |
+| **B1 PUBLIC_RUNTIME_FOUNDATION** | **SCOPE_APPROVED / AWAITING_OWNER_FORWARD** | Sol High; one consolidated offline implementation and final acceptance |
+| First live public GET activation | **NOT AUTHORIZED** | Requires accepted B1 and separate completed local operating scope |
+| **B2 MARKET_DECISION_MVP** | PLANNED / NOT_DISPATCHED | Sol Extra High; market-only signal, risk card, 5/10m reprice and local journal |
+| **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | PLANNED / NOT_DISPATCHED | Sol Extra High; merge R2 + R3 offline, after stable B2 episode contracts |
+| R5 controlled expansion/notifications | PLANNED | Feishu external activation remains separately gated |
+| R6 prospective evaluation | PLANNED | Collect event denominators starting with B2; no Alpha claims |
+| Layer 3 TRADE | DISABLED | No trade key, route or worker |
+
+Original R2/R3 draft prompts remain references, not dispatched tasks. For current execution order and capability-specific gates see [Roadmap and Gates](V080_ROADMAP_AND_GATES_20261118.md).
+
+## Controller evidence (local v0.8.0 workspace only)
+
+- R1 scoped acceptance: controller-decisions/V080_CONTROLLER_R1_LAYER1_PUBLIC_OFFLINE_SCOPED_ACCEPTANCE_20261118.json (SHA-256 32ddbab7a7244852fb6c5948c057b2063c3d01be420d50eb4046ec8696baeefa).
+- Astra architecture scoped acceptance: controller-decisions/V080_CONTROLLER_ASTRA_FULL_SYSTEM_ARCH_AUDIT_ACCEPTANCE_20261118.json (SHA-256 0213dcfc3a12419081404923c9d8112cbb532269f6fc537f2403ced9c4990663).
+- Supplemental B1 scope approval: controller-decisions/V080_CONTROLLER_SOL62_B1_PUBLIC_RUNTIME_FOUNDATION_FORWARD_APPROVAL_20261118.json. Actual Sol execution has not started at the latest local check.
 
 ## Next action
-Controller 0-C independently reviews the new baseline, Program J manifest, API matrix and R1 prompt. If the scope and tests are sound, 0-C dispatches R1 to GPT-6.2 Sol. No real Binance request or credential use occurs during implementation.
+
+Owner forwards only the [Controller-approved B1 integrated prompt](../prompts/v0.8/V080_SOL62_PUBLIC_RUNTIME_FOUNDATION_B1_20261118.md) to GPT-6.2 Sol. Sol handles all internal B1 milestones and returns one complete evidence package for independent 0-C acceptance. No live Binance request, credential/private-account access, Feishu, or trading is authorized by this document.
