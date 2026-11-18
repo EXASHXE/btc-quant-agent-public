@@ -232,5 +232,3 @@ Do not improvise a scope expansion. Ask Controller 0-C for a scoped design decis
 Return READY_FOR_CONTROLLER_REVIEW only when all offline evidence and handoff files exist. Otherwise return BLOCKED with exact missing evidence.
 
 Worker completion is not Controller acceptance. Do not mark the task ACCEPTED or dispatch R2 yourself.
-
-[executed on device: hyz-laptop (bfc916f4-e88a-469a-9999-cf08962f68ed)]

@@ -23,5 +23,3 @@
 - Independent Owner advice → ChatGPT 1-A.
 
 No Orchestrator role. One active core implementation owner at a time. Worker PASS ≠ independent review PASS ≠ Controller acceptance. A task prompt is not a dispatch.
-
-[executed on device: hyz-laptop (bfc916f4-e88a-469a-9999-cf08962f68ed)]

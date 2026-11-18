@@ -146,5 +146,3 @@ Negative/boundary:
 Deliver isolated implementation, fake fixtures, tests, credential setup guide, permission preflight checklist, local retention/backup notes, sanitized WORKER_RESULT, CONTROLLER_HANDOFF and SHA256 manifest.
 
 Return READY_FOR_CONTROLLER_REVIEW only after offline tests and fail-closed cases pass. Do not mark accepted, do not connect a real key, and do not dispatch R3 yourself.
-
-[executed on device: hyz-laptop (bfc916f4-e88a-469a-9999-cf08962f68ed)]

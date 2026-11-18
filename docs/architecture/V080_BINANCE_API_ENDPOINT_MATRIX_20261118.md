@@ -61,5 +61,3 @@ Fail closed: if Enable Reading alone cannot call Futures USER_DATA, and the only
 - Binance API Key FAQ: https://www.binance.com/en/support/faq/detail/360002502072
 - Binance Account API Restrictions: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/account
 - Binance Get Income History: https://developers.binance.com/docs/derivatives/usds-margined-futures/account/rest-api/Get-Income-History
-
-[executed on device: hyz-laptop (bfc916f4-e88a-469a-9999-cf08962f68ed)]
