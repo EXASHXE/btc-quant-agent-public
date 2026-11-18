@@ -1,0 +1,64 @@
+{
+  "schema": "V080_OWNER_DIRECTIVE_V1",
+  "date_local": "2026-11-18",
+  "product": "QUANT v0.8.0 Personal Trading Decision Support",
+  "status": "OWNER_DIRECTED_BASELINE_PENDING_CONTROLLER_REVIEW",
+  "github": {
+    "repository": "EXASHXE/btc-quant-agent-public",
+    "branch": "v0.8.0",
+    "branch_created": true,
+    "base_lineage": [
+      "v0.7.0 executable code lineage",
+      "docs/engineering current documentation history"
+    ]
+  },
+  "local": {
+    "project_root": "/root/workspace/project/quant-0.8.0/",
+    "program_j_baseline": "baseline/program-j/",
+    "program_j_manifest": "baseline/PROGRAM_J_BASELINE_MANIFEST_20261118.json"
+  },
+  "standing_public_data_attestation": {
+    "path": "OWNER_STANDING_M2_AUTHORIZATION_20261024.md",
+    "sha256": "094780240fb440fc550326fbb3797ee60d26cb9e776374fcbc2c0645818830c6",
+    "provenance": "OWNER_ATTESTED",
+    "reuse_scope": "same personal, noncommercial, private/local, read-only public-market-data research scope",
+    "third_party_legal_certification": false,
+    "repeat_request_required": false
+  },
+  "api_layers": {
+    "L1_PUBLIC_MARKET": "PUBLIC_GET_NO_ACCOUNT_KEY",
+    "L2_PRIVATE_USER_DATA": "SEPARATE_LOCAL_READ_ONLY_KEY_SIGNED_GET_ONLY",
+    "L3_TRADE_EXECUTION": "DISABLED_NO_KEY_NO_CLIENT_NO_ROUTES"
+  },
+  "holding_horizon_hours": [2, 12],
+  "decision_timeframes": ["1D", "4H", "1H", "15m", "5m"],
+  "roles": {
+    "architecture": "GPT-6.2 Astra",
+    "primary_engineering": "GPT-6.2 Sol",
+    "high_intensity_cross_module_engineering": "GPT-6.2 Sol Max lane within Sol role",
+    "simple_engineering_qa": "Gemini 4 Hydrogen",
+    "independent_controller": "Controller 0-C",
+    "independent_owner_advisor": "ChatGPT 1-A",
+    "orchestrator": "NONE"
+  },
+  "task_states": {
+    "R1_LAYER1": "PENDING_CONTROLLER_0C_REVIEW_AND_DISPATCH",
+    "R2_LAYER2": "DRAFT_AFTER_R1_ACCEPTANCE",
+    "R3_ACCOUNT_OVERLAY": "DRAFT_AFTER_R1_AND_R2_ACCEPTANCE",
+    "R4_PERSONAL_MVP": "PLANNED",
+    "R5_UNIVERSE_AND_ALERTS": "PLANNED",
+    "R6_FORWARD_EVALUATION": "PLANNED",
+    "L3_TRADE": "DISABLED"
+  },
+  "effects": {
+    "real_public_requests": 0,
+    "real_private_requests": 0,
+    "credentials_read": 0,
+    "trade_requests": 0,
+    "feishu_sends": 0,
+    "host_changes": 0
+  },
+  "controller_acceptance": "PENDING"
+}
+
+[executed on device: hyz-laptop (bfc916f4-e88a-469a-9999-cf08962f68ed)]
