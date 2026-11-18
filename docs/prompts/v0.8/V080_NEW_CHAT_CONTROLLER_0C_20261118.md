@@ -24,6 +24,8 @@ Read first:
 - docs/project/V080_ROADMAP_AND_GATES_20261118.md
 - docs/roles/V080_ACTIVE_ROLE_MATRIX_20261118.md
 - docs/project/V080_BASELINE_MIGRATION_RECORD_20261118.md
+- docs/project/V080_PERSONAL_PUBLIC_MARKET_OPERATING_SCOPE_20261118.md
+- governance/V080_PERSONAL_PUBLIC_MARKET_SCOPE_TEMPLATE_20261118.json
 - governance/V080_OWNER_DIRECTIVE_20261118.json
 - baseline/PROGRAM_J_BASELINE_MANIFEST_20261118.json
 
@@ -54,6 +56,7 @@ baseline/program-j/ is a read-only Program J snapshot copied from the accepted v
 Do not edit baseline/program-j/ or historical v0.7.0 files. New implementation must use a task-specific isolated workspace under workspaces/.
 
 The prior v0.7.0 task V070-SOL62-PERSONAL-MVP-LAYER1-PUBLIC-01 was NOT_STARTED and work_root_created=false. Its Controller receipt remains immutable. The v0.8.0 R1 task has a new ID and new work root; verify no worker was started elsewhere before dispatch.
+Historical receipt: controller-decisions/V070_SOL62_PERSONAL_MVP_THREE_LAYER_API_CONTROLLER_DISPATCH_20261118.json. Prior plan acceptance: controller-decisions/V070_PERSONAL_MVP_THREE_LAYER_REBASELINE_CONTROLLER_PLAN_ACCEPTANCE_20261118.json.
 
 ## 5. Current task files
 
@@ -85,6 +88,7 @@ Before dispatch:
 6. Review R1 scope for no live network, no credential access, no private endpoints and no Layer 3.
 7. Confirm R1 does not edit Program J baseline and uses an isolated worktree.
 8. Check for an active overlapping core worker.
+9. After R1 scoped acceptance and before the first live public scan, review the one-time local PUBLIC_MARKET scope template. It must define symbols, endpoints, cadence/weight budget, local retention, region/route and stop conditions. This is not a repeated Owner attestation or per-request consent.
 
 If the scope is sound and no conflict exists, issue the new R1 dispatch to GPT-6.2 Sol. Do not call the task dispatched until the dispatch record is actually written and the worker is explicitly forwarded. If a blocking design issue exists, route a bounded architecture challenge to GPT-6.2 Astra and retain R1 as pending.
 

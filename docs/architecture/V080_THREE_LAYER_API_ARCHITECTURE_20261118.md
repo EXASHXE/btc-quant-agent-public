@@ -129,6 +129,10 @@ Static tests must prove forbidden methods and routes are unreachable from both r
 - Respect 429 and Retry-After; stop/back off on 418. At most one bounded retry for clearly transient idempotent GET failures. Never retry permission denial, malformed data, or an explicit venue/region restriction.
 - Cache candles incrementally; refresh 15m/5m and quote context when a candidate approaches its entry zone. Before a human acts 5–10 minutes after a notification, refresh price/book/mark/funding and recompute entry, hard SL, TP1/2/3, fee, spread, slippage, net R and first 4H/1D obstacle.
 
+### One-time operating scope before the first live public scan
+
+After R1 is independently accepted and before the first live Layer 1 scan, complete the local template at governance/V080_PERSONAL_PUBLIC_MARKET_SCOPE_TEMPLATE_20261118.json. It records the allowed public endpoints, initial symbols/timeframes, one-time cadence/weight budget, local retention, operating region/route and stop conditions. This is a technical runtime scope, not a repeated rights attestation or per-request consent. Within the active scope, repeated public GET requests do not require per-request approval. Material scope changes require review. Keep the template inactive until Controller 0-C has reviewed it and the Owner's local values are complete.
+
 ## 6. Storage and privacy
 
 Use separate local stores or strict schema/ACL separation:

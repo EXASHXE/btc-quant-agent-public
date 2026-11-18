@@ -210,9 +210,10 @@ Inside the isolated work root:
 4. Test logs, command list, environment versions and machine/runtime details.
 5. Endpoint weight matrix with source URL and verification date.
 6. Local operator runbook and a future bounded-scan plan (plan only; do not run it).
-7. WORKER_RESULT.md and CONTROLLER_HANDOFF.md.
-8. SHA256SUMS for every deliverable; manifest excludes itself.
-9. Explicit statement of all external effects: expected zero.
+7. A draft PERSONAL_PUBLIC_MARKET operating-scope config based on governance/V080_PERSONAL_PUBLIC_MARKET_SCOPE_TEMPLATE_20261118.json; keep it NOT_ACTIVE and do not perform a live scan.
+8. WORKER_RESULT.md and CONTROLLER_HANDOFF.md.
+9. SHA256SUMS for every deliverable; manifest excludes itself.
+10. Explicit statement of all external effects: expected zero.
 
 ## 12. Stop conditions
 

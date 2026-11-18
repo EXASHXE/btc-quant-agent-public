@@ -1,0 +1,75 @@
+{
+  "schema": "V080_PERSONAL_PUBLIC_MARKET_SCOPE_V1",
+  "status": "DRAFT_NOT_ACTIVE",
+  "mode": "PERSONAL_MVP",
+  "layer": "PUBLIC_MARKET",
+  "authorization_reference": {
+    "path": "OWNER_STANDING_M2_AUTHORIZATION_20261024.md",
+    "sha256": "094780240fb440fc550326fbb3797ee60d26cb9e776374fcbc2c0645818830c6",
+    "provenance": "OWNER_ATTESTED",
+    "repeat_per_request_consent": false
+  },
+  "symbols": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+  "intervals": ["1d", "4h", "1h", "15m", "5m"],
+  "allowed_methods": ["GET"],
+  "allowed_endpoints": [
+    "/fapi/v1/time",
+    "/fapi/v1/exchangeInfo",
+    "/fapi/v1/klines",
+    "/fapi/v1/ticker/24hr",
+    "/fapi/v1/ticker/bookTicker",
+    "/fapi/v1/depth",
+    "/fapi/v1/openInterest",
+    "/futures/data/openInterestHist",
+    "/fapi/v1/fundingRate",
+    "/fapi/v1/premiumIndex"
+  ],
+  "optional_disabled_endpoints": [
+    "/fapi/v1/rpiDepth",
+    "/fapi/v1/aggTrades"
+  ],
+  "request_budget": {
+    "max_weight_per_scan": null,
+    "min_scan_interval_seconds": null,
+    "source": "Versioned endpoint weights plus Binance response headers",
+    "note": "Set once before activation; no permanent 24-request/40-weight/120-second product ceiling."
+  },
+  "time_policy": {
+    "local_clock": "Normal OS synchronization",
+    "elapsed_time": "Monotonic",
+    "venue_time": "/fapi/v1/time offset bracket",
+    "independent_nts_required": false,
+    "hardware_anchor_required": false
+  },
+  "retention": {
+    "mode": "OWNER_CONTROLLED_LOCAL",
+    "retention_days": null,
+    "private_account_data_in_scope": false,
+    "cloud_upload": false,
+    "feishu_private_data": false
+  },
+  "network": {
+    "region": null,
+    "approved_route": null,
+    "proxy_or_region_bypass": false
+  },
+  "activation_gates": {
+    "r1_controller_acceptance_required": true,
+    "controller_scope_review_required": true,
+    "owner_local_values_required": true,
+    "live_requests_enabled": false
+  },
+  "stop_conditions": [
+    "HTTP_418_IP_BAN",
+    "HTTP_429_RETRY_AFTER",
+    "HTTP_403_OR_451_RESTRICTION",
+    "TLS_VERIFICATION_FAILURE",
+    "MALFORMED_OR_CONFLICTING_DATA",
+    "UNRECONCILED_VENUE_TIME",
+    "STALE_DATA",
+    "UNAPPROVED_ENDPOINT_OR_METHOD",
+    "OUT_OF_SCOPE_SYMBOL_OR_INTERVAL"
+  ],
+  "layer2_enabled": false,
+  "layer3_enabled": false
+}

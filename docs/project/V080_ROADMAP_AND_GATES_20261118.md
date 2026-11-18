@@ -18,6 +18,8 @@ Controller 0-C reviews R0 and the R1 task card, verifies the copied Program J ba
 
 R1 is offline/mock-only. It must not perform live Binance GETs, inspect credentials, or implement Layer 2 or Layer 3.
 
+After R1 scoped acceptance, complete the one-time local PUBLIC_MARKET operating-scope template and have 0-C review it before the first live public scan. No per-request consent is required while requests remain inside that approved scope.
+
 ## Acceptance ladder
 1. Worker delivers code, tests, baseline-preservation record, handoff and manifest.
 2. Astra reviews architecture only where a material cross-layer decision exists; this does not count as implementation acceptance.
