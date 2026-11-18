@@ -1,0 +1,41 @@
+# v0.6.5 — Research Execution Routing & Lightweight Testing Policy R2
+
+**Status:** owner-directed recommendation prepared in a separate docs branch. **No CI YAML change made**. Applies to research-first B-line only; A-line/protected-release controls stay separately governed. [Current operating contract](https://github.com/EXASHXE/btc-quant-agent-public/blob/9ec13bb44dc674c45c7099db1ff2177ea60393ff/docs/project/V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md). Historic policy and measurements at [frozen M0](https://github.com/EXASHXE/btc-quant-agent-public/blob/065d62965373627c4887e52f482d1dcb984af860/docs/project/V0.6_GEMINI_MODE_ROUTING_AND_CI_EXECUTION_EFFICIENCY_POLICY.md).
+
+## Model and agent selection
+
+| Work | Preferred runner | Default depth |
+|---|---|---|
+| README, link, task card, small manifest | ChatGPT 2-E / Gemini NORMAL | deterministic quick change |
+| Bounded single module, data format converter, fixture | Gemini NORMAL / Codex | focused tests |
+| Large cross-module repo consolidation, ETL and complex data QC | Codex High/Sol when actually available | exact proof + targeted tests |
+| Mark/PIT/OI/Funding causal and account state design | Gemini BOOST / Codex High | changed causal invariant negatives + independent gate if promoted |
+| Hypothesis novelty and falsification | 2-R then 2-C if material | no exploratory parameter fishing |
+| Rights/source/Alpha/integration acceptance | independent 1 and Controller 0 | evidence and one terminal |
+
+No custom nested subagents, no model access assumptions and no rerunning long tasks solely for cosmetic reports.
+
+## Four verification tiers
+
+**T0 DOCUMENTARY:** Git SHA/changed files/relative links and diff integrity. 0 mandatory full pytest / entire Ruff / mypy / compatibility matrix. Do not force unrelated six H41 lint debt or a second scientific reviewer onto documentation-only updates.
+
+**T1 RESEARCH_CODE_LOW_IMPACT:** run changed-module tests, changed path Ruff/compile and perhaps one small import smoke. Target <= one local focused run + one final push. No repeated whole-tree run unless a new dependency, control-flow or critical source boundary requires it. Defects identified from task's own negative examples are fixed; unrelated historical failures documented, not made into endless repair loops.
+
+**T2 MARKET_DATA_CAUSAL_FINANCIAL:** enforce checksums/original object identity and allowed source rights; test malformed/duplicate/missing date, timestamp grid, native symbol/contract units, original available-at vs observed-at, signed funding and ledger/state transitions **for changed paths**. Independent review only for a claim used to admit source, causal strategy, account utility or a consequential integration patch. An author report alone is not reproduction; sample-dependent risk must be explicit.
+
+**T3 EXECUTION_RELEASE:** full necessary CI on frozen SHA, all directly affected negative financial/no-order/funds tests, compatibility/restart/end-to-end profiles as required, independent adjudication and explicit owner/Controller approval. TESTNET/LIVE/real funds have no implicit permission.
+
+**CI constraint:** `BRANCH_PROTECTION_VERIFICATION_PENDING`. Current workflow retains push/PR/manual/scheduled triggers as configured; this *policy document* cannot disable them. Any reduced CI cadence needs separate actual protection evidence, explicit owner approval and proven manual full-suite recovery. Every published report must distinguish `PASS`, `FAIL`, `SKIPPED`, `NOT_RUN_BY_SCOPE` and true hosted run SHA. Do not remove old tests to create a superficial green workflow.
+
+## Time budget and stopping rules
+
+- First ask: **which current uncertainty will this work remove?** If none, deprioritize.
+- Prefer parallel independent documentary/rights/size/engineering lanes in isolated workspaces. **One task per chat**, no shared writing same file.
+- Never perform the same full test suite on local and GitHub repeatedly for the same unchanged SHA with no new evidence.
+- For a blocked source/clock/legal issue, one finite challenge and one correction only if external evidence exists; otherwise STOP or switch source.
+- Summaries should present net milestone completion, remaining blockers, and links to exact proofs. One substantial report only for consequential conclusions.
+- Keep historical failure results and research register immutable, not copied into main owner-facing daily replies.
+
+## Protected and scientific separation
+
+Personal noncommercial offline research can streamline formal reviews, **not falsify timestamps, legal rights, complete transaction economics, independent Alpha, original OOS provenance, financial authorizations or results**. Preserve `SOURCE_NOT_ADMITTED / PIT_UNKNOWN / COST_INCOMPLETE / UTILITY_NOT_IDENTIFIED / G2_ALPHA_NO_GO / G4_TESTNET_NO_GO / LIVE_NO_GO / REAL_FUNDS_WRITE_NONE`.

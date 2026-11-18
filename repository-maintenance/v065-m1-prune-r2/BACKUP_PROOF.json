@@ -1,0 +1,11 @@
+{
+  "file": "pre-prune-execution.bundle",
+  "sha256": "44e9b94242bff4bf950018d61c026639746774aeaab2472c1a65d575d537c8da",
+  "bytes": 39924384,
+  "owner_approved_durable_local_directory": "/root/workspace/project/quant-v0.6/m1-remote-cleanup/backups",
+  "restored_exact_heads": 222,
+  "complete_history": true,
+  "connectivity_fsck_exit": 0,
+  "selected_archive_refs_verified": 178,
+  "deleted_commit_local_rollback_push_and_exact_ref_verification": 173
+}

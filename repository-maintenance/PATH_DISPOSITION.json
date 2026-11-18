@@ -1,0 +1,395 @@
+{
+  "task": "V065-M1",
+  "base": "065d62965373627c4887e52f482d1dcb984af860",
+  "pr6": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+  "task_sha": "dc04f56e418e762e0137fbc28429fef0f545bce4",
+  "paths": [
+    {
+      "source_path": "docs/MULTI_MODEL_RESEARCH_GOVERNANCE.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "c739f68554a2784a642340fdbd7bd616574302b6",
+      "destination_branch": "docs/engineering",
+      "destination_path": "historical-engineering/MULTI_MODEL_RESEARCH_GOVERNANCE.md",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "Engineering/maintenance history; no literal active source/test/config dependency found."
+    },
+    {
+      "source_path": "docs/LINUX_VPS_MIGRATION_RUNBOOK.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "7c879750209617524d8f71ed61d0345399eea488",
+      "destination_branch": "docs/engineering",
+      "destination_path": "infrastructure/LINUX_VPS_MIGRATION_RUNBOOK.md",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "Engineering/maintenance history; no literal active source/test/config dependency found."
+    },
+    {
+      "source_path": "docs/operations/g3/OPERATIONAL_READINESS_R1.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "f942917ad8a8b42f39e69a783daff09a4bcdc89f",
+      "destination_branch": "docs/engineering",
+      "destination_path": "infrastructure/G3_OPERATIONAL_READINESS_R1.md",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "Engineering/maintenance history; no literal active source/test/config dependency found."
+    },
+    {
+      "source_path": "docs/project/V06_CI_DOCS_ONLY_PIP_CACHE_REGRESSION.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "ab5f12914228b97304be8026c4be255d397c278c",
+      "destination_branch": "docs/engineering",
+      "destination_path": "ci/V06_CI_DOCS_ONLY_PIP_CACHE_REGRESSION.md",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "Engineering/maintenance history; no literal active source/test/config dependency found."
+    },
+    {
+      "source_path": "docs/project/V065_BRANCH_CONSOLIDATION_MANIFEST_R1.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "1132dd013a29822edc264213aa91d7b38285711d",
+      "destination_branch": "docs/engineering",
+      "destination_path": "repository-maintenance/m0/V065_BRANCH_CONSOLIDATION_MANIFEST_R1.md",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "M0 genealogy and integration receipts do not belong in daily research context."
+    },
+    {
+      "source_path": "docs/project/V065_BRANCH_DAG_INVENTORY_R1.json",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "695f2c9a46a7ebedf3e7eedef6c5363c67682ad8",
+      "destination_branch": "docs/engineering",
+      "destination_path": "repository-maintenance/m0/V065_BRANCH_DAG_INVENTORY_R1.json",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "M0 genealogy and integration receipts do not belong in daily research context."
+    },
+    {
+      "source_path": "docs/project/V065_COMMIT_PARENT_GRAPH_R1.json",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "e958d3a1583d86c03bee86e1dad8f86e72de9bde",
+      "destination_branch": "docs/engineering",
+      "destination_path": "repository-maintenance/m0/V065_COMMIT_PARENT_GRAPH_R1.json",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "M0 genealogy and integration receipts do not belong in daily research context."
+    },
+    {
+      "source_path": "docs/project/V065_PATH_PROVENANCE_R1.json",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "7bfd4783d0f1510f5e821d77c78d25259fb69141",
+      "destination_branch": "docs/engineering",
+      "destination_path": "repository-maintenance/m0/V065_PATH_PROVENANCE_R1.json",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "M0 genealogy and integration receipts do not belong in daily research context."
+    },
+    {
+      "source_path": "docs/project/V065_VALIDATION_RECEIPT_R1.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "cef4f4afa16f3c828d8a2c5d3eb67ed770ee8277",
+      "destination_branch": "docs/engineering",
+      "destination_path": "repository-maintenance/m0/V065_VALIDATION_RECEIPT_R1.md",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "M0 genealogy and integration receipts do not belong in daily research context."
+    },
+    {
+      "source_path": "docs/project/V0.6_GEMINI_MODE_ROUTING_AND_CI_EXECUTION_EFFICIENCY_POLICY.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "ae265bf5751cd5eb02891d34d459dc639b000ef5",
+      "destination_branch": "docs/engineering",
+      "destination_path": "ci/RESEARCH_EXECUTION_ROUTING_AND_LIGHTWEIGHT_TESTING_R2.md",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "Mixed PR #6 engineering/model/CI process: keep full page here, short research-facing summary on main."
+    },
+    {
+      "source_path": "docs/engineering/V065_BRANCH_LIFECYCLE_ARCHIVE_AND_DELETE_RUNBOOK_R1.md",
+      "source_commit": "dc04f56e418e762e0137fbc28429fef0f545bce4",
+      "source_blob": "a6924be096065a92dd5c266efa04fe1e72860246",
+      "destination_branch": "docs/engineering",
+      "destination_path": "repository-maintenance/V065_BRANCH_LIFECYCLE_ARCHIVE_AND_DELETE_RUNBOOK_R1.md",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "Exact M1 instructions retained verbatim; status is historical task text, not execution proof."
+    },
+    {
+      "source_path": "prompts/v0.6/repository/V065_M1_CODEX_CLEAN_MAIN_DOCS_LEGACY_BRANCH_PRUNE_R1.md",
+      "source_commit": "dc04f56e418e762e0137fbc28429fef0f545bce4",
+      "source_blob": "78d988cfbaace40be9effa397a2c09adb92eb593",
+      "destination_branch": "docs/engineering",
+      "destination_path": "repository-maintenance/V065_M1_CODEX_CLEAN_MAIN_DOCS_LEGACY_BRANCH_PRUNE_R1.md",
+      "action": "MOVE_ENGINEERING_DOCS",
+      "reason": "Exact M1 instructions retained verbatim; status is historical task text, not execution proof."
+    },
+    {
+      "source_path": "docs/project/V0.6_NEW_CHAT_HANDOVER_INDEX.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "84d0798fe76a02eb635970b723aac26b0ad4effb",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/project/V0.6_NEW_CHAT_HANDOVER_INDEX.md",
+      "action": "KEEP_MAIN",
+      "reason": "Current research-role/status/UI contract; selective adoption with current navigation corrections, no scientific promotion."
+    },
+    {
+      "source_path": "docs/project/V0.6_PROJECT_STATUS_AND_ROADMAP.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "cdd9f674d3c08d8bb4beda343429a5366c90c8b4",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/project/V0.6_PROJECT_STATUS_AND_ROADMAP.md",
+      "action": "KEEP_MAIN",
+      "reason": "Current research-role/status/UI contract; selective adoption with current navigation corrections, no scientific promotion."
+    },
+    {
+      "source_path": "docs/project/V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "c20975dce9fd1b2becec09f3e3f05598b0055004",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/project/V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md",
+      "action": "KEEP_MAIN",
+      "reason": "Current research-role/status/UI contract; selective adoption with current navigation corrections, no scientific promotion."
+    },
+    {
+      "source_path": "docs/project/V06_CHATGPT_FIVE_SESSION_ROLE_MATRIX_R1.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "008aadfc3b690de8389f57fb4a54b2e455c770af",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/project/V06_CHATGPT_FIVE_SESSION_ROLE_MATRIX_R1.md",
+      "action": "KEEP_MAIN",
+      "reason": "Current research-role/status/UI contract; selective adoption with current navigation corrections, no scientific promotion."
+    },
+    {
+      "source_path": "docs/project/V06_CHATGPT_OUTPUT_UI_AND_TASK_CARD_STANDARD_R1.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "8542c41513729d4a30879460f806c93faf244780",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/project/V06_CHATGPT_OUTPUT_UI_AND_TASK_CARD_STANDARD_R1.md",
+      "action": "KEEP_MAIN",
+      "reason": "Current research-role/status/UI contract; selective adoption with current navigation corrections, no scientific promotion."
+    },
+    {
+      "source_path": "docs/roles/V0.6_CHATGPT_0_PRIMARY_CONTROLLER.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "094f05550beb74954cc60c1cb73f79801b3ae50e",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/roles/V0.6_CHATGPT_0_PRIMARY_CONTROLLER.md",
+      "action": "KEEP_MAIN",
+      "reason": "Current research-role/status/UI contract; selective adoption with current navigation corrections, no scientific promotion."
+    },
+    {
+      "source_path": "docs/roles/V0.6_CHATGPT_1_SUPERVISORY_AUDITOR.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "4a08cdf8ff5b77aa9f7df9293c98b1c792e25ab4",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/roles/V0.6_CHATGPT_1_SUPERVISORY_AUDITOR.md",
+      "action": "KEEP_MAIN",
+      "reason": "Current research-role/status/UI contract; selective adoption with current navigation corrections, no scientific promotion."
+    },
+    {
+      "source_path": "docs/roles/V0.6_CHATGPT_2_ADVERSARIAL_CHALLENGER.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "3aca6febb359ace7fe962c555b460b67a8a3d4a1",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/roles/V0.6_CHATGPT_2_ADVERSARIAL_CHALLENGER.md",
+      "action": "KEEP_MAIN",
+      "reason": "Current research-role/status/UI contract; selective adoption with current navigation corrections, no scientific promotion."
+    },
+    {
+      "source_path": "docs/roles/V0.6_CHATGPT_2_DIRECT_EXECUTION_OPERATOR.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "6246cdbedb28ef4170305d8e7e190bc5826200cf",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/roles/V0.6_CHATGPT_2_DIRECT_EXECUTION_OPERATOR.md",
+      "action": "KEEP_MAIN",
+      "reason": "Current research-role/status/UI contract; selective adoption with current navigation corrections, no scientific promotion."
+    },
+    {
+      "source_path": "docs/roles/V0.6_CHATGPT_2_INDEPENDENT_RESEARCH_SCIENTIST.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "4caa99f0d59e51d6a2cb1b9ce70147ae637d0a8f",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/roles/V0.6_CHATGPT_2_INDEPENDENT_RESEARCH_SCIENTIST.md",
+      "action": "KEEP_MAIN",
+      "reason": "Current research-role/status/UI contract; selective adoption with current navigation corrections, no scientific promotion."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V065_NEW_CHAT_B_LINE_CONTROLLER_R2.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "c8aaebd74f280e0ea7c3eaedd7057acf1fc14234",
+      "destination_branch": "v0.6.5",
+      "destination_path": "prompts/v0.6/chat_handover/V065_NEW_CHAT_B_LINE_CONTROLLER_R3.md",
+      "action": "KEEP_MAIN_NEW_REVISION",
+      "reason": "Fresh M1 R3 revision; original R2 immutable prompt is not modified in place."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V065_NEW_CHAT_CHALLENGER_2C_R2.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "098a001e67d0a915618582c3fc0953e6d3c3fc3a",
+      "destination_branch": "v0.6.5",
+      "destination_path": "prompts/v0.6/chat_handover/V065_NEW_CHAT_CHALLENGER_2C_R3.md",
+      "action": "KEEP_MAIN_NEW_REVISION",
+      "reason": "Fresh M1 R3 revision; original R2 immutable prompt is not modified in place."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V065_NEW_CHAT_EXECUTOR_2E_R2.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "7bf4727e1e96353fdd9d3bb20011f6d4024dd167",
+      "destination_branch": "v0.6.5",
+      "destination_path": "prompts/v0.6/chat_handover/V065_NEW_CHAT_EXECUTOR_2E_R3.md",
+      "action": "KEEP_MAIN_NEW_REVISION",
+      "reason": "Fresh M1 R3 revision; original R2 immutable prompt is not modified in place."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V065_NEW_CHAT_RESEARCHER_2R_R2.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "5dd0dfdc96e0a3332bd896baf3c8b5985bf83556",
+      "destination_branch": "v0.6.5",
+      "destination_path": "prompts/v0.6/chat_handover/V065_NEW_CHAT_RESEARCHER_2R_R3.md",
+      "action": "KEEP_MAIN_NEW_REVISION",
+      "reason": "Fresh M1 R3 revision; original R2 immutable prompt is not modified in place."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V065_NEW_CHAT_SUPERVISORY_AUDITOR_R2.md",
+      "source_commit": "9ec13bb44dc674c45c7099db1ff2177ea60393ff",
+      "source_blob": "2ceef8ff5079f76c1c1ac6c4e810a26613a842be",
+      "destination_branch": "v0.6.5",
+      "destination_path": "prompts/v0.6/chat_handover/V065_NEW_CHAT_SUPERVISORY_AUDITOR_R3.md",
+      "action": "KEEP_MAIN_NEW_REVISION",
+      "reason": "Fresh M1 R3 revision; original R2 immutable prompt is not modified in place."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V06_NEW_CHAT_G2_RESEARCH_SCIENTIST.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "8a372e0fb4b41693b488943aeddcd41fc221bbac",
+      "destination_branch": "legacy/research-archive",
+      "destination_path": null,
+      "action": "ARCHIVE_LEGACY",
+      "reason": "Superseded B-line chat bootstrap retained through exact original ancestry; fresh R3 entrypoints on main."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V06_NEW_CHAT_G2_ADVERSARIAL_CHALLENGER.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "0a831cd671d3bec68b1ec325459544aba8d7d3e2",
+      "destination_branch": "legacy/research-archive",
+      "destination_path": null,
+      "action": "ARCHIVE_LEGACY",
+      "reason": "Superseded B-line chat bootstrap retained through exact original ancestry; fresh R3 entrypoints on main."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V065_NEW_CHAT_B_LINE_CONTROLLER_R1.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "e04c5f11a871a8619a3f1a91ad6bc78151a75a5d",
+      "destination_branch": "legacy/research-archive",
+      "destination_path": null,
+      "action": "ARCHIVE_LEGACY",
+      "reason": "Superseded B-line chat bootstrap retained through exact original ancestry; fresh R3 entrypoints on main."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V06_R11_NEW_CHAT_B_LINE_CONTROLLER_20261016.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "eed451b0540af7ed1c7c30d820621f5f67f42821",
+      "destination_branch": "legacy/research-archive",
+      "destination_path": null,
+      "action": "ARCHIVE_LEGACY",
+      "reason": "Superseded B-line chat bootstrap retained through exact original ancestry; fresh R3 entrypoints on main."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V06_NEW_CHAT_G2_EXECUTION_OPERATOR.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "1f5b022d00bc7a3a808a0fd8682ee38d4ac0a38f",
+      "destination_branch": "legacy/research-archive",
+      "destination_path": null,
+      "action": "ARCHIVE_LEGACY",
+      "reason": "Superseded B-line chat bootstrap retained through exact original ancestry; fresh R3 entrypoints on main."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V06_NEW_CHAT_SUPERVISORY_AUDITOR.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "186bcf5bfad08cad32d851de6578b029e773d6cd",
+      "destination_branch": "legacy/research-archive",
+      "destination_path": null,
+      "action": "ARCHIVE_LEGACY",
+      "reason": "Superseded B-line chat bootstrap retained through exact original ancestry; fresh R3 entrypoints on main."
+    },
+    {
+      "source_path": "prompts/v0.6/chat_handover/V06_NEW_CHAT_B_LINE_CONTROLLER.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "a7192e9af8c8dbb48a26516f0994c5d743890956",
+      "destination_branch": "legacy/research-archive",
+      "destination_path": null,
+      "action": "ARCHIVE_LEGACY",
+      "reason": "Superseded B-line chat bootstrap retained through exact original ancestry; fresh R3 entrypoints on main."
+    },
+    {
+      "source_path": "docs/RESEARCH_REGISTRY.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "5bbb0f1be8407a5193e879534a7eed6d2a91cfe7",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/RESEARCH_REGISTRY.md",
+      "action": "KEEP_MAIN_COMPATIBILITY_OR_PROTECTED",
+      "reason": "Existing research/source documentation or literal source/test/config dependency; protected A-line document unchanged."
+    },
+    {
+      "source_path": "docs/CURRENT_ARCHITECTURE.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "3cf0ec90d3d63f38e1cae4cd1ed702b64bfd7290",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/CURRENT_ARCHITECTURE.md",
+      "action": "KEEP_MAIN_COMPATIBILITY_OR_PROTECTED",
+      "reason": "Existing research/source documentation or literal source/test/config dependency; protected A-line document unchanged."
+    },
+    {
+      "source_path": "docs/h40/H40_P2_ACCEPTANCE_RECORD.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "8b556b30acfc79591e21557f60490fed6e3acb3a",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/h40/H40_P2_ACCEPTANCE_RECORD.md",
+      "action": "KEEP_MAIN_COMPATIBILITY_OR_PROTECTED",
+      "reason": "Existing research/source documentation or literal source/test/config dependency; protected A-line document unchanged."
+    },
+    {
+      "source_path": "docs/MARKET_WATCH_FEISHU.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "0b5130f7a34ec4ccd3edec337a5e51d71024b04c",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/MARKET_WATCH_FEISHU.md",
+      "action": "KEEP_MAIN_COMPATIBILITY_OR_PROTECTED",
+      "reason": "Existing research/source documentation or literal source/test/config dependency; protected A-line document unchanged."
+    },
+    {
+      "source_path": "docs/OPTIMIZED_DESIGN.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "3a244c19ab8e3b4e9560ee0f1b4e51aaf6bc7091",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/OPTIMIZED_DESIGN.md",
+      "action": "KEEP_MAIN_COMPATIBILITY_OR_PROTECTED",
+      "reason": "Existing research/source documentation or literal source/test/config dependency; protected A-line document unchanged."
+    },
+    {
+      "source_path": "docs/LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "c14a48184630ed2bafa029c07d24e7a011d328eb",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md",
+      "action": "KEEP_MAIN_COMPATIBILITY_OR_PROTECTED",
+      "reason": "Existing research/source documentation or literal source/test/config dependency; protected A-line document unchanged."
+    },
+    {
+      "source_path": "docs/FORWARD_DERIVATIVES_OPERATIONS.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "389fdd3ed659e669843928d81de0c7a32ac7241e",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/FORWARD_DERIVATIVES_OPERATIONS.md",
+      "action": "KEEP_MAIN_COMPATIBILITY_OR_PROTECTED",
+      "reason": "Existing research/source documentation or literal source/test/config dependency; protected A-line document unchanged."
+    },
+    {
+      "source_path": "docs/DERIVATIVES_FORWARD_COLLECTION.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "30ba7de225b7fd0c81623bff97fc9ddc524e01e1",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/DERIVATIVES_FORWARD_COLLECTION.md",
+      "action": "KEEP_MAIN_COMPATIBILITY_OR_PROTECTED",
+      "reason": "Existing research/source documentation or literal source/test/config dependency; protected A-line document unchanged."
+    },
+    {
+      "source_path": "docs/roles/V0.6_CHATGPT_A_LINE_PRIMARY_CONTROLLER.md",
+      "source_commit": "065d62965373627c4887e52f482d1dcb984af860",
+      "source_blob": "3f12b71906a10c85314659e2353d9d69b3e7bf16",
+      "destination_branch": "v0.6.5",
+      "destination_path": "docs/roles/V0.6_CHATGPT_A_LINE_PRIMARY_CONTROLLER.md",
+      "action": "KEEP_MAIN_COMPATIBILITY_OR_PROTECTED",
+      "reason": "Existing research/source documentation or literal source/test/config dependency; protected A-line document unchanged."
+    }
+  ]
+}

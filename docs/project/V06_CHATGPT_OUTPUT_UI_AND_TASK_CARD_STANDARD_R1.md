@@ -2,6 +2,20 @@
 
 **ACTIVE for owner-facing presentation under V065-M1; scientific/release acceptance is separate.** Audience: B-line 0 / 1 / 2-R / 2-C / 2-E. Owner preference: **visual, compact, action-oriented**, with prompt-copy controls and exact links, not full prompt dumps. [Research-first operating contract](V065_RESEARCH_FIRST_OPERATING_CONTRACT_R2.md). [Prior complete R1 standard](https://github.com/EXASHXE/btc-quant-agent-public/blob/065d62965373627c4887e52f482d1dcb984af860/docs/project/V06_CHATGPT_OUTPUT_UI_AND_TASK_CARD_STANDARD_R1.md).
 
+## Mandatory project-wide prompt-card contract
+
+This is the **single shared presentation rule for every project role and executor**, not a Controller-only preference. It applies to Controller 0, Auditor 1, Researcher 2-R, Challenger 2-C, Direct Executor 2-E, A-line Controller, Codex/Sol/Astra/Gemini, and any subagent. Role-specific output conventions do not override it.
+
+Whenever presenting an executable or dispatchable prompt to the Owner:
+
+- Render a compact task card with the required metadata and **at most two cards per response**.
+- Each card has exactly one functional **Copy prompt** button. Put the complete prompt only in that button's copy payload.
+- Never display the prompt body in narrative prose, a code fence, a writing block, an expanded/collapsible panel, or any duplicate visible text.
+- If the current interface cannot provide a functional copy action, state that limitation and **ask before exposing the prompt body**. Never render a fake button or claim copying succeeded without host confirmation.
+- Mark READY, NOT DISPATCHED, RUNNING, DELIVERED, REVIEWED, and BLOCKED accurately. For completed work, show its receipt/evidence instead of reissuing the execution prompt.
+
+This rule governs prompt presentation only. It creates no execution authority and does not change source, PIT, protected-sample, Alpha, TESTNET, LIVE, or funds gates.
+
 ## First-screen contract for Controller 0
 
 Show the same five elements in this order (aim for one mobile screen):
@@ -21,10 +35,10 @@ No repeated list of old phases or massive review quote before actionable choices
 - **Objective + acceptance:** one result in 1–2 sentences.
 - **Prerequisite and parallel wave:** exact SHA for consequential targets; distinct branch/worktree/path owner; W2 conditions visibly **NOT DISPATCHED**.
 - **Frozen original Prompt:** a real `github.com/.../blob/<full commit SHA>/<prompt path>` URL. If no published prompt exists, explicitly label `UNPUBLISHED` instead of inventing a link.
-- **Copy prompt:** where interactive UI supports host copy, use a real button/action that copies the exact ready prompt; otherwise show **one** copyable code block or exact prompt link, not an inert fake button or raw prompt repeated in narrative.
+- **Copy prompt:** use exactly one real button/action that copies the exact ready prompt. If this interface cannot provide a functional copy action, state the limitation and ask before showing the prompt body. Never use an inert/fake button.
 - **Receipt:** if task delivered, replace “Copy to execute” with author SHA, report link, actual test status and review dependency.
 
-Do not paste full task prose outside the card. If owner specifically requests the full prompt, give one clearly copyable block, not multiple identical versions.
+Do not paste full task prose outside the card. If the Owner explicitly requests a visible prompt fallback and the interface cannot provide a working copy action, first state the limitation and obtain confirmation; then provide exactly one copyable block. Never duplicate the prompt.
 
 ## Ready wave vs conditional successors
 

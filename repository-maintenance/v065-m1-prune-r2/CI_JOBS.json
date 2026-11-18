@@ -1,0 +1,204 @@
+{
+  "total_count": 2,
+  "jobs": [
+    {
+      "id": 117031993940,
+      "run_id": 38918484549,
+      "workflow_name": "CI",
+      "head_branch": "v0.6.5",
+      "run_url": "https://api.github.com/repos/EXASHXE/btc-quant-agent-public/actions/runs/38918484549",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUlws788AAAAbP6aCVA",
+      "head_sha": "941f24af8f1e12c1f314e2d970e7af8f97293b21",
+      "url": "https://api.github.com/repos/EXASHXE/btc-quant-agent-public/actions/jobs/117031993940",
+      "html_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38918484549/job/117031993940",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-16T14:46:28Z",
+      "started_at": "2026-10-16T14:46:31Z",
+      "completed_at": "2026-10-16T14:46:43Z",
+      "name": "Risk-based quality (Python 3.12)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-16T14:46:32Z",
+          "completed_at": "2026-10-16T14:46:32Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-16T14:46:32Z",
+          "completed_at": "2026-10-16T14:46:34Z"
+        },
+        {
+          "name": "Fetch immutable CI base for merge-base resolution",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-16T14:46:34Z",
+          "completed_at": "2026-10-16T14:46:34Z"
+        },
+        {
+          "name": "Ensure cache directory exists for docs-only/zero-pip FAST paths",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-16T14:46:34Z",
+          "completed_at": "2026-10-16T14:46:34Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-16T14:46:34Z",
+          "completed_at": "2026-10-16T14:46:35Z"
+        },
+        {
+          "name": "Build fail-closed test plan",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-16T14:46:35Z",
+          "completed_at": "2026-10-16T14:46:35Z"
+        },
+        {
+          "name": "Classify impact before heavy dependency installation",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-16T14:46:35Z",
+          "completed_at": "2026-10-16T14:46:35Z"
+        },
+        {
+          "name": "Install tiny CI-planner dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-16T14:46:35Z",
+          "completed_at": "2026-10-16T14:46:38Z"
+        },
+        {
+          "name": "Install production/research validation dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2026-10-16T14:46:38Z",
+          "completed_at": "2026-10-16T14:46:38Z"
+        },
+        {
+          "name": "Ruff with bounded historical EXE001 debt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-16T14:46:38Z",
+          "completed_at": "2026-10-16T14:46:38Z"
+        },
+        {
+          "name": "Type-check production package on production changes",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-10-16T14:46:38Z",
+          "completed_at": "2026-10-16T14:46:38Z"
+        },
+        {
+          "name": "Compile Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-16T14:46:38Z",
+          "completed_at": "2026-10-16T14:46:39Z"
+        },
+        {
+          "name": "Validate changed JSON artifacts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-16T14:46:39Z",
+          "completed_at": "2026-10-16T14:46:39Z"
+        },
+        {
+          "name": "Tests selected by risk/changed scope",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-16T14:46:39Z",
+          "completed_at": "2026-10-16T14:46:40Z"
+        },
+        {
+          "name": "Retain scoped test evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-16T14:46:40Z",
+          "completed_at": "2026-10-16T14:46:41Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-10-16T14:46:41Z",
+          "completed_at": "2026-10-16T14:46:41Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 30,
+          "started_at": "2026-10-16T14:46:41Z",
+          "completed_at": "2026-10-16T14:46:41Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31,
+          "started_at": "2026-10-16T14:46:41Z",
+          "completed_at": "2026-10-16T14:46:41Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/EXASHXE/btc-quant-agent-public/check-runs/117031993940",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002291,
+      "runner_name": "GitHub Actions 1000002291",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 117031996050,
+      "run_id": 38918484549,
+      "workflow_name": "CI",
+      "head_branch": "v0.6.5",
+      "run_url": "https://api.github.com/repos/EXASHXE/btc-quant-agent-public/actions/runs/38918484549",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUlws788AAAAbP6aKkg",
+      "head_sha": "941f24af8f1e12c1f314e2d970e7af8f97293b21",
+      "url": "https://api.github.com/repos/EXASHXE/btc-quant-agent-public/actions/jobs/117031996050",
+      "html_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38918484549/job/117031996050",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-10-16T14:46:28Z",
+      "started_at": "2026-10-16T14:46:28Z",
+      "completed_at": "2026-10-16T14:46:28Z",
+      "name": "Compatibility manual full suite",
+      "steps": [],
+      "check_run_url": "https://api.github.com/repos/EXASHXE/btc-quant-agent-public/check-runs/117031996050",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    }
+  ]
+}

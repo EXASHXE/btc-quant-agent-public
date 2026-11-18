@@ -1,0 +1,28 @@
+# V065-DATA-R3 — Continue contiguous Binance/OKX BTC/ETH archive acquisition
+
+Role: Agy/Gemini High, parallel independent data execution agent.
+Priority: P0 research data coverage, separate from Codex P0/P1/cross-venue coding.
+Owner decision: Binance + OKX and other useful source-eligible personal noncommercial historical research data may be acquired and validated in reproducible tranches. This authorization is not a grant of access where a specific provider's terms disallow it.
+Repo: /root/workspace/project/quant-0.6.5 / v0.6.5, last baseline 12b74b4c2fd3a22a9f4b35dbf331cfb1166aae77. **Do not touch the 14 Owner R4 dirty doc/prompt files**, nor scripts/research/r11_d2, scripts/research/strategy_eval, scripts/research/cross_venue, tests/research. Data owner may edit ONLY existing scripts/data, tools/data, tests/data. No Git branch/worktree, stash, clean, reset, commit or push.
+
+Existing physically verified Q3 acquisitions (DO NOT OVERWRITE):
+- /root/workspace/project/crypto-data/historical/binance-usdm-expansion (210-record manifest, DATA_TRANCHE_VERIFIED, existing manifest SHA256 2e4c90606207673b83753a23847633b154282bb489525e371aa987dc6b1c2d1d).
+- /root/workspace/project/crypto-data/historical/okx-swap-expansion (463-record manifest, DATA_TRANCHE_VERIFIED, existing manifest SHA256 bd19f980aea4eedb9c66b08fe661d783ed8087ed4b98e459479f1033c2416242).
+- Existing R10/R11 pilot relocation remains immutable and protected; never recopy R10/R11 or touch original Quant-agent/Quant-agent-sanitized/history/private OOS.
+
+CRITICAL OBSERVED LIMITATION: tools/data/binance_usdm.py hardcodes MONTHS=("2026-07","2026-08","2026-09") and tools/data/okx_swap.py hardcodes DAYS_92 for Q3, while scripts/data/acquire_tranche.py has no date-range CLI. Merely re-running current default `--venue all --action acquire` cannot fetch the next Q2 2026 tranche; it repeats Q3.
+
+WORK:
+1. Freeze the real Q3 files and verify exact original current hashes and protected-output boundaries. Read documented licensing/source eligibility for each official Binance Vision and OKX historical archive before new requests. Respect provider location/access, robots/rate limit and replay/publication constraints; if barred, source-specific RIGHTS_HOLD, continue any independent allowed source. No VPN/proxy/geofence circumvention, credentials, trading or new live WebSocket/API streaming.
+2. Generalize existing tools/data and scripts/data acquisition CLI to accept explicit `--start-date YYYY-MM-DD`, `--end-date YYYY-MM-DD` (end exclusive), selecting only official archive periods and requiring predictable filename/symbol/market identity. Preserve existing Q3 behavior/default compatibility and all QC/checksum semantics; do not overwrite Q3 manifests when launching a new tranche. Add a `--tranche-id` (or equivalent) that produces separate versioned manifest/report root for each acquisition batch. Correct OKX UTC+8 filename/day semantics vs UTC event timestamps. Add targeted tests for month/day enumeration, selection, manifest conservation and resumable incomplete objects. No unrelated refactor.
+3. Execute next high-value contiguous Q2 `2026-04-01 UTC` through `2026-07-01 UTC` exclusive for BTCUSDT, ETHUSDT Binance USD-M perp and BTC-USDT-SWAP, ETH-USDT-SWAP OKX SWAP:
+   - price klines 1m, mark/index, funding actual event times, native OI/long-short sampled metrics where official archive provides, spot benchmark if independently sourced;
+   - actual trades/aggTrades and OKX 400-level L2 1-day sample only where source terms and endpoint support it, and only after base data coverage.
+   - separate per-venue acquisition roots under /root/workspace/project/crypto-data/historical/ (e.g. binance-usdm-2026q2, okx-swap-2026q2), containing original archives + sha256/official checksums + QC/manifest/coverage; never mix venues.
+4. Hard per-run batch guard: new compressed <=4GiB, expanded <=16GiB, requests <=2000, >=100GiB free, finite retries, max 12h operator scope; if bounds approach, STOP_BUDGET with resumable manifest and exact next gap; do not silently extend scope. Using a healthy memory budget is mandatory; if MemAvailable <500MiB or swap exhausted AND heavy Codex running, postpone expensive processing and return HOLD_HOST_RESOURCES. Large L2 data require explicit size accounting before fetching.
+5. Verify acquired bytes with provider checksum if provided, streaming SHA256, bounded ZIP schema/time-range/family identity/coverage and duplicate/gap checks. Mark missing publisher checksum accurately; do not turn missing first-known receiver PIT into source admission. Test no-redownload on resumed tranche, no write to existing Q3 files, no symlink escape.
+6. Deliver real on-disk data (not only design): first bounded Q2 tranche with counted files/new bytes/coverage/failures; executable CLI invocation; positive/negative scoped test results; exact path and SHA-256 for manifest, qc, coverage. If acquiring Q2 remotely is blocked, at minimum ship the date-parameterized working downloader + tests and precise source-specific blocker. Next earliest outstanding window after Q2 is 2026-Q1 and 2025-Q4; don't start it until Q2 validated.
+
+Concurrent scope: Codex can operate on scripts/research while this agent owns scripts/data and tools/data. This historical data job need NOT wait for a Controller F-R2 forward migration slot. Do not edit production systemd, active forward stores, prospective/source-qa, accounts or any Git docs prompt.
+
+Verdict: Q2_DATA_TRANCHE_VERIFIED, Q2_DATA_PARTIAL_WITH_NEXT_BATCH, Q2_SOURCE_RIGHTS_HOLD or HOLD_HOST_RESOURCES. Disclose original native exchange timestamps vs PIT_UNKNOWN, Alpha unproven, NO_TESTNET/LIVE, no financial writes.

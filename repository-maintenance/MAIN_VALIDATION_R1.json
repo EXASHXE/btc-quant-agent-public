@@ -1,0 +1,11 @@
+{
+  "tree": "721e53dd0041093716f8fe46cb9831443d33e494",
+  "changed_paths": 35,
+  "added_or_modified": 19,
+  "removed": 16,
+  "local_links_resolved": 59,
+  "broken_links": [],
+  "executable_and_protected_bytes_unchanged": true,
+  "tests": "NOT_RUN_BY_SCOPE_T0",
+  "git_diff_check": "PASS"
+}

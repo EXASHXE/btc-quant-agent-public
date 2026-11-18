@@ -1,4 +1,6 @@
 # V070-ADVISORY-FOUNDATION-01 — Codex Task Proposal
+
+> **Canonical:** GitHub `docs/engineering`. [Documentation Branch Policy](V070_DOCUMENTATION_BRANCH_POLICY.md). Matching `v0.7.0` documents are historical copies.
 Status: PROPOSAL_ONLY, pending an explicit Owner implementation authorization. Prepared 2026-10-28.
 
 ## Objective

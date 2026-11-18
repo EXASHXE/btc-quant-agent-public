@@ -1,43 +1,46 @@
-# Quant Agent — Active v0.7.0 Project Overlay (2026-10-28)
+# Quant docs/engineering — Active Documentation Agent Overlay
 
-This file guides agents operating in this worktree. It is not an authorization to execute any task. Explicit Owner scope and the exact requested task control actions and data access.
+> **PROJECT-WIDE PROMPT PRESENTATION (2026-11-11):** [Mandatory Prompt Copy Cards](docs/project/V070_PROMPT_COPY_CARD_STANDARD_20261111.md). Every ChatGPT role (0-C, 1-A, audit and agent planners) must present each newly generated full prompt inside a compact card with a **working 复制完整 Prompt / Copy Full Prompt button** copying the complete exact prompt. Text-only environments use a single complete fenced-block fallback. This active v0.7.0 standard supersedes conflicting historical format instructions; it creates no execution authorization.
 
-## Active mission and document order
-1. [Advisory Mission](docs/project/V070_ADVISORY_MISSION_AND_SCOPE.md)
-2. [Roles and authority](docs/roles/V070_ADVISORY_AGENT_ROLES.md)
-3. [Delivery roadmap](docs/project/V070_ADVISORY_ROADMAP.md)
-4. [Verified handoff](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md)
-5. [Next bounded task](docs/project/V070_ADVISORY_FOUNDATION_TASK.md)
-6. [ChatGPT independent advisor role](docs/roles/V070_CHATGPT_STRATEGIC_ADVISOR.md)
-7. [New ChatGPT conversation](docs/project/V070_CHATGPT_NEW_CHAT_START.md)
+> **LATEST 2026-11-11 OWNER WORKFLOW / MVP CLOSURE:** [Current MVP Home](docs/project/V070_MVP_CLOSURE_HOME_20261111.md) · [Lean delegated execution](docs/project/V070_EXECUTION_DELEGATION_POLICY_20261111.md) · [Three Gemini report review and fast roadmap](docs/project/V070_GEMINI_PREFLIGHT_REVIEW_AND_FAST_MVP_PLAN_20261111.md) · [New 0-C start](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261111_MVP_CLOSURE.md). Routine offline coding, mock tests, documentation and Codex/Gemini coordination no longer require approval for every task/SHA. Earlier 2026-11-09 PROMPT-ONLY restrictions are superseded for such work. Actual Source/Feishu external activation and privileged/account/financial actions remain separate gates. Q0BC positive semantic proof is still blocked on Controller provenance; Source remains unqualified.
 
-These are the current product-planning references. Historical v0.6/v0.6.5 research, frozen experiment protocols, immutable registry and research decisions remain authoritative for their own evidence; do not retroactively change them. A new roadmap does not authorize a new trial, a data read, a repository mutation or a deployment.
+> **CURRENT Q0 HANDOFF — 2026-11-09:** [Start here: Handoff Home](docs/project/V070_HANDOFF_HOME_20261109.md) · [Current Status](docs/project/V070_STATUS_AND_WORKPACKAGES_20261109_Q0.md) · [Q0 Roadmap](docs/project/V070_MULTISYMBOL_MTF_FEISHU_ROADMAP_20261109.md) · [0-C new chat](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0.md) · [1-A new chat](prompts/v0.7/V070_NEW_CHAT_1A_20261109_Q0.md). Old 2026-11-02 snapshots below are historical, not current operational evidence. S is Controller-accepted **offline-only**; Q0B/Q0C await independent Controller acceptance; live Source/Feishu not authorized.\n\n## v0.7.0 current 2026-11-02 handoff (docs/engineering only)
 
-## Working trees and preservation
-- Research worktree R: /root/workspace/project/quant-0.7.0/research-loop-bootstrap.
-- Operating collector Q: /root/workspace/project/Quant-agent.
-- Product feature tree M: /root/workspace/project/Quant-agent-market-watch.
-- Do not assume these trees are synchronized. Identify source revisions and inspect all dirty changes before selecting an integration base.
-- Preserve the original 12 added paths in R, the pending M edits, live Q services and all PRIMARY registry events. Do not reset, clean, stash, force checkout, overwrite or merge owner work.
-- Prefer an isolated worktree for code changes and a small reviewable patch. Do not commit, push or deploy unless explicitly authorized.
+Use [Session04 evidence reconciliation](docs/project/V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md), [dual-review convergence](docs/project/V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md), [current state](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md), [roadmap](docs/project/V070_ADVISORY_ROADMAP.md), [roles](docs/roles/V070_ADVISORY_AGENT_ROLES.md), [1-A new-chat](prompts/v0.7/V070_NEW_CHAT_1A.md), and [0-C new-chat](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md).
 
-## Product invariants
-- Product is a read-only advisory system: market scanning, evidence-backed candidate plans, user-confirmed positions, deterministic risk/management guidance, and reliable notifications. No autonomous orders.
-- Candidate, suggested entry, actual user report, simulated fill, account-confirmed fill, and CLOSED are separate states.
-- Structure-derived stop/target, volatility projection and open-ended trailing are different explicitly typed policies. Do not manufacture a 2R target or invent support/resistance.
-- Initial stop/risk limits never silently loosen; risk-critical notifications do not wait for LLM review.
-- Timestamp correctness: source event, receive, available, decision, commit, notification and fill clocks must be distinguished. No lookahead.
-- Persist before notifying. False notification-success flags, silent backfill and fabricated fills are prohibited.
-- Refuse action on stale/insufficient data. A numeric rule ranking is not calibrated probability or Alpha.
-- All modeled costs, slippage, funding and terminal-state accounting remain explicit; missing full-net evidence is not zero.
+Owner reports Session04 native completion; latest inspected local acceptance says `READY_FOR_OWNER_SIGNING / NOT_RUN`. Controller must reconcile with a newer genuine report before stage advancement. Route B is a proposed, offline-first, unified Source→Shadow MVP, NOT a new native grant. Do not start workers or collectors from documentation.
 
-## Research and execution boundaries
-- Historical fixed-horizon results remain valid for their exact protocols, including failures and NULLs. Dynamic lifecycle research is a new exploratory hypothesis, not a rescue.
-- 2021–2023 may be explored ONLY under explicitly authorized scope with exposure logging. Sealed 2024+ and the 2026-02-01–2026-08-01 FINAL_HOLDOUT remain protected.
-- PRIMARY 3/6 used, 3 unassigned as last verified; inspect current registry before any planning. Do not create PRIMARY-04 implicitly.
-- Forward market payload, broker accounts, tests needing real-network exchange calls, service restarts, live writes, historical outcome computations and paper/testnet/live orders each require separately granted scope.
-- Pure documentation maintenance does not imply code deployment; synthetic test success does not imply source or production readiness.
+---
 
-## Efficient agent workflow
-Controller 0-C translates Owner direction into ONE bounded task and accepts a demonstrated patch; Codex implements scoped code and tests. Astra, Opus or Gemini are optional for genuinely novel economic, causal or architectural questions, not mandatory for every engineering change.
-Prefer working product evidence over governance expansion. Report actual files changed, tests run, exclusions and blockers; never claim tests, forward evidence or profitability not independently verified.
+
+## Current engineering state (2026-11-02)
+
+Read the [Source-to-Advisory Closure Status](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md) before interpreting older plans. Session03 was genuine but permanently `PARTIAL/BACKPRESSURE_BLOCKED`; Source instrumentation remains PARTIAL/cause UNKNOWN; local Dashboard and Session04+LONG handoff are READY_OFFLINE, **not native qualified**. No fresh signed Session04 or <=48h LONG grant exists as of the cited local receipt. A docs change does not activate a worker or authorize source, signer, account, service or market operation.
+
+This independent docs-only branch is the **sole canonical documentation source** for v0.7.0 product mission, roles, architecture/roadmap, task cards, handoff, and new-chat startup prompts.
+
+Read [Documentation Branch Policy](docs/project/V070_DOCUMENTATION_BRANCH_POLICY.md) before changing documents.
+
+## Mandatory routing
+- ALL future documentation writes and reads target GitHub `docs/engineering` with verified HEAD.
+- Do NOT use `v0.7.0`, `v0.6.5` or R-local Markdown as an alternate writable or authoritative doc source. Those may contain legacy copies.
+- Actual code and service state belong to R=/root/workspace/project/quant-0.7.0/research-loop-bootstrap, M=/root/workspace/project/Quant-agent-market-watch, Q=/root/workspace/project/Quant-agent. Verify them separately; docs changes do not deploy.
+- The branch is documentation only: no runtime code, tests, protected market data, account credentials, registry changes or service operations.
+
+## Active entrypoints
+- [Mission](docs/project/V070_ADVISORY_MISSION_AND_SCOPE.md)
+- [Roles](docs/roles/V070_ADVISORY_AGENT_ROLES.md)
+- [ChatGPT independent advisor](docs/roles/V070_CHATGPT_STRATEGIC_ADVISOR.md)
+- [Roadmap](docs/project/V070_ADVISORY_ROADMAP.md)
+- [Handoff](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md)
+- [Current Source-to-Advisory closure](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md)
+- [Foundation task](docs/project/V070_ADVISORY_FOUNDATION_TASK.md)
+- [ChatGPT new chat](docs/project/V070_CHATGPT_NEW_CHAT_START.md)
+- [Controller new chat](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md)
+
+## Prompt presentation
+When user requests Controller/Codex/Astra/Opus/Gemini/new-chat prompt, provide a working **Copy Full Prompt** button copying every character when the host chat UI supports it. Never a fake copy button or excerpt-only copy. Otherwise put full prompt into one complete fenced block.
+
+## Product role
+Read-only crypto opportunity & position management advisory, actionable structure-driven entry/stop/target or open-ended trailing, user-confirmed positions, timely deterministic risk events. Do not assert 2R/time-based exits are mandatory or claim verified Alpha without evidence.
+Owner decides permissions. Controller 0-C coordinates Codex engineering; ChatGPT independent advisor critically reviews rather than runs parallel dispatch.

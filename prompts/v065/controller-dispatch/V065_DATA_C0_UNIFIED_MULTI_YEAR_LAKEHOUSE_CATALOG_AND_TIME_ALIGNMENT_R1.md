@@ -1,0 +1,50 @@
+# quant v0.6.5 — DATA-C0 unified multi-year historical lakehouse and canonical data catalog
+
+You are the current quant v0.6.5 direct data engineering implementer. Continue in this agent session. Do not restart a model or agent, create a scheduler, or write a prose-only plan.
+
+## Goal
+
+Establish ONE durable, read-only-source **multi-year, multi-venue data catalog and queryable normalized data lake** unifying existing BTC/ETH Binance/OKX data. Cover ALL extant older datasets, not only the recent 2026 Q2/Q3 P3 sample. Separate dataset indexing and research-derived outcome permissions: H39/H40/Final/Forward reservations constrain scientific trial labels and holdout claims, NOT mere metadata inventory or local physical organization. Never open or expose protected outcome rows or live private-account content. Do not claim every indicator is available every year.
+
+## Existing verified local facts (2026-10-18 20:25 Asia/Shanghai)
+
+Repo: /root/workspace/project/quant-0.6.5; branch v0.6.5 previously HEAD 12b74b4c2fd3a22a9f4b35dbf331cfb1166aae77. Preserve Owner R4 changes and untracked P0/P1/P2/P3 code and data downloader. No git clean/reset/checkout/stash, commit, push, new worktree. No modifications to original historical archives or collector live services. Keep original Quant-agent as immutable input.
+
+Original local source A: /root/workspace/project/Quant-agent/data/research (~81GiB):
+- BTCUSDT/1m/ year=2021..2025 all 12 months and 2026 Jan–Jul (67 Parquet). data_manifest.json reports 2,934,720 BTC perpetual 1m bars from 2021-01-01 until 2026-08-01 UTC exclusive, missing=0, duplicate=0.
+- BTCUSDT_SPOT/1m/ 2021..2025 full months plus Jan 2026 (61 Parquet); data_manifest reports 2,673,007 bars, 1,073 missing minutes and 7 known gaps, ends 2026-02-01 exclusive.
+- v0.3.19_official_derivatives/raw/ monthly BTCUSDT 2021-01..2026-01 (61 each): fundingRate, indexPriceKlines_1m, markPriceKlines_1m, premiumIndexKlines_1m, perp_aggTrades (~37.1 GB compressed), spot_aggTrades (~48.3GB compressed). raw_data_manifest.json 366 verified archive identities; derived hourly_inputs.parquet has 44,568 hourly rows.
+- cross_asset_1h/ 2021-01..2026-01 ETHUSDT, ADAUSDT, BNBUSDT, LTCUSDT, XRPUSDT monthly 1h candles and materialized Parquet. May contain real old ETH data but not Binance/OKX 1m ETH back to 2021.
+- BTCUSDT/funding_events.csv and other research derived features are NOT primary raw sources and should be cataloged with provenance as derived research assets, not mistaken for exchange-native raw streams.
+- Other v0.3.18 samples and h39_validation may be protected; index safe metadata without reading outcome values.
+
+Original source B: /root/workspace/project/Quant-agent/data/forward/BTCUSDT (~97GiB), including day-based live microstructure SQLite from 2026-08-31 onward and other live derivatives/forward databases. The btc-quant-microstructure-forward.service is actively writing. Treat ALL active forward DBs read-only/protected; NEVER attach to live DB or inspect sensitive rows. Only catalog safely established file/directory metadata or manifest of closed partitions, and label receiver clocks if documented. Do not copy 97GB to make a backup or join protected Forward outcome labels.
+
+New source C: /root/workspace/project/crypto-data/historical (~833MB total crypto-data):
+- binance-usdm-2026q2 208/208 PASS (2026 Apr–Jun): BTC+ETH 1m perp and spot bars, mark 1m, funding 8h, metrics 5m OI+top-position ratios, few aggTrades days.
+- binance-usdm-expansion 210/210 PASS (Jul–Sep), analogous.
+- okx-swap-2026q2 457/458 PASS, one missing Apr1 BTC 400-level L2; daily BTC/ETH SWAP and spot 1m, ALL_SWAPS funding 8h, tick trade samples.
+- okx-swap-expansion 463/463 PASS (Jul–Sep), analogous.
+- r10-binance-vision (7 days Sep 2022 BTC klines/mark/metrics) and r11-binance-core-pilot (2024 Jan BTC/ETH pilot + Sep 2022 samples) overlap older holdings; avoid double counting.
+- File-pass != minute-complete: June 2026 BTC Binance markPriceKlines gap 1440 1m; Aug26 2026 OKX ALL_SWAPS funding 3 missing aggregate records; spot historical has 1073 missing 1m.
+- Binance monthly archive calendar UTC; OKX daily archive filenames UTC+8, must normalize actual event UTC; do not join filename labels directly.
+- Host ~1.9 GiB physical RAM, swap 5 GiB, ~719GiB free disk. pyarrow and sqlite3 available. DuckDB not installed as of the prior check. Use zero-install SQLite metadata catalog + partitioned Parquet via pyarrow initially. DuckDB optional only if independently available/approved, no global pip install needed.
+
+## Deliver C0 usable artifacts, not an empty skeleton
+
+New, disjoint implementation files only under scripts/data/catalog/ and tests/data/catalog/. Write outputs under NEW /root/workspace/project/crypto-data/lakehouse/ (if safely absent and allowed); NOT under old Quant-agent, historical raw or Git. No wholesale copy of raw 80GiB or 97GiB data.
+
+1. Build a deterministic inventory walker driven by existing manifests and safe file metadata that enumerates every known dataset family and the exact local read-only source path. Give source_id, product type SPOT vs USD-M vs OKX SWAP, exchange, canonical BTC/ETH identity, field family, native time zone/calendar, source period, real UTC start/end if reliable, observed rows, gaps, duplicates, SHA provenance/manifest and QA level. When unavailable write UNKNOWN, never infer completeness. Mark older BTC 2021–2026 1m, 366 old derivative archives, 5 cross-asset histories, Q2/Q3 exact sets, R10/R11 duplicates and Forward closed/active separately. Include as-of source selection precedence, duplicate/overlap report, and explicit unresolved-source conflicts.
+2. Persist a standard SQLite catalog (e.g. catalog.sqlite), with source_files, datasets, dataset_coverage, canonical_instruments, integrity_status, exclusion_scope_metadata, schema_registry tables or equivalent. Idempotent rerun/update. It is a **local index**, not a broker runtime state DB. The historical archives remain immutable; no huge raw archive hash re-scan for files already pinned unless bounded audit is specified.
+3. Implement canonical Parquet partition schema and bounded transform for representative real NONPROTECTED, readily available input partitions: BTC perp 1m from an older year plus a 2026 month, BTC spot 1m, ETH 1h older, Binance BTC+ETH 2026 1m/OI, OKX BTC+ETH 2026 1m. Select small bounded partitions before writing, record exact source hashes and start/end, use incremental row-group streaming memory below 400MiB RSS if practical. Dates reserved for protected studies must be tagged as development restrictions; neither read protected outcome labels nor compute return labels. If older source has protected date whose permission to read the raw bar contents is not independently clear, restrict to metadata-only and state why. Never import live active Forward SQLite payload.
+4. Time canonical keys:
+    exchange, native_symbol, canonical_underlying, quote_asset, product_type, contract_identity, price_unit, base_qty_unit, event_ts_utc, interval_start_utc, interval_end_utc, interval, source_native_ts, source_time_unit, exchange_published_at (nullable), local_ingested_at (nullable), receiver_first_known_at (nullable), source_id, raw_sha256, schema_version, qc_flags.
+   Separate event candles, mark/index/premium, OI/top-trader ratio 5m, funding settlements, trades/aggTrades, L2 snapshots/deltas and feature marts into DIFFERENT typed tables/files rather than force an enormous sparse wide join.
+5. Build a reusable "as-of" sample query/transform at 1h fixed origin HH:01 with C=HH:00: strictly prior closed X bars, BTC OI sample 5–10m before C + exact 4h predecessor, native timestamp distinct from receiver first-known, funding only actual previous settlements as feature and future actual settlement only in a separately authorized outcome calculation (DO NOT calculate future settlement/realized PnL here). Mark missing, stale, gap and no-action/feature-unready explicitly. Use one real bounded 2026 Q2/Q3 BTC+ETH metadata/feature example without protected research return labels; compare Binance/OKX same-minute BTC price spread with native market identity. Do not manufacture 2021-era OI or OKX depth that is absent.
+6. Deliver generated dataset_coverage_matrix.csv or JSON (per venue/asset/product/family/granularity/year/month), source overlap and gap report, catalog.sqlite, canonical schema spec, reproducible example query, migration roadmap C1 (full historic candles/funding), C2 (aggTrades batch), C3 (historical-vs-Forward chronology) and README with exact commands and safety gates.
+7. Tests target only new catalog code: mixed UTC vs UTC+8 archive label, BTC perp vs spot, Binance/OKX overlap precedence, 2021 old vs 2026 expansion stitches, 1m vs 5m/8h events, missing metrics, inconsistent funding, gaps not silently filled, raw immutable, idempotent catalog, output confinement, protected forward metadata-only, memory-bounded scan. Run focused pytest and a real bounded demo; report file hashes, actual runtime and RSS.
+8. Keep explicit separation:
+    Data layer: evidence catalog and normalized historical raw/features across years, built irrespective of holdout membership.
+    Scientific evaluation layer: policy-driven per-study train/DEV/validation/holdout date and label permissions; P3_ACCESS_SCOPE_HOLD still blocks actual BTC Mechanism A historical income evaluation until Owner resolves protected private dates and authorizes the specific study. Do not treat access to a catalog or as-of features as Owner outcome approval.
+
+Terminal: DATA_C0_CATALOG_AND_ALIGNMENT_READY if SQLite catalog, coverage matrix, typed Parquet example, as-of example and focused tests run end-to-end on real unprotected source with source preservation; else DATA_C0_PARTIAL with precise blockers and surviving artifacts. Do not promise a complete multi-year OI/OKX L2 coverage that source files cannot provide. No testnet/live/account/trade/order/fund writes; no stopping Forward service.

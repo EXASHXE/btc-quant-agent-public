@@ -1,0 +1,154 @@
+{
+  "runs": [
+    {
+      "id": 38895173698,
+      "sha": "273dffa8e805c8dc32a04f72f747490b1dd27f2f",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38895173698",
+      "branch": "v0.6.5"
+    },
+    {
+      "id": 38894985650,
+      "sha": "273dffa8e805c8dc32a04f72f747490b1dd27f2f",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38894985650",
+      "branch": "integration/v0.6.5-candidate-r1"
+    }
+  ],
+  "main_jobs": {
+    "jobs": [
+      {
+        "id": 116953810540,
+        "name": "Risk-based quality (Python 3.12)",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 38895173698,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Fetch v0.6 immutable base for merge-base resolution",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Ensure cache directory exists for docs-only/zero-pip FAST paths",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Run actions/setup-python@v5",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Build fail-closed test plan",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Classify impact before heavy dependency installation",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Install tiny CI-planner dependencies",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 8
+          },
+          {
+            "name": "Install production/research validation dependencies",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 9
+          },
+          {
+            "name": "Ruff with bounded historical EXE001 debt",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 10
+          },
+          {
+            "name": "Type-check production package on production changes",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 11
+          },
+          {
+            "name": "Compile Python",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12
+          },
+          {
+            "name": "Validate changed JSON artifacts",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13
+          },
+          {
+            "name": "Tests selected by risk/changed scope",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 14
+          },
+          {
+            "name": "Retain scoped test evidence",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15
+          },
+          {
+            "name": "Post Run actions/setup-python@v5",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 29
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 30
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 31
+          }
+        ]
+      },
+      {
+        "id": 116953812688,
+        "name": "Compatibility manual full suite",
+        "status": "completed",
+        "conclusion": "skipped",
+        "run_id": 38895173698,
+        "logs_url": null,
+        "steps": null
+      }
+    ]
+  },
+  "local_tests": "NOT_RUN_BY_SCOPE_T0"
+}
