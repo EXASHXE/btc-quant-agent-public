@@ -1,46 +1,50 @@
-# Quant docs/engineering — Active Documentation Agent Overlay
+# QUANT v0.8.0 — Active Agent Instructions
 
-> **PROJECT-WIDE PROMPT PRESENTATION (2026-11-11):** [Mandatory Prompt Copy Cards](docs/project/V070_PROMPT_COPY_CARD_STANDARD_20261111.md). Every ChatGPT role (0-C, 1-A, audit and agent planners) must present each newly generated full prompt inside a compact card with a **working 复制完整 Prompt / Copy Full Prompt button** copying the complete exact prompt. Text-only environments use a single complete fenced-block fallback. This active v0.7.0 standard supersedes conflicting historical format instructions; it creates no execution authorization.
+## Current baseline
+The active product baseline is v0.8.0. Read first:
+1. docs/project/V080_PROJECT_HOME_20261118.md
+2. docs/project/V080_OWNER_REBASELINE_DECISION_20261118.md
+3. docs/architecture/V080_THREE_LAYER_API_ARCHITECTURE_20261118.md
+4. docs/architecture/V080_BINANCE_API_ENDPOINT_MATRIX_20261118.md
+5. docs/project/V080_ROADMAP_AND_GATES_20261118.md
+6. docs/roles/V080_ACTIVE_ROLE_MATRIX_20261118.md
 
-> **LATEST 2026-11-11 OWNER WORKFLOW / MVP CLOSURE:** [Current MVP Home](docs/project/V070_MVP_CLOSURE_HOME_20261111.md) · [Lean delegated execution](docs/project/V070_EXECUTION_DELEGATION_POLICY_20261111.md) · [Three Gemini report review and fast roadmap](docs/project/V070_GEMINI_PREFLIGHT_REVIEW_AND_FAST_MVP_PLAN_20261111.md) · [New 0-C start](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261111_MVP_CLOSURE.md). Routine offline coding, mock tests, documentation and Codex/Gemini coordination no longer require approval for every task/SHA. Earlier 2026-11-09 PROMPT-ONLY restrictions are superseded for such work. Actual Source/Feishu external activation and privileged/account/financial actions remain separate gates. Q0BC positive semantic proof is still blocked on Controller provenance; Source remains unqualified.
+Local working root: /root/workspace/project/quant-0.8.0/.
 
-> **CURRENT Q0 HANDOFF — 2026-11-09:** [Start here: Handoff Home](docs/project/V070_HANDOFF_HOME_20261109.md) · [Current Status](docs/project/V070_STATUS_AND_WORKPACKAGES_20261109_Q0.md) · [Q0 Roadmap](docs/project/V070_MULTISYMBOL_MTF_FEISHU_ROADMAP_20261109.md) · [0-C new chat](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261109_Q0.md) · [1-A new chat](prompts/v0.7/V070_NEW_CHAT_1A_20261109_Q0.md). Old 2026-11-02 snapshots below are historical, not current operational evidence. S is Controller-accepted **offline-only**; Q0B/Q0C await independent Controller acceptance; live Source/Feishu not authorized.\n\n## v0.7.0 current 2026-11-02 handoff (docs/engineering only)
+## Authority and role separation
+- Owner controls product direction and local credential configuration.
+- Controller 0-C is the sole engineering queue owner, dispatcher and independent acceptance authority.
+- GPT-6.2 Astra performs complex architecture/strategy analysis and independent challenge; it does not dispatch or accept.
+- GPT-6.2 Sol is the primary engineering executor. Sol Max is the high-intensity lane for cross-module work, not a separate controller.
+- Gemini 4 Hydrogen handles simple bounded engineering, fixtures, documentation and mechanical QA.
+- ChatGPT 1-A is an independent Owner-facing advisor, not Controller 0-C.
+- No Orchestrator role. A worker never accepts its own work.
 
-Use [Session04 evidence reconciliation](docs/project/V070_SESSION04_EVIDENCE_RECONCILIATION_20261102.md), [dual-review convergence](docs/project/V070_ARCHITECTURE_AND_RESEARCH_CONVERGENCE_20261102.md), [current state](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md), [roadmap](docs/project/V070_ADVISORY_ROADMAP.md), [roles](docs/roles/V070_ADVISORY_AGENT_ROLES.md), [1-A new-chat](prompts/v0.7/V070_NEW_CHAT_1A.md), and [0-C new-chat](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md).
+## Personal three-layer API boundary
+- Layer 1 PUBLIC_MARKET: public GET only, no personal account key.
+- Layer 2 PRIVATE_USER_DATA: separate local read-only key, signed GET allowlist only. No credential is shared with a worker or chat.
+- Layer 3 TRADE_EXECUTION: disabled and unreachable. Do not implement order placement, cancellation, modification, leverage, margin, transfer or withdrawal.
+- Do not use POST/PUT/DELETE for private user-data stream lifecycle in the current GET-only Layer 2.
+- If the current Binance key UI requires a Futures permission whose TRADE implications are not proven read-only, stop. Do not widen permissions to make an endpoint pass.
 
-Owner reports Session04 native completion; latest inspected local acceptance says `READY_FOR_OWNER_SIGNING / NOT_RUN`. Controller must reconcile with a newer genuine report before stage advancement. Route B is a proposed, offline-first, unified Source→Shadow MVP, NOT a new native grant. Do not start workers or collectors from documentation.
+## Existing Owner attestation
+OWNER_STANDING_M2_AUTHORIZATION_20261024.md is reusable as OWNER_ATTESTED for the same personal, noncommercial, private/local, read-only public-market-data research scope. Do not repeatedly ask for the same statement or fabricate third-party legal certification. This does not authorize region/proxy circumvention, commercial redistribution, private-account access, trading or withdrawals.
 
----
+## Data and research invariants
+- Personal data is labeled PERSONAL_PUBLIC_MARKET or PERSONAL_PRIVATE_ACCOUNT.
+- Strict Research, protected history and holdout rules remain unchanged. Personal data is never silently promoted into Strict Source/E1, Strict Shadow or economic validation.
+- Never use forming candles as completed setup/trigger evidence. No lookahead. Preserve gaps, revisions, freshness and provenance.
+- No synthetic fallback in live mode.
+- TLS verification, rate-limit accounting, bounded retries, hard stop/position risk, fees, funding, spread and slippage remain mandatory.
+- Private account data remains local by default and is excluded from controller evidence bundles and Feishu.
+- A market-side EXECUTABLE state is advisory only; account-context availability is a separate dimension.
 
+## Task execution
+All new local implementation tasks, worktrees, evidence and handoffs belong under /root/workspace/project/quant-0.8.0/. Treat baseline/program-j/ as read-only. New code goes in a task-specific isolated workspace under workspaces/. Never modify accepted Program J/v0.7.0 source in place.
 
-## Current engineering state (2026-11-02)
+A task prompt is not a Controller dispatch. The R1 prompt is pending Controller 0-C review; do not start it until 0-C verifies the baseline and issues the dispatch. R2 remains draft until R1 scoped acceptance.
 
-Read the [Source-to-Advisory Closure Status](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md) before interpreting older plans. Session03 was genuine but permanently `PARTIAL/BACKPRESSURE_BLOCKED`; Source instrumentation remains PARTIAL/cause UNKNOWN; local Dashboard and Session04+LONG handoff are READY_OFFLINE, **not native qualified**. No fresh signed Session04 or <=48h LONG grant exists as of the cited local receipt. A docs change does not activate a worker or authorize source, signer, account, service or market operation.
+## Prompt integrity
+Every worker/new-chat prompt must be complete, bounded, and include exact baseline, allowed/prohibited paths, offline/mock constraints, test matrix, stop conditions, deliverables and reviewer. Do not use an excerpt as a substitute for the full task card.
 
-This independent docs-only branch is the **sole canonical documentation source** for v0.7.0 product mission, roles, architecture/roadmap, task cards, handoff, and new-chat startup prompts.
-
-Read [Documentation Branch Policy](docs/project/V070_DOCUMENTATION_BRANCH_POLICY.md) before changing documents.
-
-## Mandatory routing
-- ALL future documentation writes and reads target GitHub `docs/engineering` with verified HEAD.
-- Do NOT use `v0.7.0`, `v0.6.5` or R-local Markdown as an alternate writable or authoritative doc source. Those may contain legacy copies.
-- Actual code and service state belong to R=/root/workspace/project/quant-0.7.0/research-loop-bootstrap, M=/root/workspace/project/Quant-agent-market-watch, Q=/root/workspace/project/Quant-agent. Verify them separately; docs changes do not deploy.
-- The branch is documentation only: no runtime code, tests, protected market data, account credentials, registry changes or service operations.
-
-## Active entrypoints
-- [Mission](docs/project/V070_ADVISORY_MISSION_AND_SCOPE.md)
-- [Roles](docs/roles/V070_ADVISORY_AGENT_ROLES.md)
-- [ChatGPT independent advisor](docs/roles/V070_CHATGPT_STRATEGIC_ADVISOR.md)
-- [Roadmap](docs/project/V070_ADVISORY_ROADMAP.md)
-- [Handoff](docs/project/V070_CURRENT_STATE_AND_HANDOFF.md)
-- [Current Source-to-Advisory closure](docs/project/V070_SOURCE_TO_ADVISORY_CLOSURE_STATUS_20261102.md)
-- [Foundation task](docs/project/V070_ADVISORY_FOUNDATION_TASK.md)
-- [ChatGPT new chat](docs/project/V070_CHATGPT_NEW_CHAT_START.md)
-- [Controller new chat](prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C.md)
-
-## Prompt presentation
-When user requests Controller/Codex/Astra/Opus/Gemini/new-chat prompt, provide a working **Copy Full Prompt** button copying every character when the host chat UI supports it. Never a fake copy button or excerpt-only copy. Otherwise put full prompt into one complete fenced block.
-
-## Product role
-Read-only crypto opportunity & position management advisory, actionable structure-driven entry/stop/target or open-ended trailing, user-confirmed positions, timely deterministic risk events. Do not assert 2R/time-based exits are mandatory or claim verified Alpha without evidence.
-Owner decides permissions. Controller 0-C coordinates Codex engineering; ChatGPT independent advisor critically reviews rather than runs parallel dispatch.
+[executed on device: hyz-laptop (bfc916f4-e88a-469a-9999-cf08962f68ed)]
