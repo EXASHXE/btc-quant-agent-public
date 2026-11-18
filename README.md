@@ -1,3 +1,17 @@
+# QUANT v0.8.0 — Current Documentation Baseline
+
+> **Canonical documentation branch:** [docs/engineering](https://github.com/EXASHXE/btc-quant-agent-public/tree/docs/engineering). All project, architecture, role, roadmap, task-card, handoff and new-chat documentation is maintained here.
+>
+> **Executable source/runtime branch:** [v0.8.0](https://github.com/EXASHXE/btc-quant-agent-public/tree/v0.8.0). Same-path documentation copies on v0.8.0 are non-authoritative mirrors.
+>
+> **Start here:** [V080 Project Home](docs/project/V080_PROJECT_HOME_20261118.md) · [Owner Rebaseline](docs/project/V080_OWNER_REBASELINE_DECISION_20261118.md) · [Three-Layer API Architecture](docs/architecture/V080_THREE_LAYER_API_ARCHITECTURE_20261118.md) · [Roadmap and Gates](docs/project/V080_ROADMAP_AND_GATES_20261118.md) · [V080 Role Matrix](docs/roles/V080_ACTIVE_ROLE_MATRIX_20261118.md) · [Documentation Branch Policy](docs/project/V080_DOCUMENTATION_BRANCH_POLICY_20261118.md) · [Prompt Copy Card Standard](docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md).
+>
+> **Current new chats:** [1-A Independent Advisor](docs/prompts/v0.8/V080_NEW_CHAT_1A_20261118.md) · [Controller 0-C](docs/prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md).
+>
+> The v0.7.0 material below is retained as historical project documentation unless a V080 document explicitly supersedes it.
+
+---
+
 # Engineering documentation — docs/engineering
 
 > **PROMPT UI STANDARD (2026-11-11):** [Full Prompt Copy Card Contract](docs/project/V070_PROMPT_COPY_CARD_STANDARD_20261111.md). Applies across roles; one real full-text copy control per prompt (or copyable text-only fallback).

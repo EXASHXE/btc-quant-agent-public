@@ -1,3 +1,17 @@
+# QUANT v0.8.0 — Documentation Branch Agent Overlay
+
+> **Canonical documentation source:** GitHub docs/engineering. Before reading or changing project direction, architecture, roles, roadmaps, task cards, handoffs or new-chat prompts, use the latest docs/engineering HEAD.
+>
+> **Executable source/runtime:** GitHub branch v0.8.0 and local root /root/workspace/project/quant-0.8.0/. Use that workspace for source, tests and actual runtime/Controller evidence only. Do not treat same-path Markdown on v0.8.0 as authoritative project documentation.
+>
+> **Active v0.8.0 entrypoints:** [Project Home](docs/project/V080_PROJECT_HOME_20261118.md) · [Documentation Branch Policy](docs/project/V080_DOCUMENTATION_BRANCH_POLICY_20261118.md) · [Prompt Copy Card Standard](docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md) · [Role Matrix](docs/roles/V080_ACTIVE_ROLE_MATRIX_20261118.md) · [1-A New Chat](docs/prompts/v0.8/V080_NEW_CHAT_1A_20261118.md) · [0-C New Chat](docs/prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md).
+
+All documentation-only updates must be committed to docs/engineering. Do not write canonical project documentation to v0.8.0. Preserve docs-only branch scope: no source code, tests, runtime configuration, credentials, private account payloads, protected data, registry mutation or deployment changes.
+
+All Owner-facing prompts must follow docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md. A prompt is not a dispatch; Controller 0-C remains the sole engineering dispatcher and scoped acceptance authority.
+
+---
+
 # Quant docs/engineering — Active Documentation Agent Overlay
 
 > **PROJECT-WIDE PROMPT PRESENTATION (2026-11-11):** [Mandatory Prompt Copy Cards](docs/project/V070_PROMPT_COPY_CARD_STANDARD_20261111.md). Every ChatGPT role (0-C, 1-A, audit and agent planners) must present each newly generated full prompt inside a compact card with a **working 复制完整 Prompt / Copy Full Prompt button** copying the complete exact prompt. Text-only environments use a single complete fenced-block fallback. This active v0.7.0 standard supersedes conflicting historical format instructions; it creates no execution authorization.
