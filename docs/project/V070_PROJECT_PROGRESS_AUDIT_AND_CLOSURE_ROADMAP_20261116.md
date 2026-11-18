@@ -1,5 +1,7 @@
 # Quant v0.7.0 — Current Progress Audit and Accelerated Real MVP Roadmap (2026-11-16)
 
+> **Current executor routing (Owner update 2026-11-18):** [GPT-6.2 Astra / GPT-6.2 Sol role routing](V070_ENGINEERING_MODEL_TASK_ROUTING_20261118.md). This link updates model assignment only; this 2026-11-16 evidence audit remains a dated snapshot and is superseded by newer local Controller receipts.
+
 > **Canonical current audit.** This is a documentation reconciliation of local Controller decisions, accepted L0 receipts and worker handoffs under /root/workspace/project/quant-0.7.0/. It is not a new Controller acceptance, Source grant, network authorization or execution approval. Historical records remain immutable. If newer local Controller receipts exist, they supersede this snapshot.
 
 > **Executive verdict:** The synthetic L0 foundation is closed. P1C04 Fix01, P1-B Venue WATCH admission Fix01 and the detached Venue Time WATCH-only L0 now have scoped Controller acceptance. The P1-B ADR-01 V2 amendment is still not approved for real L1. The next bottleneck is no longer VW01–VW03 implementation; it is Controller reconciliation of the independent Sol Max architecture review, actual endpoint timestamp/finality proof, rights/egress, raw custody and the separate L1-A/L1-B authorization boundary. Independent UTC and production WAL remain unqualified, but neither needs to block a narrowly scoped, non-executable Venue WATCH path if the revised ADR explicitly permits it and all L1-specific proofs pass.

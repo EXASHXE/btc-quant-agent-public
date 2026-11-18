@@ -1,3 +1,5 @@
+> **SUPERSEDED FOR ACTIVE MODEL ROUTING — 2026-11-18:** Use [GPT-6.2 Engineering Model and Task Routing](V070_ENGINEERING_MODEL_TASK_ROUTING_20261118.md). This 2026-11-16 snapshot is retained for historical context; its active role assignments and next-task state must not be used for current routing.
+
 # Quant v0.7.0 — Engineering Model and Task Routing (Current 2026-11-16)
 
 > **Current project baseline:** [Nov 16 progress audit and accelerated Real MVP roadmap](V070_PROJECT_PROGRESS_AUDIT_AND_CLOSURE_ROADMAP_20261116.md) · [MVP Closure Home](V070_MVP_CLOSURE_HOME_20261111.md) · [Current 0-C startup](../../prompts/v0.7/V070_NEW_CHAT_CONTROLLER_0C_20261116_REAL_MVP_ACCELERATION.md) · [Prompt Copy Card Standard](V070_PROMPT_COPY_CARD_STANDARD_20261111.md).
