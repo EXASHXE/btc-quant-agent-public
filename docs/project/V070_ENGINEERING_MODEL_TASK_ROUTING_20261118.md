@@ -1,3 +1,5 @@
+> **V0.8.0 ROUTING OVERLAY — OWNER UPDATE 2026-11-19:** For QUANT v0.8.0 and future v0.8.0 engineering assignments, use [V080 Owner Model Routing Policy](V080_MODEL_ROUTING_POLICY_20261119.md). Gemini Neon replaces Gemini Argon as the Owner-designated peer-level alternative to GPT-6.2 Sol for complex engineering, including Sol quota fallback and Controller-approved independent parallel work. This overlay does **not** rewrite the v0.7.0 historical task attributions or change the version-specific routing record below.
+
 # Quant v0.7.0 — Engineering Model and Task Routing (Current 2026-11-18)
 
 > **Owner model-routing update — 2026-11-18.** GPT-6.2 Sol replaces the prior GPT-6.1 Sol implementation assignment. GPT-6.2 Astra replaces the prior GPT-6 Astra architecture-analysis assignment. The responsibility split is unchanged: Astra designs, Sol implements, Hydrogen handles simple bounded work, and Controller 0-C dispatches and independently accepts. This updates future routing only; it does not rewrite historical task attribution, grant operational authority, or claim a model benchmark advantage.

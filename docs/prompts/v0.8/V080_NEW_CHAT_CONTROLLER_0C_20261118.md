@@ -28,6 +28,7 @@ Read first from the canonical docs/engineering branch:
 - docs/project/V080_BASELINE_MIGRATION_RECORD_20261118.md
 - docs/project/V080_DOCUMENTATION_BRANCH_POLICY_20261118.md
 - docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md
+- docs/project/V080_MODEL_ROUTING_POLICY_20261119.md
 - docs/project/V080_PERSONAL_PUBLIC_MARKET_OPERATING_SCOPE_20261118.md
 
 Read these local operational artifacts from /root/workspace/project/quant-0.8.0/ (do not publish them to the docs-only branch without separate review):
@@ -65,49 +66,48 @@ Do not edit baseline/program-j/ or historical v0.7.0 files. New implementation m
 The prior v0.7.0 task V070-SOL62-PERSONAL-MVP-LAYER1-PUBLIC-01 was NOT_STARTED and work_root_created=false. Its Controller receipt remains immutable. The v0.8.0 R1 task has a new ID and new work root; verify no worker was started elsewhere before dispatch.
 Historical receipt: controller-decisions/V070_SOL62_PERSONAL_MVP_THREE_LAYER_API_CONTROLLER_DISPATCH_20261118.json. Prior plan acceptance: controller-decisions/V070_PERSONAL_MVP_THREE_LAYER_REBASELINE_CONTROLLER_PLAN_ACCEPTANCE_20261118.json.
 
-## 5. Current task files
+## 5. Current task and evidence status — 2026-11-19
 
-R1 task:
-docs/prompts/v0.8/V080_SOL62_PERSONAL_MVP_LAYER1_PUBLIC_IMPLEMENTATION_20261118.md
+Use the latest canonical Project Home and Roadmap, then reconcile against local Controller decisions and actual worker work roots.
 
-R2 draft:
-docs/prompts/v0.8/V080_SOL62_PERSONAL_MVP_LAYER2_USER_DATA_DRAFT_20261118.md
+Current known state:
+- R1 PUBLIC_MARKET: SCOPED_ACCEPTED_OFFLINE_ONLY.
+- Astra full-system architecture audit: SCOPED_ACCEPTED_ARCHITECTURE_REVIEW_ONLY.
+- B1 PUBLIC_RUNTIME_FOUNDATION: SCOPED_ACCEPTED_OFFLINE_ONLY; genuine live origin remains dormant.
+- B2 MARKET_DECISION_MVP: worker handoff READY_FOR_CONTROLLER_REVIEW, dated 2026-11-19. Worker reports 54/54 B2 tests and 89/89 inherited B1 tests passing, clean build/install and preserved accepted baselines. This is WORKER_REPORTED, NOT Controller acceptance.
+- B3 ACCOUNT_AWARE_DECISION_SUPPORT: planned, not dispatched.
+- First real public scan: NOT AUTHORIZED; requires separate operating-scope and real-origin activation review.
+- Real private account connection: DISCONNECTED / NOT AUTHORIZED pending proof of a genuinely read-only Futures USER_DATA permission set.
+- Layer 3 TRADE_EXECUTION: DISABLED.
 
-R3 draft:
-docs/prompts/v0.8/V080_SOL62_ACCOUNT_SIGNAL_OVERLAY_R3_DRAFT_20261118.md
+The original narrow Stage 1A prompt is superseded for future forwarding by the integrated B1 package. Preserve its historical Controller decision. Do not dispatch duplicate R1, Stage 1A or B1 work.
 
-Current state:
-- R0 baseline documents and local source snapshot prepared.
-- R1 prompt is OWNER_REQUESTED / READY_FOR_0C_REVIEW / NOT_YET_DISPATCHED.
-- R2 is DRAFT_ONLY and starts after R1 scoped acceptance.
-- R3 starts after R1 and R2 scoped acceptance.
-- R4/R5/R6 planned.
-- Layer 3 disabled.
+## 6. Immediate Controller responsibility
 
-## 6. Immediate Controller review and decision
+The immediate work is to independently review the complete B2 worker handoff and sealed evidence under the accepted B2 scope.
 
-Before dispatch:
-1. Verify local root and GitHub branch v0.8.0 exist.
-2. Verify Owner authorization source and copied file SHA match.
-3. Verify baseline/program-j manifest and the source copy.
-4. Inspect the historical v0.7.0 dispatch to confirm it was not started and no work root exists.
-5. Review the Binance endpoint matrix against current official docs, especially openAlgoOrders/allAlgoOrders, history limits, depth/RPI semantics and API key permissions.
-6. Review R1 scope for no live network, no credential access, no private endpoints and no Layer 3.
-7. Confirm R1 does not edit Program J baseline and uses an isolated worktree.
-8. Check for an active overlapping core worker.
-9. After R1 scoped acceptance and before the first live public scan, review the one-time local PUBLIC_MARKET scope template. It must define symbols, endpoints, cadence/weight budget, local retention, region/route and stop conditions. This is not a repeated Owner attestation or per-request consent.
+Check the actual work root:
+workspaces/lt-v080-sol62-personal-mvp-market-decision-b2-01/
 
-If the scope is sound and no conflict exists, issue the new R1 dispatch to GPT-6.2 Sol. Do not call the task dispatched until the dispatch record is actually written and the worker is explicitly forwarded. If a blocking design issue exists, route a bounded architecture challenge to GPT-6.2 Astra and retain R1 as pending.
+Review the exact task card, source, test logs/XML, build/install evidence, preservation checks, synthetic demo and SHA256SUMS. Reproduce the high-risk causal, state-machine, Decimal risk/cost, repricing, crash-recovery and isolation tests. Distinguish WORKER_REPORTED from CONTROLLER_ACCEPTED.
+
+Do not dispatch another core writer into B2 while this review is pending. If a specific defect is independently reproduced, issue one bounded supplemental fix under a clear write boundary; otherwise make one consolidated acceptance decision.
+
+The B2 offline acceptance cannot authorize genuine Binance public requests, private account access, Feishu or trading. The first live public scan remains a separate capability activation.
+
 
 ## 7. Model routing
 
 - GPT-6.2 Astra: architecture, strategy, threat models, cross-module design and independent challenge.
-- GPT-6.2 Sol: primary core engineering implementation.
-- GPT-6.2 Sol Max: high-intensity lane for cross-module work within Sol's role, not a separate controller or queue.
-- Gemini 4 Hydrogen: simple bounded engineering, fixtures, docs and mechanical QA.
+- GPT-6.2 Sol: default primary complex engineering executor.
+- Gemini Neon: Owner-designated peer-level alternative complex engineering executor; use when Sol quota/capacity is insufficient or for Controller-approved, genuinely independent parallel packages.
+- GPT-6.2 Sol Max: high-intensity lane within Sol's role, not a separate controller or queue.
+- Gemini 4 Hydrogen: simple bounded engineering, fixtures, docs and mechanical QA; not a fallback for complex work.
 - Controller 0-C: sole dispatch, audit and acceptance.
 - ChatGPT 1-A: independent Owner advisor, not dispatch/acceptance.
 - No Orchestrator.
+- Parallel Sol/Neon work requires separate task scopes, isolated worktrees, explicit non-overlapping write sets, frozen interfaces and one named integration owner. If these conditions cannot be met, use one core writer sequentially.
+- Record the actual model ID/variant shown by the execution interface; do not infer a version from the Gemini Neon nickname.
 
 ## 8. Three-layer API controls
 
@@ -134,7 +134,7 @@ Do not require NTS, hardware witnesses, a blanket 50ms wall-step veto or 24-hour
 - Only Controller 0-C issues scoped acceptance.
 - Preserve actual command logs, fail-first tests, negative/boundary tests and SKIP counts.
 - Never edit historical Controller decisions; issue new supplemental records.
-- Keep one active core implementation owner at a time.
+- Keep one primary writer per work package. Sol and Gemini Neon may execute parallel packages only when Controller-approved scopes, isolated worktrees, explicit non-overlapping write sets, frozen interfaces and one integration owner are in place.
 - No automatic live API call follows from offline L0 acceptance.
 - No trade, withdrawal, transfer, order mutation or host/network change follows from this baseline.
 
@@ -154,3 +154,7 @@ The v0.8.0 branch is the executable code/runtime baseline. Do not update canonic
 Every complete Owner-facing prompt and worker task card must follow docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md. Use one compact card per distinct prompt, with truthful state and a full exact prompt copy action. If a dedicated clipboard action is unavailable, use a complete copyable writing/code block. Never use a decorative button, truncated payload or summary-only copy.
 
 A task prompt is not a dispatch. Only Controller 0-C can formally dispatch and issue scoped acceptance.
+
+## 13. Owner model-routing update — 2026-11-19
+
+Gemini Neon replaces Gemini Argon for future complex engineering assignments. Neon is a peer-level alternative to GPT-6.2 Sol in the Owner's project routing. Use it when Sol quota/capacity is insufficient or for genuinely independent parallel engineering work. Apply the same complete prompt, isolation, tests, evidence and final Controller acceptance requirements as Sol. Do not retroactively rename historical Argon work. Follow docs/project/V080_MODEL_ROUTING_POLICY_20261119.md. This update changes model routing only; it grants no additional API, credential, deployment, private-account or trading permission.

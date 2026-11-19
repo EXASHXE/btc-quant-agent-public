@@ -42,7 +42,7 @@ STRICT_RESEARCH remains unchanged. Strict Source/E1, protected historical window
 - Dedicated key, Enable Reading only.
 - No trade, withdrawal, transfer, margin or account mutation permissions.
 - Secret stored in OS credential storage / DPAPI / keyring or equivalent.
-- Never send key, secret, signed query, private payload or personal account screenshot to ChatGPT, Astra, Sol, Hydrogen, GitHub, logs, Feishu or controller evidence.
+- Never send key, secret, signed query, private payload or personal account screenshot to ChatGPT, Astra, Sol, Gemini Neon, Hydrogen, GitHub, logs, Feishu or controller evidence.
 - If the current Binance permission UI/API requires a Futures permission whose TRADE implications are not proven read-only, stop and leave Layer 2 disconnected. Do not widen permission to force access.
 
 ## 6. Scope sequencing

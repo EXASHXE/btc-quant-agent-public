@@ -1,6 +1,7 @@
 # QUANT v0.8.0 — Roadmap, Task Ownership and Exit Gates
 
-Status: Controller-reconciled integrated delivery plan · 2026-11-18; B1 independently accepted OFFLINE ONLY.
+Status: Controller-reconciled integrated delivery plan · 2026-11-19; B1 independently accepted OFFLINE ONLY; B2 worker handoff received, Controller review pending.
+Current model routing: [V080 Model Routing Policy](V080_MODEL_ROUTING_POLICY_20261119.md).
 Owner directive: V080-OWNER-0C-CONSOLIDATED-DELIVERY-REPLAN-20261118.
 Executable branch: v0.8.0 · canonical documentation: docs/engineering.
 This plan consolidates engineering implementation and audit cycles; it does **not** consolidate or waive separate permissions for live public market API or private account access.
@@ -13,10 +14,10 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 | Original narrow Stage 1A | GPT-6.2 Sol | **SUPERSEDED_FOR_FUTURE_FORWARDING / NOT_STARTED** | Existing Controller record retained unchanged; only the integrated B1 task is forwardable |
 | **B1 PUBLIC_RUNTIME_FOUNDATION** | **GPT-6.2 Sol High** | **SCOPED_ACCEPTED_OFFLINE_ONLY** | 89 B1 tests and 99 inherited targeted tests independently PASS; no real API; live composition dormant |
 | First bounded live PUBLIC_MARKET scan | Owner local scope / 0-C capability activation | **NOT AUTHORIZED** | Only after B1 acceptance and separate region/route, endpoint, cadence, budget, retention and stop-condition review |
-| **B2 MARKET_DECISION_MVP** | **GPT-6.2 Sol Extra High** | **CONTROLLER_SCOPE_APPROVED / AWAITING_OWNER_FORWARD** | Full 4H/1H/15m/5m strategy → risk card → episode → 5/10-minute reprice → local journal; offline engine acceptance is not live-operational acceptance |
-| **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | **GPT-6.2 Sol Extra High** | **PLANNED / NOT_DISPATCHED** | Consolidate R2 signed-GET offline private connector + R3 reconciliation after stable B2 MarketPlan/SignalEpisode; independent read-only credential activation gate remains CLOSED |
-| R5 universe expansion and market-only alerts | Sol / optional Hydrogen QA | PLANNED / NOT_DISPATCHED | B2 usable public market workflow plus scoped source/rate review; external Feishu separately authorized |
-| R6 prospective evaluation | Sol / Astra challenge / 0-C | PLANNED / NOT_DISPATCHED | Capture signal/response denominators beginning with B2; economics require independently sufficient real evidence |
+| **B2 MARKET_DECISION_MVP** | **GPT-6.2 Sol Extra High** | **WORKER_REPORTED_READY_FOR_CONTROLLER_REVIEW / CONTROLLER_ACCEPTANCE_PENDING** | 54 B2 tests + 89 inherited B1 tests reported PASS; integrated synthetic strategy/card/episode/reprice/journal delivered; no genuine market access or economic proof |
+| **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | **GPT-6.2 Sol Extra High or Gemini Neon** | **PLANNED / NOT_DISPATCHED** | Consolidate R2 signed-GET offline private connector + R3 reconciliation after stable B2 MarketPlan/SignalEpisode; independent read-only credential activation gate remains CLOSED |
+| R5 universe expansion and market-only alerts | Sol or Gemini Neon / optional Hydrogen QA | PLANNED / NOT_DISPATCHED | B2 usable public market workflow plus scoped source/rate review; external Feishu separately authorized |
+| R6 prospective evaluation | Sol or Gemini Neon / Astra challenge / 0-C | PLANNED / NOT_DISPATCHED | Capture signal/response denominators beginning with B2; economics require independently sufficient real evidence |
 | Layer 3 TRADE_EXECUTION | No assigned worker | **DISABLED / EXCLUDED** | No route, trade key, auto order or automatic future stage |
 
 ## Current dispatch and accepted evidence
@@ -26,7 +27,8 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 - Narrow 1A forward approval: controller-decisions/V080_CONTROLLER_SOL62_STAGE1A_BOUNDARY_CAUSALITY_FORWARD_APPROVAL_20261118.json. Worker not started at the Controller's latest local check. The record is historical and remains intact.
 - Integrated B1 supplemental approval: controller-decisions/V080_CONTROLLER_SOL62_B1_PUBLIC_RUNTIME_FOUNDATION_FORWARD_APPROVAL_20261118.json. Historical pre-execution approval; B1 has since completed.
 - **B1 independent offline acceptance:** controller-decisions/V080_CONTROLLER_B1_PUBLIC_RUNTIME_OFFLINE_SCOPED_ACCEPTANCE_20261118.json (SHA-256 b42ad44bc91a5fe89e7e2209ba4682ca5232d6611c5340b2b5febfe356a08cbf). Verified 56 B1 sealed files, 89 B1 plus 99 inherited R1 PASS, Program J 323 original files unchanged.
-- **B2 supplemental scope approval:** controller-decisions/V080_CONTROLLER_SOL62_B2_MARKET_DECISION_MVP_FORWARD_APPROVAL_20261118.json, awaiting actual Owner forwarding; no B2 worker or acceptance.
+- **B2 supplemental scope approval:** controller-decisions/V080_CONTROLLER_SOL62_B2_MARKET_DECISION_MVP_FORWARD_APPROVAL_20261118.json. Owner forwarding and worker execution subsequently occurred.
+- **B2 worker handoff:** workspaces/lt-v080-sol62-personal-mvp-market-decision-b2-01/WORKER_RESULT.md and CONTROLLER_HANDOFF.md, dated 2026-11-19. Worker reports 54/54 B2 tests and 89/89 inherited B1 tests PASS, plus build/install/demo and preservation evidence. This remains WORKER_REPORTED until Controller independently reviews the sealed handoff and issues a decision.
 - Canonical complete B2 task: [V080 Sol B2 Market Decision MVP](../prompts/v0.8/V080_SOL62_MARKET_DECISION_MVP_B2_20261118.md).
 - B1 canonical full task card: [V080 Sol B1 Public Runtime Foundation](../prompts/v0.8/V080_SOL62_PUBLIC_RUNTIME_FOUNDATION_B1_20261118.md).
 - Original R2/R3 task cards remain **historical drafts**, not active worker dispatches; they will be consolidated into a separate B3 task only after B2 contracts stabilize.
@@ -44,9 +46,13 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 ## Single engineering queue and review protocol
 
 1. Controller approves one bounded implementation package; Owner forwards the complete worker prompt.
-2. Sol is the sole core engineering writer, performs internal milestones/fixes/test iterations, and submits one sealed implementation handoff.
-3. Hydrogen may do bounded mechanical fixtures/QA when helpful; Astra may review a material architecture/math fork. Neither dispatches engineering or self-accepts.
+2. GPT-6.2 Sol is the default core engineering writer. Gemini Neon is an Owner-designated peer-level alternative for complex engineering when Sol quota/capacity is insufficient, and may execute a separate independent package in parallel when Controller approves disjoint worktrees/write sets and a named integration owner.
+3. Use one primary writer per work package. Do not allow Sol and Neon to edit the same files or shared mutable integration surface concurrently. Hydrogen remains for bounded mechanical fixtures/QA; Astra reviews material architecture/math forks. Neither worker model dispatches or self-accepts.
 4. Controller independently checks installed artifact, provenance, targeted adversarial tests, representative regressions and seal hashes **once at package completion**, not after every internal step. Do not impose arbitrary test-count quotas or repeat full R1 reacceptance absent changed risk.
 5. External capability activation (first live public scan, real private read, external notification, any financial action) is independent. Only actual Controller acceptance and applicable Owner authorization permit progression.
 
 PERSONAL_MVP remains separate from STRICT_RESEARCH. No economic or profitability qualification is implied by a test suite, deterministic fixtures or a single real scan.
+
+## Owner model-routing update — 2026-11-19
+
+Gemini Neon replaces Gemini Argon for future complex engineering execution. Neon is routed at the same project task-complexity tier as GPT-6.2 Sol, especially for Sol quota fallback or Controller-approved independent parallel work. This is not a universal benchmark claim. Record the exact execution-interface model ID. Historical Argon reviews remain unchanged. See [V080 Model Routing Policy](V080_MODEL_ROUTING_POLICY_20261119.md).

@@ -4,7 +4,7 @@
 >
 > **Executable source/runtime:** GitHub branch v0.8.0 and local root /root/workspace/project/quant-0.8.0/. Use that workspace for source, tests and actual runtime/Controller evidence only. Do not treat same-path Markdown on v0.8.0 as authoritative project documentation.
 >
-> **Active v0.8.0 entrypoints:** [Project Home](docs/project/V080_PROJECT_HOME_20261118.md) · [Documentation Branch Policy](docs/project/V080_DOCUMENTATION_BRANCH_POLICY_20261118.md) · [Prompt Copy Card Standard](docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md) · [Role Matrix](docs/roles/V080_ACTIVE_ROLE_MATRIX_20261118.md) · [1-A New Chat](docs/prompts/v0.8/V080_NEW_CHAT_1A_20261118.md) · [0-C New Chat](docs/prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md).
+> **Active v0.8.0 entrypoints:** [Project Home](docs/project/V080_PROJECT_HOME_20261118.md) · [Documentation Branch Policy](docs/project/V080_DOCUMENTATION_BRANCH_POLICY_20261118.md) · [Prompt Copy Card Standard](docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md) · [Role Matrix](docs/roles/V080_ACTIVE_ROLE_MATRIX_20261118.md) · [Model Routing](docs/project/V080_MODEL_ROUTING_POLICY_20261119.md) · [1-A New Chat](docs/prompts/v0.8/V080_NEW_CHAT_1A_20261118.md) · [0-C New Chat](docs/prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md).
 
 All documentation-only updates must be committed to docs/engineering. Do not write canonical project documentation to v0.8.0. Preserve docs-only branch scope: no source code, tests, runtime configuration, credentials, private account payloads, protected data, registry mutation or deployment changes.
 

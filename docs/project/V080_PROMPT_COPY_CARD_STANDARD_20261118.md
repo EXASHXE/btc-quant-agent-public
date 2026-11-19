@@ -85,7 +85,7 @@ The canonical Markdown prompt and the Owner-facing copy payload must represent t
 
 ### ChatGPT 1-A
 
-Must use this standard whenever preparing a prompt for Sol, Astra, Hydrogen, Controller 0-C or a new QUANT chat. 1-A may advise and draft but does not dispatch.
+Must use this standard whenever preparing a prompt for Sol, Sol Max, Gemini Neon, Astra, Hydrogen, Controller 0-C or a new QUANT chat. 1-A may advise and draft but does not dispatch.
 
 ### Controller 0-C
 
@@ -93,7 +93,7 @@ Must use this standard for Owner-facing task cards and forwarded worker prompts.
 
 ### Worker models
 
-Sol, Sol Max, Hydrogen and Astra are recipients/executors unless separately instructed otherwise. Their terminal output does not create a ChatGPT copy-card UI action.
+Sol, Sol Max, Gemini Neon, Hydrogen and Astra are recipients/executors unless separately instructed otherwise. Their terminal output does not create a ChatGPT copy-card UI action.
 
 ## 8. Branch authority
 
