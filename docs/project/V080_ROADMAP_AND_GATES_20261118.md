@@ -1,6 +1,6 @@
 # QUANT v0.8.0 — Roadmap, Task Ownership and Exit Gates
 
-Status: Controller-reconciled integrated delivery plan · 2026-11-19; B1 independently accepted OFFLINE ONLY; B2 independently accepted OFFLINE INTEGRATED ONLY.
+Status: Controller-reconciled integrated delivery plan · 2026-11-20; B1 accepted OFFLINE ONLY, B2 accepted OFFLINE INTEGRATED ONLY and B3 accepted OFFLINE ACCOUNT-AWARE ONLY.
 Current model routing: [V080 Model Routing Policy](V080_MODEL_ROUTING_POLICY_20261119.md).
 Owner directive: V080-OWNER-0C-CONSOLIDATED-DELIVERY-REPLAN-20261118.
 Executable branch: v0.8.0 · canonical documentation: docs/engineering.
@@ -15,7 +15,7 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 | **B1 PUBLIC_RUNTIME_FOUNDATION** | **GPT-6.2 Sol High** | **SCOPED_ACCEPTED_OFFLINE_ONLY** | 89 B1 tests and 99 inherited targeted tests independently PASS; no real API; live composition dormant |
 | First bounded live PUBLIC_MARKET scan | Owner local scope / 0-C capability activation | **NOT AUTHORIZED** | Only after B1 acceptance and separate region/route, endpoint, cadence, budget, retention and stop-condition review |
 | **B2 MARKET_DECISION_MVP** | **GPT-6.2 Sol Extra High** | **SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY** | 54 B2 + 89 B1 independently rerun PASS; 16 synthetic cards/8 reprices, 24 independent path calculations; real market access/economic proof excluded |
-| **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | **Gemini Neon (primary) or GPT-6.2 Sol Extra High (fallback)** | **PROMPT_READY / NOT_DISPATCHED** | One consolidated R2+R3 offline implementation package; fake credentials/fixtures only; real private permission gate remains CLOSED |
+| **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | **Gemini 4 Neon XHigh** | **SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY** | 51 B3 + 54 inherited B2 independently PASS; 183 files sealed, 17 synthetic scenarios, zero private live activation |
 | R5 universe expansion and market-only alerts | Sol or Gemini Neon / optional Hydrogen QA | PLANNED / NOT_DISPATCHED | B2 usable public market workflow plus scoped source/rate review; external Feishu separately authorized |
 | R6 prospective evaluation | Sol or Gemini Neon / Astra challenge / 0-C | PLANNED / NOT_DISPATCHED | Capture signal/response denominators beginning with B2; economics require independently sufficient real evidence |
 | Layer 3 TRADE_EXECUTION | No assigned worker | **DISABLED / EXCLUDED** | No route, trade key, auto order or automatic future stage |
@@ -28,11 +28,12 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 - Integrated B1 supplemental approval: controller-decisions/V080_CONTROLLER_SOL62_B1_PUBLIC_RUNTIME_FOUNDATION_FORWARD_APPROVAL_20261118.json. Historical pre-execution approval; B1 has since completed.
 - **B1 independent offline acceptance:** controller-decisions/V080_CONTROLLER_B1_PUBLIC_RUNTIME_OFFLINE_SCOPED_ACCEPTANCE_20261118.json (SHA-256 b42ad44bc91a5fe89e7e2209ba4682ca5232d6611c5340b2b5febfe356a08cbf). Verified 56 B1 sealed files, 89 B1 plus 99 inherited R1 PASS, Program J 323 original files unchanged.
 - **B2 supplemental scope approval:** controller-decisions/V080_CONTROLLER_SOL62_B2_MARKET_DECISION_MVP_FORWARD_APPROVAL_20261118.json. Owner forwarding and worker execution subsequently occurred.
+- **B3 independent offline-only acceptance:** controller-decisions/V080_CONTROLLER_B3_ACCOUNT_AWARE_OFFLINE_SCOPED_ACCEPTANCE_20261120.json, SHA-256 0d3b88ea3bcedeab9f8d18d8118929be4610ecfa433d2bd35cd6fc7f96b8d7a0. B3 seal corrected (183/183 hashes), compared byte-for-byte with the pre-seal copy, 51/51 B3 + 54/54 B2 independent tests PASS; previous HOLD_SEAL_MISSING closed. No private API, real credentials, Feishu, deployment or trading authority.
 - **B2 independent offline-integrated acceptance:** controller-decisions/V080_CONTROLLER_B2_MARKET_DECISION_OFFLINE_INTEGRATED_ACCEPTANCE_20261119.json, SHA-256 7de93eed45541d09a3b65b3e8452033c894ad402a169306bd97e4952929ac48d. Controller independently reran 54/54 B2 and 89/89 B1 tests, reinstalled the pinned wheels, checked 93 B2/56 B1/367 R1/323 Program J hashes and recalculated 24 conditional Decimal paths. Nonblocking review-copy test path dependency was resolved with explicit B1 database configuration.
 - Canonical complete B2 task: [V080 Sol B2 Market Decision MVP](../prompts/v0.8/V080_SOL62_MARKET_DECISION_MVP_B2_20261118.md). Historical assigned executor remains Sol; Neon routing does not retroactively reassign it.
 - **Neon routing adoption:** controller-decisions/V080_CONTROLLER_GEMINI_NEON_ROUTING_ADOPTION_20261119.json; B3 executor is Owner-selected as Gemini Neon; GPT-6.2 Sol Extra High is the fallback if Neon capacity is insufficient.
 - B1 canonical full task card: [V080 Sol B1 Public Runtime Foundation](../prompts/v0.8/V080_SOL62_PUBLIC_RUNTIME_FOUNDATION_B1_20261118.md).
-- Original R2/R3 task cards remain **historical drafts**, not active worker dispatches. Their scope is now consolidated into the canonical B3 prompt: [B3 Account-Aware Decision Support](../prompts/v0.8/V080_PERSONAL_MVP_ACCOUNT_AWARE_DECISION_SUPPORT_B3_20261119.md). Status is READY_FOR_OWNER_FORWARDING / NOT_DISPATCHED; this prompt does not itself dispatch a worker.
+- Original R2/R3 task cards remain **historical drafts**, not active worker dispatches. Their scope was consolidated into [B3 Account-Aware Decision Support](../prompts/v0.8/V080_PERSONAL_MVP_ACCOUNT_AWARE_DECISION_SUPPORT_B3_20261119.md), implemented by Gemini 4 Neon XHigh and independently accepted offline only. Historical prompt and original worker attribution are preserved.
 
 ## One consolidated package = one independent implementation acceptance
 
@@ -42,7 +43,7 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 
 **B2:** Single larger strategy decision delivery: 4H regime, 1H setup (standard pullback + early continuation), independent completed 15m trigger, 5m actionability, 4H/1D obstacle and net R, hard SL/TP1–3, OI/funding/mark/depth, explicit WATCH/INVALID/NO_SETUP/SOURCE_BLOCKED/EXECUTABLE and reasons, versioned episode, local card, +5/+10m action-time reprice and journal. B2 is **SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY** and is not yet a live decision-ready MVP. Account unavailable means unit-risk/manual account check, not a fabricated safe trade size. Old simulation budgets are not personal approved limits.
 
-**B3:** One substantial offline private-read + account overlay package after B2 MarketPlan and SignalEpisode are stable. Dedicated signed GET / private store, ordinary and Algo orders, positions/fills/income/fees/funding, non-atomic coverage, pagination/dedup/recovery, hedge legs, position protection and multi-to-many matching. Synthetic-only tests and one 0-C offline acceptance. **Private real access remains separate** and DISCONNECTED unless strictly read-only Futures USER_DATA permissions are proven without a trade-capable setting. Layer 1 and the public decision engine must work without Layer 2.
+**B3 (ACCEPTED OFFLINE ONLY):** Gemini 4 Neon delivered an independent fake-signed GET/private-fixture store, ordinary/Algo orders, positions/fills/income/fees/funding, pagination/checkpoints, hedge protection and multi-to-many signal matching. The Controller validated 51/51 B3 tests, 54/54 inherited B2 regressions, hash-pinned install, 17 synthetic cases and 183/183 SHA seals. **Private real access remains separate** and DISCONNECTED unless strictly read-only Futures USER_DATA permissions are proven without a trade-capable setting. The public market decision engine runs without Layer 2.
 
 ## Single engineering queue and review protocol
 
