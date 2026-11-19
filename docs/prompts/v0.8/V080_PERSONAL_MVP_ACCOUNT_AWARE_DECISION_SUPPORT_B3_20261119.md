@@ -2,8 +2,8 @@
 ## Consolidated R2 PRIVATE_USER_DATA + R3 Account/Signal Overlay
 
 - Task ID: V080-PERSONAL-MVP-ACCOUNT-AWARE-B3-01
-- Executor: GPT-6.2 Sol, Extra High
-- Peer-level alternative: Gemini Neon, same complex-engineering tier, only if Sol quota/capacity is insufficient
+- Executor: Gemini Neon (complex-engineering tier; use the highest available reasoning/effort setting)
+- Peer-level alternative: GPT-6.2 Sol Extra High, only if Neon quota/capacity is insufficient
 - Architecture advisor: GPT-6.2 Astra only for a material architecture fork; no mandatory full-system audit
 - Optional bounded QA: Gemini 4 Hydrogen; not a substitute executor for this complex package
 - Dispatcher and sole independent acceptance authority: Controller 0-C
@@ -77,7 +77,7 @@ workspaces/lt-v080-personal-mvp-account-aware-b3-01/
 
 Use a separate worktree or clean isolated copy based on the verified v0.8.0 baseline. Do not edit the shared v0.8.0 checkout. Do not modify Program J, baseline/program-j, accepted R1, B1, B2, prior controller decisions, or historical v0.7.0 artifacts. Keep implementation, synthetic fixtures, tests and sanitized evidence inside the B3 work root. Canonical project documentation remains on docs/engineering; do not write canonical project documents to v0.8.0.
 
-Record the actual execution-interface model identifier and available thinking effort. Do not infer the exact model ID from a nickname. If Gemini Neon is used instead of Sol, preserve the same task ID, scope and acceptance bar, and record the actual Neon model identifier. This is a single integrated work package with one core writer; do not run Sol and Neon concurrently on the same package.
+Record the actual execution-interface model identifier and available thinking effort. Do not infer the exact model ID from a nickname. Gemini Neon is the primary assigned executor. If GPT-6.2 Sol is used instead because Neon quota/capacity is insufficient, preserve the same task ID, scope and acceptance bar, and record the actual Sol model identifier and effort. This is a single integrated work package with one core writer; do not run Neon and Sol concurrently on the same package.
 
 ## 2. B2 integration contract — read-only and immutable
 
