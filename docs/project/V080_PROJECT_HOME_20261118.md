@@ -1,6 +1,6 @@
 # QUANT v0.8.0 — Project Home and Baseline (updated 2026-11-19)
 
-Status: R1 and B1 SCOPED_ACCEPTED_OFFLINE_ONLY; Astra architecture audit accepted; B2 worker handoff received 2026-11-19 and awaits independent Controller review. Real Binance market/API activation remains disabled.
+Status: R1/B1 SCOPED_ACCEPTED_OFFLINE_ONLY; B2 SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY; Astra architecture review accepted; all genuine-public, real-private and trading capabilities remain disabled.
 Product: Personal Trading Decision Support.
 Local root: /root/workspace/project/quant-0.8.0/
 Executable code/runtime branch: v0.8.0 in EXASHXE/btc-quant-agent-public.
@@ -22,7 +22,7 @@ Canonical project documentation branch: docs/engineering. All project, role, arc
 - [R2 PRIVATE_USER_DATA draft](../prompts/v0.8/V080_SOL62_PERSONAL_MVP_LAYER2_USER_DATA_DRAFT_20261118.md)
 - [R3 account/signal overlay draft](../prompts/v0.8/V080_SOL62_ACCOUNT_SIGNAL_OVERLAY_R3_DRAFT_20261118.md)
 - [B1 integrated public runtime task — Controller accepted offline only](../prompts/v0.8/V080_SOL62_PUBLIC_RUNTIME_FOUNDATION_B1_20261118.md)
-- [B2 integrated market decision MVP task — Controller scope approved, Owner forwarding pending](../prompts/v0.8/V080_SOL62_MARKET_DECISION_MVP_B2_20261118.md)
+- [B2 integrated market decision MVP task — Controller accepted offline-integrated only](../prompts/v0.8/V080_SOL62_MARKET_DECISION_MVP_B2_20261118.md)
 - [1-A new chat](../prompts/v0.8/V080_NEW_CHAT_1A_20261118.md)
 - [0-C new chat](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md)
 
@@ -57,13 +57,13 @@ This attestation does not claim Binance legal approval, third-party legal certif
 | Narrow Stage 1A | **SUPERSEDED_FOR_FUTURE_FORWARDING / NOT_STARTED** | Original decision preserved; no overlapping workspace found |
 | **B1 PUBLIC_RUNTIME_FOUNDATION** | **SCOPED_ACCEPTED_OFFLINE_ONLY** | 89 B1 + 99 inherited targeted tests independently PASS; genuine-public origin remains dormant |
 | First live public GET activation | **NOT AUTHORIZED** | Requires accepted B1 and separate completed local operating scope |
-| **B2 MARKET_DECISION_MVP** | **WORKER_REPORTED_READY_FOR_CONTROLLER_REVIEW / CONTROLLER_ACCEPTANCE_PENDING** | Sol Extra High; 54 B2 tests and 89 inherited B1 tests reported PASS; offline-only pending independent review |
+| **B2 MARKET_DECISION_MVP** | **SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY** | Sol Extra High; Controller independently reran 54/54 B2 + 89/89 B1 tests, installed both wheels and recalculated 24 paths; genuine market integration remains dormant |
 | **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | PLANNED / NOT_DISPATCHED | Sol Extra High or Gemini Neon; merge R2 + R3 offline after stable B2 episode contracts |
 | R5 controlled expansion/notifications | PLANNED | Feishu external activation remains separately gated |
 | R6 prospective evaluation | PLANNED | Collect event denominators starting with B2; no Alpha claims |
 | Layer 3 TRADE | DISABLED | No trade key, route or worker |
 
-Original R2/R3 draft prompts remain references, not dispatched tasks. B2 implementation has been worker-reported complete and is awaiting independent Controller review; it is not yet Controller-accepted. For current execution order and capability-specific gates see [Roadmap and Gates](V080_ROADMAP_AND_GATES_20261118.md).
+Original R2/R3 draft prompts remain references, not dispatched tasks. B2 has now passed the independent 0-C offline-integrated acceptance. A separate reviewed real-origin source bridge and operating scope are necessary before a live market decision workflow. For current execution order and capability-specific gates see [Roadmap and Gates](V080_ROADMAP_AND_GATES_20261118.md).
 
 ## Controller evidence (local v0.8.0 workspace only)
 
@@ -71,14 +71,15 @@ Original R2/R3 draft prompts remain references, not dispatched tasks. B2 impleme
 - Astra architecture scoped acceptance: controller-decisions/V080_CONTROLLER_ASTRA_FULL_SYSTEM_ARCH_AUDIT_ACCEPTANCE_20261118.json (SHA-256 0213dcfc3a12419081404923c9d8112cbb532269f6fc537f2403ced9c4990663).
 - Supplemental B1 scope approval: controller-decisions/V080_CONTROLLER_SOL62_B1_PUBLIC_RUNTIME_FOUNDATION_FORWARD_APPROVAL_20261118.json. Historical; B1 worker has since delivered and been accepted offline only.
 - **B1 offline acceptance:** controller-decisions/V080_CONTROLLER_B1_PUBLIC_RUNTIME_OFFLINE_SCOPED_ACCEPTANCE_20261118.json, SHA-256 b42ad44bc91a5fe89e7e2209ba4682ca5232d6611c5340b2b5febfe356a08cbf. B1 56 artifacts sealed, 89/89 tests independently rerun, 99/99 R1 targeted regression, all 323 Program J files verified.
-- **B2 scope approval:** controller-decisions/V080_CONTROLLER_SOL62_B2_MARKET_DECISION_MVP_FORWARD_APPROVAL_20261118.json.
-- **B2 worker handoff:** workspaces/lt-v080-sol62-personal-mvp-market-decision-b2-01/WORKER_RESULT.md and CONTROLLER_HANDOFF.md, dated 2026-11-19. Worker-reported 54/54 B2 and 89/89 inherited B1 tests PASS; Controller acceptance remains pending.
+- **B2 scope approval:** controller-decisions/V080_CONTROLLER_SOL62_B2_MARKET_DECISION_MVP_FORWARD_APPROVAL_20261118.json (historical pre-execution approval).
+- **Neon policy adoption:** controller-decisions/V080_CONTROLLER_GEMINI_NEON_ROUTING_ADOPTION_20261119.json (Owner-directed routing only; no new worker or permission).
+- **B2 offline-integrated acceptance:** controller-decisions/V080_CONTROLLER_B2_MARKET_DECISION_OFFLINE_INTEGRATED_ACCEPTANCE_20261119.json, SHA-256 7de93eed45541d09a3b65b3e8452033c894ad402a169306bd97e4952929ac48d. Controller reran 54 B2 and 89 B1 tests, verified 93 B2, 56 B1, 367 R1 and 323 Program J hashes, checked clean install and recomputed 24 Decimal conditional paths. The first isolated review-copy test attempt needed an explicit B1 DB path; its rerun passed 54/54. Account context and real-source eligibility remain unavailable.
 
 ## Next action
 
-Controller 0-C should independently review the B2 worker handoff and sealed evidence in workspaces/lt-v080-sol62-personal-mvp-market-decision-b2-01/. The worker reports 54 B2 tests and 89 inherited B1 tests passing, but this is not Controller acceptance. Do not dispatch a duplicate B2 writer while review is pending.
+B2 has been independently accepted for offline synthetic decision integration. It is no longer awaiting Controller review, and no duplicate B2 worker is needed. For the first genuine public-market decision workflow, separately review the Owner-controlled operating scope AND the B1/B2 genuine-origin binding and activation change; existing B1 and B2 wheels deliberately refuse genuine-public operation.
 
-In parallel with B2 engineering planning, the first real public scan requires a separately completed Owner-controlled operating scope and a **new reviewed real-origin binding/activation**, because the accepted B1 wheel deliberately returns LIVE_CAPABILITY_DORMANT. This activation is not authorized by B1 acceptance or B2 dispatch. R2/R3 are merged conceptually into a future B3 offline package after B2 contracts stabilize; real private Futures permission remains unproved. Layer 3 remains disabled.
+The next integrated engineering package is B3 (R2+R3 offline account-aware reconciliation), assigned to Sol or Neon only after a separate Controller dispatch. The first real public scan requires a separate Owner-controlled scope, real-origin binding and explicit activation; the B2 adapter is still limited to fixture/loopback inputs. Real private Futures read permission remains unproved. Layer 3 remains disabled.
 
 ## Owner model-routing update — 2026-11-19
 
