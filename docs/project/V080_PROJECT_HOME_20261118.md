@@ -1,6 +1,6 @@
 # QUANT v0.8.0 — Project Home and Baseline (updated 2026-11-19)
 
-Status: R1/B1 SCOPED_ACCEPTED_OFFLINE_ONLY; B2 SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY; Astra architecture review accepted; all genuine-public, real-private and trading capabilities remain disabled.
+Status: R1/B1 SCOPED_ACCEPTED_OFFLINE_ONLY; B2 SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY; B3 consolidated R2+R3 prompt prepared READY_FOR_OWNER_FORWARDING / NOT_DISPATCHED; all genuine-public, real-private and trading capabilities remain disabled.
 Product: Personal Trading Decision Support.
 Local root: /root/workspace/project/quant-0.8.0/
 Executable code/runtime branch: v0.8.0 in EXASHXE/btc-quant-agent-public.
@@ -23,6 +23,7 @@ Canonical project documentation branch: docs/engineering. All project, role, arc
 - [R3 account/signal overlay draft](../prompts/v0.8/V080_SOL62_ACCOUNT_SIGNAL_OVERLAY_R3_DRAFT_20261118.md)
 - [B1 integrated public runtime task — Controller accepted offline only](../prompts/v0.8/V080_SOL62_PUBLIC_RUNTIME_FOUNDATION_B1_20261118.md)
 - [B2 integrated market decision MVP task — Controller accepted offline-integrated only](../prompts/v0.8/V080_SOL62_MARKET_DECISION_MVP_B2_20261118.md)
+- [B3 consolidated account-aware decision support — prompt ready, not dispatched](../prompts/v0.8/V080_PERSONAL_MVP_ACCOUNT_AWARE_DECISION_SUPPORT_B3_20261119.md)
 - [1-A new chat](../prompts/v0.8/V080_NEW_CHAT_1A_20261118.md)
 - [0-C new chat](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md)
 
@@ -58,7 +59,7 @@ This attestation does not claim Binance legal approval, third-party legal certif
 | **B1 PUBLIC_RUNTIME_FOUNDATION** | **SCOPED_ACCEPTED_OFFLINE_ONLY** | 89 B1 + 99 inherited targeted tests independently PASS; genuine-public origin remains dormant |
 | First live public GET activation | **NOT AUTHORIZED** | Requires accepted B1 and separate completed local operating scope |
 | **B2 MARKET_DECISION_MVP** | **SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY** | Sol Extra High; Controller independently reran 54/54 B2 + 89/89 B1 tests, installed both wheels and recalculated 24 paths; genuine market integration remains dormant |
-| **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | PLANNED / NOT_DISPATCHED | Sol Extra High or Gemini Neon; merge R2 + R3 offline after stable B2 episode contracts |
+| **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | **PROMPT_READY / NOT_DISPATCHED** | Consolidated R2+R3 offline package; GPT-6.2 Sol Extra High default, Gemini Neon peer alternative; no real credentials/API |
 | R5 controlled expansion/notifications | PLANNED | Feishu external activation remains separately gated |
 | R6 prospective evaluation | PLANNED | Collect event denominators starting with B2; no Alpha claims |
 | Layer 3 TRADE | DISABLED | No trade key, route or worker |
@@ -79,7 +80,7 @@ Original R2/R3 draft prompts remain references, not dispatched tasks. B2 has now
 
 B2 has been independently accepted for offline synthetic decision integration. It is no longer awaiting Controller review, and no duplicate B2 worker is needed. For the first genuine public-market decision workflow, separately review the Owner-controlled operating scope AND the B1/B2 genuine-origin binding and activation change; existing B1 and B2 wheels deliberately refuse genuine-public operation.
 
-The next integrated engineering package is B3 (R2+R3 offline account-aware reconciliation), assigned to Sol or Neon only after a separate Controller dispatch. The first real public scan requires a separate Owner-controlled scope, real-origin binding and explicit activation; the B2 adapter is still limited to fixture/loopback inputs. Real private Futures read permission remains unproved. Layer 3 remains disabled.
+The next integrated engineering package is B3 (R2+R3 offline account-aware reconciliation). Its complete canonical prompt is prepared and READY_FOR_OWNER_FORWARDING / NOT_DISPATCHED; GPT-6.2 Sol Extra High is the default executor and Gemini Neon is the peer-level alternative if Sol capacity is insufficient. The package uses one core writer, not parallel Sol/Neon edits. The first real public scan requires a separate Owner-controlled scope, real-origin binding and explicit activation; the B2 adapter is still limited to fixture/loopback inputs. Real private Futures read permission remains unproved. Layer 3 remains disabled.
 
 ## Owner model-routing update — 2026-11-19
 

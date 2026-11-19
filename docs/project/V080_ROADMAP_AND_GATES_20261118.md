@@ -15,7 +15,7 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 | **B1 PUBLIC_RUNTIME_FOUNDATION** | **GPT-6.2 Sol High** | **SCOPED_ACCEPTED_OFFLINE_ONLY** | 89 B1 tests and 99 inherited targeted tests independently PASS; no real API; live composition dormant |
 | First bounded live PUBLIC_MARKET scan | Owner local scope / 0-C capability activation | **NOT AUTHORIZED** | Only after B1 acceptance and separate region/route, endpoint, cadence, budget, retention and stop-condition review |
 | **B2 MARKET_DECISION_MVP** | **GPT-6.2 Sol Extra High** | **SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY** | 54 B2 + 89 B1 independently rerun PASS; 16 synthetic cards/8 reprices, 24 independent path calculations; real market access/economic proof excluded |
-| **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | **GPT-6.2 Sol Extra High or Gemini Neon** | **PLANNED / NOT_DISPATCHED** | Consolidate R2 signed-GET offline private connector + R3 reconciliation after stable B2 MarketPlan/SignalEpisode; independent read-only credential activation gate remains CLOSED |
+| **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | **GPT-6.2 Sol Extra High (default) or Gemini Neon (peer alternative)** | **PROMPT_READY / NOT_DISPATCHED** | One consolidated R2+R3 offline implementation package; fake credentials/fixtures only; real private permission gate remains CLOSED |
 | R5 universe expansion and market-only alerts | Sol or Gemini Neon / optional Hydrogen QA | PLANNED / NOT_DISPATCHED | B2 usable public market workflow plus scoped source/rate review; external Feishu separately authorized |
 | R6 prospective evaluation | Sol or Gemini Neon / Astra challenge / 0-C | PLANNED / NOT_DISPATCHED | Capture signal/response denominators beginning with B2; economics require independently sufficient real evidence |
 | Layer 3 TRADE_EXECUTION | No assigned worker | **DISABLED / EXCLUDED** | No route, trade key, auto order or automatic future stage |
@@ -32,7 +32,7 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 - Canonical complete B2 task: [V080 Sol B2 Market Decision MVP](../prompts/v0.8/V080_SOL62_MARKET_DECISION_MVP_B2_20261118.md). Historical assigned executor remains Sol; Neon routing does not retroactively reassign it.
 - **Neon routing adoption:** controller-decisions/V080_CONTROLLER_GEMINI_NEON_ROUTING_ADOPTION_20261119.json; future B3 executor selection Sol or Neon remains Controller-gated.
 - B1 canonical full task card: [V080 Sol B1 Public Runtime Foundation](../prompts/v0.8/V080_SOL62_PUBLIC_RUNTIME_FOUNDATION_B1_20261118.md).
-- Original R2/R3 task cards remain **historical drafts**, not active worker dispatches; they will be consolidated into a separate B3 task only after B2 contracts stabilize.
+- Original R2/R3 task cards remain **historical drafts**, not active worker dispatches. Their scope is now consolidated into the canonical B3 prompt: [B3 Account-Aware Decision Support](../prompts/v0.8/V080_PERSONAL_MVP_ACCOUNT_AWARE_DECISION_SUPPORT_B3_20261119.md). Status is READY_FOR_OWNER_FORWARDING / NOT_DISPATCHED; this prompt does not itself dispatch a worker.
 
 ## One consolidated package = one independent implementation acceptance
 
@@ -48,7 +48,7 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 
 1. Controller approves one bounded implementation package; Owner forwards the complete worker prompt.
 2. GPT-6.2 Sol is the default core engineering writer. Gemini Neon is an Owner-designated peer-level alternative for complex engineering when Sol quota/capacity is insufficient, and may execute a separate independent package in parallel when Controller approves disjoint worktrees/write sets and a named integration owner.
-3. Use one primary writer per work package. Do not allow Sol and Neon to edit the same files or shared mutable integration surface concurrently. Hydrogen remains for bounded mechanical fixtures/QA; Astra reviews material architecture/math forks. Neither worker model dispatches or self-accepts.
+3. Use one primary writer per work package. Do not allow Sol and Neon to edit the same files or shared mutable integration surface concurrently. B3 is one integrated accounting/matching package and is assigned to a single core writer. Hydrogen remains for bounded mechanical fixtures/QA; Astra reviews material architecture/math forks. Neither worker model dispatches or self-accepts.
 4. Controller independently checks installed artifact, provenance, targeted adversarial tests, representative regressions and seal hashes **once at package completion**, not after every internal step. Do not impose arbitrary test-count quotas or repeat full R1 reacceptance absent changed risk.
 5. External capability activation (first live public scan, real private read, external notification, any financial action) is independent. Only actual Controller acceptance and applicable Owner authorization permit progression.
 
