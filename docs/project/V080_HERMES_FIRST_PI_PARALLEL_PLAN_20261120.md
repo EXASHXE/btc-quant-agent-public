@@ -95,6 +95,6 @@ Pi P2 is a future offline-only prototype; run both on H1 V1 fixtures and measure
 - [H1 — one integrated P0 correction prompt (not dispatched)](../prompts/v0.8/V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md)
 - [P1 — Astra Pi architecture task](../prompts/v0.8/V080_ASTRA_PI_QUANT_AGENT_ARCHITECTURE_P1_20261120.md)
 
-One recommended immediate Owner action: **Forward the integrated H1 P0 correction prompt to Gemini 4 Neon XHigh.** P1 has already been accepted architecture-only; Pi P2 is blocked until corrected H1 V1 vectors/contract are accepted. Neither P2 nor live Feishu/public calls are permitted.
+Immediate Controller action: **Reconcile the H1 P0 correction workroot observed locally at 2026-11-20 17:34 HKT, before forwarding or starting any additional worker.** The last Controller record (17:12) called the correction NOT_DISPATCHED, but initial code and tests now exist in the designated isolated root. A workroot alone is not independently verified authorization, completion or acceptance. Verify Owner forwarding, worker identity and the exact scope before reviewing a sealed correction. P1 is already accepted architecture-only; Pi P2 is blocked until corrected H1 V1 vectors/reference export are independently accepted. Neither P2 nor live Feishu/public calls are permitted.
 
 The original H1 and P1 were Owner-forwarded and delivered; Controller accepted P1 architecture only and held H1 for P0. The H1 correction prompt and Pi P2 have NOT been dispatched. No real network action or credential activation occurred.

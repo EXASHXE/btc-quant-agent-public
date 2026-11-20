@@ -87,3 +87,5 @@ PERSONAL_MVP remains separate from STRICT_RESEARCH. No economic or profitability
 ## Owner model-routing update — 2026-11-19
 
 Gemini Neon replaces Gemini Argon for future complex engineering execution. Neon is routed at the same project task-complexity tier as GPT-6.2 Sol, especially for Sol quota fallback or Controller-approved independent parallel work. This is not a universal benchmark claim. Record the exact execution-interface model ID. Historical Argon reviews remain unchanged. See [V080 Model Routing Policy](V080_MODEL_ROUTING_POLICY_20261119.md).
+
+**H1 P0 execution reconciliation (2026-11-20 17:34 HKT observation):** The isolated correction workroot workspaces/lt-v080-gemini-neon-hermes-h1-p0-interop-fix-01/ now exists with initial files, later than the Controller 17:12 NOT_DISPATCHED receipt. This is WORKSPACE_OBSERVED, not confirmation of Owner forwarding, complete Worker delivery or independent Controller acceptance. Before any new dispatch, 0-C must reconcile actual assignment, then accept one sealed correction after P0-C01/C02/C03 tests and golden vectors pass. Pi P2 remains blocked.

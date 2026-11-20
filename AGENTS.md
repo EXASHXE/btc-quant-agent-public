@@ -6,6 +6,8 @@
 >
 > **Active v0.8.0 entrypoints:** [Project Home](docs/project/V080_PROJECT_HOME_20261118.md) · [Documentation Branch Policy](docs/project/V080_DOCUMENTATION_BRANCH_POLICY_20261118.md) · [Prompt Copy Card Standard](docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md) · [Role Matrix](docs/roles/V080_ACTIVE_ROLE_MATRIX_20261118.md) · [Model Routing](docs/project/V080_MODEL_ROUTING_POLICY_20261119.md) · [1-A New Chat](docs/prompts/v0.8/V080_NEW_CHAT_1A_20261118.md) · [0-C New Chat](docs/prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md).
 
+**Latest v0.8.0 checkpoint (2026-11-20):** [Hermes/Pi workplan](docs/project/V080_HERMES_FIRST_PI_PARALLEL_PLAN_20261120.md) · [Controller P0 dispositions](docs/architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md) · [H1 consolidated correction task](docs/prompts/v0.8/V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md). P1 is accepted ARCHITECTURE_ONLY; H1 remains P0 HOLD after 54 independent offline tests PASS; P2 is BLOCKED until corrected goldens are independently accepted. B5 Phase B, real Feishu/OAuth, private Futures USER_DATA and TRADE are NOT authorized.
+
 All documentation-only updates must be committed to docs/engineering. Do not write canonical project documentation to v0.8.0. Preserve docs-only branch scope: no source code, tests, runtime configuration, credentials, private account payloads, protected data, registry mutation or deployment changes.
 
 All Owner-facing prompts must follow docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md. A prompt is not a dispatch; Controller 0-C remains the sole engineering dispatcher and scoped acceptance authority.

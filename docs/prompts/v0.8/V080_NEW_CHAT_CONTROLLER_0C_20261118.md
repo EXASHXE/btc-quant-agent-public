@@ -30,6 +30,11 @@ Read first from the canonical docs/engineering branch:
 - docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md
 - docs/project/V080_MODEL_ROUTING_POLICY_20261119.md
 - docs/project/V080_PERSONAL_PUBLIC_MARKET_OPERATING_SCOPE_20261118.md
+- docs/project/V080_HERMES_FIRST_PI_PARALLEL_PLAN_20261120.md
+- docs/architecture/V080_QUANT_AGENT_CONTRACT_V1_20261120.md (frozen)
+- docs/architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md
+- docs/architecture/V080_QUANT_AGENT_V1_P0_CROSS_LANGUAGE_GOLDENS_20261120.json
+- docs/prompts/v0.8/V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md (prepared, not dispatched)
 
 Read these local operational artifacts from /root/workspace/project/quant-0.8.0/ (do not publish them to the docs-only branch without separate review):
 - governance/V080_PERSONAL_PUBLIC_MARKET_SCOPE_TEMPLATE_20261118.json
@@ -66,35 +71,41 @@ Do not edit baseline/program-j/ or historical v0.7.0 files. New implementation m
 The prior v0.7.0 task V070-SOL62-PERSONAL-MVP-LAYER1-PUBLIC-01 was NOT_STARTED and work_root_created=false. Its Controller receipt remains immutable. The v0.8.0 R1 task has a new ID and new work root; verify no worker was started elsewhere before dispatch.
 Historical receipt: controller-decisions/V070_SOL62_PERSONAL_MVP_THREE_LAYER_API_CONTROLLER_DISPATCH_20261118.json. Prior plan acceptance: controller-decisions/V070_PERSONAL_MVP_THREE_LAYER_REBASELINE_CONTROLLER_PLAN_ACCEPTANCE_20261118.json.
 
-## 5. Current task and evidence status — 2026-11-19
+## 5. Current independently verified state — 2026-11-20 17:12 HKT receipts
 
-Use the latest canonical Project Home and Roadmap, then reconcile against local Controller decisions and actual worker work roots.
+Always recheck the newest local Controller JSON decisions and actual worker roots; the [Project Home](../../project/V080_PROJECT_HOME_20261118.md) and [Roadmap](../../project/V080_ROADMAP_AND_GATES_20261118.md) remain the active state authority.
 
-Current known state:
-- R1 PUBLIC_MARKET: SCOPED_ACCEPTED_OFFLINE_ONLY.
-- Astra full-system architecture audit: SCOPED_ACCEPTED_ARCHITECTURE_REVIEW_ONLY.
-- B1 PUBLIC_RUNTIME_FOUNDATION: SCOPED_ACCEPTED_OFFLINE_ONLY; genuine live origin remains dormant.
-- B2 MARKET_DECISION_MVP: worker handoff READY_FOR_CONTROLLER_REVIEW, dated 2026-11-19. Worker reports 54/54 B2 tests and 89/89 inherited B1 tests passing, clean build/install and preserved accepted baselines. This is WORKER_REPORTED, NOT Controller acceptance.
-- B3 ACCOUNT_AWARE_DECISION_SUPPORT: planned, not dispatched.
-- First real public scan: NOT AUTHORIZED; requires separate operating-scope and real-origin activation review.
-- Real private account connection: DISCONNECTED / NOT AUTHORIZED pending proof of a genuinely read-only Futures USER_DATA permission set.
-- Layer 3 TRADE_EXECUTION: DISABLED.
+- R1/B1: SCOPED_ACCEPTED_OFFLINE_ONLY.
+- B2 market decision: SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY; synthetic, not proof of a live opportunity.
+- B3 account-aware: SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY; private Futures permissions and real data connection remain unproven.
+- B4 public bridge: SCOPED_ACCEPTED_OFFLINE_PUBLIC_BRIDGE_ONLY.
+- B5 Phase A: SCOPED_ACCEPTED_OFFLINE_PHYSICAL_BINDING_READY. Controller independently reproduced B5/B1/B2/B4 27/89/54/28 (198 PASS); Phase B genuine network scan NOT_AUTHORIZED.
+- Pi P1: SCOPED_ACCEPTED_ARCHITECTURE_ONLY; seven sealed documents and pinned Pi v1.5.2 source verified, with no Pi installation/runtime proof or P2 authorization.
+- Hermes H1 original: HOLD_P0_CONTRACT_SEMANTICS_AND_GOLDEN_EXPORT. Controller independently reran clean/mixed/Hermes 17/17+17/17+20/20 tests and verified 57 files, but two proven V1 semantic defects and absent H1-owned cross-language goldens block H1 reference acceptance.
+- H1 P0 correction: single complete task V080-HERMES-H1-P0-INTEROP-REMEDIATION-01 is PROMPT_READY / NOT_DISPATCHED. Original sealed H1 must remain immutable.
+- Pi P2: BLOCKED_BY_H1_INTERFACE / NOT_DISPATCHED. P1 draft is not an approved worker task.
+- Live Feishu, model OAuth, recurring market scans, private Futures API and B5 Phase B: NOT_AUTHORIZED. Layer 3 TRADE DISABLED.
 
-The original narrow Stage 1A prompt is superseded for future forwarding by the integrated B1 package. Preserve its historical Controller decision. Do not dispatch duplicate R1, Stage 1A or B1 work.
+Primary local Controller receipts:
+- controller-decisions/V080_CONTROLLER_P1_PI_ARCHITECTURE_ACCEPTANCE_20261120.json
+- controller-decisions/V080_CONTROLLER_H1_INDEPENDENT_P0_HOLD_20261120.json
+- controller-decisions/V080_CONTROLLER_B5_PHASE_A_OFFLINE_ACCEPTANCE_20261120.json
 
-## 6. Immediate Controller responsibility
+The earlier H1/P1 forward-approval and narrow Stage 1A records are historical, not current dispatch states. Do not re-dispatch accepted B1–B5, completed P1 or the held original H1.
 
-The immediate work is to independently review the complete B2 worker handoff and sealed evidence under the accepted B2 scope.
+## 6. Immediate responsibility — H1 P0 repair and independent review
 
-Check the actual work root:
-workspaces/lt-v080-sol62-personal-mvp-market-decision-b2-01/
+The current Owner-forwardable engineering work is **one integrated H1 P0 interoperability correction**, NOT a duplicate B2 review, a new architecture study or a Pi P2 dispatch.
 
-Review the exact task card, source, test logs/XML, build/install evidence, preservation checks, synthetic demo and SHA256SUMS. Reproduce the high-risk causal, state-machine, Decimal risk/cost, repricing, crash-recovery and isolation tests. Distinguish WORKER_REPORTED from CONTROLLER_ACCEPTED.
+Reference the [Controller P0 disposition](../../architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md), [seven cross-language golden vectors](../../architecture/V080_QUANT_AGENT_V1_P0_CROSS_LANGUAGE_GOLDENS_20261120.json) and the complete [H1 P0 correction task](V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md):
 
-Do not dispatch another core writer into B2 while this review is pending. If a specific defect is independently reproduced, issue one bounded supplemental fix under a clear write boundary; otherwise make one consolidated acceptance decision.
+1. P0-C01: B2 NO_SETUP/NOT_EVALUATED without a genuine episode ID must be diagnostic-only and never an active signal or alert event.
+2. P0-C02: before evidence verification and in mixed/empty aggregates, return UNKNOWN as a non-evidence response sentinel, preserving true item-level evidence and blocking affirmative alerts.
+3. P0-C03: produce executable Python/Node golden pack for canonical UTF-8, immutable version, event hashes, exact renderer bytes, outbox and private-DM traces.
 
-The B2 offline acceptance cannot authorize genuine Binance public requests, private account access, Feishu or trading. The first live public scan remains a separate capability activation.
+A NEW H1 P0 root workspaces/lt-v080-gemini-neon-hermes-h1-p0-interop-fix-01/ was observed with initial copied files at 2026-11-20 17:34 HKT, after the 17:12 NOT_DISPATCHED Controller record. **Reconcile whether the Owner has already forwarded the task and which writer owns it before any new forwarding.** A workroot is not independent proof of authorization, completion or acceptance. The assigned worker must fix all three P0s and submit one sealed handoff; Controller independently reviews it. Pi P2 is eligible for a separate Controller task only after corrected H1 golden export acceptance.
 
+Hermes remains the sole proposed first deterministic outbox/sender, independent of any model. B5 real public scan and real Feishu remain separate capability gates; the documentation update grants no external, model, private or trading permissions.
 
 ## 7. Model routing
 
@@ -115,7 +126,7 @@ Layer 1 public GET only; no account key.
 Layer 2 signed GET only with a separate local read-only key.
 Layer 3 disabled.
 
-The R1 task must not make live Binance requests or inspect credentials. R2 must not start until R1 is independently accepted.
+All R1/B1–B5 artifacts have only scoped offline acceptance; this never authorizes genuine Binance requests. The optional B3 account layer is offline-only, and a real Futures read-only permission set still requires independent proof and activation.
 
 Binance describes Enable Reading as GET-only and exposes enableFutures separately. If the required Futures USER_DATA endpoints cannot be accessed with a permission set proven read-only, leave Layer 2 DISCONNECTED. Do not enable a Futures permission whose TRADE implications are unclear. Never ask for API Key/Secret in chat.
 
