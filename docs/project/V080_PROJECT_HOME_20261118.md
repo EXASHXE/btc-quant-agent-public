@@ -1,6 +1,6 @@
 # QUANT v0.8.0 — Project Home and Baseline (updated 2026-11-20)
 
-Status: R1/B1 SCOPED_ACCEPTED_OFFLINE_ONLY; B2 SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY; B3 SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY; B4 SCOPED_ACCEPTED_OFFLINE_PUBLIC_BRIDGE_ONLY. B5 Phase A offline engineering scope approved / awaiting Owner forwarding; Phase B genuine scan NOT AUTHORIZED. Genuine-public physical origin, real-private access, external messaging and trading remain disabled.
+Status: R1/B1 SCOPED_ACCEPTED_OFFLINE_ONLY; B2 SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY; B3 SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY; B4 SCOPED_ACCEPTED_OFFLINE_PUBLIC_BRIDGE_ONLY; B5 Phase A SCOPED_ACCEPTED_OFFLINE_PHYSICAL_BINDING_READY. H1 Hermes integration and P1 Pi architecture prompts READY_FOR_OWNER_FORWARDING / NOT_DISPATCHED. B5 Phase B genuine scan, real Feishu, private data and trading remain NOT AUTHORIZED.
 Product: Personal Trading Decision Support.
 Local root: /root/workspace/project/quant-0.8.0/
 Executable code/runtime branch: v0.8.0 in EXASHXE/btc-quant-agent-public.
@@ -25,7 +25,11 @@ Canonical project documentation branch: docs/engineering. All project, role, arc
 - [B2 integrated market decision MVP task — Controller accepted offline-integrated only](../prompts/v0.8/V080_SOL62_MARKET_DECISION_MVP_B2_20261118.md)
 - [B3 consolidated account-aware decision support — Gemini Neon delivered, Controller accepted offline only](../prompts/v0.8/V080_PERSONAL_MVP_ACCOUNT_AWARE_DECISION_SUPPORT_B3_20261119.md)
 - [B4 public-source bridge — Controller accepted offline only; live remains disabled](../prompts/v0.8/V080_PUBLIC_SOURCE_BRIDGE_B4_20261120.md)
-- [B5 genuine public source + first bounded scan — Phase A only approved for Owner forwarding](../prompts/v0.8/V080_LIVE_PUBLIC_FIRST_BOUNDED_SCAN_B5_20261120.md)
+- [B5 genuine public source + first bounded scan — Phase A accepted offline, Phase B unauthorized](../prompts/v0.8/V080_LIVE_PUBLIC_FIRST_BOUNDED_SCAN_B5_20261120.md)
+- [Hermes-first + Pi-parallel Owner workplan](V080_HERMES_FIRST_PI_PARALLEL_PLAN_20261120.md)
+- [Controller-frozen Quant-Agent Contract V1](../architecture/V080_QUANT_AGENT_CONTRACT_V1_20261120.md)
+- [H1 — Hermes + QUANT + Feishu offline integration, Neon task](../prompts/v0.8/V080_HERMES_QUANT_FEISHU_H1_20261120.md)
+- [P1 — Pi Quant-Agent architecture ADR, Astra task](../prompts/v0.8/V080_ASTRA_PI_QUANT_AGENT_ARCHITECTURE_P1_20261120.md)
 - [1-A new chat](../prompts/v0.8/V080_NEW_CHAT_1A_20261118.md)
 - [0-C new chat](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md)
 
@@ -50,7 +54,7 @@ OWNER_STANDING_M2_AUTHORIZATION_20261024.md is preserved byte-identically. Its p
 
 This attestation does not claim Binance legal approval, third-party legal certification, or permission for a different region, commercial use, redistribution, private account access or trading. Program N's one-shot invocation remains consumed and must not be replayed.
 
-## Current state — 2026-11-19
+## Current state — 2026-11-20
 
 | Workstream | Controller-reconciled state | Notes |
 |---|---|---|
@@ -60,11 +64,14 @@ This attestation does not claim Binance legal approval, third-party legal certif
 | Narrow Stage 1A | **SUPERSEDED_FOR_FUTURE_FORWARDING / NOT_STARTED** | Original decision preserved; no overlapping workspace found |
 | **B1 PUBLIC_RUNTIME_FOUNDATION** | **SCOPED_ACCEPTED_OFFLINE_ONLY** | 89 B1 + 99 inherited targeted tests independently PASS; genuine-public origin remains dormant |
 | **B4 PUBLIC_SOURCE_BRIDGE** | **SCOPED_ACCEPTED_OFFLINE_PUBLIC_BRIDGE_ONLY** | gpt-6.2-sol xhigh; Controller independent B4/B1/B2 28/89/54 tests PASS; 50 sealed files; real physical origin still absent |
-| **B5 GENUINE_PUBLIC_SOURCE + FIRST BOUNDED SCAN** | **PHASE_A_APPROVED / AWAITING_OWNER_FORWARD** | Sol Extra High primary, Gemini Neon XHigh fallback; genuine-source code and gates offline first; actual one-shot network phase requires separate Owner+Controller activation |
+| **B5 GENUINE_PUBLIC_SOURCE + FIRST BOUNDED SCAN** | **SCOPED_ACCEPTED_OFFLINE_PHYSICAL_BINDING_READY** | Sol xhigh delivered, 0-C reran B5/B1/B2/B4 27/89/54/28 PASS, 58 files sealed; genuine Phase B NOT AUTHORIZED |
+| **H1 HERMES_QUANT_FEISHU** | **PROMPT_READY / NOT_DISPATCHED** | Gemini 4 Neon XHigh; local QUANT V1 read tools, deterministic notification outbox, mock Hermes Feishu one-shot/gateway workflows |
+| **P1 PI_QUANT_AGENT_ARCH_ADR** | **PROMPT_READY / NOT_DISPATCHED** | GPT-6.2 Astra Extra High; TypeScript Pi SDK architecture, shared V1, Hermes migration and P2 prototype specification |
+| OpenClaw | DEFERRED | No active worker or three-way framework re-evaluation |
 | First live public GET activation | **NOT AUTHORIZED** | Requires accepted B1 and separate completed local operating scope |
 | **B2 MARKET_DECISION_MVP** | **SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY** | Sol Extra High; Controller independently reran 54/54 B2 + 89/89 B1 tests, installed both wheels and recalculated 24 paths; genuine market integration remains dormant |
 | **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | **SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY** | Gemini 4 Neon XHigh; 51 B3 + 54 inherited B2 independent PASS; 183/183 sealed files, 17 synthetic scenarios, no live credentials/API |
-| R5 controlled expansion/notifications | PLANNED | Feishu external activation remains separately gated |
+| R5 controlled expansion/notifications | PLANNED | Hermes H1 is offline notification/interaction integration only; actual Feishu and recurring data cadence separately gated |
 | R6 prospective evaluation | PLANNED | Collect event denominators starting with B2; no Alpha claims |
 | Layer 3 TRADE | DISABLED | No trade key, route or worker |
 
@@ -79,14 +86,18 @@ Original R2/R3 draft prompts remain references, not dispatched tasks. B2 has now
 - **B2 scope approval:** controller-decisions/V080_CONTROLLER_SOL62_B2_MARKET_DECISION_MVP_FORWARD_APPROVAL_20261118.json (historical pre-execution approval).
 - **Neon policy adoption:** controller-decisions/V080_CONTROLLER_GEMINI_NEON_ROUTING_ADOPTION_20261119.json (Owner-directed routing only; no new worker or permission).
 - **B4 offline forward approval (historical):** controller-decisions/V080_CONTROLLER_B4_PUBLIC_SOURCE_BRIDGE_OFFLINE_FORWARD_APPROVAL_20261120.json. Owner subsequently forwarded the task to gpt-6.2-sol xhigh; B4 has completed and been independently accepted for offline scope only.
-- **B5 Phase A offline forward scope approval:** controller-decisions/V080_CONTROLLER_B5_LIVE_PUBLIC_TWO_PHASE_FORWARD_APPROVAL_20261120.json. One B5 task combines offline source binding and conditional first genuine scan; only Phase A is forwardable now, Phase B remains NOT_AUTHORIZED and requires separate actual Owner+0-C scope activation.
+- **B5 Phase A forward approval (historical):** controller-decisions/V080_CONTROLLER_B5_LIVE_PUBLIC_TWO_PHASE_FORWARD_APPROVAL_20261120.json. Sol has delivered B5 Phase A; Controller independently accepted offline physical-binding-ready scope. Phase B remains NOT_AUTHORIZED.
+- **B5 Phase A independent acceptance:** controller-decisions/V080_CONTROLLER_B5_PHASE_A_OFFLINE_ACCEPTANCE_20261120.json. B5 27 + B1 89 + B2 54 + B4 28 tests independently PASS, B5 58/58 files sealed, cold/mixed installation, eight rejected live gates; no genuine exchange request.
+- **Hermes/Pi Owner direction:** V080-OWNER-0C-HERMES-FIRST-PI-PARALLEL-PLAN-20261120; H1/P1 tasks and frozen V1 contract prepared in docs/engineering. No worker dispatched automatically.
+- **H1/P1 Controller forward approval:** controller-decisions/V080_CONTROLLER_HERMES_H1_PI_P1_PARALLEL_FORWARD_APPROVAL_20261120.json, SHA-256 626a0af67b7264da7d203181cb06d48542681fecb8be9cdebb6f2f7645f09dac. H1 and P1 are READY_FOR_OWNER_FORWARDING / NOT_DISPATCHED; actual Feishu/market actions NOT AUTHORIZED.
+- **B5 Phase A acceptance hash:** controller-decisions/V080_CONTROLLER_B5_PHASE_A_OFFLINE_ACCEPTANCE_20261120.json, SHA-256 1af049c8b5f2be6570d837dd37055a987e3749e9ef0d9c94dfdccfa5ccbd320f.
 - **B4 offline scoped acceptance:** controller-decisions/V080_CONTROLLER_B4_PUBLIC_SOURCE_BRIDGE_OFFLINE_SCOPED_ACCEPTANCE_20261120.json, SHA-256 095dc79a730b843257947f6d77760a741efb67a6973880c4f9a806ef9ec86b58. Independently reran 28 B4 + 89 B1 + 54 B2, checked 50/50 B4 seals, rebuilt wheel, 16 cards/8 reprices and recalculated 36 Decimal conditional paths; genuine-public entry exits code 3. No authentic live market data or trading capability authorized.
 - **B3 offline account-aware acceptance:** controller-decisions/V080_CONTROLLER_B3_ACCOUNT_AWARE_OFFLINE_SCOPED_ACCEPTANCE_20261120.json, SHA-256 0d3b88ea3bcedeab9f8d18d8118929be4610ecfa433d2bd35cd6fc7f96b8d7a0. Controller independently verified 183/183 B3 sealed files, 51/51 B3 and 54/54 inherited B2 offline tests, 17 synthetic scenarios and exact 183-file byte identity with pre-seal evidence. Prior HOLD_SEAL_MISSING closed. Real private/public access remains disabled.
 - **B2 offline-integrated acceptance:** controller-decisions/V080_CONTROLLER_B2_MARKET_DECISION_OFFLINE_INTEGRATED_ACCEPTANCE_20261119.json, SHA-256 7de93eed45541d09a3b65b3e8452033c894ad402a169306bd97e4952929ac48d. Controller reran 54 B2 and 89 B1 tests, verified 93 B2, 56 B1, 367 R1 and 323 Program J hashes, checked clean install and recomputed 24 Decimal conditional paths. The first isolated review-copy test attempt needed an explicit B1 DB path; its rerun passed 54/54. Account context and real-source eligibility remain unavailable.
 
 ## Next action
 
-**B4 is complete and independently accepted offline only.** B5 is now the single consolidated follow-on task; Owner can forward [the full B5 prompt](../prompts/v0.8/V080_LIVE_PUBLIC_FIRST_BOUNDED_SCAN_B5_20261120.md) to Sol Extra High (Neon XHigh if unavailable) to complete **Phase A offline physical-source integration**, then hand off READY_FOR_ACTIVATION_REVIEW. B5 Phase B is a separate Owner+Controller one-shot activation under the same task ID; no real Binance requests are authorized by Phase A forwarding. No duplicate B4 or new microtask is needed.
+**Owner immediate action:** forward the [H1 full offline Hermes+QUANT+Feishu task](../prompts/v0.8/V080_HERMES_QUANT_FEISHU_H1_20261120.md) to Gemini 4 Neon XHigh. Astra may independently receive the [P1 Pi SDK ADR task](../prompts/v0.8/V080_ASTRA_PI_QUANT_AGENT_ARCHITECTURE_P1_20261120.md) in parallel. H1 and P1 share the frozen [Quant-Agent Contract V1](../architecture/V080_QUANT_AGENT_CONTRACT_V1_20261120.md) with disjoint workroots and Controller acceptance. OpenClaw is deferred. B5 Phase A has already been independently accepted offline; Phase B genuine scan still requires separate Owner scope and Controller activation.
 
 B2 has been independently accepted for offline synthetic decision integration. It is no longer awaiting Controller review, and no duplicate B2 worker is needed. For the first genuine public-market decision workflow, separately review the Owner-controlled operating scope AND the B1/B2 genuine-origin binding and activation change; existing B1 and B2 wheels deliberately refuse genuine-public operation.
 
