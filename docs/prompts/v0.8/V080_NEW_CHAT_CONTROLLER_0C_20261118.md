@@ -30,7 +30,8 @@ Read first from the canonical docs/engineering branch:
 - docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md
 - docs/project/V080_MODEL_ROUTING_POLICY_20261119.md
 - docs/project/V080_PERSONAL_PUBLIC_MARKET_OPERATING_SCOPE_20261118.md
-- docs/project/V080_HERMES_FIRST_PI_PARALLEL_PLAN_20261120.md
+- docs/project/V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md (latest Owner execution order)
+- docs/project/V080_HERMES_FIRST_PI_PARALLEL_PLAN_20261120.md (historical P1/H1 parallel delivery)
 - docs/architecture/V080_QUANT_AGENT_CONTRACT_V1_20261120.md (frozen)
 - docs/architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md
 - docs/architecture/V080_QUANT_AGENT_V1_P0_CROSS_LANGUAGE_GOLDENS_20261120.json
@@ -82,8 +83,8 @@ Always recheck the newest local Controller JSON decisions and actual worker root
 - B5 Phase A: SCOPED_ACCEPTED_OFFLINE_PHYSICAL_BINDING_READY. Controller independently reproduced B5/B1/B2/B4 27/89/54/28 (198 PASS); Phase B genuine network scan NOT_AUTHORIZED.
 - Pi P1: SCOPED_ACCEPTED_ARCHITECTURE_ONLY; seven sealed documents and pinned Pi v1.5.2 source verified, with no Pi installation/runtime proof or P2 authorization.
 - Hermes H1 original: HOLD_P0_CONTRACT_SEMANTICS_AND_GOLDEN_EXPORT. Controller independently reran clean/mixed/Hermes 17/17+17/17+20/20 tests and verified 57 files, but two proven V1 semantic defects and absent H1-owned cross-language goldens block H1 reference acceptance.
-- H1 P0 correction: single complete task V080-HERMES-H1-P0-INTEROP-REMEDIATION-01 is PROMPT_READY / NOT_DISPATCHED. Original sealed H1 must remain immutable.
-- Pi P2: BLOCKED_BY_H1_INTERFACE / NOT_DISPATCHED. P1 draft is not an approved worker task.
+- H1 P0 correction: SCOPED_ACCEPTED_OFFLINE_HERMES_H1_REFERENCE_WITH_P0_FIXED_ONLY per controller-decisions/V080_CONTROLLER_H1_P0_OFFLINE_REFERENCE_SCOPED_ACCEPTANCE_20261120.json (18:25 HKT); 71/71 seals, 63/63 independent PASS, Python/Node golden exports and all P0-C01/C02/C03 closed offline. Original H1 remains historical P0 HOLD; no real Feishu/Binance authorization.
+- Pi P2: OWNER_DEFERRED_UNTIL_H_FIELD_TRIAL / NOT_DISPATCHED. H1 reference input is now accepted; a P2 READY_FOR_OWNER_FORWARDING task draft was observed temporarily but is not confirmed as a canonical published task; latest Owner execution order defers actual Pi engineering until Hermes has begun authorized real-use testing and produced initial operating feedback. No P2 automatic forwarding.
 - Live Feishu, model OAuth, recurring market scans, private Futures API and B5 Phase B: NOT_AUTHORIZED. Layer 3 TRADE DISABLED.
 
 Primary local Controller receipts:
@@ -95,7 +96,7 @@ The earlier H1/P1 forward-approval and narrow Stage 1A records are historical, n
 
 ## 6. Immediate responsibility — H1 P0 repair and independent review
 
-The current Owner-forwardable engineering work is **one integrated H1 P0 interoperability correction**, NOT a duplicate B2 review, a new architecture study or a Pi P2 dispatch.
+The H1 P0 correction is now independently accepted OFFLINE ONLY. The immediate work is **Hermes H-only real-operation preparation**, separately gating B5 Phase B genuine market data and Feishu allowlisted private DM before any external call. Pi P2 remains deferred regardless of any prepared draft by latest Owner timing; no new H1 correction or P2 worker is needed.
 
 Reference the [Controller P0 disposition](../../architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md), [seven cross-language golden vectors](../../architecture/V080_QUANT_AGENT_V1_P0_CROSS_LANGUAGE_GOLDENS_20261120.json) and the complete [H1 P0 correction task](V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md):
 
@@ -103,7 +104,7 @@ Reference the [Controller P0 disposition](../../architecture/V080_QUANT_AGENT_V1
 2. P0-C02: before evidence verification and in mixed/empty aggregates, return UNKNOWN as a non-evidence response sentinel, preserving true item-level evidence and blocking affirmative alerts.
 3. P0-C03: produce executable Python/Node golden pack for canonical UTF-8, immutable version, event hashes, exact renderer bytes, outbox and private-DM traces.
 
-A NEW H1 P0 root workspaces/lt-v080-gemini-neon-hermes-h1-p0-interop-fix-01/ was observed with initial copied files at 2026-11-20 17:34 HKT, after the 17:12 NOT_DISPATCHED Controller record. **Reconcile whether the Owner has already forwarded the task and which writer owns it before any new forwarding.** A workroot is not independent proof of authorization, completion or acceptance. The assigned worker must fix all three P0s and submit one sealed handoff; Controller independently reviews it. Pi P2 is eligible for a separate Controller task only after corrected H1 golden export acceptance.
+0-C has **already accepted** the H1 P0 corrected reference at 18:25 HKT (63 independent PASS), closing P0-C01/C02/C03 offline. Do not re-run a duplicate H1 worker. **Next close H in separately authorized real use**, with bounded official Binance public-source canary and real Feishu DM interaction, then record initial measured source-to-message, inbound reply, fallback and human actionability. **Only when H actual-use testing is underway** may Controller seek Owner forwarding of a separately reverified offline Pi P2 task; task-card readiness alone is not dispatch authorization.
 
 Hermes remains the sole proposed first deterministic outbox/sender, independent of any model. B5 real public scan and real Feishu remain separate capability gates; the documentation update grants no external, model, private or trading permissions.
 
@@ -169,3 +170,7 @@ A task prompt is not a dispatch. Only Controller 0-C can formally dispatch and i
 ## 13. Owner model-routing update — 2026-11-19
 
 Gemini Neon replaces Gemini Argon for future complex engineering assignments. Neon is a peer-level alternative to GPT-6.2 Sol in the Owner's project routing. Use it when Sol quota/capacity is insufficient or for genuinely independent parallel engineering work. Apply the same complete prompt, isolation, tests, evidence and final Controller acceptance requirements as Sol. Do not retroactively rename historical Argon work. Follow docs/project/V080_MODEL_ROUTING_POLICY_20261119.md. This update changes model routing only; it grants no additional API, credential, deployment, private-account or trading permission.
+
+## 14. Latest Owner sequencing override — 2026-11-20
+
+**H_FIRST_THEN_PI_DURING_FIELD_TRIAL** supersedes the earlier *future* Hermes/Pi parallel development plan. Pi P1 architecture and corrected Hermes H1 P0 reference are now independently accepted in their offline scopes. Do not commission Pi implementation, provider testing, SDK installation or a second bot until real authorized H use has begun. Engineering capacity focuses on accepted H1 reference, separately authorized genuine B5 source, approved Feishu DM delivery and first operational Hermes+QUANT feedback. Start a single bounded Pi P2 offline comparison **during continuing H real-use measurements**, after the first operational baseline and a new Owner/Controller dispatch. Hermes is the sole sender throughout. Read docs/project/V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md before proposing any new Agent task. No authorization is created by this policy update.

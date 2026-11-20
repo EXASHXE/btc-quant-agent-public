@@ -1,4 +1,7 @@
-# QUANT v0.8.0 — Hermes First, Pi in Parallel: Controller Work Plan
+# QUANT v0.8.0 — Hermes First, Pi in Parallel: Historical Controller Work Plan
+
+**SUPERSEDED FOR FUTURE EXECUTION SEQUENCE (Owner 2026-11-20):** [H-first, Pi-during-field-trial controlling plan](V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md). The parallel H1/P1 architectural work was already delivered historically; **do not start Pi P2 engineering until Hermes is independently accepted, starts an authorized actual-use trial, and has initial operational feedback**. Pi P1 stays accepted ARCHITECTURE_ONLY. All original decisions and source pins below are retained as historical context.
+
 
 - Owner direction: V080-OWNER-0C-HERMES-FIRST-PI-PARALLEL-PLAN-20261120
 - Controller plan: 2026-11-20

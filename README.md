@@ -8,6 +8,8 @@
 >
 > **Current new chats:** [1-A Independent Advisor](docs/prompts/v0.8/V080_NEW_CHAT_1A_20261118.md) · [Controller 0-C](docs/prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md).
 >
+> **Latest Owner execution order (2026-11-20):** [Hermes real-use first; Pi coding during field trial](docs/project/V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md). P1 architecture and H1 corrected reference are independently accepted offline, but Pi P2 remains Owner-deferred until Hermes begins an authorized actual-use trial with initial operating evidence. The earlier Pi-parallel workplan is historical.
+>
 > **Latest v0.8.0 checkpoint (2026-11-20):** [Hermes-first / Pi-parallel plan](docs/project/V080_HERMES_FIRST_PI_PARALLEL_PLAN_20261120.md) · [Controller H1 P0 dispositions](docs/architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md) · [single H1 correction task](docs/prompts/v0.8/V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md). P1 architecture accepted; H1 independent 54 PASS but full H1 reference held for three P0 issues; Pi P2 blocked. B5 Phase A accepted offline; real Binance, Feishu, private-account and trade activation NOT AUTHORIZED. Below, v0.7.0 material is historical.
 >
 > The v0.7.0 material below is retained as historical project documentation unless a V080 document explicitly supersedes it.

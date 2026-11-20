@@ -8,6 +8,8 @@
 
 **Latest v0.8.0 checkpoint (2026-11-20):** [Hermes/Pi workplan](docs/project/V080_HERMES_FIRST_PI_PARALLEL_PLAN_20261120.md) · [Controller P0 dispositions](docs/architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md) · [H1 consolidated correction task](docs/prompts/v0.8/V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md). P1 is accepted ARCHITECTURE_ONLY; H1 remains P0 HOLD after 54 independent offline tests PASS; P2 is BLOCKED until corrected goldens are independently accepted. B5 Phase B, real Feishu/OAuth, private Futures USER_DATA and TRADE are NOT authorized.
 
+**Controlling 2026-11-20 Owner execution order:** [H operational first, Pi engineering during field trial](docs/project/V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md). Do not dispatch Pi P2 while H1 integration and real-use readiness are incomplete; Pi P1 is architecture-only history. Corrected H1 P0 reference was independently accepted offline at 18:25 HKT; this does not grant real Feishu/Binance or Pi P2 execution. Never confuse parallel role capacity with authorization for concurrent Pi implementation.
+
 All documentation-only updates must be committed to docs/engineering. Do not write canonical project documentation to v0.8.0. Preserve docs-only branch scope: no source code, tests, runtime configuration, credentials, private account payloads, protected data, registry mutation or deployment changes.
 
 All Owner-facing prompts must follow docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md. A prompt is not a dispatch; Controller 0-C remains the sole engineering dispatcher and scoped acceptance authority.
