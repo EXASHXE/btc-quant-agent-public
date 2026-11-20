@@ -1,6 +1,6 @@
 # QUANT v0.8.0 — Project Home and Baseline (updated 2026-11-20)
 
-Status: R1/B1 SCOPED_ACCEPTED_OFFLINE_ONLY; B2 SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY; B3 SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY; B4 public-source bridge scoped for OFFLINE engineering, AWAITING_OWNER_FORWARD / NOT_STARTED. Genuine-public, real-private, external messaging and trading capabilities remain disabled.
+Status: R1/B1 SCOPED_ACCEPTED_OFFLINE_ONLY; B2 SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY; B3 SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY; B4 SCOPED_ACCEPTED_OFFLINE_PUBLIC_BRIDGE_ONLY. Genuine-public physical origin, real-private access, external messaging and trading remain disabled.
 Product: Personal Trading Decision Support.
 Local root: /root/workspace/project/quant-0.8.0/
 Executable code/runtime branch: v0.8.0 in EXASHXE/btc-quant-agent-public.
@@ -24,7 +24,7 @@ Canonical project documentation branch: docs/engineering. All project, role, arc
 - [B1 integrated public runtime task — Controller accepted offline only](../prompts/v0.8/V080_SOL62_PUBLIC_RUNTIME_FOUNDATION_B1_20261118.md)
 - [B2 integrated market decision MVP task — Controller accepted offline-integrated only](../prompts/v0.8/V080_SOL62_MARKET_DECISION_MVP_B2_20261118.md)
 - [B3 consolidated account-aware decision support — Gemini Neon delivered, Controller accepted offline only](../prompts/v0.8/V080_PERSONAL_MVP_ACCOUNT_AWARE_DECISION_SUPPORT_B3_20261119.md)
-- [B4 genuine public-source bridge — offline engineering prompt approved, awaiting Owner forwarding](../prompts/v0.8/V080_PUBLIC_SOURCE_BRIDGE_B4_20261120.md)
+- [B4 public-source bridge — Controller accepted offline only; live remains disabled](../prompts/v0.8/V080_PUBLIC_SOURCE_BRIDGE_B4_20261120.md)
 - [1-A new chat](../prompts/v0.8/V080_NEW_CHAT_1A_20261118.md)
 - [0-C new chat](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md)
 
@@ -58,7 +58,7 @@ This attestation does not claim Binance legal approval, third-party legal certif
 | Astra full-system review | **SCOPED_ACCEPTED_ARCHITECTURE_REVIEW_ONLY** | Evidence-based architecture recommendations; not implementation authorization |
 | Narrow Stage 1A | **SUPERSEDED_FOR_FUTURE_FORWARDING / NOT_STARTED** | Original decision preserved; no overlapping workspace found |
 | **B1 PUBLIC_RUNTIME_FOUNDATION** | **SCOPED_ACCEPTED_OFFLINE_ONLY** | 89 B1 + 99 inherited targeted tests independently PASS; genuine-public origin remains dormant |
-| **B4 PUBLIC_SOURCE_BRIDGE** | **SCOPE_APPROVED / AWAITING_OWNER_FORWARD** | Sol Extra High default; Neon XHigh peer alternative; one integrated offline public-source/admission/B2 reprice package; live remains disabled |
+| **B4 PUBLIC_SOURCE_BRIDGE** | **SCOPED_ACCEPTED_OFFLINE_PUBLIC_BRIDGE_ONLY** | gpt-6.2-sol xhigh; Controller independent B4/B1/B2 28/89/54 tests PASS; 50 sealed files; real physical origin still absent |
 | First live public GET activation | **NOT AUTHORIZED** | Requires accepted B1 and separate completed local operating scope |
 | **B2 MARKET_DECISION_MVP** | **SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY** | Sol Extra High; Controller independently reran 54/54 B2 + 89/89 B1 tests, installed both wheels and recalculated 24 paths; genuine market integration remains dormant |
 | **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | **SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY** | Gemini 4 Neon XHigh; 51 B3 + 54 inherited B2 independent PASS; 183/183 sealed files, 17 synthetic scenarios, no live credentials/API |
@@ -76,17 +76,18 @@ Original R2/R3 draft prompts remain references, not dispatched tasks. B2 has now
 - **B1 offline acceptance:** controller-decisions/V080_CONTROLLER_B1_PUBLIC_RUNTIME_OFFLINE_SCOPED_ACCEPTANCE_20261118.json, SHA-256 b42ad44bc91a5fe89e7e2209ba4682ca5232d6611c5340b2b5febfe356a08cbf. B1 56 artifacts sealed, 89/89 tests independently rerun, 99/99 R1 targeted regression, all 323 Program J files verified.
 - **B2 scope approval:** controller-decisions/V080_CONTROLLER_SOL62_B2_MARKET_DECISION_MVP_FORWARD_APPROVAL_20261118.json (historical pre-execution approval).
 - **Neon policy adoption:** controller-decisions/V080_CONTROLLER_GEMINI_NEON_ROUTING_ADOPTION_20261119.json (Owner-directed routing only; no new worker or permission).
-- **B4 offline forward approval:** controller-decisions/V080_CONTROLLER_B4_PUBLIC_SOURCE_BRIDGE_OFFLINE_FORWARD_APPROVAL_20261120.json. Status SCOPE_APPROVED_FOR_OWNER_MANUAL_FORWARD_OFFLINE_ONLY; B4 not started, real Binance not authorized.
+- **B4 offline forward approval (historical):** controller-decisions/V080_CONTROLLER_B4_PUBLIC_SOURCE_BRIDGE_OFFLINE_FORWARD_APPROVAL_20261120.json. Owner subsequently forwarded the task to gpt-6.2-sol xhigh; B4 has completed and been independently accepted for offline scope only.
+- **B4 offline scoped acceptance:** controller-decisions/V080_CONTROLLER_B4_PUBLIC_SOURCE_BRIDGE_OFFLINE_SCOPED_ACCEPTANCE_20261120.json, SHA-256 095dc79a730b843257947f6d77760a741efb67a6973880c4f9a806ef9ec86b58. Independently reran 28 B4 + 89 B1 + 54 B2, checked 50/50 B4 seals, rebuilt wheel, 16 cards/8 reprices and recalculated 36 Decimal conditional paths; genuine-public entry exits code 3. No authentic live market data or trading capability authorized.
 - **B3 offline account-aware acceptance:** controller-decisions/V080_CONTROLLER_B3_ACCOUNT_AWARE_OFFLINE_SCOPED_ACCEPTANCE_20261120.json, SHA-256 0d3b88ea3bcedeab9f8d18d8118929be4610ecfa433d2bd35cd6fc7f96b8d7a0. Controller independently verified 183/183 B3 sealed files, 51/51 B3 and 54/54 inherited B2 offline tests, 17 synthetic scenarios and exact 183-file byte identity with pre-seal evidence. Prior HOLD_SEAL_MISSING closed. Real private/public access remains disabled.
 - **B2 offline-integrated acceptance:** controller-decisions/V080_CONTROLLER_B2_MARKET_DECISION_OFFLINE_INTEGRATED_ACCEPTANCE_20261119.json, SHA-256 7de93eed45541d09a3b65b3e8452033c894ad402a169306bd97e4952929ac48d. Controller reran 54 B2 and 89 B1 tests, verified 93 B2, 56 B1, 367 R1 and 323 Program J hashes, checked clean install and recomputed 24 Decimal conditional paths. The first isolated review-copy test attempt needed an explicit B1 DB path; its rerun passed 54/54. Account context and real-source eligibility remain unavailable.
 
 ## Next action
 
-**Owner may manually forward the [B4 integrated offline public-source bridge prompt](../prompts/v0.8/V080_PUBLIC_SOURCE_BRIDGE_B4_20261120.md) to Sol Extra High**, or Neon XHigh if Sol is unavailable. B4 is not started and does not include a real Binance call or activation. The complete bridge and first-bounded-scan runbook are one engineering package with one final independent Controller offline audit.
+**B4 is complete and independently accepted offline only.** Its delivery includes an inactive first bounded scan scope candidate, preactivation checklist and source-to-B2 card replay, but the shipped wheel cannot make genuine Binance requests. The next Owner-controlled decision is a separately scoped physical Binance public-origin binding, completed local operating scope, and one bounded real scan activation with Controller review. Do not dispatch a duplicate B4 writer or treat this as a configuration switch.
 
 B2 has been independently accepted for offline synthetic decision integration. It is no longer awaiting Controller review, and no duplicate B2 worker is needed. For the first genuine public-market decision workflow, separately review the Owner-controlled operating scope AND the B1/B2 genuine-origin binding and activation change; existing B1 and B2 wheels deliberately refuse genuine-public operation.
 
-B3 has now been delivered by Gemini 4 Neon XHigh and independently accepted for **offline account-aware integration only**. No repeat B3 worker is needed. The next Owner decision is whether to prioritize a separately scoped first genuine-public market-source binding/activation or a separate private Futures USER_DATA read-only permission feasibility review. Neither action is authorized by B3 acceptance. B1 genuine-public remains dormant, B2 accepts only fixture/loopback inputs, and private credentials are not activated. Layer 3 remains disabled.
+B3 remains **SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY** and fully separate from B4. Private Futures USER_DATA permission feasibility remains unproved. The public-data first scan is the immediate product-utility dependency, but even after B4 acceptance it requires a reviewed physical host binding, completed Owner region/route and retention scope, official rate-weight validation, and a new activation decision. Layer 3 remains disabled.
 
 ## Owner model-routing update — 2026-11-19
 
