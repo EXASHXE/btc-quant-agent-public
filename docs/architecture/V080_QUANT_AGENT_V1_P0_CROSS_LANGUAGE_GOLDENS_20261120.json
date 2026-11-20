@@ -1,0 +1,43 @@
+{
+  "schema": "V080_QUANT_AGENT_V1_CONTROLLER_CROSS_LANGUAGE_GOLDEN_VECTORS_20261120",
+  "conformance": "Controller independently computed on Python 3.12 json.dumps(sort_keys=True,ensure_ascii=False,separators=(',',':'),allow_nan=False) and Node.js 24.13.1 recursive ASCII-key-sort plus UTF-8 JSON string escape; 7/7 exact preimage bytes and SHA-256 match.",
+  "identity_rule": "event_id=sha256(utf8(canonical_json([contract_id,channel,recipient,episode_id,card_id,card_version,market_status])))",
+  "data": {
+    "ascii_watch": {
+      "preimage": "[\"V080_QUANT_AGENT_CONTRACT_V1\",\"feishu\",\"ou_owner001\",\"abc\",\"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\"jseq:7:abcdef01:12345678\",\"WATCH\"]",
+      "sha256": "5a0ab436c4f4df8bfee2f5e55f81acb842bdc6285809f4c9854c3866bea8b7ff"
+    },
+    "status_changed": {
+      "preimage": "[\"V080_QUANT_AGENT_CONTRACT_V1\",\"feishu\",\"ou_owner001\",\"abc\",\"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\"jseq:7:abcdef01:12345678\",\"INVALID\"]",
+      "sha256": "7b9a690b9bc99966b1bc4624f68b8e99d8978e0043dd490ae0dc77fda826268a"
+    },
+    "version_changed": {
+      "preimage": "[\"V080_QUANT_AGENT_CONTRACT_V1\",\"feishu\",\"ou_owner001\",\"abc\",\"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\"jseq:8:abcdef02:12345678\",\"WATCH\"]",
+      "sha256": "744a78c947e03af873a467f2c57fa1267dd8ecc64ce63ad8b345e34c79a19441"
+    },
+    "recipient_changed": {
+      "preimage": "[\"V080_QUANT_AGENT_CONTRACT_V1\",\"feishu\",\"ou_owner002\",\"abc\",\"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\"jseq:7:abcdef01:12345678\",\"WATCH\"]",
+      "sha256": "e87cac1de99b1f0ced8a31b9907f990058b21f9181bcf3c6154a1fccca99e6d0"
+    },
+    "real_b2_style": {
+      "preimage": "[\"V080_QUANT_AGENT_CONTRACT_V1\",\"feishu\",\"ou_owner001\",\"aad84b894b7548da9c0e93d6fca324c0f4ccb4273b0ea7b5cd1c185a5db5bc53\",\"61021d22326d9d85dd8962c790c2745f69580a7c5db183ec6fb973643eac1a00\",\"jseq:13:ae85486779f47312:3ec61364d9d6677c\",\"EXECUTABLE\"]",
+      "sha256": "2ce95725951b976d0f8b647f038d22bb4097813f3830acd8e59339aea0b0c036"
+    },
+    "utf8_value": {
+      "preimage": "{\"card_version\":\"jseq:7:abcdef01:12345678\",\"market_status\":\"WATCH\",\"price\":\"101.2300\",\"reasons\":[\"未触发\",\"复价 +5m\"],\"source_evidence_class\":\"SYNTHETIC_QA_ONLY\"}",
+      "sha256": "acf41ac53339293b91d90a74eada1415c6ffe702eb74e1ed424283839e64b97d"
+    },
+    "key_order": {
+      "preimage": "{\"a\":\"首\",\"ints\":[1,2,3],\"k\":{\"a\":\"甲\",\"b\":\"乙\"},\"z\":\"末\"}",
+      "sha256": "3028fed6344fffa1939077881c4b499d72134e85b0f3ff3062d994c2bffb12a3"
+    }
+  },
+  "prohibitions": [
+    "Never forge an episode ID for NO_SETUP/NOT_EVALUATED",
+    "No event_id when episode_id is absent",
+    "No JS Number round-trip for decimal strings or card_version",
+    "No normalization/case folding of approved opaque IDs unless a separately versioned shared rule exists",
+    "Never infer a new version from later unrelated journal events"
+  ],
+  "note": "This independent Controller vector set defines a required conformance oracle but does not replace H1 implementation-owned sealed fixture/vector export. H1 is on hold until those artifacts and negative cases pass independently."
+}

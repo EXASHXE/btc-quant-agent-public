@@ -2,7 +2,7 @@
 
 - Owner direction: V080-OWNER-0C-HERMES-FIRST-PI-PARALLEL-PLAN-20261120
 - Controller plan: 2026-11-20
-- Status: PLANNED / H1_AND_P1_READY_FOR_OWNER_FORWARDING / NOT_DISPATCHED
+- Status: P1_ACCEPTED_ARCHITECTURE_ONLY / H1_P0_HOLD / H1_CORRECTION_PROMPT_READY_NOT_DISPATCHED / P2_BLOCKED
 - Baseline: B1–B5 independently accepted OFFLINE only; no live Binance, private account, Feishu or trading activation.
 
 ## Architecture decision
@@ -64,10 +64,11 @@ Phase B actual public network NOT_AUTHORIZED. No region/route, approved retentio
 | Track | Assigned model | Task / write set | State |
 |---|---|---|---|
 | QUANT source | Sol Extra High | B5 Phase A already accepted; B5 Phase B requires separate Owner+0-C capability activation | OFFLINE_ACCEPTED / LIVE_NOT_AUTHORIZED |
-| H1 Hermes plugin | Gemini 4 Neon XHigh, Sol fallback | workspaces/lt-v080-gemini-neon-hermes-quant-feishu-h1-01/ ONLY | PROMPT_READY / NOT_DISPATCHED |
-| P1 Pi ADR | GPT-6.2 Astra Extra High | workspaces/lt-v080-astra-pi-quant-agent-architecture-p1-01/ ONLY | PROMPT_READY / NOT_DISPATCHED |
+| H1 Hermes original | Gemini 4 Neon XHigh, Sol fallback | workspaces/lt-v080-gemini-neon-hermes-quant-feishu-h1-01/ ONLY | DELIVERED / P0_HOLD after 54 independent PASS |
+| H1 consolidated P0 correction | Gemini 4 Neon XHigh | workspaces/lt-v080-gemini-neon-hermes-h1-p0-interop-fix-01/ ONLY | PROMPT_READY / NOT_DISPATCHED |
+| P1 Pi ADR | GPT-6.2 Astra Extra High | workspaces/lt-v080-astra-pi-quant-agent-architecture-p1-01/ ONLY | SCOPED_ACCEPTED_ARCHITECTURE_ONLY |
 | Controller | 0-C | freeze V1 contract, integrate docs, task audit, acceptance decisions | ACTIVE |
-| Pi prototype P2 | Not assigned | Future separate work root; consumes H1 conformance fixtures and P1 ADR | NOT_DISPATCHED |
+| Pi prototype P2 | Not assigned | Future separate work root; consumes accepted corrected H1 conformance fixtures and P1 ADR | BLOCKED_INPUT / NOT_DISPATCHED |
 | OpenClaw | No executor | Deferred fallback only | DEFERRED |
 
 The H1 and P1 workers may run concurrently because H1 implements code in its own isolated worktree while P1 writes read-only architecture reports into a disjoint worktree. Neither edits the canonical V1 contract, QUANT protected code, docs/engineering branch or the other's work root. Controller 0-C owns integration and one final acceptance per delivery.
@@ -88,9 +89,12 @@ Pi P2 is a future offline-only prototype; run both on H1 V1 fixtures and measure
 
 ## Canonical prompts and immediate Owner action
 
-- [H1 — Hermes/QUANT/Feishu full task](../prompts/v0.8/V080_HERMES_QUANT_FEISHU_H1_20261120.md)
+- [H1 — original Hermes/QUANT/Feishu task, delivered P0 HOLD](../prompts/v0.8/V080_HERMES_QUANT_FEISHU_H1_20261120.md)
+- [Controller P0 interpretations and independent evidence](../architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md)
+- [Controller canonical Python/Node vectors](../architecture/V080_QUANT_AGENT_V1_P0_CROSS_LANGUAGE_GOLDENS_20261120.json)
+- [H1 — one integrated P0 correction prompt (not dispatched)](../prompts/v0.8/V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md)
 - [P1 — Astra Pi architecture task](../prompts/v0.8/V080_ASTRA_PI_QUANT_AGENT_ARCHITECTURE_P1_20261120.md)
 
-One recommended immediate Owner action: **Forward the H1 complete prompt to Gemini 4 Neon XHigh.** P1 may be independently forwarded to Astra in parallel if desired, without blocking H1 or B5.
+One recommended immediate Owner action: **Forward the integrated H1 P0 correction prompt to Gemini 4 Neon XHigh.** P1 has already been accepted architecture-only; Pi P2 is blocked until corrected H1 V1 vectors/contract are accepted. Neither P2 nor live Feishu/public calls are permitted.
 
-Neither H1 nor P1 has been automatically dispatched, and no real network action or credentials have been activated.
+The original H1 and P1 were Owner-forwarded and delivered; Controller accepted P1 architecture only and held H1 for P0. The H1 correction prompt and Pi P2 have NOT been dispatched. No real network action or credential activation occurred.
