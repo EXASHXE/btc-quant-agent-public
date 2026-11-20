@@ -1,6 +1,6 @@
 # QUANT v0.8.0 — Roadmap, Task Ownership and Exit Gates
 
-Status: Controller-reconciled integrated delivery plan · 2026-11-20; B1, B2, B3 and B4 independently accepted for their OFFLINE scopes only. No live public or private capability activated.
+Status: Controller-reconciled integrated delivery plan · 2026-11-20; B1–B4 accepted OFFLINE only, B5 Phase A scoped/awaiting Owner forwarding. Live public Phase B and private data still NOT AUTHORIZED.
 Current model routing: [V080 Model Routing Policy](V080_MODEL_ROUTING_POLICY_20261119.md).
 Owner directive: V080-OWNER-0C-CONSOLIDATED-DELIVERY-REPLAN-20261118.
 Executable branch: v0.8.0 · canonical documentation: docs/engineering.
@@ -14,6 +14,7 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 | Original narrow Stage 1A | GPT-6.2 Sol | **SUPERSEDED_FOR_FUTURE_FORWARDING / NOT_STARTED** | Existing Controller record retained unchanged; only the integrated B1 task is forwardable |
 | **B1 PUBLIC_RUNTIME_FOUNDATION** | **GPT-6.2 Sol High** | **SCOPED_ACCEPTED_OFFLINE_ONLY** | 89 B1 tests and 99 inherited targeted tests independently PASS; no real API; live composition dormant |
 | **B4 PUBLIC_SOURCE_BRIDGE** | **gpt-6.2-sol xhigh** | **SCOPED_ACCEPTED_OFFLINE_PUBLIC_BRIDGE_ONLY** | 28/89/54 B4/B1/B2 independent PASS; 50 seals, 16 synthetic cards/8 reprices, genuine live entry disabled |
+| **B5 GENUINE_PUBLIC_SOURCE / BOUNDED_FIRST_SCAN** | **Sol Extra High / Neon XHigh fallback** | **PHASE_A_SCOPE_APPROVED / AWAITING_OWNER_FORWARD; PHASE_B NOT_AUTHORIZED** | One source-binding + activation packet task; offline engineering first, genuine GET only after separate Owner + Controller gate |
 | First bounded live PUBLIC_MARKET scan | Owner local scope / 0-C capability activation | **NOT AUTHORIZED** | Only after B1 acceptance and separate region/route, endpoint, cadence, budget, retention and stop-condition review |
 | **B2 MARKET_DECISION_MVP** | **GPT-6.2 Sol Extra High** | **SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY** | 54 B2 + 89 B1 independently rerun PASS; 16 synthetic cards/8 reprices, 24 independent path calculations; real market access/economic proof excluded |
 | **B3 ACCOUNT_AWARE_DECISION_SUPPORT** | **Gemini 4 Neon XHigh** | **SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY** | 51 B3 + 54 inherited B2 independently PASS; 183 files sealed, 17 synthetic scenarios, zero private live activation |
@@ -38,11 +39,15 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 
 - **B4 accepted offline bridge:** [V080 B4 Public Source Bridge](../prompts/v0.8/V080_PUBLIC_SOURCE_BRIDGE_B4_20261120.md); historical forward approval controller-decisions/V080_CONTROLLER_B4_PUBLIC_SOURCE_BRIDGE_OFFLINE_FORWARD_APPROVAL_20261120.json; final independent acceptance controller-decisions/V080_CONTROLLER_B4_PUBLIC_SOURCE_BRIDGE_OFFLINE_SCOPED_ACCEPTANCE_20261120.json, SHA-256 095dc79a730b843257947f6d77760a741efb67a6973880c4f9a806ef9ec86b58. Worker delivered; 28 B4+89 B1+54 B2 tests independently PASS; 50 files sealed; physical genuine origin and activation not authorized.
 
+- **B5 Phase A offline task approval:** [V080 B5 Genuine Public Origin and First Bounded Scan](../prompts/v0.8/V080_LIVE_PUBLIC_FIRST_BOUNDED_SCAN_B5_20261120.md); Controller local record controller-decisions/V080_CONTROLLER_B5_LIVE_PUBLIC_TWO_PHASE_FORWARD_APPROVAL_20261120.json. B5 not started; only offline Phase A has scope approval. Actual genuine-public requests are a separately approved Phase B under the same task ID.
+
 ## One consolidated package = one independent implementation acceptance
 
 **B1:** Isolated PERSONAL_MVP install/entrypoint and no legacy execution reachability; causal snapshot V2 and NOT_EVALUATED; offline mock/loopback TLS HTTPS transport with exact unsigned GET allowlist, no redirects or response overrun; restart-safe request budgets and restrictions; funding/OI/public schema fixtures, bounded incremental warmup, separate slow/fast input refresh and crash recovery. Sol may implement and correct internal substeps under this one scope. Clean-install E2E, deterministic negative tests, hashes, QA, and one 0-C final offline acceptance. **Never send a real Binance request in B1.**
 
 **B4 (SCOPED_ACCEPTED_OFFLINE_PUBLIC_BRIDGE_ONLY):** Separate installable bridge with exact 10-route unsigned GET allowlist, persistent rate/venue stop discipline, synthetic provenance admission and B2 market card/reprice integration. Controller verified 50/50 seal hashes, 28/89/54 B4/B1/B2 regressions, 16 synthetic cards and 8 reprice observations, plus Decimal net-R paths. Inactive Owner scope candidate and first-runbook are ready. B4 does NOT contain a production physical-origin binding and the live entry is unconditionally disabled.
+
+**B5 (NEXT / TWO-PHASE TASK):** Phase A implements a standalone, reviewed official-host HTTPS binding, versioned non-QA genuine receipt admission, budget/incident controls, activation readiness, and B2 real-origin market-card integration entirely offline. It must hand off READY_FOR_ACTIVATION_REVIEW without any Binance API calls. After Owner fills/approves actual region/route, storage/retention and one-run budget, Controller reviews the exact wheel/source and issues a separate capability decision for Phase B; only then may the operator execute at most one bounded public scan and return its evidence for consolidated Controller acceptance. One task ID, not duplicate implementation stages.
 
 **B4 → first live public scan:** B4 now provides a tested offline source-to-B2 bridge, but B4 live-scan exits 3 with LIVE_CAPABILITY_NOT_ACTIVATED and B1 still has no physical genuine entrypoint. The next separate gate requires a reviewed physical official-host source binding, source evidence classification through both layers, actual Owner-local operating region/direct route and retention, exact ten GET endpoints, 3 symbols and 5 frames, latest endpoint weights, shared-egress budgets and revocation. Owner and Controller must separately approve the exact release/scope and one bounded real scan before any genuine request. The standing Owner public-data attestation is reused, not resubmitted. Restriction, TLS, region denial and clock errors fail closed; no route bypass.
 
