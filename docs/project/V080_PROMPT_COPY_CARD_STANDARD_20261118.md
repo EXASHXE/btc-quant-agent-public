@@ -108,3 +108,9 @@ This standard is maintained on docs/engineering. Do not update its canonical cop
 - **Action:** **复制完整 Prompt / Copy Full Prompt**
 
 A link to the canonical prompt may accompany the card, but never substitutes for the complete copy payload.
+
+## 2026-11-21 — Explicit handoff authority wording for engineering cards
+
+Follow the [Owner Direct Offline Task Execution Protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). Label every new future task with exactly one start mode: CONTROLLER_DISPATCHED (actual receipt exists), OWNER_DIRECT_OFFLINE_ALLOWED (Owner may execute by forwarding the complete card), or PROPOSAL_ONLY (not executable until later Owner direction/Controller dispatch). Do not generate a card that tells a worker to execute immediately while also demanding an unavailable second Controller receipt for safe offline work.
+
+A complete prompt/card stored in docs is not itself dispatch. Explicit Owner forwarding in the actual worker chat with an instruction to execute a named bounded OFFLINE task is a sufficient Owner-direct offline start. Worker records OWNER_DIRECT_OFFLINE_STARTED, no fabricated Controller receipt and no self-acceptance. Real Binance/Feishu/provider/private/TRADE/production permissions are NEVER inferred.

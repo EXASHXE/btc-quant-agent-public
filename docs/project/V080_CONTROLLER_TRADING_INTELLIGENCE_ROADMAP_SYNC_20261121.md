@@ -158,3 +158,9 @@ Future extensions may not relabel one evidence lane as another. Real ACCOUNT req
 **Independently review the existing A1 \`0.8.0b5.post2\` offline candidate** in a fresh isolated copy, including the worker's 237-test claims, byte-accurate release, native \`H2A_OWNER_PUBLIC_SCOPE_V2\` vs old \`B5_OWNER_PUBLIC_SCOPE_V1\` distinction, spent-state rollback, wrong UID, approved mock two-GET/no-card, cross-version regressions and sealed inputs. Issue one scoped 0-C acceptance or a bounded HOLD with reproducing evidence. **Do not redispatch the worker and do not perform or approve real Binance/Feishu calls in this planning turn.**
 
 Only after that acceptance should the Owner supply protected local exact A1 operating evidence and seek a **separate** production release/scope approval. All QI1/QL1/QB1/QR1, Pi P2, QN1/QM1 remain **NOT_DISPATCHED**.
+
+## Supplemental H4 update / Owner offline task-start protocol — 2026-11-21
+
+H4 S2–S5 consolidated readiness was independently accepted OFFLINE ONLY by 0-C at 19:58 (336 PASS, 103/103 seals). S2 genuine canary, S3 fundingRate historical weight, S4 Feishu client/identity, S5 real operational loop and S6 continuing operation remain blocked/unobserved as specified by H4 receipt. Latest Controller H4 acceptance explicitly issued NO new worker dispatch.
+
+The Owner has separately established [direct forwarding for future bounded OFFLINE tasks](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). This removes the requirement for a duplicate 0-C dispatch receipt when the Owner explicitly forwards a complete named offline task to its worker and says execute; it does not relax source, Feishu, security or trading gates. H4 acceptance and this document do NOT dispatch the proposed Neon S2 Owner-local readiness task.

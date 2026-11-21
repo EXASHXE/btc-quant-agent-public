@@ -166,3 +166,9 @@ This roadmap is planning-only. Controller 0-C should:
 - Add work package dependencies and future review points to active roadmap and startup prompts.
 - Keep Pi P2 deferred until S5 first real operational baseline and fresh Owner decision.
 - Return one prioritized queue and acceptance-gate map. Do not dispatch the new domain packages or authorize any real call based on this document.
+
+## 2026-11-21 19:58 checkpoint / Owner direct-offline authority
+
+Controller H4 consolidated S2–S5 OFFLINE readiness is now accepted (336 independently passing QA, 103 sealed files), superseding the earlier S1 A1 worker-pending checkpoint for H4 integrated readiness only. No real Binance, Feishu, LLM or private/trading rights were conferred; S2 protected production/Owner-local eligibility, S3 fundingRate general IP weight, S4 authentic client/identity and S5 real field baseline remain unresolved.
+
+Future QI1/QL1/QB1/QR1 development stays after H real field use; Pi P2 remains Owner-deferred. For future **explicitly Owner-executed bounded offline work**, apply the [new execution-start protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md); absent formal Controller JSON is not by itself a reason to block otherwise valid offline tasks. Worker output still requires Controller independent acceptance. This is a dated supplemental status and does not rewrite any prior immutable decision.

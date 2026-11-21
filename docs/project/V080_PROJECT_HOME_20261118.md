@@ -1,4 +1,9 @@
-# QUANT v0.8.0 — Project Home and Baseline (updated 2026-11-20)
+# QUANT v0.8.0 — Project Home and Baseline (checkpoint updated 2026-11-21)
+
+
+**LATEST VERIFIED 2026-11-21 19:58 HKT — H4 accepted OFFLINE ONLY:** Controller 0-C independently accepted V080-SOL62-H4-S2S5-CONSOLIDATED-READINESS-01 in controller-decisions/V080_CONTROLLER_H4_S2S5_CONSOLIDATED_OFFLINE_SCOPED_ACCEPTANCE_20261121.json. Status SCOPED_ACCEPTED_H4_S2S5_OFFLINE_INTEGRATION_READINESS_ONLY; **336/336 independent PASS, 103/103 sealed, Python/Node seven goldens each PASS**, two reproducible candidate wheels. S2 real Binance 2 GET is still BLOCKED_PRODUCTION_AND_INPUT_NOT_AUTHORIZED; S3 full scan FUNDING_WEIGHT_UNRESOLVED, S4 Feishu live client/identity/callback BLOCKED, S5 first actual Hermes/QUANT human loop NOT OBSERVED, S6 recurrence NOT AUTHORIZED. Pi P2 OWNER_DEFERRED and QI1/QL1/QB1/QR1 NOT_DISPATCHED. H4 independent acceptance explicitly states new_worker_dispatch_issued=false.
+
+**LATEST OWNER OPERATING RULE:** [Explicit Owner direct OFFLINE task execution](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). For a named complete offline task explicitly forwarded with EXECUTE, Sol/Neon may start in an isolated workroot even without a second 0-C dispatch JSON, record OWNER_DIRECT_OFFLINE_STARTED and submit one independently reviewable handoff. This grants NO live/privileged rights; Controller remains sole acceptance authority. Historical status lines below are snapshots, not current dispatch gates.
 
 Status: R1/B1 SCOPED_ACCEPTED_OFFLINE_ONLY; B2 SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY; B3 SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY; B4 SCOPED_ACCEPTED_OFFLINE_PUBLIC_BRIDGE_ONLY; B5 Phase A SCOPED_ACCEPTED_OFFLINE_PHYSICAL_BINDING_READY. P1 Pi architecture SCOPED_ACCEPTED_ARCHITECTURE_ONLY; H1 Hermes engineering independently reran 54/54 PASS but is HOLD_P0_CONTRACT_SEMANTICS_AND_GOLDEN_EXPORT; corrected H1 P0 reference SCOPED_ACCEPTED_OFFLINE_HERMES_H1_REFERENCE_WITH_P0_FIXED_ONLY (63 independent PASS); P2 remains OWNER_DEFERRED_UNTIL_H_FIELD_TRIAL / NOT_DISPATCHED regardless of draft readiness. B5 Phase B genuine scan, real Feishu, private data and trading remain NOT AUTHORIZED.
 **Controlling 2026-11-21 checkpoint:** H2-A, H2-B, H3 Phase A and H3-B Gate A independently accepted **OFFLINE ONLY**. Controller A1 Binance local derivative candidate has WORKER_REPORTED_READY_FOR_CONTROLLER_REVIEW_OFFLINE_CANDIDATE (237 worker PASS, independent acceptance pending at 17:10). Genuine Binance S2/S3 and Feishu S4 remain NOT_AUTHORIZED; S5/S6 actual human-use not started. **Future domain priority after H S5 is QI1 + QL1, then QB1 + QR1; QN1/QM1 deferred.** Pi P2 remains Owner-deferred. The older 2026-11-20 status line above is a historical baseline, not a current real-activation verdict.
@@ -18,6 +23,9 @@ Canonical project documentation branch: docs/engineering. All project, role, arc
 - [**Controller 0-C latest evidence and dependency sync — 2026-11-21**](V080_CONTROLLER_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md)
 - [Owner→0-C future roadmap sync prompt](../prompts/v0.8/V080_OWNER_0C_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md)
 - [Owner model-routing policy](V080_MODEL_ROUTING_POLICY_20261119.md)
+- [**Owner direct offline engineering start protocol**](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md)
+- [**Worker new-chat bootstrap — Sol / Neon**](../prompts/v0.8/V080_NEW_CHAT_OFFLINE_ENGINEERING_WORKER_20261121.md)
+- [**Owner → 0-C H4 progress and dispatch-friction sync prompt**](../prompts/v0.8/V080_OWNER_0C_H4_PROGRESS_OFFLINE_START_SYNC_20261121.md)
 - [One-time public operating scope](V080_PERSONAL_PUBLIC_MARKET_OPERATING_SCOPE_20261118.md)
 - [Canonical documentation branch policy](V080_DOCUMENTATION_BRANCH_POLICY_20261118.md)
 - [Prompt copy-card standard](V080_PROMPT_COPY_CARD_STANDARD_20261118.md)
@@ -37,7 +45,7 @@ Canonical project documentation branch: docs/engineering. All project, role, arc
 - [H1 — Hermes + QUANT + Feishu offline original (delivered; P0 HOLD)](../prompts/v0.8/V080_HERMES_QUANT_FEISHU_H1_20261120.md)
 - [Controller P0 interoperability dispositions](../architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md)
 - [Controller 7 Python/TS canonical goldens](../architecture/V080_QUANT_AGENT_V1_P0_CROSS_LANGUAGE_GOLDENS_20261120.json)
-- [H1 consolidated P0 correction — READY_FOR_OWNER_FORWARDING / NOT_DISPATCHED](../prompts/v0.8/V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md)
+- [H1 consolidated P0 correction — historically dispatched, corrected reference accepted OFFLINE only](../prompts/v0.8/V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md)
 - [P1 — Pi Quant-Agent architecture ADR (Controller accepted ARCHITECTURE_ONLY)](../prompts/v0.8/V080_ASTRA_PI_QUANT_AGENT_ARCHITECTURE_P1_20261120.md)
 - [1-A new chat](../prompts/v0.8/V080_NEW_CHAT_1A_20261118.md)
 - [0-C new chat](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md)
@@ -62,6 +70,18 @@ baseline/program-j/ is a read-only local copy of the accepted Program J source, 
 OWNER_STANDING_M2_AUTHORIZATION_20261024.md is preserved byte-identically. Its provenance remains CURRENT_USER_DIRECT_MESSAGE / OWNER_ATTESTED. It is reusable for the same personal, noncommercial, private/local, read-only public-market-data scope. Do not ask the Owner to repeat it.
 
 This attestation does not claim Binance legal approval, third-party legal certification, or permission for a different region, commercial use, redistribution, private account access or trading. Program N's one-shot invocation remains consumed and must not be replayed.
+
+## H4 consolidated offline acceptance and immediate S2 target — 2026-11-21 19:58
+
+| Scope | 0-C outcome | Real-operation boundary |
+|---|---|---|
+| H4-A / S2 | Accepted OFFLINE post3 two-mock-GET canary; separate rollback witness | Real S2 unauthorized; Owner-local venue eligibility/egress, UID, CA, protected dual-store witness and exact release/signature missing |
+| H4-B / S3 | Accepted OFFLINE 39-request plan with known debits plus unresolved fundingRate history weights | Genuine BTC/ETH/SOL full market scan not authorized; fundingRate general IP weight UNKNOWN |
+| H4-C / S4 | Accepted OFFLINE Feishu quota/one-sender/unknown-delivery patches | Actual app/tenant/private recipient/client identity and inbound binding not approved |
+| H4-D / S5 | Accepted OFFLINE H3+Hermes+Feishu mock integration | No true Feishu/network/human baseline; production 2s cold start unverified |
+| S6 continuing operations | NOT AUTHORIZED | One-shot success is not recurring permission |
+
+The first nonprivileged operational work after H4 is **Owner-local S2 A1 readiness**. A later Neon task card named V080-NEON-S2-A1-OWNER-LOCAL-READINESS-01 may be run OFFLINE only if the Owner explicitly forwards it to Neon and directs EXECUTE under the new [offline protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md), or an actual 0-C dispatch is present. The H4 acceptance itself created no new worker dispatch; do not fabricate a receipt or duplicate H4.
 
 ## Latest accepted offline expansion / A1 worker handoff — 2026-11-21
 

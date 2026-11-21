@@ -4,7 +4,7 @@
 - **Effective date:** 2026-11-19
 - **Canonical branch:** docs/engineering
 - **Scope:** Future v0.8.0 engineering assignments, parallel work allocation, role prompts and Controller handoffs
-- **Authority:** Owner routing decision; Controller 0-C retains dispatch and acceptance authority
+- **Authority:** Owner routing decision; Controller 0-C retains default task dispatch, queue ownership and sole independent scoped acceptance; explicit Owner-direct bounded OFFLINE execution is separately allowed under the 2026-11-21 protocol.
 
 ## 1. Owner decision
 
@@ -31,7 +31,7 @@ This change applies prospectively. Historical Gemini Argon reviews and completed
 | **Gemini Neon** | Peer-level alternative complex engineering executor to GPT-6.2 Sol | Complex implementation when Sol quota/capacity is insufficient, or a separate non-overlapping package can be executed in parallel; same engineering and evidence bar as Sol |
 | **GPT-6.2 Sol Max** | High-intensity lane within the Sol engineering role | Used when Sol is selected and unusually high cross-module reasoning is required; not a separate queue or independent role |
 | **Gemini 4 Hydrogen** | Simple bounded engineering and mechanical QA | Fixtures, documentation, routine tests, lint/format, mechanical refactors and low-risk isolated fixes; not a fallback for complex work merely because Sol is unavailable |
-| **Controller 0-C** | Sole engineering queue owner, dispatcher, independent evidence auditor and scoped acceptance authority | Approves task boundaries, worker assignment, integration ownership and final acceptance |
+| **Controller 0-C** | Default dispatcher, sole engineering queue/reconciliation owner, independent evidence auditor and scoped acceptance authority | Distinguishes genuine Controller dispatch from explicit Owner-direct offline start; approves/holds final acceptance |
 | **ChatGPT 1-A** | Independent Owner-facing product, architecture and quantitative-research advisor | Advises and drafts; does not dispatch or accept |
 | **Owner** | Product authority and permission decisions | Explicitly controls material product choices and separate live/private capability activation |
 
@@ -42,7 +42,7 @@ This change applies prospectively. Historical Gemini Argon reviews and completed
 - Complex core implementation when Sol quota/capacity is unavailable → **Gemini Neon** at the same project complexity tier.
 - Independent parallel engineering package → **GPT-6.2 Sol + Gemini Neon**, only after Controller 0-C approves a non-overlapping decomposition.
 - Small deterministic fixtures, docs, mechanical tests and low-risk QA → **Gemini 4 Hydrogen**.
-- Dispatch, queue ownership, independent review and acceptance → **Controller 0-C**.
+- Default dispatch, queue reconciliation, independent review and scoped acceptance → **Controller 0-C**; explicit Owner direct OFFLINE start is the narrow alternative under the [2026-11-21 protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md).
 
 Do not downgrade a complex task to Hydrogen simply to keep work moving when Sol is quota-blocked. Use Neon if available and suitable; otherwise keep the task pending or ask the Owner to choose another route.
 
@@ -74,7 +74,7 @@ Sol and Neon receive the same task quality requirements:
 - preservation of accepted baselines and evidence;
 - no self-acceptance and no implied external permissions.
 
-Controller 0-C remains the only dispatcher and scoped acceptance authority. A worker's successful tests or READY_FOR_CONTROLLER_REVIEW handoff do not constitute Controller acceptance.
+Controller 0-C remains the sole scoped acceptance authority and default dispatcher. An explicit Owner execute instruction for a named, bounded offline package suffices to start that limited work, even with no Controller receipt; record OWNER_DIRECT_OFFLINE_STARTED rather than inventing Controller dispatch. A worker's successful tests or READY_FOR_CONTROLLER_REVIEW handoff do not constitute Controller acceptance.
 
 For each worker run, record the actual model label/identifier, thinking effort if exposed, execution environment, base commit, work root, changed paths and final handoff. Do not claim a model identity that the execution surface does not verify.
 
@@ -96,3 +96,7 @@ Gemini Neon inherits the same constraints as Sol:
 - no Feishu/external message, deployment or financial action without its own authority.
 
 This policy changes model routing only. It does not grant network access, credentials, private-account permission, deployment rights, trading rights or acceptance authority.
+
+## 8. Prevent administrative dispatch deadlocks (Owner 2026-11-21)
+
+Use [Owner Direct Offline Protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). Future tasks must specify CONTROLLER_DISPATCHED, OWNER_DIRECT_OFFLINE_ALLOWED, or PROPOSAL_ONLY. When Owner explicitly forwards a complete offline task to Neon or Sol with an execute instruction, a missing separate 0-C JSON does not stop offline work; log an offline Owner-start evidence note inside the isolated workroot. Never auto-start a draft or bypass real Binance/Feishu/model/private/TRADE gates. Controller remains the only independent acceptance authority.

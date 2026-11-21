@@ -67,7 +67,7 @@ All Owner-facing prompt authors must follow:
 
 Every distinct complete prompt requires its own compact card, truthful status, intended executor and full-text copy action where supported. If the UI cannot provide a dedicated clipboard action, provide a complete copyable WritingBlock/CodeBlock. Never fabricate an interactive control or copy only a summary.
 
-A task prompt is not a dispatch. Controller 0-C remains the sole engineering dispatcher and scoped acceptance authority.
+A task prompt FILE alone is not a dispatch. Controller 0-C is the default dispatcher and sole independent scoped acceptance authority. A complete strictly offline task that the Owner explicitly forwards with EXECUTE is independently startable as OWNER_DIRECT_OFFLINE_STARTED under the [newer 2026-11-21 protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md); do not invent a Controller dispatch receipt. All real capability gates remain separate.
 
 ## 6. Active v0.8.0 documentation entrypoints
 
@@ -86,3 +86,7 @@ A task prompt is not a dispatch. Controller 0-C remains the sole engineering dis
 Existing v0.7.0 documents remain available as historical records. They are not automatically rewritten to describe v0.8.0. For current v0.8.0 roles, product baseline and task state, use the V080 documents linked above.
 
 This policy is documentation-only. It does not authorize API calls, credentials, external messages, deployment, private-account access or trading.
+
+## 8. Operational AGENTS pointer caveat (2026-11-21)
+
+The executable v0.8.0 root AGENTS.md contains historical initial-R1 wording that a worker may mistake for a general dispatch prerequisite. Current canonical Owner-direct OFFLINE start policy is in [this protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). All new worker chat prompts must cite it explicitly. Changing executable-root AGENTS.md is a separately scoped runtime bootstrap adjustment, not an excuse to create a second canonical project-document authority on v0.8.0. Do not update executable source or accepted manifests merely as part of docs-only work.

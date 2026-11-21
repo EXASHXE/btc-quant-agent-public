@@ -1,6 +1,7 @@
 # QUANT v0.8.0 — Roadmap, Task Ownership and Exit Gates
 
-Status: Controller-reconciled integrated delivery plan · updated Owner future planning 2026-11-21; previous 2026-11-20 historical receipts below; B1–B4 accepted OFFLINE and B5 Phase A independently accepted OFFLINE_PHYSICAL_BINDING_READY. P1 SCOPED_ACCEPTED_ARCHITECTURE_ONLY; original H1 reference remains historical P0 HOLD; corrected H1 post1 P0 SCOPED_ACCEPTED_OFFLINE_REFERENCE (63 Controller PASS); Pi P2 OWNER_DEFERRED_UNTIL_H_FIELD_TRIAL regardless of any prepared P2 draft; B5 Phase B genuine public and real Feishu/private/trade actions still NOT AUTHORIZED.
+Status: Updated 2026-11-21 19:58 HKT Controller H4 OFFLINE acceptance (336 PASS, 103 seals); historical 2026-11-20 receipts below are dated snapshots; REAL S2–S6 NOT AUTHORIZED/NOT OBSERVED. B1–B4 accepted OFFLINE and B5 Phase A independently accepted OFFLINE_PHYSICAL_BINDING_READY. P1 SCOPED_ACCEPTED_ARCHITECTURE_ONLY; original H1 reference remains historical P0 HOLD; corrected H1 post1 P0 SCOPED_ACCEPTED_OFFLINE_REFERENCE (63 Controller PASS); Pi P2 OWNER_DEFERRED_UNTIL_H_FIELD_TRIAL regardless of any prepared P2 draft; B5 Phase B genuine public and real Feishu/private/trade actions still NOT AUTHORIZED.
+**Active offline-start rule:** [Owner direct OFFLINE work may start without a redundant 0-C receipt only after an explicit Owner execute instruction](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). This does NOT enable real S2/S3/S4/S5, private or trade capabilities.
 **Current product direction:** [Trading Intelligence Platform QI1/QL1/QB1/QR1](V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md), with QN1/QM1 deferred. **Operational S0–S8 stage gates are not renamed or waived.**
 **Latest Controller 0-C planning reconciliation:** [Controller 0-C evidence, dependency, schema and acceptance sync](V080_CONTROLLER_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md). Current S1 A1 is WORKER_READY (237 worker tests; original sealed manifest verified), but **not independently accepted as of this evidence checkpoint**. One queue: independently review A1, then separate S2 Binance Canary, S3 genuine market and S4 Feishu grants, S5 actual H3 loop, S6 bounded H, QI1/QL1, QB1, QR1. QN1/QM1 remain deferred; Pi P2 requires S5 field evidence and a fresh dispatch.
 Current model routing: [V080 Model Routing Policy](V080_MODEL_ROUTING_POLICY_20261119.md).
@@ -29,6 +30,23 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 | R5 universe expansion and market-only alerts | Sol or Gemini Neon / optional Hydrogen QA | PLANNED / NOT_DISPATCHED | B2 usable public market workflow plus scoped source/rate review; external Feishu separately authorized |
 | R6 prospective evaluation | Sol or Gemini Neon / Astra challenge / 0-C | PLANNED / NOT_DISPATCHED | Capture signal/response denominators beginning with B2; economics require independently sufficient real evidence |
 | Layer 3 TRADE_EXECUTION | No assigned worker | **DISABLED / EXCLUDED** | No route, trade key, auto order or automatic future stage |
+
+## H4 independently accepted integrated OFFLINE checkpoint — 2026-11-21 19:58 HKT
+
+**Decision:** controller-decisions/V080_CONTROLLER_H4_S2S5_CONSOLIDATED_OFFLINE_SCOPED_ACCEPTANCE_20261121.json; task V080-SOL62-H4-S2S5-CONSOLIDATED-READINESS-01; SCOPED_ACCEPTED_H4_S2S5_OFFLINE_INTEGRATION_READINESS_ONLY. 0-C verified 103/103 sealed items and 336 independent tests PASS, 0 FAIL, 0 SKIP, seven frozen V1 Python and Node goldens, reproducible wheels and disabled live gates. The older A1 post2/H3-B checkpoints below remain historical, not active outstanding engineering.
+
+| Stage | Current gate after H4 | Next factual evidence |
+|---|---|---|
+| S0/H4 OFFLINE integrated | ACCEPTED_OFFLINE_ONLY | No live authorization |
+| S1 A1/post2 and H4 post3 | ACCEPTED_OFFLINE_ONLY | Real protected installation/dual-store witness not proven |
+| S2 first genuine Binance 2-GET | BLOCKED_PRODUCTION_AND_INPUT_NOT_AUTHORIZED | Owner venue eligibility, direct route/CA/UID, protected independent rollback witness, exact dual signatures and one-shot release |
+| S3 full market BTC/ETH/SOL | FUNDING_WEIGHT_UNRESOLVED / NOT_AUTHORIZED | Authoritative fundingRate history general-IP request weight or separate redesigned and approved acquisition scope |
+| S4 Feishu outbound/inbound | BLOCKED_LIVE_CLIENT_AND_IDENTITY / NOT_AUTHORIZED | Real app/tenant/recipient, protected sender and callback identity, scoped bootstrap and quota |
+| S5 first genuine Hermes human loop | NOT_OBSERVED / NOT_AUTHORIZED | After S2–S4 specific gates, actual source→card→message→inbound and measured user response |
+| S6 bounded ongoing operation | NOT_AUTHORIZED | Explicit recurrence, resource/retention budget; production cold-start latency unverified |
+| Pi P2 and QI1/QL1/QB1/QR1 | NOT_DISPATCHED | Owner P2 deferred until actual H baseline; domain work after S5 as planned |
+
+**H4 acceptance issued zero new-worker dispatches.** A separately identified Neon Owner-local S2 A1 readiness task remains a proposal absent a real 0-C receipt, but an explicit Owner instruction forwarding the complete strictly offline task may start it under OWNER_DIRECT_OFFLINE_STARTED (not a Controller dispatch). Keep all real gates closed and do not recreate H4. See the [2026-11-21 Owner Direct Offline Protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md).
 
 ## Current H execution state and next business phases — evidence snapshot 2026-11-21 17:10
 

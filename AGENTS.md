@@ -4,9 +4,13 @@
 >
 > **Executable source/runtime:** GitHub branch v0.8.0 and local root /root/workspace/project/quant-0.8.0/. Use that workspace for source, tests and actual runtime/Controller evidence only. Do not treat same-path Markdown on v0.8.0 as authoritative project documentation.
 >
+**CURRENT 2026-11-21 OWNER OFFLINE-START RULE:** [Owner Direct Offline Engineering Start Protocol](docs/project/V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md) · [Sol/Neon new worker prompt](docs/prompts/v0.8/V080_NEW_CHAT_OFFLINE_ENGINEERING_WORKER_20261121.md). An **explicit Owner execution message** forwarding a complete named strictly offline task is sufficient for the worker to start under OWNER_DIRECT_OFFLINE_STARTED even when no separate 0-C dispatch JSON exists. A card merely present in a directory is not. Real external/privileged capabilities still require exact gates; Controller remains sole independent acceptance authority. Historical executable-branch root AGENTS.md R1-era pre-dispatch wording is NOT a universal blocker for later Owner-direct offline work.
+
+**LATEST H4 CHECKPOINT (2026-11-21 19:58 HKT):** S2–S5 consolidated readiness SCOPED_ACCEPTED_H4_S2S5_OFFLINE_INTEGRATION_READINESS_ONLY: 336/336 independent PASS, 103/103 sealed. S2 genuine two GET BLOCKED, S3 fundingRate general IP weight unresolved, S4 Feishu client/identity blocked, S5 real use not observed; no live grants. Pi P2 and QI1/QL1/QB1/QR1 not dispatched.
+
 > **Active v0.8.0 entrypoints:** [Project Home](docs/project/V080_PROJECT_HOME_20261118.md) · [Documentation Branch Policy](docs/project/V080_DOCUMENTATION_BRANCH_POLICY_20261118.md) · [Prompt Copy Card Standard](docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md) · [Role Matrix](docs/roles/V080_ACTIVE_ROLE_MATRIX_20261118.md) · [Model Routing](docs/project/V080_MODEL_ROUTING_POLICY_20261119.md) · [1-A New Chat](docs/prompts/v0.8/V080_NEW_CHAT_1A_20261118.md) · [0-C New Chat](docs/prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md).
 
-**Latest v0.8.0 checkpoint (2026-11-20):** [Hermes/Pi workplan](docs/project/V080_HERMES_FIRST_PI_PARALLEL_PLAN_20261120.md) · [Controller P0 dispositions](docs/architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md) · [H1 consolidated correction task](docs/prompts/v0.8/V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md). P1 is accepted ARCHITECTURE_ONLY; H1 remains P0 HOLD after 54 independent offline tests PASS; P2 is BLOCKED until corrected goldens are independently accepted. B5 Phase B, real Feishu/OAuth, private Futures USER_DATA and TRADE are NOT authorized.
+**Historical v0.8.0 checkpoint (2026-11-20, superseded for H1 current status):** [Hermes/Pi workplan](docs/project/V080_HERMES_FIRST_PI_PARALLEL_PLAN_20261120.md) · [Controller P0 dispositions](docs/architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md) · [H1 consolidated correction task](docs/prompts/v0.8/V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md). P1 is accepted ARCHITECTURE_ONLY; H1 remains P0 HOLD after 54 independent offline tests PASS; P2 is BLOCKED until corrected goldens are independently accepted. B5 Phase B, real Feishu/OAuth, private Futures USER_DATA and TRADE are NOT authorized.
 
 **Controlling 2026-11-20 Owner execution order:** [H operational first, Pi engineering during field trial](docs/project/V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md). Do not dispatch Pi P2 while H1 integration and real-use readiness are incomplete; Pi P1 is architecture-only history. Corrected H1 P0 reference was independently accepted offline at 18:25 HKT; this does not grant real Feishu/Binance or Pi P2 execution. Never confuse parallel role capacity with authorization for concurrent Pi implementation.
 
@@ -14,7 +18,7 @@
 
 All documentation-only updates must be committed to docs/engineering. Do not write canonical project documentation to v0.8.0. Preserve docs-only branch scope: no source code, tests, runtime configuration, credentials, private account payloads, protected data, registry mutation or deployment changes.
 
-All Owner-facing prompts must follow docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md. A prompt is not a dispatch; Controller 0-C remains the sole engineering dispatcher and scoped acceptance authority.
+All Owner-facing prompts must follow docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md. A prompt artifact is not itself an execution order; the Owner may explicitly start complete bounded offline tasks without a second 0-C JSON under the latest protocol. Controller 0-C remains sole scoped acceptance authority. No external capability is granted by an offline start.
 
 ---
 
