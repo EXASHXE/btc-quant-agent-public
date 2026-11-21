@@ -15,6 +15,7 @@ Canonical project documentation branch: docs/engineering. All project, role, arc
 - [Binance API endpoint matrix](../architecture/V080_BINANCE_API_ENDPOINT_MATRIX_20261118.md)
 - [Roadmap and gates](V080_ROADMAP_AND_GATES_20261118.md)
 - [**Current Trading Intelligence platform/product roadmap**](V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md)
+- [**Controller 0-C latest evidence and dependency sync — 2026-11-21**](V080_CONTROLLER_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md)
 - [Owner→0-C future roadmap sync prompt](../prompts/v0.8/V080_OWNER_0C_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md)
 - [Owner model-routing policy](V080_MODEL_ROUTING_POLICY_20261119.md)
 - [One-time public operating scope](V080_PERSONAL_PUBLIC_MARKET_OPERATING_SCOPE_20261118.md)

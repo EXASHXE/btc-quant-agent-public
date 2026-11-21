@@ -27,6 +27,8 @@ Current routing authority: [V080 Model Routing Policy](../project/V080_MODEL_ROU
 - Dispatch, queue control, independent audit and acceptance → Controller 0-C.
 - Independent Owner advice → ChatGPT 1-A.
 
+**Future QI1/QL1/QB1/QR1 routing (NOT_DISPATCHED):** Astra reviews the shared QI1 annotation and QL1 multi-axis event-schema fork and QB1/QR1 quantitative methodology; Sol is the preferred QL1 Core/event-store and H integration owner; Neon or Sol is suitable for the non-overlapping QI1 adapter; Hydrogen can own narrow deterministic fixtures. QB1/QR1 implementation needs separate scope and independent evaluation. See [Controller Trading Intelligence roadmap sync](../project/V080_CONTROLLER_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md). New roles and gates are **not** activated by this future allocation.
+
 No Orchestrator role. One primary writer per work package. Sol and Neon may work in parallel only on Controller-approved, non-overlapping packages with frozen interfaces and a named integration owner. Worker PASS ≠ independent review PASS ≠ Controller acceptance. A task prompt is not a dispatch.
 
 ## Documentation authority and prompt presentation

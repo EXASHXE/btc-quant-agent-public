@@ -6,6 +6,7 @@ Product: Personal low-frequency cryptocurrency trading decision support (2–12h
 Controlling execution: [H first, Pi during actual H field trials](V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md).
 Existing stage gates: [S0–S8 underlying engineering and real-access roadmap](V080_ROADMAP_AND_GATES_20261118.md).
 Controller authority: 0-C owns verified state, task scoping and independent acceptance. This document is a product direction, not evidence of implementation or an authorization.
+**Independent Controller synchronization (2026-11-21):** [Controller 0-C evidence, dependency, schema and acceptance sync](V080_CONTROLLER_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md). That addendum provides the current A1 receipt audit, single operational/product dependency graph, proposed QI1/QL1 contracts, QB1/QR1 failure gates and one immediate action. It is documentation only.
 
 ## 1. Owner decision — what becomes the core product
 

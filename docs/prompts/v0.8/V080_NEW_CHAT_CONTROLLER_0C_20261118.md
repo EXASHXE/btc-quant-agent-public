@@ -32,6 +32,7 @@ Read first from the canonical docs/engineering branch:
 - docs/project/V080_PERSONAL_PUBLIC_MARKET_OPERATING_SCOPE_20261118.md
 - docs/project/V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md (H-first Owner order)
 - docs/project/V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md (latest long-term product architecture)
+- docs/project/V080_CONTROLLER_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md (Controller adopted queue, versioned QI1/QL1 draft seams, QB1/QR1 review gates, one immediate action; planning-only)
 - docs/prompts/v0.8/V080_OWNER_0C_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md (Owner planning request, no auto-dispatch)
 - docs/project/V080_HERMES_FIRST_PI_PARALLEL_PLAN_20261120.md (historical P1/H1 parallel delivery)
 - docs/architecture/V080_QUANT_AGENT_CONTRACT_V1_20261120.md (frozen)
