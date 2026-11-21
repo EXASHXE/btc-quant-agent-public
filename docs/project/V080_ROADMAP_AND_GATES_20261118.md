@@ -1,6 +1,7 @@
 # QUANT v0.8.0 — Roadmap, Task Ownership and Exit Gates
 
-Status: Controller-reconciled integrated delivery plan · 2026-11-20; B1–B4 accepted OFFLINE and B5 Phase A independently accepted OFFLINE_PHYSICAL_BINDING_READY. P1 SCOPED_ACCEPTED_ARCHITECTURE_ONLY; original H1 reference remains historical P0 HOLD; corrected H1 post1 P0 SCOPED_ACCEPTED_OFFLINE_REFERENCE (63 Controller PASS); Pi P2 OWNER_DEFERRED_UNTIL_H_FIELD_TRIAL regardless of any prepared P2 draft; B5 Phase B genuine public and real Feishu/private/trade actions still NOT AUTHORIZED.
+Status: Controller-reconciled integrated delivery plan · updated Owner future planning 2026-11-21; previous 2026-11-20 historical receipts below; B1–B4 accepted OFFLINE and B5 Phase A independently accepted OFFLINE_PHYSICAL_BINDING_READY. P1 SCOPED_ACCEPTED_ARCHITECTURE_ONLY; original H1 reference remains historical P0 HOLD; corrected H1 post1 P0 SCOPED_ACCEPTED_OFFLINE_REFERENCE (63 Controller PASS); Pi P2 OWNER_DEFERRED_UNTIL_H_FIELD_TRIAL regardless of any prepared P2 draft; B5 Phase B genuine public and real Feishu/private/trade actions still NOT AUTHORIZED.
+**Current product direction:** [Trading Intelligence Platform QI1/QL1/QB1/QR1](V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md), with QN1/QM1 deferred. **Operational S0–S8 stage gates are not renamed or waived.**
 Current model routing: [V080 Model Routing Policy](V080_MODEL_ROUTING_POLICY_20261119.md).
 **Controlling Owner execution order:** [H-first / Pi engineering during H real-use trial](V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md), superseding only the old parallel execution plan.
 Owner directive: V080-OWNER-0C-CONSOLIDATED-DELIVERY-REPLAN-20261118.
@@ -27,6 +28,22 @@ This plan consolidates engineering implementation and audit cycles; it does **no
 | R5 universe expansion and market-only alerts | Sol or Gemini Neon / optional Hydrogen QA | PLANNED / NOT_DISPATCHED | B2 usable public market workflow plus scoped source/rate review; external Feishu separately authorized |
 | R6 prospective evaluation | Sol or Gemini Neon / Astra challenge / 0-C | PLANNED / NOT_DISPATCHED | Capture signal/response denominators beginning with B2; economics require independently sufficient real evidence |
 | Layer 3 TRADE_EXECUTION | No assigned worker | **DISABLED / EXCLUDED** | No route, trade key, auto order or automatic future stage |
+
+## Current H execution state and next business phases — evidence snapshot 2026-11-21 17:10
+
+| Existing gate | State | Independently required next evidence |
+|---|---|---|
+| S0 H2-A/H2-B/H3 Phase A/H3-B Gate A | Controller accepted within respective OFFLINE_ONLY scopes | Not proof of a live service |
+| S1 **Controller A1 Binance derivative candidate** | DISPATCHED_OFFLINE_ONLY; worker now READY_FOR_CONTROLLER_REVIEW_OFFLINE_CANDIDATE (237 worker PASS) | Independently review candidate, hashes, trust/UID/rollback and local eligibility; do not duplicate worker |
+| S2 first two genuine Binance GET | NOT_AUTHORIZED | Exact Owner + 0-C live grant; must return NOT_EVALUATED, not invented setup |
+| S3 full BTC/ETH/SOL five-frame market/B2 scan | BLOCKED | New public-source/funding/weight/causality/operation scope; not implied by S2 |
+| S4 Feishu inbound and outbound | BLOCKED | Separate app, sender, recipient, client binding and explicit activation |
+| S5 first real Hermes+QUANT human loop | NOT_STARTED | True source/card/notice/query/response/expiry evidence accepted |
+| S6 ongoing bounded H use | NOT_STARTED | Explicit recurrence/retention/stop conditions and observed signal/response data |
+| S7 Pi P2 comparison | OWNER_DEFERRED | First actual H field-use baseline + independent task and forwarding |
+| S8 optional private account | DEFERRED | Separate read-only Futures eligibility, key and reconciliation scope |
+
+After **S5** actual user-loop evidence, make **QI1 + QL1** the first business-value product packages (analysis and full lifecycle), using one shared immutable identity/evidence seam. **QB1** historical reproducible point-in-time backtest follows stable event/outcome evidence; **QR1** Agent hypothesis/testing research follows credible backtest and out-of-sample methodology. **QN1** news and **QM1** multi-market expansion remain deferred. These names avoid collisions with Controller A1, R1 and S1. See the [new product roadmap](V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md). QI1 first-alert annotation must never put LLM on the deterministic delivery critical path; no AI-produced numeric trade eligibility.
 
 ## Current dispatch and accepted evidence
 

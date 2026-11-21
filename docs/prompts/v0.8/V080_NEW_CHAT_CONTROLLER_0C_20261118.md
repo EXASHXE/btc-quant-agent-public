@@ -30,7 +30,9 @@ Read first from the canonical docs/engineering branch:
 - docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md
 - docs/project/V080_MODEL_ROUTING_POLICY_20261119.md
 - docs/project/V080_PERSONAL_PUBLIC_MARKET_OPERATING_SCOPE_20261118.md
-- docs/project/V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md (latest Owner execution order)
+- docs/project/V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md (H-first Owner order)
+- docs/project/V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md (latest long-term product architecture)
+- docs/prompts/v0.8/V080_OWNER_0C_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md (Owner planning request, no auto-dispatch)
 - docs/project/V080_HERMES_FIRST_PI_PARALLEL_PLAN_20261120.md (historical P1/H1 parallel delivery)
 - docs/architecture/V080_QUANT_AGENT_CONTRACT_V1_20261120.md (frozen)
 - docs/architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md
@@ -72,41 +74,41 @@ Do not edit baseline/program-j/ or historical v0.7.0 files. New implementation m
 The prior v0.7.0 task V070-SOL62-PERSONAL-MVP-LAYER1-PUBLIC-01 was NOT_STARTED and work_root_created=false. Its Controller receipt remains immutable. The v0.8.0 R1 task has a new ID and new work root; verify no worker was started elsewhere before dispatch.
 Historical receipt: controller-decisions/V070_SOL62_PERSONAL_MVP_THREE_LAYER_API_CONTROLLER_DISPATCH_20261118.json. Prior plan acceptance: controller-decisions/V070_PERSONAL_MVP_THREE_LAYER_REBASELINE_CONTROLLER_PLAN_ACCEPTANCE_20261118.json.
 
-## 5. Current independently verified state — 2026-11-20 17:12 HKT receipts
+## 5. Current Controller-evidenced checkpoint — 2026-11-21 17:10 +08:00
 
-Always recheck the newest local Controller JSON decisions and actual worker roots; the [Project Home](../../project/V080_PROJECT_HOME_20261118.md) and [Roadmap](../../project/V080_ROADMAP_AND_GATES_20261118.md) remain the active state authority.
+Always recheck actual controller-decisions/ and sealed workroots: these are dated evidence snapshots, not a standing future-status guarantee. Canonical [Product Roadmap](../../project/V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md) and [Project Home](../../project/V080_PROJECT_HOME_20261118.md) summarize them.
 
-- R1/B1: SCOPED_ACCEPTED_OFFLINE_ONLY.
-- B2 market decision: SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY; synthetic, not proof of a live opportunity.
-- B3 account-aware: SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY; private Futures permissions and real data connection remain unproven.
-- B4 public bridge: SCOPED_ACCEPTED_OFFLINE_PUBLIC_BRIDGE_ONLY.
-- B5 Phase A: SCOPED_ACCEPTED_OFFLINE_PHYSICAL_BINDING_READY. Controller independently reproduced B5/B1/B2/B4 27/89/54/28 (198 PASS); Phase B genuine network scan NOT_AUTHORIZED.
-- Pi P1: SCOPED_ACCEPTED_ARCHITECTURE_ONLY; seven sealed documents and pinned Pi v1.5.2 source verified, with no Pi installation/runtime proof or P2 authorization.
-- Hermes H1 original: HOLD_P0_CONTRACT_SEMANTICS_AND_GOLDEN_EXPORT. Controller independently reran clean/mixed/Hermes 17/17+17/17+20/20 tests and verified 57 files, but two proven V1 semantic defects and absent H1-owned cross-language goldens block H1 reference acceptance.
-- H1 P0 correction: SCOPED_ACCEPTED_OFFLINE_HERMES_H1_REFERENCE_WITH_P0_FIXED_ONLY per controller-decisions/V080_CONTROLLER_H1_P0_OFFLINE_REFERENCE_SCOPED_ACCEPTANCE_20261120.json (18:25 HKT); 71/71 seals, 63/63 independent PASS, Python/Node golden exports and all P0-C01/C02/C03 closed offline. Original H1 remains historical P0 HOLD; no real Feishu/Binance authorization.
-- Pi P2: OWNER_DEFERRED_UNTIL_H_FIELD_TRIAL / NOT_DISPATCHED. H1 reference input is now accepted; a P2 READY_FOR_OWNER_FORWARDING task draft was observed temporarily but is not confirmed as a canonical published task; latest Owner execution order defers actual Pi engineering until Hermes has begun authorized real-use testing and produced initial operating feedback. No P2 automatic forwarding.
-- Live Feishu, model OAuth, recurring market scans, private Futures API and B5 Phase B: NOT_AUTHORIZED. Layer 3 TRADE DISABLED.
+- R1/B1/B2/B3/B4 and B5 Phase A: independently accepted within OFFLINE_ONLY scopes. B2 strategies have synthetic market cards; B3 real private Futures API remains disconnected.
+- H1 post1 P0 reference: SCOPED_ACCEPTED_OFFLINE_HERMES_H1_REFERENCE_WITH_P0_FIXED_ONLY (63/63 Controller tests, Python/Node goldens). The original H1 P0 HOLD is historical only and preserved.
+- H2-A public-source activation readiness: SCOPED_ACCEPTED_OFFLINE_H2A_ACTIVATION_READINESS_ONLY.
+- H2-B Hermes/Feishu readiness: SCOPED_ACCEPTED_OFFLINE_H2B_FEISHU_READINESS_ONLY.
+- H3 Phase A full Hermes/QUANT integration: SCOPED_ACCEPTED_H3_PHASE_A_OFFLINE_ONLY.
+- H3-B Gate A live preparation: SCOPED_ACCEPTED_H3B_OFFLINE_GATE_A_PREPARATION_ONLY; live eligibility and rollout blockers remain unresolved.
+- **Controller A1 (Binance local derivative candidate)**: task V080-SOL62-A1-B5-LOCAL-DERIVATIVE-OFFLINE-01 dispatched for OFFLINE_ONLY at 2026-11-21 16:52. Isolated worker workroot lt-v080-sol62-a1-b5-local-derivative-offline-01/ reports READY_FOR_CONTROLLER_REVIEW_OFFLINE_CANDIDATE (237 WORKER PASS, sealed work). Independent A1 acceptance NOT FOUND at this inspection; reconcile newest receipts before acting.
+- **S2–S4 genuine Binance/Feishu and S5–S6 actual field/continued operations:** NOT AUTHORIZED / NOT STARTED. S2 first two GET is a NOT_EVALUATED canary, not a strategy signal or recurring scan.
+- Pi P1: SCOPED_ACCEPTED_ARCHITECTURE_ONLY. Pi P2: OWNER_DEFERRED_UNTIL_H_FIELD_TRIAL / NOT_DISPATCHED, and must not block Trading Intelligence domain development.
+- Private B3 real account, model/provider credentials, recurring scans/reprices and TRADE: NOT AUTHORIZED; TRADE remains DISABLED.
 
-Primary local Controller receipts:
-- controller-decisions/V080_CONTROLLER_P1_PI_ARCHITECTURE_ACCEPTANCE_20261120.json
-- controller-decisions/V080_CONTROLLER_H1_INDEPENDENT_P0_HOLD_20261120.json
-- controller-decisions/V080_CONTROLLER_B5_PHASE_A_OFFLINE_ACCEPTANCE_20261120.json
+Primary current receipts:
+- controller-decisions/V080_CONTROLLER_H2A_B5_PHASEB_OFFLINE_SCOPED_ACCEPTANCE_20261120.json
+- controller-decisions/V080_CONTROLLER_H2B_HERMES_FEISHU_OFFLINE_SCOPED_ACCEPTANCE_20261121.json
+- controller-decisions/V080_CONTROLLER_H3_PHASE_A_OFFLINE_INTEGRATION_SCOPED_ACCEPTANCE_20261121.json
+- controller-decisions/V080_CONTROLLER_H3B_GATE_A_OFFLINE_PREPARATION_SCOPED_ACCEPTANCE_20261121.json
+- controller-decisions/V080_CONTROLLER_A1_B5_LOCAL_DERIVATIVE_OFFLINE_DISPATCH_20261121.json
 
-The earlier H1/P1 forward-approval and narrow Stage 1A records are historical, not current dispatch states. Do not re-dispatch accepted B1–B5, completed P1 or the held original H1.
+Do not repeat H1/H2/H3 offline engineering or dispatch a new A1 worker merely because A1 independent acceptance is pending. Preserve exact acceptance scope and original JSON evidence.
 
-## 6. Immediate responsibility — H1 P0 repair and independent review
+## 6. Immediate responsibility — H completion before new domain work
 
-The H1 P0 correction is now independently accepted OFFLINE ONLY. The immediate work is **Hermes H-only real-operation preparation**, separately gating B5 Phase B genuine market data and Feishu allowlisted private DM before any external call. Pi P2 remains deferred regardless of any prepared draft by latest Owner timing; no new H1 correction or P2 worker is needed.
+1. **Independently review A1 local Binance derivative candidate**: the worker's sealed READY_FOR_CONTROLLER_REVIEW_OFFLINE_CANDIDATE is NOT Controller acceptance. Reproduce package trust/identity/restart/rollback/negative and 237 worker regression claims as warranted; issue scoped verdict or a single consolidated correction.
+2. Prepare Owner-local eligibility and exact capability-specific authorizations for **S2 first genuine Binance 2-GET canary**, then **S3 BTC/ETH/SOL complete market scan**, and **S4 bounded real Feishu outbound/inbound**. No scan, direct send, provider OAuth or model call without its distinct gate. H3-B Gate A offline acceptance is not a live release.
+3. Move H3 to S5 actual first human-use loop with genuine provenance, deterministic first sender, query and +5/+10 actionability where separately authorized; then consider scoped S6 continued run and feedback collection.
+4. Reserve future product package IDs **QI1 (AI analysis), QL1 (lifecycle/outcome), QB1 (backtest), QR1 (strategy research)**; **QN1/QM1 deferred**. Do not confuse QI1 with existing Controller A1, QL1 with S1, or QB1 with existing R1.
+5. After independently accepted S5 field-use evidence, prepare QI1/QL1 concrete contracts and scoped implementation cards. QI1 first notification may include precomputed AI analysis but must retain model-independent deterministic fallback; QL1 preserves full signal/notification/human/outcome state and no-episode diagnostics.
+6. QB1 follows a trustworthy lifecycle/data foundation; QR1 follows validated historical/synthetic/forward evaluation. Any live strategy upgrade requires independent Owner+Controller approval. No autogenerated live strategy changes.
+7. **Pi P2 remains Owner deferred until S5 initial real operational baseline**, then may be developed offline while S6 H real use continues. Pi never becomes a second sender.
 
-Reference the [Controller P0 disposition](../../architecture/V080_QUANT_AGENT_V1_P0_CONTROLLER_DISPOSITIONS_20261120.md), [seven cross-language golden vectors](../../architecture/V080_QUANT_AGENT_V1_P0_CROSS_LANGUAGE_GOLDENS_20261120.json) and the complete [H1 P0 correction task](V080_HERMES_H1_P0_INTEROP_REMEDIATION_20261120.md):
-
-1. P0-C01: B2 NO_SETUP/NOT_EVALUATED without a genuine episode ID must be diagnostic-only and never an active signal or alert event.
-2. P0-C02: before evidence verification and in mixed/empty aggregates, return UNKNOWN as a non-evidence response sentinel, preserving true item-level evidence and blocking affirmative alerts.
-3. P0-C03: produce executable Python/Node golden pack for canonical UTF-8, immutable version, event hashes, exact renderer bytes, outbox and private-DM traces.
-
-0-C has **already accepted** the H1 P0 corrected reference at 18:25 HKT (63 independent PASS), closing P0-C01/C02/C03 offline. Do not re-run a duplicate H1 worker. **Next close H in separately authorized real use**, with bounded official Binance public-source canary and real Feishu DM interaction, then record initial measured source-to-message, inbound reply, fallback and human actionability. **Only when H actual-use testing is underway** may Controller seek Owner forwarding of a separately reverified offline Pi P2 task; task-card readiness alone is not dispatch authorization.
-
-Hermes remains the sole proposed first deterministic outbox/sender, independent of any model. B5 real public scan and real Feishu remain separate capability gates; the documentation update grants no external, model, private or trading permissions.
+The latest [Product Roadmap](../../project/V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md) and [Owner sync task](V080_OWNER_0C_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md) are PLANNING ONLY. No worker dispatch or new capability authorization is implied.
 
 ## 7. Model routing
 
@@ -174,3 +176,7 @@ Gemini Neon replaces Gemini Argon for future complex engineering assignments. Ne
 ## 14. Latest Owner sequencing override — 2026-11-20
 
 **H_FIRST_THEN_PI_DURING_FIELD_TRIAL** supersedes the earlier *future* Hermes/Pi parallel development plan. Pi P1 architecture and corrected Hermes H1 P0 reference are now independently accepted in their offline scopes. Do not commission Pi implementation, provider testing, SDK installation or a second bot until real authorized H use has begun. Engineering capacity focuses on accepted H1 reference, separately authorized genuine B5 source, approved Feishu DM delivery and first operational Hermes+QUANT feedback. Start a single bounded Pi P2 offline comparison **during continuing H real-use measurements**, after the first operational baseline and a new Owner/Controller dispatch. Hermes is the sole sender throughout. Read docs/project/V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md before proposing any new Agent task. No authorization is created by this policy update.
+
+## 15. Trading Intelligence long-range product roadmap — Owner 2026-11-21
+
+After S5 actual Hermes+QUANT loop and during S6 controlled observation, prioritize QI1 + QL1. The AI analyst supplies source-bound, time-bounded opportunity reasoning and critique; a deterministic truthful first card always remains deliverable without the model. The lifecycle engine records independent market, delivery, human, model and outcome axes; hypothetical path results do not become verified realized PnL. Once that foundation is accepted, QB1 provides reproducible cost-aware no-lookahead research; QR1 proposes falsifiable hypotheses and runs controlled tests with human-approved strategy-version promotion. QN1 event/news and QM1 multi-market adapters are deferred. Keep Hermes/Pi as replaceable runtimes behind stable domain contracts. This is roadmap adoption, not permission to implement or activate any listed capability.

@@ -1,7 +1,9 @@
 # QUANT v0.8.0 — Project Home and Baseline (updated 2026-11-20)
 
 Status: R1/B1 SCOPED_ACCEPTED_OFFLINE_ONLY; B2 SCOPED_ACCEPTED_OFFLINE_INTEGRATED_ONLY; B3 SCOPED_ACCEPTED_OFFLINE_ACCOUNT_AWARE_ONLY; B4 SCOPED_ACCEPTED_OFFLINE_PUBLIC_BRIDGE_ONLY; B5 Phase A SCOPED_ACCEPTED_OFFLINE_PHYSICAL_BINDING_READY. P1 Pi architecture SCOPED_ACCEPTED_ARCHITECTURE_ONLY; H1 Hermes engineering independently reran 54/54 PASS but is HOLD_P0_CONTRACT_SEMANTICS_AND_GOLDEN_EXPORT; corrected H1 P0 reference SCOPED_ACCEPTED_OFFLINE_HERMES_H1_REFERENCE_WITH_P0_FIXED_ONLY (63 independent PASS); P2 remains OWNER_DEFERRED_UNTIL_H_FIELD_TRIAL / NOT_DISPATCHED regardless of draft readiness. B5 Phase B genuine scan, real Feishu, private data and trading remain NOT AUTHORIZED.
-Product: Personal Trading Decision Support.
+**Controlling 2026-11-21 checkpoint:** H2-A, H2-B, H3 Phase A and H3-B Gate A independently accepted **OFFLINE ONLY**. Controller A1 Binance local derivative candidate has WORKER_REPORTED_READY_FOR_CONTROLLER_REVIEW_OFFLINE_CANDIDATE (237 worker PASS, independent acceptance pending at 17:10). Genuine Binance S2/S3 and Feishu S4 remain NOT_AUTHORIZED; S5/S6 actual human-use not started. **Future domain priority after H S5 is QI1 + QL1, then QB1 + QR1; QN1/QM1 deferred.** Pi P2 remains Owner-deferred. The older 2026-11-20 status line above is a historical baseline, not a current real-activation verdict.
+
+Product: Personal Trading Decision Support → Trading Intelligence Platform roadmap.
 Local root: /root/workspace/project/quant-0.8.0/
 Executable code/runtime branch: v0.8.0 in EXASHXE/btc-quant-agent-public.
 Canonical project documentation branch: docs/engineering. All project, role, architecture, roadmap, task-card, handoff and new-chat documentation is maintained there; same-path documentation copies on v0.8.0 are non-authoritative.
@@ -12,6 +14,8 @@ Canonical project documentation branch: docs/engineering. All project, role, arc
 - [Three-layer API architecture](../architecture/V080_THREE_LAYER_API_ARCHITECTURE_20261118.md)
 - [Binance API endpoint matrix](../architecture/V080_BINANCE_API_ENDPOINT_MATRIX_20261118.md)
 - [Roadmap and gates](V080_ROADMAP_AND_GATES_20261118.md)
+- [**Current Trading Intelligence platform/product roadmap**](V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md)
+- [Owner→0-C future roadmap sync prompt](../prompts/v0.8/V080_OWNER_0C_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md)
 - [Owner model-routing policy](V080_MODEL_ROUTING_POLICY_20261119.md)
 - [One-time public operating scope](V080_PERSONAL_PUBLIC_MARKET_OPERATING_SCOPE_20261118.md)
 - [Canonical documentation branch policy](V080_DOCUMENTATION_BRANCH_POLICY_20261118.md)
@@ -57,6 +61,21 @@ baseline/program-j/ is a read-only local copy of the accepted Program J source, 
 OWNER_STANDING_M2_AUTHORIZATION_20261024.md is preserved byte-identically. Its provenance remains CURRENT_USER_DIRECT_MESSAGE / OWNER_ATTESTED. It is reusable for the same personal, noncommercial, private/local, read-only public-market-data scope. Do not ask the Owner to repeat it.
 
 This attestation does not claim Binance legal approval, third-party legal certification, or permission for a different region, commercial use, redistribution, private account access or trading. Program N's one-shot invocation remains consumed and must not be replayed.
+
+## Latest accepted offline expansion / A1 worker handoff — 2026-11-21
+
+| Area | Independently evidenced scope | What remains |
+|---|---|---|
+| H2-A B5 public activation readiness | SCOPED_ACCEPTED_OFFLINE_H2A_ACTIVATION_READINESS_ONLY | Real Binance release/Canary not activated |
+| H2-B Hermes/Feishu readiness | SCOPED_ACCEPTED_OFFLINE_H2B_FEISHU_READINESS_ONLY | Real Feishu app/client, recipient, send/receive not activated |
+| H3 Phase A integration | SCOPED_ACCEPTED_H3_PHASE_A_OFFLINE_ONLY | No end-to-end real-market/Feishu run |
+| H3-B Gate A | SCOPED_ACCEPTED_H3B_OFFLINE_GATE_A_PREPARATION_ONLY | Owner-local environment, eligibility and future production authorization still blocked |
+| **Controller A1 Binance derivative** | **WORKER_REPORTED_READY_FOR_CONTROLLER_REVIEW_OFFLINE_CANDIDATE** | Dispatched 16:52; worker 237 PASS / sealed evidence at 17:10; independently review; NOT live authorized |
+| **H S5/S6** | NOT_STARTED | First separately authorized real human loop and ongoing feedback |
+| **QI1/QL1 → QB1 → QR1** | PLANNED / NOT_DISPATCHED | Formal business engineering after initial real H baseline; QN1/QM1 deferred |
+| **Pi P2** | OWNER_DEFERRED / NOT_DISPATCHED | H actual-use first; no dual-sender |
+
+The original 2026-11-20 table below is retained to preserve the earlier accepted-stage record. For real actions consult the newest Controller receipts and [current stage gates](V080_ROADMAP_AND_GATES_20261118.md). A worker package labeled READY_FOR_CONTROLLER_REVIEW is not accepted, and an offline acceptance does not authorize real network traffic.
 
 ## Current state — 2026-11-20
 

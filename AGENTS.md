@@ -10,6 +10,8 @@
 
 **Controlling 2026-11-20 Owner execution order:** [H operational first, Pi engineering during field trial](docs/project/V080_HERMES_H_FIRST_PI_FIELD_TRIAL_SEQUENCE_20261120.md). Do not dispatch Pi P2 while H1 integration and real-use readiness are incomplete; Pi P1 is architecture-only history. Corrected H1 P0 reference was independently accepted offline at 18:25 HKT; this does not grant real Feishu/Binance or Pi P2 execution. Never confuse parallel role capacity with authorization for concurrent Pi implementation.
 
+**2026-11-21 Owner business roadmap:** [Trading Intelligence Platform](docs/project/V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md) and [Controller sync task](docs/prompts/v0.8/V080_OWNER_0C_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md). Do not confuse existing A1 Binance release, S0–S8 live gates, R1 PUBLIC foundation, Pi P1/P2 with reserved QI1/QL1/QB1/QR1 business phases; QN1/QM1 deferred. Priority is H real-use S5 then AI opportunity analysis + immutable signal lifecycle, then historical backtests and bounded research experiments. Domain modules remain Hermes/Pi independent and cannot write accepted QUANT strategy decisions.
+
 All documentation-only updates must be committed to docs/engineering. Do not write canonical project documentation to v0.8.0. Preserve docs-only branch scope: no source code, tests, runtime configuration, credentials, private account payloads, protected data, registry mutation or deployment changes.
 
 All Owner-facing prompts must follow docs/project/V080_PROMPT_COPY_CARD_STANDARD_20261118.md. A prompt is not a dispatch; Controller 0-C remains the sole engineering dispatcher and scoped acceptance authority.

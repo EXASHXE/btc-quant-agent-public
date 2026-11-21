@@ -72,3 +72,7 @@ After the first usable H baseline, Controller may issue a single integrated P2 *
 - Keep implementation work packages substantial and Controller reviews consolidated. This does not relax individual evidence or capability gates.
 
 **Next action as of this document:** H1 P0 corrected OFFLINE reference is independently accepted. Controller 0-C should now prepare the H-only, separately authorized B5 Phase B genuine public canary and real Feishu private-DM limited activation, followed by actual Hermes field-trial telemetry. Do **not** forward P2 despite its prepared draft until the H real-use baseline exists.
+
+## 7. Subsequent Trading Intelligence business-value roadmap (Owner 2026-11-21)
+
+After an independently observed S5 first real Hermes loop, prioritize [QI1 AI Opportunity Intelligence and QL1 Signal Lifecycle/Outcome](V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md) as domain modules independent of the Hermes/Pi runtime. QI1 may pre-analyze WATCH candidates with validated evidence, bounded latency and model-free first-alert fallback. QL1 should preserve episode, delivery, model annotation, human response and observed hypothetical-vs-verified outcome axes; it feeds the historical/backtest **QB1** and experimental research **QR1**. Keep optional Pi P2 a deferred runtime comparison, not a blocker to QI1/QL1. Defer QN1 news and QM1 multi-venue until the core lifecycle, research and data contracts are demonstrably stable. Existing S0–S8 / Controller A1 gates and the frozen V1 remain unchanged.
