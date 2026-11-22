@@ -1,4 +1,4 @@
-# QUANT v0.8.0 — Active Role Matrix (updated 2026-11-21)
+# QUANT v0.8.0 — Active Role Matrix (updated 2026-11-23)
 
 Current routing authority: [V080 Model Routing Policy](../project/V080_MODEL_ROUTING_POLICY_20261119.md).
 
@@ -52,3 +52,21 @@ See [V080 Model Routing Policy](../project/V080_MODEL_ROUTING_POLICY_20261119.md
 ## 2026-11-21 H4 current engineering queue
 
 H4 S2–S5 consolidated readiness is independently accepted OFFLINE ONLY (336 independent PASS, 103 sealed files). For future Neon local readiness, Controller may prepare a formal dispatch or Owner may explicitly start scoped offline engineering with a full task card; do not impose both administrative paths. S2 genuine Canary remains BLOCKED_PRODUCTION/INPUT, S3 fundingRate history weight UNKNOWN, S4 real Feishu identity/callback blocked, S5 real end-to-end not observed. Pi P2 Owner-deferred. See [Project Home](../project/V080_PROJECT_HOME_20261118.md).
+
+## 2026-11-23 active stage assignments — authoritative 2026-11-22 22:23 receipts
+
+The new scope-limited offline acceptances are: Sol S2 V2 (55 PASS / 39 sealed); Neon optional risk CLI (12 PASS / 36 sealed, disabled by default); Astra S3 documentary study (9 sealed, `d` UNKNOWN); plus Neon optional Feishu Mode0/1 local offline onboarding. See [verified progress and next gates](../project/V080_PROGRESS_AND_NEXT_GATES_20261123.md). No live S2/S3/S4/S5 or recurring operations have been authorized; the next-stage Controller note is `PLANNING_ONLY / new_dispatch_issued=false`.
+
+| Near-term role | Work/product owner | Appropriate effort and authority |
+|---|---|---|
+| Owner | KR/USDT-M route applicability; WSL2 direct egress/CA/shared-IP evidence; Feishu app/recipient prerequisites; separately approve/decline genuine one-run S2 | Evidence and decisions; do **not** forward sensitive data/API keys into chat |
+| Controller 0-C | One engineering queue, independent receipt/hash/negative-test review, exact production holds, next-stage prioritization | Sole acceptance authority; 22:23 roadmap does **not** dispatch workers |
+| Sol | P0 real-wire-capable default-disabled **OFFLINE** S2 derivative; later P1 S3 zero-retry sealed derivative and H/Core integration | XHigh for S2 security-sensitive seam; High or XHigh for S3 depending on signature/integration risks |
+| Gemini Neon | Minimal Owner-local KR/WSL2 evidence, reused collectors (no new framework); later disjoint AI adapter work | Use task-suitable lower effort for mechanical inventory; reserve XHigh for real complex implementation/conflicts |
+| Hydrogen | Feishu non-sensitive checklist, bounded documentation/fixture/QA | Simple/low-cost, no independent security architecture or activation |
+| Astra | No new S3 general architecture task while documentary A/B/C holds are unchanged; later material funding-contract/strategy-methodology fork | On-demand architecture challenge; not routine repeated review |
+| ChatGPT 1-A | Independent product/quality review, scope challenge, copy-ready 0-C/Worker Prompt drafts, project docs only at Owner request | Advisory; no task dispatch, signature, live grant or acceptance |
+
+**Prompt display is mandatory, not optional:** Every Owner-facing full Prompt (new chat/task/research/audit/revision) MUST appear in one copyable card with the **entire** version and a real **复制完整 Prompt / Copy Full Prompt** action/button where the UI permits it. When custom copy controls are unavailable, use a complete WritingBlock/CodeBlock with native copy facility. Do **not** claim a nonfunctional decorative button is clickable. Never supply only a URL, an excerpt or a separate summary instead of a copyable complete prompt. The canonical Markdown and copy payload must match exactly.
+
+Keep H-first, S5 field baseline before Pi P2. QI1/QL1 follow S5; QB1/QR1 afterward; neither these future packages nor real S4 is activated merely by updated role assignments.

@@ -80,3 +80,9 @@ After an independently observed S5 first real Hermes loop, prioritize [QI1 AI Op
 ## Latest H4 and offline-start status — 2026-11-21 19:58
 
 H4 S2–S5 integration accepted OFFLINE ONLY after 336 Controller PASS and 103 sealed items. S2 real A1 two GET remains BLOCKED_PRODUCTION_AND_INPUT_NOT_AUTHORIZED, S3 fundingRate weight unresolved, S4 real Feishu identity/client not authorized and S5 real human-use baseline absent. The immediate priority is bounded Owner-local S2 readiness, not Pi P2. A task explicitly forwarded by Owner for OFFLINE work may start without a redundant Controller dispatch JSON under [Owner Direct Offline Protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). Neither that offline start nor this H4 status grants real network access or self-acceptance.
+
+## 2026-11-22/23 evidence sync — H-first remains controlling
+
+Local optional Feishu onboarding Mode0 Core CLI and Mode1 Hermes six local reads are independently accepted **OFFLINE**. Mode2 real Feishu remains disabled. Sol S2 V2 is accepted as a synthetic default-disabled wheel; the genuine physical two-GET Canary still has no authorized real transport, eligible KR route proof or one-run signatures. Astra S3 study retains Plan A as the intended genuine B2 source contract but historical fundingRate debit `d` is unknown. See [latest verified progress / next gates](V080_PROGRESS_AND_NEXT_GATES_20261123.md).
+
+Priority now: minimal Sol S2 physical-wire OFFLINE candidate parallel to minimal Owner/Neon KR-WSL2 evidence and Owner Feishu setup; **independent real S2 readiness/grant milestone** next; conditional Sol S3 zero-retry offline work does not replace the live gate. Local Mode0 observations can validate UX only; the genuine S5 H/Feishu human loop still needs separate S3/S4 grants and actual observed evidence. Pi P2 remains Owner-deferred until an initial H field baseline.

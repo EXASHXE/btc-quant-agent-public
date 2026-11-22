@@ -114,3 +114,15 @@ A link to the canonical prompt may accompany the card, but never substitutes for
 Follow the [Owner Direct Offline Task Execution Protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). Label every new future task with exactly one start mode: CONTROLLER_DISPATCHED (actual receipt exists), OWNER_DIRECT_OFFLINE_ALLOWED (Owner may execute by forwarding the complete card), or PROPOSAL_ONLY (not executable until later Owner direction/Controller dispatch). Do not generate a card that tells a worker to execute immediately while also demanding an unavailable second Controller receipt for safe offline work.
 
 A complete prompt/card stored in docs is not itself dispatch. Explicit Owner forwarding in the actual worker chat with an instruction to execute a named bounded OFFLINE task is a sufficient Owner-direct offline start. Worker records OWNER_DIRECT_OFFLINE_STARTED, no fabricated Controller receipt and no self-acceptance. Real Binance/Feishu/provider/private/TRADE/production permissions are NEVER inferred.
+
+## 2026-11-23 Owner requirement — copy-button/card display is a hard acceptance rule
+
+This is **mandatory for every occasion** when a full Prompt is given to the Owner, including new Controller chats, 1-A chats, Sol/Neon/Hydrogen/Astra tasks, research reviews, rewrites and corrected versions; it is not limited to prompts initially generated on 2026-11-18.
+
+- Provide **one complete copyable card per distinct Prompt**. Put the current **entire** prompt, not an excerpt, within its own copy payload.
+- Provide a visible, functional **复制完整 Prompt / Copy Full Prompt** button/action whenever the chat surface supports a real clipboard control. If the platform does not expose a custom button, use a **complete WritingBlock or CodeBlock with its native Copy feature**. The copyable block itself is the card; do not add a decorative fake "复制" button.
+- Link the canonical Markdown file for provenance **in addition** to, never instead of, the full copyable content. A Markdown repository file cannot guarantee a UI control in other clients; the presenting assistant must use the current client's real capability.
+- Include recipient, state/start authority, exact task ID, current source baseline and constraints, required QA, deliverables, prohibitions and stop conditions. Multiple versions: latest complete text, no delta-only prompt.
+- This UI standard **does not** turn a prompt into a Controller dispatch or authorize live provider access. Accurate `PROPOSAL_ONLY / OWNER_DIRECT_OFFLINE_ALLOWED / CONTROLLER_DISPATCHED` markings remain required.
+
+Reviewers should reject an Owner-facing "prompt delivered" claim when only a path, tiny sample, incomplete preview or nonworking imitation button was provided.

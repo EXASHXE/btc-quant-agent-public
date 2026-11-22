@@ -90,3 +90,9 @@ This policy is documentation-only. It does not authorize API calls, credentials,
 ## 8. Operational AGENTS pointer caveat (2026-11-21)
 
 The executable v0.8.0 root AGENTS.md contains historical initial-R1 wording that a worker may mistake for a general dispatch prerequisite. Current canonical Owner-direct OFFLINE start policy is in [this protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). All new worker chat prompts must cite it explicitly. Changing executable-root AGENTS.md is a separately scoped runtime bootstrap adjustment, not an excuse to create a second canonical project-document authority on v0.8.0. Do not update executable source or accepted manifests merely as part of docs-only work.
+
+## 2026-11-23 status/copy-card update
+
+- Active latest status appendix: [V080_PROGRESS_AND_NEXT_GATES_20261123.md](V080_PROGRESS_AND_NEXT_GATES_20261123.md); older 2026-11-21 inline tables remain historical when superseded by verified later Controller records.
+- Active new Controller bootstrap: [V080_NEW_CHAT_CONTROLLER_0C_20261123.md](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261123.md).
+- Every Owner-facing complete prompt MUST be displayed in a **complete copyable card with a genuine Copy control whenever supported**, otherwise a WritingBlock/CodeBlock with native copy. Preserve precise content/version. No fake button, links-only, or partial excerpt. See [Prompt Copy Card Standard](V080_PROMPT_COPY_CARD_STANDARD_20261118.md).

@@ -180,3 +180,7 @@ After S5 actual Hermes+QUANT loop and during S6 controlled observation, prioriti
 ## 16. Owner 2026-11-21 anti-deadlock directive for all worker tasks
 
 **Do NOT repeatedly tell an Owner who has explicitly forwarded a complete OFFLINE task to get another Controller dispatch receipt.** If named task, workroot, write-set and offline safeguards are clear, start the safe parts, log OWNER_DIRECT_OFFLINE_START inside the isolated root, produce evidence for 0-C independent acceptance. Never self-start from proposal-only discovery, self-accept, forge a receipt, overlap an active writer or use this as a real external/production grant. The source-root historical R1 AGENTS.md text cannot silently override this latest canonical Owner-direct offline rule. See [protocol](../../project/V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md).
+
+## 2026-11-23 newer Controller 0-C bootstrap (current replacement)
+
+This 2026-11-18 entry is preserved as a historical bootstrap. For any **new 0-C conversation**, present the entire [V080-NEW-CHAT-CONTROLLER-0C-20261123](V080_NEW_CHAT_CONTROLLER_0C_20261123.md) in a **native copyable complete Prompt card**; do not use this older 2026-11-21 H4 checkpoint as latest state. 2026-11-22 22:23 Controller planning is **not a dispatch** and real S2/S3/S4/S5 remains unauthorised.

@@ -1,6 +1,24 @@
 # QUANT v0.8.0 — Roadmap, Task Ownership and Exit Gates
 
-Status: Updated 2026-11-21 19:58 HKT Controller H4 OFFLINE acceptance (336 PASS, 103 seals); historical 2026-11-20 receipts below are dated snapshots; REAL S2–S6 NOT AUTHORIZED/NOT OBSERVED. B1–B4 accepted OFFLINE and B5 Phase A independently accepted OFFLINE_PHYSICAL_BINDING_READY. P1 SCOPED_ACCEPTED_ARCHITECTURE_ONLY; original H1 reference remains historical P0 HOLD; corrected H1 post1 P0 SCOPED_ACCEPTED_OFFLINE_REFERENCE (63 Controller PASS); Pi P2 OWNER_DEFERRED_UNTIL_H_FIELD_TRIAL regardless of any prepared P2 draft; B5 Phase B genuine public and real Feishu/private/trade actions still NOT AUTHORIZED.
+
+## Current 2026-11-22 22:23 checkpoint and revised product-first milestone (supersedes older status tables as a CURRENT snapshot)
+
+**Source:** [2026-11-23 evidence/next gates](V080_PROGRESS_AND_NEXT_GATES_20261123.md). Re-open local Controller receipts before making a new decision; this section is documentation only and issues no worker dispatch.
+
+| Gate | Current verified status | Next genuine milestone |
+|---|---|---|
+| S0/H4, S1/A1 post3 | Controller accepted respective **OFFLINE ONLY** scopes; H4 336 PASS, 103 sealed | No automatic production rights |
+| S2 V2 | Sol 55 independent PASS, 39 sealed, 10 defaults + 14 legacy challenges; **OFFLINE DERIVATIVE ONLY** | Sol default-disabled real-wire-capable OFFLINE wheel; Owner/Neon KR/WSL2 route/evidence; separate production issuance, exact one-run S2 2 GET authorization |
+| Local risk / CLI | Neon 12 PASS / 36 sealed, disabled-by-default synthetic overlay | Use/read local Core; do not enlarge policy or claim real account data |
+| S3 A/B/C | Astra documentary accepted 9/9; A 39 GET / `39+3d` unknown, B 36 GET / known 39 diagnostic only, C research | Pin zero-retry S3 offline derivative **conditionally**; separate credible `d` and venue budget evidence before full S3 |
+| S4 Feishu local | Optional Mode0/Mode1 OFFLINE accepted; Mode2 disabled | Owner app/tenant/client/recipient/callback preparation in parallel; live S4 authorization separately |
+| S5, S6 | Genuine H human loop not observed; S6 cadence not authorized | Core real decision → authorized sender/DM/Q&A → human feedback, then separately bounded continuing H |
+| S7 Pi / S8 Layer2 | Pi P2 Owner-deferred; actual account read-only unapproved | Pi shadow after genuine H baseline; independent verified private-only permission; TRADE disabled |
+
+**Revised priority:** (1) two disjoint P0 offline packages — Sol S2 physical transport and minimal Owner-local KR/WSL2 evidence — plus low-overhead Owner Feishu setup, (2) independent S2 candidate review and exact genuine two-GET approval if eligible, (3) bounded S3 zero-retry offline engineering without blocking S2 and no fabricated `d`, (4) genuine local Core decision then separately permitted S4/S5. The 22:23 Controller `NEXT_STAGE` file contains **new_dispatch_issued=false**. Prompt-card output must include complete copyable prompt and functional native Copy action where supported.
+
+
+Historical snapshot: 2026-11-21 19:58 HKT Controller H4 OFFLINE acceptance (336 PASS, 103 seals); historical 2026-11-20 receipts below are dated snapshots; REAL S2–S6 NOT AUTHORIZED/NOT OBSERVED. B1–B4 accepted OFFLINE and B5 Phase A independently accepted OFFLINE_PHYSICAL_BINDING_READY. P1 SCOPED_ACCEPTED_ARCHITECTURE_ONLY; original H1 reference remains historical P0 HOLD; corrected H1 post1 P0 SCOPED_ACCEPTED_OFFLINE_REFERENCE (63 Controller PASS); Pi P2 OWNER_DEFERRED_UNTIL_H_FIELD_TRIAL regardless of any prepared P2 draft; B5 Phase B genuine public and real Feishu/private/trade actions still NOT AUTHORIZED.
 **Active offline-start rule:** [Owner direct OFFLINE work may start without a redundant 0-C receipt only after an explicit Owner execute instruction](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). This does NOT enable real S2/S3/S4/S5, private or trade capabilities.
 **Current product direction:** [Trading Intelligence Platform QI1/QL1/QB1/QR1](V080_TRADING_INTELLIGENCE_PLATFORM_ROADMAP_20261121.md), with QN1/QM1 deferred. **Operational S0–S8 stage gates are not renamed or waived.**
 **Latest Controller 0-C planning reconciliation:** [Controller 0-C evidence, dependency, schema and acceptance sync](V080_CONTROLLER_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md). Current S1 A1 is WORKER_READY (237 worker tests; original sealed manifest verified), but **not independently accepted as of this evidence checkpoint**. One queue: independently review A1, then separate S2 Binance Canary, S3 genuine market and S4 Feishu grants, S5 actual H3 loop, S6 bounded H, QI1/QL1, QB1, QR1. QN1/QM1 remain deferred; Pi P2 requires S5 field evidence and a fresh dispatch.

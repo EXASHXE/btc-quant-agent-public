@@ -100,3 +100,16 @@ This policy changes model routing only. It does not grant network access, creden
 ## 8. Prevent administrative dispatch deadlocks (Owner 2026-11-21)
 
 Use [Owner Direct Offline Protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). Future tasks must specify CONTROLLER_DISPATCHED, OWNER_DIRECT_OFFLINE_ALLOWED, or PROPOSAL_ONLY. When Owner explicitly forwards a complete offline task to Neon or Sol with an execute instruction, a missing separate 0-C JSON does not stop offline work; log an offline Owner-start evidence note inside the isolated workroot. Never auto-start a draft or bypass real Binance/Feishu/model/private/TRADE gates. Controller remains the only independent acceptance authority.
+
+## 9. 2026-11-23 product-first cost/effort routing update
+
+Verified 2026-11-22 receipts and current roles: [Progress and next gates](V080_PROGRESS_AND_NEXT_GATES_20261123.md). Sol S2 V2, Neon optional CLI and Astra S3 study were independently accepted OFFLINE ONLY. Follow-up proposals in `V080_CONTROLLER_NEXT_STAGE_WSL2_S2_RELEASE_AND_S3_PREP_PLAN_20261122.json` have `new_dispatch_issued=false`.
+
+- **P0 S2 physical transport capable but disabled wheel:** Sol XHigh because signatures, durable spend, release identity and TLS/route are consequential.
+- **P0 minimal Owner-local KR/WSL2 evidence:** Neon with low/medium effort, or Hydrogen for non-sensitive mechanical inventory; do not build another verifier or overuse XHigh for a checklist. Escalate when conflicting trust/host evidence requires complex analysis.
+- **Owner S4 onboarding preparation:** no new large worker task; Hydrogen can assemble a sanitized checklist. Mode0/Mode1 already accepted locally, not a real provider.
+- **P1 S3 pinned three-file zero-retry offline package:** Sol High for bounded patch/QA; XHigh only if substantive signature/versioning/security complexity arises. Do not invent `fundingRate` general debit `d`.
+- **Astra:** wait unless there is a consequential new source contract, funding-cost semantics or strategy methodology decision; accepted research should not be repeated without a new question.
+- **Freeze optional risk CLI expansion:** no real Layer2/TRADE and no real position sizing; focus on first actual local Core market decision and S2 physical gate.
+
+No selected model can self-accept or infer live authorization. Evaluate capability, quota, cost, change risk and test coverage together, not a blanket "all XHigh" rule. All new task/new-chat/research prompts follow [Prompt Copy Card Standard](V080_PROMPT_COPY_CARD_STANDARD_20261118.md): complete, truthful, card-shaped with an actual copy action where supported; native copyable WritingBlock/CodeBlock fallback.
