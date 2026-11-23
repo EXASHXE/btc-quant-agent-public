@@ -1,0 +1,31 @@
+{
+  "description": "Constructed simulator history; no real market candles, native payloads, fill or economic evidence",
+  "exposure": "SYNTHETIC",
+  "files": [
+    {
+      "normalized_digest": "e01994f24a9f48330651a48a25cda77a054f4c3b2dacb39db922791cce2e1023",
+      "path": "SYNTHETIC_positive_v1.jsonl",
+      "rows": 492,
+      "sha256": "a846b8907c336ded0d2a98d9e0d7a21ba3378fea83492c107c7f5aceffa4b498"
+    },
+    {
+      "normalized_digest": "7fe66f711a16edd9bae969df11bb1ff1d4d6d44d42d9807c53abd429905fc1a9",
+      "path": "SYNTHETIC_mixed_v1.jsonl",
+      "rows": 492,
+      "sha256": "55c02e0b3bb238fb03dbe4cfa63efd519e2ae5fc8c8d844cc726bbf89f93fcf5"
+    },
+    {
+      "normalized_digest": "f7152845ada67ad021b2460e87de8307333707542b1198af03ef08a7f4f92d05",
+      "path": "SYNTHETIC_all_no_setup_v1.jsonl",
+      "rows": 492,
+      "sha256": "1df13faad725bb92ff0d92342ff5d0aac93f21dc71297fe51c0c850942429b2d"
+    }
+  ],
+  "schema": "PROGRAM_A_SYNTHETIC_FIXTURES_V1",
+  "seed": 7061106,
+  "served_windows": {
+    "1D": 60,
+    "1H": 24,
+    "4H": 80
+  }
+}

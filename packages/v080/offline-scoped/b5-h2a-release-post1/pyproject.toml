@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quant-personal-live-public-b5"
+version = "0.8.0b5.post1"
+description = "QUANT H2-A staged one-shot public HTTPS activation candidate"
+requires-python = ">=3.11"
+dependencies = ["quant-personal-public-b1==0.8.0b1", "quant-personal-decision-b2==0.8.0b2", "quant-personal-public-bridge-b4==0.8.0b4"]
+
+[project.optional-dependencies]
+activation-verifier = ["cryptography==45.0.7"]
+
+[project.scripts]
+quant-public-b5 = "quant_personal_live_public_b5.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+quant_personal_live_public_b5 = ["dependency_lock.json"]

@@ -1,0 +1,31 @@
+schema_version: 0.7.0
+name: swing_advisory_offline
+market: PERPETUAL
+universe: [BTCUSDT, ETHUSDT, SOLUSDT]
+benchmark: BTCUSDT
+dataset: synthetic
+interval_seconds: 14400
+product:
+  version: V070_SWING_ADVISORY_V1
+  market_timeframes: [1H, 4H, 1D]
+  decision_timeframes: [4H, 1D]
+  review_hours_utc: [0, 12]
+  one_hour_role: OPTIONAL_NON_URGENT_CONFIRMATION
+  source_gate: LOW_RATE_CLOSED_BAR_V1
+  native_acquisition: false
+  orders: false
+  private_accounts: false
+  notifications: false
+strategies:
+  - id: trend_pullback
+    params: {fast: 10, slow: 30}
+entry:
+  expiry_minutes: 1440
+  confirmation_bars: 0
+exits:
+  stop_lookback: 12
+  stop_buffer_ticks: 1
+  stop_buffer_atr: 0.25
+  max_holding_bars: 5
+risk:
+  leverage: 1

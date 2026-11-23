@@ -1,0 +1,73 @@
+{
+  "all_states_are_advisory": true,
+  "ambiguous_OHLC": "No execution outcome inferred; stop/target same-bar ordering UNKNOWN. Active contract conservatively invalidates a crossed stop without reporting a loss/fill/PnL.",
+  "exit_contract": {
+    "cancellation": "Invalidation, expired review validity, source block, missing data, no-fill/missed entry",
+    "order_cancellation": false,
+    "structural_stop": "Preobservable level plus separately declared ATR and execution buffers",
+    "targets": "Declared zones, never favorable touch-based fills",
+    "time_exit": "At predeclared 8h/24h/72h/5d horizon when supported; future LT-B/LT-C integration"
+  },
+  "expiry_boundary": "expires_ms <= next_review_ms is EXPIRED, including equality",
+  "implemented_positive_state_producer": "Caller-supplied OFFLINE_CONTRACT candidate only; automated S1 compiler returns None until LT-B",
+  "legacy_mapping": {
+    "ARMED": "WATCH",
+    "CANCELED": "INVALIDATED",
+    "CANCELLED": "INVALIDATED",
+    "DISCOVERED": "WATCH",
+    "ENTRY_ELIGIBLE": "WATCH",
+    "EXPIRED": "EXPIRED",
+    "INVALIDATED": "INVALIDATED",
+    "NO_SETUP": "NO_SETUP",
+    "UNKNOWN": "SOURCE_BLOCKED",
+    "WATCH": "WATCH"
+  },
+  "legacy_statuses_unchanged_in_originals": true,
+  "legacy_view_metadata": [
+    "HISTORICAL_FROZEN / OUT_OF_ACTIVE_SCOPE",
+    "legacy_state",
+    "legacy_schema",
+    "legacy_content_hash",
+    "NOT_ACTIONABLE"
+  ],
+  "new_decision_trigger": "Explicit completed 4H or 1D close, never intrabar/1H/tick/BBO",
+  "precedence": [
+    "source block",
+    "data integrity block",
+    "causal identity block",
+    "review expiry",
+    "structural invalidation",
+    "missed/no-chase",
+    "account unknown/veto",
+    "review-only region state"
+  ],
+  "review_deadline_boundary": "review_deadline_ms < next_review_ms is EXPIRED",
+  "schema": "SWING_ENTRY_EXIT_REVIEW_STATE_MODEL_V1",
+  "state_rules": {
+    "ACCOUNT_UNKNOWN": "No verified capital/margin information; account API not invoked",
+    "DATA_UNAVAILABLE": "Missing/unclosed/future/stale/gapped/duplicate/unsorted/late/unbound input",
+    "ENTRY_ZONE_ACTIVE": "Completed decision close in region; REVIEW_ONLY; never fill/order authority",
+    "EXPIRED": "TTL elapsed or validity/review deadline cannot cover next scheduled review",
+    "INVALIDATED": "Completed decision bar crosses buffered structural invalidation",
+    "MISSED_OR_NO_CHASE": "Closed price deteriorated beyond entry region; no fill inferred",
+    "NO_SETUP": "Valid completed input with no evaluated setup; never synthesize a candidate",
+    "READY_FOR_REVIEW": "Causal completed-bar contract candidate awaiting region; validity covers next scheduled check",
+    "SOURCE_BLOCKED": "Source authorization, source quality or causal identity blocked",
+    "VETO": "Explicit risk/account veto; no position management inferred",
+    "WATCH": "Informational only; legacy WATCH/ARMED/ENTRY_ELIGIBLE maps to historical WATCH without activation"
+  },
+  "states": [
+    "NO_SETUP",
+    "WATCH",
+    "READY_FOR_REVIEW",
+    "ENTRY_ZONE_ACTIVE",
+    "MISSED_OR_NO_CHASE",
+    "INVALIDATED",
+    "EXPIRED",
+    "DATA_UNAVAILABLE",
+    "SOURCE_BLOCKED",
+    "ACCOUNT_UNKNOWN",
+    "VETO"
+  ],
+  "trade_permission_from_state": false
+}

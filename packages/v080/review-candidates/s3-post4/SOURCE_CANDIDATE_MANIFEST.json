@@ -1,0 +1,141 @@
+{
+  "schema": "QUANT_V080_WORKER_READY_SOURCE_CANDIDATE_V1",
+  "status": "READY_FOR_CONTROLLER_REVIEW_NOT_ACCEPTED",
+  "task_id": "V080-NEON-S3-RELEASE-BOUND-ZERO-RETRY-OFFLINE-20261123",
+  "from_workroot": "workspaces/lt-v080-neon-s3-release-bound-zero-retry-offline-20261123",
+  "worker_reported_tests": 337,
+  "worker_reported_default_deny_checks": 14,
+  "independent_controller_acceptance": "NOT_FOUND_AS_OF_EXPORT",
+  "workroot_sha256sums_sha256": "0ca589d4482dd629460f73df2f68e939db6dc050f99c3d48601d681a203098b1",
+  "excluded": [
+    "workroot raw evidence",
+    "QA logs",
+    ".qa",
+    "model output",
+    "runtime store",
+    "genuine credentials",
+    "signed production grants"
+  ],
+  "files": [
+    {
+      "path": "src/quant_personal_live_public_b5/__init__.py",
+      "sha256": "cc2b1d8411620d865118b0bae4362ed1c63fe8e9290a91fd2ebe30c875f917d5",
+      "bytes": 70
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "bytes": 48
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/admission.py",
+      "sha256": "3429ca8592daf030d93e045d1d0310efc27dd3706f1405e369e07c1b9a176fed",
+      "bytes": 12759
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/approval.py",
+      "sha256": "08a5d1a67d2c863a769747db2b3f693cdea2e0ac8bf031a4b34174f34b79dd4d",
+      "bytes": 10468
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/cli.py",
+      "sha256": "5596397d036c6e355086a039556eb1e409686e5ccc81e60563abfa6e00c2db40",
+      "bytes": 4846
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/collection.py",
+      "sha256": "28a2e13d7f34f19d2e21dcd5f5010ad13202e83ab0f3080f90831f0249681a9e",
+      "bytes": 16285
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/contract.py",
+      "sha256": "7a0be38d0537be3b8c9dd868b050f582bd157e6fb23f30d56422859c762bebf7",
+      "bytes": 1914
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/decision.py",
+      "sha256": "81322215135cf1c02becf241ea4d11e04f06a443cb9e925e031ecd3cb996e4e0",
+      "bytes": 3210
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/dependency_lock.json",
+      "sha256": "fd5ca97f50d8b12c48c42920442496c7982e757edab6b884cf9d3f965777df1d",
+      "bytes": 4082
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/egress.py",
+      "sha256": "23c5b727446d1f1b7c376e18c6497e96ba86759bf5138ff16a650a545b60577a",
+      "bytes": 12893
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/enrollment.py",
+      "sha256": "336407426fdd70a01364bbbe3cfa8728c884ab048b9641e9945d2d8b9de90840",
+      "bytes": 4161
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/ledger.py",
+      "sha256": "0001918206169bbe463f6e2920119036142826d440b11380b3a8e70cf6fff330",
+      "bytes": 27720
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/live.py",
+      "sha256": "3173debc856a6d795a877da1ef70745da70b7df590d2cc36baf86f1a32ec0900",
+      "bytes": 6669
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/offline.py",
+      "sha256": "7d224b8d5d280bbab142c6c363abd760503fe2b014940d797451f33d07041511",
+      "bytes": 7303
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/planning.py",
+      "sha256": "2966385a9e6708385981a768ad4a8ed254a5c7f00a7a044a76a6d6bbd43a1611",
+      "bytes": 1545
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/release.py",
+      "sha256": "c095607b001efd491adb0a9fd116420f58fc08727139a157783dfb43ff5e448a",
+      "bytes": 1868
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/stages.py",
+      "sha256": "e8f6fe2d87a0e79ea6d54da8372e7eb18ba30bbac86d1e049e9e2d6450e88833",
+      "bytes": 3254
+    },
+    {
+      "path": "src/quant_personal_live_public_b5/trust.py",
+      "sha256": "8bdfd00910c1db470f2eda332444695c452635cea18911678280b089ab9a4a22",
+      "bytes": 1532
+    },
+    {
+      "path": "tests/test_s3_zero_retry_v2.py",
+      "sha256": "2798c6efb7b5ab123e15fd85a08b0d321c791bb6b30fcbf530d307be86273897",
+      "bytes": 61900
+    },
+    {
+      "path": "tools/preserve.py",
+      "sha256": "d1e6fc5f83a2f377b9cd9bdedaeab14ff5df3207508b58ae988f4610d84184b0",
+      "bytes": 10890
+    },
+    {
+      "path": "tools/qa.sh",
+      "sha256": "1a100f7f319391ce7676c81051f2cd1e3c8baf12dcbd0289e99994147dc7c3b1",
+      "bytes": 15505
+    },
+    {
+      "path": "tools/s3_plan_gate.py",
+      "sha256": "37e5033af0fabb4ac1abbcdea4befff65a8cafaa714ac9735663271009ba867f",
+      "bytes": 19023
+    },
+    {
+      "path": "tools/seal.py",
+      "sha256": "52633c39bd3a9d2f48a22ee4b17e7ba0c5d9b0e8ec86371abe54779ed6565e1e",
+      "bytes": 1739
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "0a3d68342bc914f19af4bbea0711af584f7a81c8c3fea08080ca3252851a6a4c",
+      "bytes": 741
+    }
+  ]
+}

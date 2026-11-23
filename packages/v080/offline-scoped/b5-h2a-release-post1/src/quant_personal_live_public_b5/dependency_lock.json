@@ -1,0 +1,59 @@
+{
+  "quant_personal_decision_b2": {
+    "filename": "quant_personal_decision_b2-0.8.0b2-py3-none-any.whl",
+    "modules": {
+      "__init__.py": "e7a153355123098f8f3060a9bae4737aa05d8dc122ade087ef2adbfc9e6f81f8",
+      "__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "adapter.py": "a6f399be00ed8a5a4d75c6645f6e2f0f6165ae77071cdff6352cb15ee8b5bff1",
+      "cli.py": "3053001293cc24eb02b10a1161cea5cadb394f33e2e0484788493e15e85b9073",
+      "engine.py": "d8da0b96fcddd0920192b470cae1c0bc9d986e2ab7ce45ea7e161b461c661553",
+      "fixtures.py": "6e58ebdeba2ad49f97a75dd9120e5e1e8b91ff6830209526a3c284108df00efe",
+      "journal.py": "37a668a3fe56ad9e8b13a81fd941deeb5cc6dc5b7be82067cc862e9ec6aa3157",
+      "model.py": "715852ceb94ff4e1fd3ee0b5537ded4eb530f21f55167f188e8e4e6039657c24",
+      "risk.py": "2bcbc371ca6c34e89a637ea5134db83af3671fa42f904de0ee4582734d1dce4f",
+      "strategy.py": "03c8d10aef11661d486433cff151de58b8a85bfd3e088bc23b0fc53c319238ae"
+    },
+    "wheel_sha256": "29cce34ff2b751ef9a9d305d3b7591281a6028c0057e360c9eb666b0840fed64"
+  },
+  "quant_personal_public_b1": {
+    "filename": "quant_personal_public_b1-0.8.0b1-py3-none-any.whl",
+    "modules": {
+      "__init__.py": "67dd1b37fb1e508be4d6ef4479ae13693b3fa37d876703eb09e45a66b7a0f0cd",
+      "__main__.py": "c9f7e8eb95e9ac066208a0fbf96e3a2db720abafdcb6eca4674ab60fdd1bd3db",
+      "archive.py": "7fa99ec1b1d2acab0a27b80e29fd4b4a00a402b1a2ad9767cc884a72fc963bd8",
+      "budget.py": "e253d9a936addf158f061849ed95d4b59d13c00b5e745aaf7dda14440f9ee4bf",
+      "cli.py": "2f7a2030667d20ef18763cc3dc4a0d640213a24e7c1dc329c08be809cf9b5c55",
+      "clock.py": "ccd9e46e6d9a5d53e048b77e2e5a2ed9eac04c5d5f09ce1e7f1e06bba118369a",
+      "compat.py": "19f4528ab2c8b38af13e31614a341e5c7786de77d30d33a8cec6af8d253e108d",
+      "fixture.py": "2158075272c6b9577f905a26fa6c02c0c1ed69150ad15363974a1b197ecc9d00",
+      "live.py": "06452a96aeacaf9bdfb0a0f817dd17c06ff2468c32a84ed8fe0c8727a2ab8143",
+      "normalize.py": "247508f396056833acf7ed90359cd2413f74fad90455f6026f70a9415062328e",
+      "policy.py": "893f63d85b11f5ca2b378cc086bf13408fb91077199f0e2b237ed1173969a2e6",
+      "runtime.py": "3a8e8796e82b51378a7948d59b81d5ffe5556b2510eb36b8c76c7bfc3c521dfa",
+      "session.py": "61645fcd02ab8163bfa681e316ca2cb1b2de75d76a199d8d94ed4d214b3f101d",
+      "store.py": "e04efd0d8dd86add9f50326ef228a92b897c5bbb4d0e4f98a012d01794c8398e",
+      "wire.py": "9fcbd0b7e44b5da3478c1f82bee104d3d19b60be466f95fb99d63b85a38f3b8c"
+    },
+    "wheel_sha256": "19d89bd87721733dbe05a1298f157e8ea15258fd1d4b981dd5e11e34b05a544f"
+  },
+  "quant_personal_public_bridge_b4": {
+    "filename": "quant_personal_public_bridge_b4-0.8.0b4-py3-none-any.whl",
+    "modules": {
+      "__init__.py": "14ac45f59ec82a41118008f0748cb091d9bcd538344bf9e2a4ece6112efc8b84",
+      "__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "admission.py": "e9e3e76f19c30b3a6d441d689626c3593b76943466aa6251309a1d06dc7f2d00",
+      "cli.py": "a8c18bf166ebb94c93e935128f5477c197b7e0c7d33ef436888fb285aa61b2e8",
+      "collector.py": "c12cfebb699ec44e56fd29624fad82c0dcec71b374a625a50bf586dddd4c4dff",
+      "decision.py": "887cac7e73332c895c8851cbba2486eeae8cddcf6f2a1e0ed5a188f103b5f725",
+      "demo.py": "e15e5fa2ce7402aba38daba248d73fa8fb14681f52644025c217560f64e20009",
+      "fixtures.py": "b15a8da93adc863e32335a0efeeaeda260314ef74a9bb3e23ddbac3da4c13050",
+      "live.py": "3d983c661099f4ea088255bdb9f4271d1f5996aaea4b998f7ce97a6e44cef3a8",
+      "normalize.py": "cf1fa4e476b81497ab3ef7ef970df4e41ff89664ff4dda47ffc894b27474aef0",
+      "routes.py": "fc15b536d9fd73c4b8427d696afdbe77ce3758a7db9c4842c693cafcfae313c4",
+      "session.py": "aa6c7150ef7c8be8cee7ee6c9549b42fe20e3f170a7d6c47a78f2066827024b6",
+      "source.py": "b65d6d276c8fef10a2ff699acf54a52bc004e3fabd35bf470d4a3483e88e1baa",
+      "transport.py": "3e7c637f6a621086ab67fd95ba9aba7c74f449a040ff47d928997616775b7c91"
+    },
+    "wheel_sha256": "c30332d0028b14f2c7ee89ef941be3e9d51f1ff500231bb9cbcaae95a63c7710"
+  }
+}

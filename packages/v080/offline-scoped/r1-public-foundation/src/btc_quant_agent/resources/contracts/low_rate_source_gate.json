@@ -1,0 +1,58 @@
+{
+  "acceptance": {
+    "availability": "At least 99.5% expected qualified closes durably available within 300s; every missing/late period produces explicit non-actionable state. Percentage never permits acting on a bad bar.",
+    "benchmark": "Predeclared seed/workload/hardware/storage, repeated low-rate/coincident-close/backfill/slow-disk/contention/crash runs; report p50/p95/p99/max, counts, loss, duplicates and CPU/disk",
+    "close_to_decision": "<= 300s after completed native close with explicit causal availability; processing SLA is not a human response deadline",
+    "correctness": "Zero fabricated bars, unresolved duplicate decisions, symbol/interval/unit mismatches or silently filled gaps; verify native completed flags and OHLCV against independently auditable source receipts",
+    "durability": "Every admitted receipt charged/committed exactly once; decision, prefix, watermark and snapshot transactionally bound; crash at each commit boundary cannot lose/duplicate admissions",
+    "receipt_to_durable": "p99 <= 2s, max <= 10s on declared hardware/filesystem with counts/repeats and injected stalls",
+    "recovery": "<= 300s after source return, subject to complete prefix, integrity and backfill caps; no signals from unresolved catch-up",
+    "safety": "Queue exhaustion, disk/quota failure, wall discontinuity, bad TLS, denial, integrity mismatch or stale/missing period hard-stop/withhold new review states"
+  },
+  "gate_version": "LOW_RATE_CLOSED_BAR_V1",
+  "high_rate_exclusion_proof": [
+    "allowlisted active src has no PublicTransport/PublicEngine/selector/bridge acquisition modules",
+    "quant entrypoint exposes offline swing commands only",
+    "frozen source guard references outside import path"
+  ],
+  "historical_M1B": "PARTIAL_MULTIPLE remains; sustained150/s and checkpoint failures not reclassified",
+  "independent_live_dependencies": [
+    "new source-specific genuine signed grant",
+    "venue/access eligibility",
+    "reviewed correct official endpoints and units",
+    "native source evidence within permitted windows",
+    "no reuse or extension of old grants",
+    "no local synthetic qualification promotion"
+  ],
+  "measurement_window": "At least seven calendar days of independently audited qualified native close events per symbol/timeframe; maintenance and denial remain in the declared denominator",
+  "retained_invariants": {
+    "BBO_queue_hard_stop": 128,
+    "TLS_CERT_REQUIRED_and_hostname": true,
+    "fail_closed": true,
+    "per_frame_durable_accounting": true,
+    "source_time_integrity": true,
+    "sticky_wall_discontinuity_ms": 50
+  },
+  "source_qualified": false,
+  "status": "FROZEN_SPEC_NOT_SOURCE_QUALIFIED",
+  "supersedes_only": "NEW swing release acceptance when old sustained BBO/high-rate components are outside the active critical path",
+  "synthetic_microbenchmark": "audit/low_rate_microbenchmark_final.json; engineering contract/store timing only, bound to final code hashes",
+  "workload": {
+    "150_per_second_required": false,
+    "BBO_required": false,
+    "coincident_close_burst_bars": 9,
+    "if_BBO_retained": "Original 128 queue, sticky 50ms wall stop, durable per-frame accounting and TLS stay binding; low-rate bars do not waive its source-specific acceptance",
+    "normal_arrivals": "3 completed 1H bars/hour, plus 3 completed 4H bars/4h and 3 completed 1D bars/day",
+    "resumption_burst_cap_bars": 4096,
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT"
+    ],
+    "timeframes": [
+      "1H",
+      "4H",
+      "1D"
+    ]
+  }
+}

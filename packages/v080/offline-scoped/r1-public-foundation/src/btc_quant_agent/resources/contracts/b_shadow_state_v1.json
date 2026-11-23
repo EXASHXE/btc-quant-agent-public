@@ -1,0 +1,26 @@
+{
+  "schema_version": "V070_B_SHADOW_STATE_V1",
+  "purpose": "Append-only B qualification/lifecycle projection; original Program A decision and snapshot V1 records remain immutable.",
+  "states": [
+    "NO_SETUP", "WATCH", "ARMED", "CANCELED", "INVALIDATED", "EXPIRED",
+    "SOURCE_BLOCKED", "UNKNOWN", "NO_CHASE", "MISSED_ENTRY", "NO_FILL", "TIME_STOP"
+  ],
+  "envelope": {
+    "fields": ["schema_version", "state_id", "episode_id", "decision_digest", "revision", "status", "source_status", "reason", "at_ms", "account", "actual_fill"],
+    "source_status": ["SYNTHETIC", "NATIVE_UNQUALIFIED", "UNKNOWN"],
+    "account": "ACCOUNT_UNKNOWN/ACCOUNT_VETO",
+    "actual_fill": false,
+    "persistence": "SQLite append-only per-state revision chain with digest and previous-digest binding"
+  },
+  "migration": {
+    "from": "V070_PROGRAM_A_SNAPSHOT_V1 and existing rc_decisions/rc_episodes rows",
+    "to": "V070_B_SHADOW_STATE_V1",
+    "behavior": "Create a sidecar state envelope from each existing immutable decision if no B envelope exists; never rewrite/delete V1 records.",
+    "idempotency_key": "V070_B_SHADOW_STATE_V1_FROM_RC_V1"
+  },
+  "transition_safety": {
+    "terminal_immutable": ["CANCELED", "INVALIDATED", "EXPIRED", "NO_CHASE", "MISSED_ENTRY", "NO_FILL", "TIME_STOP"],
+    "SOURCE_BLOCKED": "Append-only non-actionable state; cannot activate or re-arm an episode.",
+    "UNKNOWN": "Append-only unknown state; no neutral imputation or outcome inference."
+  }
+}

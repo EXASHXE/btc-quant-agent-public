@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quant-personal-account-b3"
+version = "0.8.0b3"
+requires-python = ">=3.11"
+dependencies = ["quant-personal-decision-b2==0.8.0b2"]
+description = "Offline PERSONAL_MVP private-user-data client, reconciliation, and B2 account-aware overlay"
+
+[project.scripts]
+quant-account-b3 = "quant_personal_account_b3.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["quant_personal_account_b3"]
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B"]
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_untyped_defs = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["quant_personal_decision_b2", "quant_personal_decision_b2.*", "quant_personal_public_b1", "quant_personal_public_b1.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

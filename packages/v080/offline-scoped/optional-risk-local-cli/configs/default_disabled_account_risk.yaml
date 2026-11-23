@@ -1,0 +1,37 @@
+schema_version: "OPTIONAL_ACCOUNT_RISK_CONFIG_V1"
+config_version: "1.0.0"
+policy_reference: "V080-OWNER-PERSONAL-WSL2-KR-OPTIONAL-RISK-20261122"
+review_status: "PROPOSED_NOT_PRODUCTION_POLICY"
+source: "OWNER_LOCAL_DISABLED_DEFAULT"
+layer2_private_user_data: "DISABLED"
+layer3_trade_execution: "DISABLED"
+
+account_risk:
+  enabled: false
+  per_trade_default: "0.02"
+  per_trade_max: "0.03"
+  selected_per_trade_risk: "0.02"
+  explicit_above_default_risk_selected: false
+  btc_eth_default_leverage: "10"
+  btc_eth_normal_band: ["10", "15"]
+  btc_eth_exceptional_max: "20"
+  sol_other_default_leverage: "10"
+  sol_other_max_leverage: "15"
+  selected_leverage_by_symbol:
+    BTCUSDT: "10"
+    ETHUSDT: "10"
+    SOLUSDT: "10"
+  explicit_exceptional_leverage_selected: false
+  daily_stop: "0.06"
+  daily_halt: "0.08"
+
+provisional_rules:
+  day_boundary:
+    convention: "00:00_UTC_TO_NEXT_00:00_UTC"
+    status: "PROPOSED"
+  cashflow_adjustment:
+    formula: "max(0,(E0-(Et-F))/E0)"
+    status: "PROPOSED"
+  portfolio_exposure_aggregation:
+    rule: "OPEN_POSITIONS_INCREMENTAL_DOWNSIDE_PLUS_CANDIDATE_UNDER_6PCT_HEADROOM"
+    status: "PROPOSED"

@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quant-personal-public-bridge-b4"
+version = "0.8.0b4"
+description = "Offline public-source admission, causal replay and market decisions for QUANT"
+requires-python = ">=3.11"
+dependencies = ["quant-personal-public-b1==0.8.0b1", "quant-personal-decision-b2==0.8.0b2"]
+
+[project.scripts]
+quant-public-b4 = "quant_personal_public_bridge_b4.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

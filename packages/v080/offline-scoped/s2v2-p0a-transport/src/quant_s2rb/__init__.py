@@ -1,0 +1,11 @@
+"""Default-disabled release derivative for the two-request S2 Canary."""
+
+from quant_s2v2 import CLOSED as CLOSED
+
+HOST = "fapi.binance.com"
+FIXTURE_HOST = "canary.s2v2.test"
+LIVE_EVIDENCE = "PERSONAL_PUBLIC_MARKET_GENUINE"
+FIXTURE_EVIDENCE = "SYNTHETIC_LOCAL_HTTPS_QA_ONLY"
+SCHEMA = "S2V2_RELEASE_BOUND_CONTROLLER_GRANT_V1"
+LIVE_DOMAIN = b"QUANT/S2V2/RELEASE-BOUND/V1/live\n"
+FIXTURE_DOMAIN = b"QUANT/S2V2/RELEASE-BOUND/V1/loopback\n"

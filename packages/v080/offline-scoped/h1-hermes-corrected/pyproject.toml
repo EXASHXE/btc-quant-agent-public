@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quant-hermes-feishu-h1"
+version = "0.8.0.post1"
+description = "QUANT v0.8.0 H1 isolated offline Hermes + QUANT Contract V1 facade + Feishu outbox/chat integration"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+quant-hermes-h1 = "quant_hermes_feishu_h1.cli:main"
+
+[project.entry-points."hermes_agent.plugins"]
+quant-v080-readonly = "quant_hermes_feishu_h1.hermes_plugin"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+quant_hermes_feishu_h1 = ["hermes_plugin/plugin.yaml"]
+
+[tool.ruff.lint.per-file-ignores]
+"hermes-plugin/quant-v080-readonly/__init__.py" = ["N999"]

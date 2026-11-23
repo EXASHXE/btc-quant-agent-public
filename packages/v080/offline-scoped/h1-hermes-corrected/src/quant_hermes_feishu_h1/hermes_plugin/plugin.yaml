@@ -1,0 +1,15 @@
+name: quant-v080-readonly
+version: "0.8.0.post1"
+description: QUANT v0.8.0 read-only local V1 tools and guardrails via authenticated QuantFacade UDS (no direct DB or TRADE)
+author: QUANT v0.8.0 H1
+provides_tools:
+  - list_active_signals
+  - get_signal_detail
+  - get_market_context
+  - get_latest_reprice
+  - get_signal_history
+  - get_strategy_summary
+  - request_reprice
+provides_hooks:
+  - pre_tool_call
+  - pre_gateway_dispatch

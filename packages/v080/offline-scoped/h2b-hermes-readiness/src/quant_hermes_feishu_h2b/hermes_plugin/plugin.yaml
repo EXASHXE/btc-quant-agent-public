@@ -1,0 +1,14 @@
+name: quant-v080-h2b-readonly
+version: "0.8.0b2"
+description: QUANT v0.8.0 H2-B default-deny Hermes + Feishu readiness plugin exposing ONLY the six read-only V1 tools and fail-closed guards
+author: QUANT v0.8.0 H2-B
+provides_tools:
+  - list_active_signals
+  - get_signal_detail
+  - get_market_context
+  - get_latest_reprice
+  - get_signal_history
+  - get_strategy_summary
+provides_hooks:
+  - pre_tool_call
+  - pre_gateway_dispatch

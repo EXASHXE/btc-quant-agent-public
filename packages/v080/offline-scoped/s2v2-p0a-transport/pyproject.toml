@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quant-s2v2-release-bound"
+version = "0.8.0a2"
+requires-python = ">=3.12"
+dependencies = ["quant-s2v2-offline==0.8.0a1"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+quant_s2rb = ["dependency_hashes.json", "fixture_public_keys.json"]

@@ -1,0 +1,22 @@
+{
+  "advisory_use_and_cache": {
+    "path": "usage_and_cache.json",
+    "sha256": null
+  },
+  "eligibility": {
+    "path": "eligibility.json",
+    "sha256": null
+  },
+  "holdout_exclusions": {
+    "path": "excluded_dates.json",
+    "sha256": null
+  },
+  "operational_rolling_lookback_only": true,
+  "policy_sha256": "340c3c2b0f7788203b8fdcab36b74fdd982a4d3d7e276b03a69fe681511707ba",
+  "proxy": null,
+  "region": "UNKNOWN",
+  "retention_days": 1,
+  "reviewer_reference": "REPLACE_WITH_INDEPENDENT_APPLICABILITY_REVIEW",
+  "schema_version": "J_OPERATIONAL_ACCESS_V1",
+  "status": "UNVERIFIED"
+}

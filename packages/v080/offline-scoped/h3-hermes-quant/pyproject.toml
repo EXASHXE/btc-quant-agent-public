@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quant-hermes-h3"
+version = "0.8.0a3"
+requires-python = ">=3.11"
+dependencies = [
+  "quant-personal-live-public-b5==0.8.0b5.post1",
+  "quant-personal-decision-b2==0.8.0b2",
+  "quant-hermes-feishu-h1==0.8.0.post1",
+  "quant-hermes-feishu-h2b==0.8.0b2",
+]
+
+[project.scripts]
+quant-hermes-h3 = "quant_hermes_h3.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quant-hermes-feishu-h2b"
+version = "0.8.0b2"
+description = "QUANT v0.8.0 H2-B default-deny Hermes + Feishu live-readiness integration adapter built on accepted H1 0.8.0.post1"
+requires-python = ">=3.11"
+dependencies = ["quant-hermes-feishu-h1==0.8.0.post1"]
+
+[project.scripts]
+quant-hermes-h2b = "quant_hermes_feishu_h2b.cli:main"
+
+[project.entry-points."hermes_agent.plugins"]
+quant-v080-h2b-readonly = "quant_hermes_feishu_h2b.hermes_plugin"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+quant_hermes_feishu_h2b = ["hermes_plugin/plugin.yaml"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint.per-file-ignores]
+"hermes-plugin/quant-v080-h2b-readonly/__init__.py" = ["N999"]

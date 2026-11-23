@@ -1,0 +1,19 @@
+{
+  "control_pool": [],
+  "episodes": [],
+  "evaluation_asof_ms": 1893456001000,
+  "export_sha256": "743fef520a8c2effbfd64130566f598fa9a6ee4b02d4213db908a7dc89658eb2",
+  "historical_bounded": false,
+  "native_admission": null,
+  "no_setup_decision_count": 3,
+  "protocol_sha256": "5f6a4c583b79d7e04af54aa1c6a321e888e3041598edbdf6f0a53d744ec17429",
+  "schema_version": "C_SOURCE_NEUTRAL_EPISODE_EXPORT_V1",
+  "source_kind": "SOURCE_SYNTHETIC",
+  "synthetic_manifest": {
+    "clock": "FABRICATED_2030_UTC",
+    "generator_sha256": "7a62388c48b76fbc1e8a792cad10daea26ac743d485bfff8ccc79d569428b7e5",
+    "meaning": "Controlled QA geometry and paths, not actual S1 signals or market outcomes",
+    "origin": "FABRICATED_QA_NO_MARKET_DATA",
+    "seed": 70001
+  }
+}

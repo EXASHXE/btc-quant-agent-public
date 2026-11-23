@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quant-optional-risk-cli"
+version = "0.8.0a1"
+description = "Versioned optional account-risk config contract, synthetic overlay boundary, and local WSL2 read-only Core CLI"
+requires-python = ">=3.11"
+dependencies = ["quant-personal-decision-b2==0.8.0b2"]
+
+[project.scripts]
+quant-local-cli = "quant_optional_risk_cli.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["quant_optional_risk_cli"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

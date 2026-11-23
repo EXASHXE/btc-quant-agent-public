@@ -1,0 +1,43 @@
+{
+  "schema_version": "V070_B_PROGRAM_C_EPISODE_EXPORT_V1",
+  "parent_contract": "PROGRAM_C_OPPORTUNITY_EVALUATION_HANDOFF_V1",
+  "source_neutral": true,
+  "evaluator_run": false,
+  "study_created": false,
+  "immutable_binding": ["contract_sha256", "decision_digest", "causal_prefix_sha256", "source_manifest_sha256", "row_sha256", "export_sha256"],
+  "required_episode_fields": [
+    "episode_id", "strategy_version", "symbol", "direction", "regime", "source_type",
+    "source_manifest_sha256", "source_receipt_bindings", "causal_prefix_sha256", "decision_digest", "bar_interval_convention",
+    "source_closed_through_ms", "source_event_ms", "received_ms", "available_ms", "durable_ms", "decision_ms",
+    "trigger_close_ms", "scheduled_review_ms", "review_delay_ms", "review_delay_status",
+    "processing_close_to_decision_latency_ms", "processing_available_to_decision_latency_ms",
+    "scheduled_human_review_delay_ms", "scheduled_human_review_delay_status", "entry_region", "structural_stop",
+    "volatility_buffer", "execution_buffer", "fixed_preobservable_target_zones", "expiry_ms",
+    "holding_horizon_hours", "account_veto", "rule_reasons", "coverage_gaps", "planned_R",
+    "planned_gross_R", "planned_after_cost_R", "modeled_after_cost_R", "executable_R",
+    "executable_R_status", "cost_assumption", "planned_cost_per_unit", "cost_assumptions", "cost_sensitivity",
+    "modeled_after_cost_R_semantics", "confidence", "observation_status", "observation_history",
+    "observation_outcome", "observation_asof_ms",
+    "observation_prefix_sha256", "observation_receipt_manifest_sha256", "observation_source_event_ms",
+    "observation_received_ms", "observation_available_ms", "observation_durable_ms", "observation_coverage_end_ms",
+    "observation_required_end_ms", "right_censored", "observation_reasons", "economic_evidence",
+    "row_sha256"
+  ],
+  "outcomes": [
+    "TARGET_FIRST", "STOP_FIRST", "TIME_STOP", "NO_FILL", "MISSED_ENTRY",
+    "AMBIGUOUS_OHLC_ORDER_UNKNOWN", "MISSING_COVERAGE", "RIGHT_CENSORED",
+    "INSUFFICIENT_FUTURE_HORIZON"
+  ],
+  "risk_separation": {
+    "planned_R": "Ex-ante gross geometric R from frozen structure",
+    "modeled_after_cost_R": "Ex-ante geometric projection only; not an observed return",
+    "executable_R": "Always null with status UNKNOWN in this export",
+    "processing_close_to_decision_latency_ms": "decision_ms minus source_closed_through_ms; measured pipeline latency",
+    "processing_available_to_decision_latency_ms": "decision_ms minus available_ms; measured post-availability pipeline latency",
+    "scheduled_human_review_delay_ms": "NULL/NOT_MEASURED unless actual human review response evidence exists",
+    "cost_sensitivity": "Structured frozen base assumptions and explicitly NOT_RUN adverse cases; no sensitivity result is implied",
+    "confidence": "Rule evidence only; never a probability",
+    "censoring": "Retain explicit right-censored and insufficient-horizon outcomes"
+  },
+  "prohibitions": ["No Program C evaluator", "No study or PRIMARY registration", "No alpha/economic claim", "No independent-sample duplication"]
+}

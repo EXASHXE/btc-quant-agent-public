@@ -1,0 +1,11 @@
+**/.qa/
+**/.venv/
+**/evidence/
+**/dist/
+**/build/
+**/__pycache__/
+**/*.whl
+**/*.db
+**/*.sqlite*
+**/*.pem
+**/*.key
