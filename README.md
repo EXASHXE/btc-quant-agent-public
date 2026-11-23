@@ -1,5 +1,16 @@
 # QUANT v0.8.0 — Current Documentation Baseline
 
+## Source code publication — 2026-11-23
+
+The executable-source branch v0.8.0 now contains a reviewable, source-only
+export (commit c35445acfb07e9a8fbcccb51f2a6c860d6af40dc):
+
+- [12 Controller-scoped OFFLINE accepted source snapshots](https://github.com/EXASHXE/btc-quant-agent-public/tree/v0.8.0/packages/v080/offline-scoped) — source, test/tool files, per-file SHA256 manifest and local Controller receipt references.
+- [S3 post4 Worker-ready review candidate](https://github.com/EXASHXE/btc-quant-agent-public/tree/v0.8.0/packages/v080/review-candidates/s3-post4) — not independently accepted at source-export time. Its 337 tests/14 default-deny cases were **worker-reported**, not Controller accepted.
+
+**This is a documentation/discovery pointer, not a new runtime build, test acceptance, provider scope or live authorization.** Original sealed workroots, actual Controller JSON, private evidence, production credentials, account data and raw QA logs remain local and were not published. The previously recorded Controller test/code HEAD values refer to their original acceptance baselines; this new export-only commit does not retroactively rewrite those receipts.
+
+
 
 ## Active v0.8.0 checkpoint (2026-11-23 02:27 +08:00)
 
