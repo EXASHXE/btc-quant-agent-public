@@ -1,11 +1,11 @@
-# QUANT v0.8.0 — Active Role Matrix (updated 2026-11-23)
+# QUANT v0.8.0 — Active Role Matrix (Owner role handoff 2026-11-23 21:20 +08:00)
 
 
 ## Current routing checkpoint — 2026-11-23 02:27 +08:00
 
 **WORKER HANDOFF (2026-11-23 ~02:52; not Controller acceptance):** Neon S3 isolated workroot has CONTROLLER_HANDOFF.md with READY_FOR_CONTROLLER_REVIEW_S3_ZERO_RETRY_OFFLINE; the worker reports 337/337 test invocations, 14/14 default-deny probes and a byte-reproducible post4 wheel. No later 0-C S3 acceptance was present in the inspected Controller directory. Treat all 337 PASS as WORKER_REPORTED until independent 0-C QA/review; do not redispatch the S3 implementation.
 
-P0A S2 transport and P0B KR/WSL2 evidence accepted in their **OFFLINE** scopes. **AGY Neon XHigh is the actively dispatched S3 zero-retry offline executor** (Controller decision `V080_CONTROLLER_NEON_S3_ZERO_RETRY_OFFLINE_ENGINEERING_DISPATCH_20261123.json`). Do not reassign to Sol without a new legitimate decision. **Gemini Neon may be a candidate advisory/backup Controller under explicit Owner handoff; a Neon Worker may not self-accept.** See [verified progress](../project/V080_PROGRESS_AND_NEXT_GATES_20261123.md).
+P0A S2 transport and P0B KR/WSL2 evidence accepted in their **OFFLINE** scopes. **AGY Neon XHigh is the actively dispatched S3 zero-retry offline executor** (Controller decision `V080_CONTROLLER_NEON_S3_ZERO_RETRY_OFFLINE_ENGINEERING_DISPATCH_20261123.json`). Do not reassign to Sol without a new legitimate decision. **Owner has now appointed the separate Gemini 4 Neon WEB CHAT as the fused 1-A/0-C Controller; local AGY Neon stays a Worker. ChatGPT GPT-6 Sol is its independent second reviewer. No worker self-acceptance.** See [verified progress](../project/V080_PROGRESS_AND_NEXT_GATES_20261123.md).
 
 **Mandatory prompt format:** Owner discussion Chinese; every *agent-facing* prompt (including new chats) **English** by default, one functional complete-copy card per prompt, not a summary/link/fake button. No role recommendation grants real provider access.
 
@@ -13,13 +13,15 @@ P0A S2 transport and P0B KR/WSL2 evidence accepted in their **OFFLINE** scopes. 
 | Role | Responsibility | Boundary |
 |---|---|---|
 | Owner | Product and permission authority; may directly START a specifically identified, bounded OFFLINE engineering task by explicitly forwarding it to a worker; separate live/privileged approvals remain mandatory | Do not infer authorization from a draft file or a previous chat; no secrets or automatic trading permission |
+| **Gemini 4 Neon WEB CHAT — 1-A + Controller 0-C** | **Active, sole project advisory + Controller queue owner:** product/quant analysis, roadmap, complete worker prompts, task routing, actual Controller dispatch and final scoped evidence acceptance | One queue; obtain independent evidence and ChatGPT Sol challenge; especially no sole acceptance of local Neon-authored work. No automatic live or trade authority |
+| **ChatGPT GPT-6 Sol — Independent Reviewer** | Second-party code, architectural, defect and acceptance challenge of web Neon decisions; independent QA when available | Review-only; separate from local Sol Worker; no queue ownership, dispatch, implementation, self-acceptance or live grants |
 | GPT-6.2 Astra | Chief architecture and strategy role; cross-module design, critical technical decisions, threat models and independent challenge of Sol's design | Advises/reviews; does not dispatch, implement by default or self-accept |
-| GPT-6.2 Sol | Primary engineering executor: public/private API adapters, data engine, strategy implementation, integration and difficult bug fixes | Implements scoped task in isolated workspace; no live calls/credentials during offline task; no self-acceptance |
-| GPT-6.2 Sol Max | High-intensity implementation lane within the Sol engineering role for cross-module or unusually complex changes | Not a separate queue or controller; same Sol scope and acceptance boundaries |
-| Gemini Neon | Peer-level alternative complex engineering executor to GPT-6.2 Sol; used when Sol quota/capacity is insufficient or for approved independent parallel packages | Same engineering/evidence/acceptance bar as Sol; isolated worktree and non-overlapping write set; not architecture authority or self-acceptance |
+| Local GPT-6.2 Sol | Primary engineering executor: public/private API adapters, data engine, strategy implementation, integration and difficult bug fixes | Implements scoped task in isolated workspace; no live calls/credentials during offline task; no self-acceptance |
+| Local GPT-6.2 Sol Max | High-intensity implementation lane within the Sol engineering role for cross-module or unusually complex changes | Not a separate queue or controller; same Sol scope and acceptance boundaries |
+| Local AGY Gemini Neon | Peer-level alternative complex engineering executor to GPT-6.2 Sol; used when Sol quota/capacity is insufficient or for approved independent parallel packages | Same engineering/evidence/acceptance bar as Sol; isolated worktree and non-overlapping write set; not architecture authority or self-acceptance |
 | Gemini 4 Hydrogen | Simple engineering, docs, fixtures, mechanical tests, routine lint/format and QA | Simple bounded work only; not a substitute for Sol/Neon on complex work; does not accept its own work |
-| Controller 0-C | Default dispatcher, sole queue/reconciliation owner and independent scoped acceptance authority; recognizes explicit Owner-direct offline starts as a separately labeled execution mode | Do not require a duplicate formal dispatch JSON for a task the Owner explicitly starts OFFLINE; never forge past receipts; live gates separate |
-| ChatGPT 1-A | Independent Owner-facing advisor; audits plans, challenges architecture, quantitative strategy and product tradeoffs, prepares prompts/docs on request | Not 0-C; does not dispatch or issue acceptance |
+| Controller 0-C (role, held by WEB Gemini 4 Neon) | Sole queue/reconciliation, formal dispatch and final scoped disposition after independent QA | Same active web Neon chat as 1-A, not a separate person/model; no self-review of local Neon work; historical Controller receipts unchanged |
+| 1-A (function, held by WEB Gemini 4 Neon) | Product, architecture, quantitative strategy and engineering-efficiency review | Same web Neon Controller chat, not a separate ChatGPT adviser queue; advisory finding is not a dispatch by itself |
 | Layer 1 | Public market data client | No personal account key |
 | Layer 2 | Private signed USER_DATA GET client | Dedicated local read-only key; no non-GET route |
 | Layer 3 | Trade execution | Disabled; no key/client/routes |
@@ -32,8 +34,9 @@ P0A S2 transport and P0B KR/WSL2 evidence accepted in their **OFFLINE** scopes. 
 - Genuinely independent parallel engineering → Sol + Gemini Neon only with Controller-approved disjoint worktrees/write sets and one integration owner.
 - Cross-module high-intensity work when Sol is selected → GPT-6.2 Sol Max lane, still under Sol ownership.
 - Small deterministic fixtures/docs/mechanical QA → Gemini 4 Hydrogen.
-- Dispatch, queue control, independent audit and acceptance → Controller 0-C.
-- Independent Owner advice → ChatGPT 1-A.
+- Dispatch, queue control and final scoped acceptance → **Gemini 4 Neon WEB CHAT acting as Controller 0-C**, after independent technical review.
+- Independent Owner-facing advice → **same Gemini 4 Neon WEB CHAT in the 1-A function**.
+- Independent technical/audit review of that fused Controller → **ChatGPT GPT-6 Sol** (not local Sol executor).
 
 **Future QI1/QL1/QB1/QR1 routing (NOT_DISPATCHED):** Astra reviews the shared QI1 annotation and QL1 multi-axis event-schema fork and QB1/QR1 quantitative methodology; Sol is the preferred QL1 Core/event-store and H integration owner; Neon or Sol is suitable for the non-overlapping QI1 adapter; Hydrogen can own narrow deterministic fixtures. QB1/QR1 implementation needs separate scope and independent evaluation. See [Controller Trading Intelligence roadmap sync](../project/V080_CONTROLLER_TRADING_INTELLIGENCE_ROADMAP_SYNC_20261121.md). New roles and gates are **not** activated by this future allocation.
 
@@ -73,16 +76,18 @@ The new scope-limited offline acceptances are: Sol S2 V2 (55 PASS / 39 sealed); 
 | Gemini Neon | Minimal Owner-local KR/WSL2 evidence, reused collectors (no new framework); later disjoint AI adapter work | Use task-suitable lower effort for mechanical inventory; reserve XHigh for real complex implementation/conflicts |
 | Hydrogen | Feishu non-sensitive checklist, bounded documentation/fixture/QA | Simple/low-cost, no independent security architecture or activation |
 | Astra | No new S3 general architecture task while documentary A/B/C holds are unchanged; later material funding-contract/strategy-methodology fork | On-demand architecture challenge; not routine repeated review |
-| ChatGPT 1-A | Independent product/quality review, scope challenge, copy-ready 0-C/Worker Prompt drafts, project docs only at Owner request | Advisory; no task dispatch, signature, live grant or acceptance |
+| Historical 1-A (now fused into WEB Neon 0-C) | Original product/quality review, scope challenge and copy-ready prompts | Historical row only; web Neon holds both current functions, ChatGPT GPT-6 Sol reviews |
 
 **Prompt display is mandatory, not optional:** Every Owner-facing full Prompt (new chat/task/research/audit/revision) MUST appear in one copyable card with the **entire** version and a real **复制完整 Prompt / Copy Full Prompt** action/button where the UI permits it. When custom copy controls are unavailable, use a complete WritingBlock/CodeBlock with native copy facility. Do **not** claim a nonfunctional decorative button is clickable. Never supply only a URL, an excerpt or a separate summary instead of a copyable complete prompt. The canonical Markdown and copy payload must match exactly.
 
 Keep H-first, S5 field baseline before Pi P2. QI1/QL1 follow S5; QB1/QR1 afterward; neither these future packages nor real S4 is activated merely by updated role assignments.
 
-## Conditional Gemini 4 Neon advisor / Controller backup (not auto-activated)
+## Owner-appointed fused WEB Gemini 4 Neon Controller (effective 2026-11-23)
 
-The Owner may designate Gemini 4 Neon **High or XHigh** for an *independent advisory 1-A-style* review after it is given the canonical docs/engineering read-only bootstrap. **It is a functional alternative, not proof of identical judgment to ChatGPT 1-A.** The model may audit roadmap, architecture, quantitative reasoning and produce English task-copy cards. Check provenance, source citations, math and hallucination through real examples.
+The 2026-11-23 Owner decision supersedes the earlier **conditional backup/pilot** discussion. **Gemini 4 Neon WEB CHAT is now the combined 1-A and Controller 0-C**. **ChatGPT GPT-6 Sol** is the independent second reviewer. Local AGY Neon remains a complex engineering Worker and is NOT the Controller by virtue of sharing a model nickname. GPT-6.2 Sol stays the local complex engineering Worker; Astra and Hydrogen retain their engineering/architecture roles.
 
-**0-C replacement is stricter:** AGY Neon may be a temporary **backup Controller only after an explicit Owner role handoff**, with one active acceptance authority and documented changeover. A Neon implementation worker (including the presently dispatched S3 task) may NEVER be the sole independent Controller accepting its own work or the QA runner's same-family output. Require a separate reviewer/model or independently witnessed substantive QA; distinguish tool execution from final Controller acceptance. Prior Controller receipts remain immutable; no retroactive role reassignment, forged signatures, authority to trade or automatic live access.
+**Evidence and acceptance:** the web Neon Controller is the only active task queue/disposition writer. It must solicit/check independent ChatGPT Sol QA on important local Neon-authored packages, use additional cross-model/human challenge as appropriate for local Sol work, and resolve material concerns before final positive acceptance. A Controller is accountable for the signed scoped disposition but cannot turn Worker PASS into independent review or retroactively re-sign earlier decisions.
 
-**MCP / tool profile:** Desktop Commander Remote MCP already supplies file, local git and shell operations, so no extra filesystem MCP is required. Optional: an authenticated GitHub MCP for remote branch/PR/commit review and a trustworthy web/documentation search MCP for current official provider evidence. Keep production credentials/provider network tools disabled; use separate read-only Controller role/policy for access. Antigravity does not inherit ChatGPT's native copy-card UI or connected apps automatically. A genuine MCP App (`ui://` interactive viewer) may be built for copy cards if the selected AGY client supports it; otherwise use full English Markdown fenced prompt with native copy. Never claim an inert plain Markdown link is a copy button.
+**Tools and copy UX:** Desktop Commander Remote MCP can inspect authorized local code and evidence when connected; GitHub and trustworthy official documentation can supplement it. Never assert access to unavailable local files or paste sensitive data into an LLM. Complete English task prompts must have a real copy action when the host supports it or a complete native-copy fenced fallback. No role change authorizes real Binance, Feishu, private accounts, production signer or TRADE.
+
+**Historical note:** Previous suggestions to pilot Neon as a backup, and former ChatGPT 1-A/0-C separation, apply ONLY to earlier dates. Do not reinstate them as current requirements or create another queue.

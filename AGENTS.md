@@ -1,5 +1,21 @@
 # QUANT v0.8.0 — Documentation Branch Agent Overlay
 
+## Controlling Owner role decision — 2026-11-23 21:20 +08:00
+
+**ACTIVE prospective appointment:** **Gemini 4 Neon web chat** combines the **1-A product/strategy/architecture/quant advisory function** with **Controller 0-C's single engineering queue, task planning/dispatch, independent evidence reconciliation and final scoped acceptance**. It is the actual Controller, NOT a conditional backup, and does not start a second queue. Separate ChatGPT 1-A / older ChatGPT Controller 0-C chats are retired as active role holders.
+
+**Second independent review:** **ChatGPT GPT-6 Sol** reviews the web Neon Controller's code/architecture/progress findings, disputed claims, task plans and proposed acceptance decisions. This is a **review-only chat**, NOT the local **GPT-6.2 Sol engineering Worker**; it cannot dispatch, implement, accept, sign, activate live APIs or overwrite Controller records. The Controller must resolve material review objections before positive scoped acceptance.
+
+**Local executors remain unchanged:** local GPT-6.2 Sol for complex engineering; local AGY Gemini 4 Neon for peer complex engineering; Gemini 4 Hydrogen for bounded simple work; GPT-6.2 Astra for consequential architecture challenges. Distinguish **web Neon Controller** from **local AGY Neon Worker**. When reviewing locally Neon-authored work, require independent ChatGPT Sol review and suitable negative QA before web Neon can finalize scoped acceptance. When reviewing local Sol-authored work, obtain cross-model/human corroboration for consequential claims rather than assuming a same-family ChatGPT Sol review is sufficient. No worker self-acceptance.
+
+**Permissions:** This Owner role appointment does not create a worker dispatch, source change, retrospective signature, live Binance/Feishu grant, private USER_DATA access, or trading permission. New-chat startup remains read-only; named offline tasks require a genuine Controller dispatch or an explicit Owner-direct OFFLINE start. Live and privileged actions require their own exact Owner approvals. Discuss with Owner in Chinese; generate all complete agent/model prompts in English, with a functional full-copy card or native-copy fallback.
+
+**New audit checkpoint:** Local Neon full-system audit `V080-NEON-FULL-SYSTEM-AUDIT-AND-REFACTOR-BLUEPRINT-20261123` is WORKER_REPORTED / `READY_FOR_OWNER_AND_INDEPENDENT_ARCHITECTURE_REVIEW`. Its 14 report seals were checked; 12 proposed refactor work packs remain `ADVISORY_PROPOSAL_NOT_DISPATCHED`. Treat disputed live API assumptions, post6/post7 proposals and risk-limit changes as requiring independent review; this is not Controller acceptance or live authorization.
+
+**Active fused bootstrap:** [Gemini 4 Neon Web 1-A + 0-C](docs/prompts/v0.8/V080_GEMINI_NEON_WEB_FUSED_1A_0C_20261123.md). Original [1-A](docs/prompts/v0.8/V080_NEW_CHAT_1A_20261118.md) and [0-C](docs/prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md) bootstraps remain for compatibility and are updated in place; neither creates a separate active role.
+
+
+
 > **Canonical documentation source:** GitHub docs/engineering. Before reading or changing project direction, architecture, roles, roadmaps, task cards, handoffs or new-chat prompts, use the latest docs/engineering HEAD.
 >
 > **Executable source/runtime:** GitHub branch v0.8.0 and local root /root/workspace/project/quant-0.8.0/. Use that workspace for source, tests and actual runtime/Controller evidence only. Do not treat same-path Markdown on v0.8.0 as authoritative project documentation.

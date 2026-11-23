@@ -1,8 +1,10 @@
 # QUANT v0.8.0 — Owner-Facing Prompt Copy Card Standard (2026-11-18)
 
+**Owner 2026-11-23 role update:** The web Gemini 4 Neon chat is the combined active 1-A/0-C; ChatGPT GPT-6 Sol provides independent review, distinct from local Sol engineering. This presentation standard applies unchanged; it does not grant execution or live capabilities.
+
 - **Status:** ACTIVE
 - **Canonical branch:** docs/engineering
-- **Applies to:** ChatGPT 1-A, Controller 0-C and all Owner-facing prompt authors
+- **Applies to:** Gemini 4 Neon web (fused 1-A + 0-C), ChatGPT GPT-6 Sol independent reviewer, and all Owner-facing prompt authors
 - **Authority:** Owner instruction; presentation rule only.
 
 This standard governs how complete prompts are presented to the Owner. It does not grant dispatch authority, implementation permission, API access, credential access, acceptance authority or trading permission.

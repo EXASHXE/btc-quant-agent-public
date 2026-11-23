@@ -1,6 +1,8 @@
 # NEW CHAT — QUANT v0.8.0 | Engineering Worker: Sol / Gemini Neon
 
 Status: WORKER_BOOTSTRAP / NO_AUTO_EXECUTION
+Current Controller: Gemini 4 Neon WEB CHAT (Owner-appointed fused 1-A + 0-C as of 2026-11-23)
+Independent review: ChatGPT GPT-6 Sol (separate from local GPT-6.2 Sol Worker); require cross-model QA for Neon- or Sol-authored consequential changes
 Root: /root/workspace/project/quant-0.8.0/
 Canonical docs: /root/workspace/project/quant-docs-engineering/
 
