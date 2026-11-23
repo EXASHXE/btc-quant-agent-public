@@ -1,6 +1,14 @@
 # QUANT v0.8.0 — Active Role Matrix (updated 2026-11-23)
 
-Current routing authority: [V080 Model Routing Policy](../project/V080_MODEL_ROUTING_POLICY_20261119.md).
+
+## Current routing checkpoint — 2026-11-23 02:27 +08:00
+
+**WORKER HANDOFF (2026-11-23 ~02:52; not Controller acceptance):** Neon S3 isolated workroot has CONTROLLER_HANDOFF.md with READY_FOR_CONTROLLER_REVIEW_S3_ZERO_RETRY_OFFLINE; the worker reports 337/337 test invocations, 14/14 default-deny probes and a byte-reproducible post4 wheel. No later 0-C S3 acceptance was present in the inspected Controller directory. Treat all 337 PASS as WORKER_REPORTED until independent 0-C QA/review; do not redispatch the S3 implementation.
+
+P0A S2 transport and P0B KR/WSL2 evidence accepted in their **OFFLINE** scopes. **AGY Neon XHigh is the actively dispatched S3 zero-retry offline executor** (Controller decision `V080_CONTROLLER_NEON_S3_ZERO_RETRY_OFFLINE_ENGINEERING_DISPATCH_20261123.json`). Do not reassign to Sol without a new legitimate decision. **Gemini Neon may be a candidate advisory/backup Controller under explicit Owner handoff; a Neon Worker may not self-accept.** See [verified progress](../project/V080_PROGRESS_AND_NEXT_GATES_20261123.md).
+
+**Mandatory prompt format:** Owner discussion Chinese; every *agent-facing* prompt (including new chats) **English** by default, one functional complete-copy card per prompt, not a summary/link/fake button. No role recommendation grants real provider access.
+
 
 | Role | Responsibility | Boundary |
 |---|---|---|
@@ -49,11 +57,11 @@ A prompt file by itself is not a dispatch. For bounded offline work, Owner may e
 
 See [V080 Model Routing Policy](../project/V080_MODEL_ROUTING_POLICY_20261119.md) for quota fallback, parallel execution requirements, exact model-identity recording and historical Argon attribution. The Owner's Neon routing decision applies prospectively; completed Gemini Argon records remain immutable.
 
-## 2026-11-21 H4 current engineering queue
+## Historical 2026-11-21 H4 engineering queue
 
 H4 S2–S5 consolidated readiness is independently accepted OFFLINE ONLY (336 independent PASS, 103 sealed files). For future Neon local readiness, Controller may prepare a formal dispatch or Owner may explicitly start scoped offline engineering with a full task card; do not impose both administrative paths. S2 genuine Canary remains BLOCKED_PRODUCTION/INPUT, S3 fundingRate history weight UNKNOWN, S4 real Feishu identity/callback blocked, S5 real end-to-end not observed. Pi P2 Owner-deferred. See [Project Home](../project/V080_PROJECT_HOME_20261118.md).
 
-## 2026-11-23 active stage assignments — authoritative 2026-11-22 22:23 receipts
+## Historical assignments — 2026-11-22 22:23; superseded by the 02:27 S3 dispatch
 
 The new scope-limited offline acceptances are: Sol S2 V2 (55 PASS / 39 sealed); Neon optional risk CLI (12 PASS / 36 sealed, disabled by default); Astra S3 documentary study (9 sealed, `d` UNKNOWN); plus Neon optional Feishu Mode0/1 local offline onboarding. See [verified progress and next gates](../project/V080_PROGRESS_AND_NEXT_GATES_20261123.md). No live S2/S3/S4/S5 or recurring operations have been authorized; the next-stage Controller note is `PLANNING_ONLY / new_dispatch_issued=false`.
 
@@ -70,3 +78,11 @@ The new scope-limited offline acceptances are: Sol S2 V2 (55 PASS / 39 sealed); 
 **Prompt display is mandatory, not optional:** Every Owner-facing full Prompt (new chat/task/research/audit/revision) MUST appear in one copyable card with the **entire** version and a real **复制完整 Prompt / Copy Full Prompt** action/button where the UI permits it. When custom copy controls are unavailable, use a complete WritingBlock/CodeBlock with native copy facility. Do **not** claim a nonfunctional decorative button is clickable. Never supply only a URL, an excerpt or a separate summary instead of a copyable complete prompt. The canonical Markdown and copy payload must match exactly.
 
 Keep H-first, S5 field baseline before Pi P2. QI1/QL1 follow S5; QB1/QR1 afterward; neither these future packages nor real S4 is activated merely by updated role assignments.
+
+## Conditional Gemini 4 Neon advisor / Controller backup (not auto-activated)
+
+The Owner may designate Gemini 4 Neon **High or XHigh** for an *independent advisory 1-A-style* review after it is given the canonical docs/engineering read-only bootstrap. **It is a functional alternative, not proof of identical judgment to ChatGPT 1-A.** The model may audit roadmap, architecture, quantitative reasoning and produce English task-copy cards. Check provenance, source citations, math and hallucination through real examples.
+
+**0-C replacement is stricter:** AGY Neon may be a temporary **backup Controller only after an explicit Owner role handoff**, with one active acceptance authority and documented changeover. A Neon implementation worker (including the presently dispatched S3 task) may NEVER be the sole independent Controller accepting its own work or the QA runner's same-family output. Require a separate reviewer/model or independently witnessed substantive QA; distinguish tool execution from final Controller acceptance. Prior Controller receipts remain immutable; no retroactive role reassignment, forged signatures, authority to trade or automatic live access.
+
+**MCP / tool profile:** Desktop Commander Remote MCP already supplies file, local git and shell operations, so no extra filesystem MCP is required. Optional: an authenticated GitHub MCP for remote branch/PR/commit review and a trustworthy web/documentation search MCP for current official provider evidence. Keep production credentials/provider network tools disabled; use separate read-only Controller role/policy for access. Antigravity does not inherit ChatGPT's native copy-card UI or connected apps automatically. A genuine MCP App (`ui://` interactive viewer) may be built for copy cards if the selected AGY client supports it; otherwise use full English Markdown fenced prompt with native copy. Never claim an inert plain Markdown link is a copy button.

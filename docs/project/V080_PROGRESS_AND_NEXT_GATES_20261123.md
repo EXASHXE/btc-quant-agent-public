@@ -1,7 +1,25 @@
 # QUANT v0.8.0 — Verified Progress, Evidence Boundaries and Next Gates (2026-11-23)
 
+
+## Current verified v0.8.0 Controller status — 2026-11-23 02:27 +08:00
+
+**WORKER HANDOFF (2026-11-23 ~02:52; not Controller acceptance):** Neon S3 isolated workroot has CONTROLLER_HANDOFF.md with READY_FOR_CONTROLLER_REVIEW_S3_ZERO_RETRY_OFFLINE; the worker reports 337/337 test invocations, 14/14 default-deny probes and a byte-reproducible post4 wheel. No later 0-C S3 acceptance was present in the inspected Controller directory. Treat all 337 PASS as WORKER_REPORTED until independent 0-C QA/review; do not redispatch the S3 implementation.
+
+**This is the active checkpoint, newer than the 2026-11-22 22:23 proposal. Always inspect newer original receipts and workroots.**
+
+- **P0A accepted OFFLINE ONLY:** `V080_CONTROLLER_P0A_S2V2_TRANSPORT_OFFLINE_SCOPED_ACCEPTANCE_20261123.json`; 40 source seals, 61 fresh transport tests + 55 parent tests and additional isolated QA. Loopback HTTPS transport is not a real Binance call.
+- **P0B accepted OFFLINE ONLY:** `V080_CONTROLLER_P0B_KR_WSL2_EVIDENCE_OFFLINE_SCOPED_ACCEPTANCE_20261123.json`; 19 seals and local synthetic dry run. KR product-specific venue applicability, direct WSL2 route, shared IP headroom and production identity remain unresolved; host clock and nonroot storage require attention.
+- **Joint reviewed:** `V080_CONTROLLER_P0_DUAL_QA_CONSOLIDATED_ACCEPTANCE_AND_QUEUE_20261123.json`. Do not recreate or redispatch accepted P0A/P0B packages.
+- **S3 actual new dispatch:** `V080_CONTROLLER_NEON_S3_ZERO_RETRY_OFFLINE_ENGINEERING_DISPATCH_20261123.json`; AGY Gemini 4 Neon XHigh, task `V080-NEON-S3-RELEASE-BOUND-ZERO-RETRY-OFFLINE-20261123`, issued 02:27. Status DISPATCHED_OFFLINE_ONLY, not yet accepted without a newer separate Controller receipt. The previous proposed Sol S3 task is superseded as an **assignment**, not as a product/source gate.
+- **Real S2/S3/S4/S5/S6:** no live Binance/Feishu/USER_DATA/TRADE permissions or observed genuine H human-use at this checkpoint. Historical fundingRate general IP debit `d` UNKNOWN; Plan A `39+3d` cannot be signed without authority. Pi P2 deferred and QI1/QL1/QB1/QR1 not dispatched.
+
+**Next priority:** Owner's exact venue eligibility for KR two public GETs, trusted Windows/WSL2 egress/clock/CA/UID/state, shared IP capacity, genuine release/key enrollment and *separately authorized* one-run S2 milestone. The Neon S3 zero-retry assignment is already active. Lightweight S4 Owner identity preparation may run independently without provider access.
+
+**Prompt presentation and language:** Answer Owner in **Chinese**; author **all full agent/model-facing prompts in English by default**, including 1-A/0-C new-chat, Sol/Neon/Astra/Hydrogen, research and independent QA. Every complete prompt must be in one functional copy-card with full payload and actual **Copy Full Prompt / 复制完整 Prompt** control where client supports it; otherwise native WritingBlock/CodeBlock Copy or full fenced-block fallback. Never simulate a button. A copy-card is not a dispatch or live authorization.
+
+
 - **Status:** 1-A OWNER-REQUESTED DOCUMENTATION SYNCHRONIZATION / ADVISORY; **not** a Controller acceptance, dispatch or production grant.
-- **Evidence checkpoint:** 2026-11-22 22:23 +08:00, plus direct read-only inspection of local Controller records, matching decision SHA256 values and existing sealed worker files.
+- **Historical evidence checkpoint:** 2026-11-22 22:23 +08:00, plus direct read-only inspection of local Controller records, matching decision SHA256 values and existing sealed worker files.
 - **Repository:** code/runtime branch `v0.8.0`; sole canonical documentation branch `docs/engineering`.
 - **Project purpose:** personal, noncommercial, read-only trading intelligence; 2–12 h holding; 1D→4H→1H→15m→5m; initial Binance USDT-M BTC/ETH/SOL. TRADE disabled.
 
@@ -43,7 +61,7 @@ Independent local SHA256 verification of the first four Controller files matched
 
 **S5:** no verified true source→Core→Hermes/Feishu→human-use episode. A genuine `NO_SETUP` on a separately admitted market run is a valid truthful local decision result; never synthesize EXECUTABLE to manufacture a notification.
 
-## 3. Revised single-line priority sequence (1-A advisory; Controller retains queue and acceptance)
+## 3. Historical 2026-11-22 22:23 proposal (P0a/P0b now completed; S3 now dispatched to Neon)
 
 | Priority | Owner-visible milestone | Executor / efficiency | Exit / hold |
 |---|---|---|---|
@@ -65,6 +83,6 @@ No new worker is dispatched by this document; existing 22:23 Controller plan is 
 - QI1/QL1 implementation is **after genuine S5 baseline** (design research may proceed earlier only if it does not block H). QL1 preserves episode, delivery, human response, AI annotation and **hypothetical vs verified** outcomes. QB1 must use point-in-time/no-lookahead and venue-aware costs; QR1 is hypothesis-driven, independently validated, Owner-approved.
 - Controller 0-C: single task queue/independent acceptance; 1-A: advisory only. Astra: major architecture/methodology forks; Sol: complex integrated engineering; Neon: peer complex executor on disjoint scope; Hydrogen: low-risk docs/fixtures/checklists. Account for complexity, quota and cost rather than always XHigh.
 - Every Owner-facing full task/new-chat prompt MUST be delivered as a **copyable card containing the complete prompt with a copy control/button where UI supports it**. Prefer a complete WritingBlock/CodeBlock with built-in Copy when custom clipboard controls are unavailable; never simulate a fake button, deliver truncated text or only a URL. See [mandatory prompt-card standard](V080_PROMPT_COPY_CARD_STANDARD_20261118.md).
-- Canonical newly prepared 0-C bootstrap: [2026-11-23 Controller 0-C startup prompt](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261123.md).
+- Canonical original 0-C bootstrap updated in place: [V080_NEW_CHAT_CONTROLLER_0C_20261118.md](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md).
 
 **No source code edits, live provider calls, private-account calls or order actions are authorized by this progress document.**

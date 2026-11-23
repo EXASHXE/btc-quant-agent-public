@@ -36,3 +36,7 @@ The Owner can forward an existing complete offline card and add:
 "Execute TASK_ID as OWNER_DIRECT_OFFLINE. Start isolated offline implementation/tests now; do not wait for an additional 0-C dispatch receipt. Record offline Owner authority; no real Binance/Feishu/model/private/trade operations. Submit sealed results to 0-C for independent acceptance."
 
 Wait for a specific Owner execution instruction or valid Controller dispatch. Do not start merely by reading this bootstrap.
+
+## Agent prompt language and copy-card rule (2026-11-23)
+
+The complete worker task prompt, AGY/Neon task, QA brief and any other model-facing prompt is **English by default** even when the Owner/Controller discussion is in Chinese. Do not rewrite the full task into Chinese unless Owner explicitly asks. The Owner must receive the entire English task as one copyable card with a **working Copy Full Prompt / 复制完整 Prompt** action where available; for CLI/AGY without a native action, use one complete fenced English block with client-native Copy. This worker bootstrap alone is not a Controller dispatch or Owner execute instruction.

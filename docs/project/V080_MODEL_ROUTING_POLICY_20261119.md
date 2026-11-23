@@ -1,10 +1,14 @@
 # QUANT v0.8.0 — Owner Model Routing Policy (2026-11-19)
 
-- **Status:** ACTIVE / OWNER-DIRECTED
-- **Effective date:** 2026-11-19
-- **Canonical branch:** docs/engineering
-- **Scope:** Future v0.8.0 engineering assignments, parallel work allocation, role prompts and Controller handoffs
-- **Authority:** Owner routing decision; Controller 0-C retains default task dispatch, queue ownership and sole independent scoped acceptance; explicit Owner-direct bounded OFFLINE execution is separately allowed under the 2026-11-21 protocol.
+
+## Current model-routing checkpoint — 2026-11-23 02:27 +08:00
+
+**WORKER HANDOFF (2026-11-23 ~02:52; not Controller acceptance):** Neon S3 isolated workroot has CONTROLLER_HANDOFF.md with READY_FOR_CONTROLLER_REVIEW_S3_ZERO_RETRY_OFFLINE; the worker reports 337/337 test invocations, 14/14 default-deny probes and a byte-reproducible post4 wheel. No later 0-C S3 acceptance was present in the inspected Controller directory. Treat all 337 PASS as WORKER_REPORTED until independent 0-C QA/review; do not redispatch the S3 implementation.
+
+Sol's P0A S2 transport and Neon's P0B evidence have independent **OFFLINE** acceptances. An actual 0-C receipt dispatched **AGY Gemini 4 Neon XHigh** to the S3 zero-retry **OFFLINE** candidate at 02:27 (supersedes the historical planned Sol S3 assignment). See [current evidence](V080_PROGRESS_AND_NEXT_GATES_20261123.md). No genuine S2/S3/S4 grants.
+
+Keep the Owner conversation in **Chinese**, but write all model/agent-facing prompts, including 1-A/0-C new-chat and worker review prompts, in **English**, with complete functional copy-card or honest native-copy fallback.
+
 
 ## 1. Owner decision
 
@@ -101,7 +105,7 @@ This policy changes model routing only. It does not grant network access, creden
 
 Use [Owner Direct Offline Protocol](V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md). Future tasks must specify CONTROLLER_DISPATCHED, OWNER_DIRECT_OFFLINE_ALLOWED, or PROPOSAL_ONLY. When Owner explicitly forwards a complete offline task to Neon or Sol with an execute instruction, a missing separate 0-C JSON does not stop offline work; log an offline Owner-start evidence note inside the isolated workroot. Never auto-start a draft or bypass real Binance/Feishu/model/private/TRADE gates. Controller remains the only independent acceptance authority.
 
-## 9. 2026-11-23 product-first cost/effort routing update
+## 9. Historical 2026-11-22 proposed task routing (P0A/P0B now accepted; S3 Neon dispatch takes precedence)
 
 Verified 2026-11-22 receipts and current roles: [Progress and next gates](V080_PROGRESS_AND_NEXT_GATES_20261123.md). Sol S2 V2, Neon optional CLI and Astra S3 study were independently accepted OFFLINE ONLY. Follow-up proposals in `V080_CONTROLLER_NEXT_STAGE_WSL2_S2_RELEASE_AND_S3_PREP_PLAN_20261122.json` have `new_dispatch_issued=false`.
 
@@ -113,3 +117,15 @@ Verified 2026-11-22 receipts and current roles: [Progress and next gates](V080_P
 - **Freeze optional risk CLI expansion:** no real Layer2/TRADE and no real position sizing; focus on first actual local Core market decision and S2 physical gate.
 
 No selected model can self-accept or infer live authorization. Evaluate capability, quota, cost, change risk and test coverage together, not a blanket "all XHigh" rule. All new task/new-chat/research prompts follow [Prompt Copy Card Standard](V080_PROMPT_COPY_CARD_STANDARD_20261118.md): complete, truthful, card-shaped with an actual copy action where supported; native copyable WritingBlock/CodeBlock fallback.
+
+## 10. Gemini Neon as optional independent advisor / Controller (2026-11-23)
+
+This is a **conditional model routing policy**, not a change in current Controller authority. Neon may handle 1-A-like advisory reviews (High for ordinary evidence/roadmap review, XHigh for difficult cross-module reasoning), subject to Owner's assessment and a canonical read-only brief. It may be a backup for 0-C only with explicit Owner activation, clean role handoff and independent review distinct from its own implementation output. The active S3 worker is AGY Neon XHigh: **do not route its self-review as final independent Controller acceptance.**
+
+Tool order: (1) Desktop Commander Remote MCP for local read-only repositories and isolated QA (already available); (2) optional authenticated GitHub MCP for remote branch/commit/PR verification; (3) official web/documentation search MCP for time-sensitive venue policy; (4) optional dedicated read-only receipt/hash-verifier and prompt copy-card MCP App only if repeated work proves useful. Do not add a redundant filesystem MCP, broker/TRADE connector, production signer or an autonomous schedule. Restrict MCP tools to allowed roots; require human approval for privileged shell, git push or provider activity.
+
+Independent QA depends on **isolation, reproducible challenges and conflict-of-interest separation**, not a model name or number of PASSES. Copy-card compliance depends on the **host UI**: ChatGPT clipboard action cannot be assumed in AGY. Use supported MCP App interactive copy UI or complete fenced English prompt with native copy.
+
+### Minimum Owner-gated Neon role pilot (read-only; not auto-dispatched)
+
+Before treating AGY Neon as a Controller substitute, let it audit **copies of three already adjudicated receipt packets plus two negative/counterexample fixtures**, and compare its traceable verdicts against the existing 0-C records; include at least one stale Worker-only PASS, one unsigned/unknown live eligibility, and the current S3 worker/Controller conflict. It must (1) verify actual code/docs HEAD and SHA manifests, (2) correctly separate Worker report, independent QA and 0-C acceptance, (3) preserve no-live/no-trade boundaries, (4) issue no new dispatch or false acceptance, (5) produce complete **English** prompt copy cards, and (6) handle missing MCP/browser data as UNKNOWN rather than hallucinate. Only then may Owner authorize a one-task, time-bounded alternate 0-C handoff with an independent human/different-model reviewer. The pilot may use Neon High for 1-A-style advice; reserve XHigh for an eventual isolated Controller-level critical review. No credential, production signer, recurring agent or second queue is required.

@@ -94,5 +94,11 @@ The executable v0.8.0 root AGENTS.md contains historical initial-R1 wording that
 ## 2026-11-23 status/copy-card update
 
 - Active latest status appendix: [V080_PROGRESS_AND_NEXT_GATES_20261123.md](V080_PROGRESS_AND_NEXT_GATES_20261123.md); older 2026-11-21 inline tables remain historical when superseded by verified later Controller records.
-- Active new Controller bootstrap: [V080_NEW_CHAT_CONTROLLER_0C_20261123.md](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261123.md).
+- Active new Controller bootstrap: [V080_NEW_CHAT_CONTROLLER_0C_20261118.md](../prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md).
 - Every Owner-facing complete prompt MUST be displayed in a **complete copyable card with a genuine Copy control whenever supported**, otherwise a WritingBlock/CodeBlock with native copy. Preserve precise content/version. No fake button, links-only, or partial excerpt. See [Prompt Copy Card Standard](V080_PROMPT_COPY_CARD_STANDARD_20261118.md).
+
+## 2026-11-23 original-file policy correction
+
+Update the **original canonical v0.8.0 files in place** for current roles, Controller/1-A new-chat bootstraps, prompt presentation and roadmaps. New dated evidence records can be kept as dated references, but must not become conflicting secondary new-chat authorities. Current canonical new chats are `docs/prompts/v0.8/V080_NEW_CHAT_1A_20261118.md` and `docs/prompts/v0.8/V080_NEW_CHAT_CONTROLLER_0C_20261118.md`, both revised in place. The duplicate `V080_NEW_CHAT_CONTROLLER_0C_20261123.md` is retired as a compatibility pointer.
+
+The Owner-facing discussion is Chinese; the **agent-facing copy payload is English by default**. All complete prompts require a real copy-card or a complete native-copy fallback. Source/Controller evidence remains in the executable workroot; docs text alone never approves live action.
