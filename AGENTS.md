@@ -22,6 +22,8 @@
 >
 **CURRENT 2026-11-21 OWNER OFFLINE-START RULE:** [Owner Direct Offline Engineering Start Protocol](docs/project/V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md) · [Sol/Neon new worker prompt](docs/prompts/v0.8/V080_NEW_CHAT_OFFLINE_ENGINEERING_WORKER_20261121.md). An **explicit Owner execution message** forwarding a complete named strictly offline task is sufficient for the worker to start under OWNER_DIRECT_OFFLINE_STARTED even when no separate 0-C dispatch JSON exists. A card merely present in a directory is not. Real external/privileged capabilities still require exact gates; Controller remains sole independent acceptance authority. Historical executable-branch root AGENTS.md R1-era pre-dispatch wording is NOT a universal blocker for later Owner-direct offline work.
 
+**Reviewer bootstrap:** [GPT-6 Sol reviewer role](docs/roles/V080_CHATGPT_GPT6_SOL_INDEPENDENT_REVIEWER_20261123.md) · [GPT-6 Sol new-chat prompt](docs/prompts/v0.8/V080_NEW_CHAT_CHATGPT_GPT6_SOL_INDEPENDENT_REVIEW_20261123.md). Independent second opinion only; no Worker dispatch, final Controller receipt or live activation.
+
 **HISTORICAL H4 CHECKPOINT (2026-11-21 19:58 HKT; superseded for current queue):** S2–S5 consolidated readiness SCOPED_ACCEPTED_H4_S2S5_OFFLINE_INTEGRATION_READINESS_ONLY: 336/336 independent PASS, 103/103 sealed. S2 genuine two GET BLOCKED, S3 fundingRate general IP weight unresolved, S4 Feishu client/identity blocked, S5 real use not observed; no live grants. Pi P2 and QI1/QL1/QB1/QR1 not dispatched.
 
 

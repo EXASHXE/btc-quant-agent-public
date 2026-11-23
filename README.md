@@ -16,6 +16,8 @@
 
 
 
+**ChatGPT GPT-6 Sol independent review entrypoints:** [Canonical reviewer role](docs/roles/V080_CHATGPT_GPT6_SOL_INDEPENDENT_REVIEWER_20261123.md) · [English new-chat startup prompt](docs/prompts/v0.8/V080_NEW_CHAT_CHATGPT_GPT6_SOL_INDEPENDENT_REVIEW_20261123.md). This is a review-only ChatGPT role, not the local GPT-6.2 Sol Worker or a second Controller; the active Gemini 4 Neon WEB CHAT remains 1-A/0-C.
+
 ## Source code publication — 2026-11-23
 
 The executable-source branch v0.8.0 now contains a reviewable, source-only

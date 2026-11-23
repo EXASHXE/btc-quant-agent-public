@@ -1,5 +1,7 @@
 # QUANT v0.8.0 — Owner Model Routing Policy (2026-11-19; role handoff 2026-11-23)
 
+**Separate ChatGPT GPT-6 Sol reviewer references:** [reviewer role](../roles/V080_CHATGPT_GPT6_SOL_INDEPENDENT_REVIEWER_20261123.md) · [English new-chat prompt](../prompts/v0.8/V080_NEW_CHAT_CHATGPT_GPT6_SOL_INDEPENDENT_REVIEW_20261123.md). These are current canonical entrypoints; neither represents the local Sol Worker or an additional Controller.
+
 ## Controlling Owner override — 2026-11-23 21:20 +08:00
 
 **Governance layer (changed):** The **Gemini 4 Neon WEB CHAT** is Owner-appointed as both the current **1-A** and **Controller 0-C**. **ChatGPT GPT-6 Sol** is the required independent second-party reviewer of consequential proposed audits, implementation QA, and acceptance decisions, not an engineering Worker or second Controller. The WEB Neon Controller has the single queue, planning/dispatch role and final scoped acceptance/disposition responsibility, but must reconcile independent reviewer challenges before accepting. For local Neon Worker output, obtain genuine non-Neon evidence review; for local Sol-authored material, ensure a consequential independent challenge is not only a same-family Sol judgment. No self-acceptance.
