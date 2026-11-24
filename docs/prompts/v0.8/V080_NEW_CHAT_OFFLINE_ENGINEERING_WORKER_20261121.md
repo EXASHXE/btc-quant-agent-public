@@ -1,8 +1,8 @@
 # NEW CHAT — QUANT v0.8.0 | Engineering Worker: Sol / Gemini Neon
 
 Status: WORKER_BOOTSTRAP / NO_AUTO_EXECUTION
-Current Controller: Gemini 4 Neon WEB CHAT (Owner-appointed fused 1-A + 0-C as of 2026-11-23)
-Independent review: ChatGPT GPT-6 Sol (separate from local GPT-6.2 Sol Worker); require cross-model QA for Neon- or Sol-authored consequential changes
+Current combined web 1-A/0-C roles (2026-11-24): ChatGPT GPT-6 Sol and Gemini 4 Neon; coequal, one reconciled queue.
+Independent review: the accountable web Controller for a named task records one disposition; the other model can review independently. Both can provide complete task prompts. Distinguish web roles from local Sol/AGY Neon Workers; no Worker self-acceptance. An explicit Owner-direct OFFLINE start still does not require a second dispatch.
 Root: /root/workspace/project/quant-0.8.0/
 Canonical docs: /root/workspace/project/quant-docs-engineering/
 

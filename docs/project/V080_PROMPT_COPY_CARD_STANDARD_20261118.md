@@ -1,10 +1,10 @@
 # QUANT v0.8.0 — Owner-Facing Prompt Copy Card Standard (2026-11-18)
 
-**Owner 2026-11-23 role update:** The web Gemini 4 Neon chat is the combined active 1-A/0-C; ChatGPT GPT-6 Sol provides independent review, distinct from local Sol engineering. This presentation standard applies unchanged; it does not grant execution or live capabilities.
+**Owner 2026-11-24 role update:** Both web ChatGPT GPT-6 Sol and Gemini 4 Neon are coequal combined 1-A/0-C roles. Both generate complete next-task prompts and audit each other; local execution is unchanged. This presentation standard applies equally; a card is not execution or live authority.
 
 - **Status:** ACTIVE
 - **Canonical branch:** docs/engineering
-- **Applies to:** Gemini 4 Neon web (fused 1-A + 0-C), ChatGPT GPT-6 Sol independent reviewer, and all Owner-facing prompt authors
+- **Applies to:** ChatGPT GPT-6 Sol WEB and Gemini 4 Neon WEB (each combined 1-A + Controller 0-C), local agents and all Owner-facing prompt authors
 - **Authority:** Owner instruction; presentation rule only.
 
 This standard governs how complete prompts are presented to the Owner. It does not grant dispatch authority, implementation permission, API access, credential access, acceptance authority or trading permission.
@@ -65,7 +65,7 @@ Prompt presentation must never imply:
 - Credentials or permissions have been granted;
 - An external message has been sent.
 
-A task prompt is not a dispatch. Only Controller 0-C can formally dispatch and accept engineering work.
+A task prompt is not a dispatch. Either coequal web model acting as Controller 0-C may formally dispatch and record scoped acceptance for a named task; keep one accountable Controller and avoid duplicates.
 
 ## 5. New-chat prompts
 
@@ -87,11 +87,11 @@ The canonical Markdown prompt and the Owner-facing copy payload must represent t
 
 ### ChatGPT 1-A
 
-Must use this standard whenever preparing a prompt for Sol, Sol Max, Gemini Neon, Astra, Hydrogen, Controller 0-C or a new QUANT chat. 1-A may advise and draft but does not dispatch.
+Must use this standard whenever preparing a prompt for Sol, Sol Max, Gemini Neon, Astra, Hydrogen, Controller 0-C or a new QUANT chat. Both combined web 1-A/0-C role holders may advise, draft complete task prompts, and separately act as accountable 0-C under established task-start authority.
 
 ### Controller 0-C
 
-Must use this standard for Owner-facing task cards and forwarded worker prompts. 0-C remains the sole dispatcher and scoped acceptance authority.
+Must use this standard for Owner-facing task cards and forwarded worker prompts. Either web 0-C may be accountable for a named dispatch and scoped disposition after required independent review.
 
 ### Worker models
 

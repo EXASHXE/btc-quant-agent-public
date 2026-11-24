@@ -1,5 +1,7 @@
 # QUANT v0.8.0 — Owner-Direct Offline Engineering Start Protocol
 
+**2026-11-24 role clarification:** Both web ChatGPT GPT-6 Sol and web Gemini 4 Neon hold combined 1-A/0-C, mutually audit and plan, and may generate full task prompts. Either can be the accountable 0-C for a task; avoid duplicate dispatch and reconcile one disposition. This changes role allocation only, not the Owner-direct OFFLINE start rule below. Do not require two Controller signatures for routine Owner-authorized OFFLINE work.
+
 Status: ACTIVE / OWNER-DIRECTED / FUTURE OFFLINE TASKS
 Effective: 2026-11-21
 Canonical branch: docs/engineering
@@ -43,7 +45,7 @@ Do not forge a Controller decision, signature, approval or source identity.
 
 Perform safe offline implementation and tests. If a genuine substep is blocked, complete other independent safe work and name the exact blocked step; do not respond only AWAITING_CONTROLLER_DISPATCH with zero work when Owner has authorized the offline task.
 
-Deliver one sealed worker package with actual PASS/FAIL/SKIP, preserving source provenance and marking READY_FOR_CONTROLLER_REVIEW. Only 0-C can independently accept/hold it. The Controller may reconcile Owner-direct work afterward but may not fabricate a retroactive Controller dispatch receipt.
+Deliver one sealed worker package with actual PASS/FAIL/SKIP, preserving source provenance and marking READY_FOR_CONTROLLER_REVIEW. The named accountable web 0-C can record independent scoped acceptance/hold after review. Either web model may be accountable; the other can challenge. The Controller may reconcile Owner-direct work afterward but may not fabricate a retroactive Controller dispatch receipt.
 
 ## 4. Controller and prompt-author duties
 
