@@ -1,10 +1,10 @@
 # QUANT v0.8.0 — Owner-Facing Prompt Copy Card Standard (2026-11-18)
 
-**Owner 2026-11-24 role update:** Both web ChatGPT GPT-6 Sol and Gemini 4 Neon are coequal combined 1-A/0-C roles. Both generate complete next-task prompts and audit each other; local execution is unchanged. This presentation standard applies equally; a card is not execution or live authority.
+**Owner 2026-11-24 role update:** Both web ChatGPT GPT-6.2 Sol and Gemini 4 Neon are coequal combined 1-A/0-C roles. Both generate complete next-task prompts and audit each other; local execution is unchanged. This presentation standard applies equally; a card is not execution or live authority.
 
 - **Status:** ACTIVE
 - **Canonical branch:** docs/engineering
-- **Applies to:** ChatGPT GPT-6 Sol WEB and Gemini 4 Neon WEB (each combined 1-A + Controller 0-C), local agents and all Owner-facing prompt authors
+- **Applies to:** ChatGPT GPT-6.2 Sol WEB and Gemini 4 Neon WEB (each combined 1-A + Controller 0-C), local agents and all Owner-facing prompt authors
 - **Authority:** Owner instruction; presentation rule only.
 
 This standard governs how complete prompts are presented to the Owner. It does not grant dispatch authority, implementation permission, API access, credential access, acceptance authority or trading permission.

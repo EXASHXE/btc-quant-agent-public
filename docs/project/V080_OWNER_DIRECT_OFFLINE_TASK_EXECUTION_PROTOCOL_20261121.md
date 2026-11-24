@@ -1,6 +1,6 @@
 # QUANT v0.8.0 — Owner-Direct Offline Engineering Start Protocol
 
-**2026-11-24 role clarification:** Both web ChatGPT GPT-6 Sol and web Gemini 4 Neon hold combined 1-A/0-C, mutually audit and plan, and may generate full task prompts. Either can be the accountable 0-C for a task; avoid duplicate dispatch and reconcile one disposition. This changes role allocation only, not the Owner-direct OFFLINE start rule below. Do not require two Controller signatures for routine Owner-authorized OFFLINE work.
+**2026-11-24 role clarification:** Both web ChatGPT GPT-6.2 Sol and web Gemini 4 Neon hold combined 1-A/0-C, mutually audit and plan, and may generate full task prompts. Either can be the accountable 0-C for a task; avoid duplicate dispatch and reconcile one disposition. This changes role allocation only, not the Owner-direct OFFLINE start rule below. Do not require two Controller signatures for routine Owner-authorized OFFLINE work.
 
 Status: ACTIVE / OWNER-DIRECTED / FUTURE OFFLINE TASKS
 Effective: 2026-11-21

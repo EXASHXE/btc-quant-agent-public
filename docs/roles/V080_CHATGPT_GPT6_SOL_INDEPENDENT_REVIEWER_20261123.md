@@ -1,4 +1,4 @@
-# QUANT v0.8.0 — ChatGPT GPT-6 Sol WEB: Combined 1-A + Controller 0-C
+# QUANT v0.8.0 — ChatGPT GPT-6.2 Sol WEB: Combined 1-A + Controller 0-C
 
 **Status:** ACTIVE — COEQUAL_COMBINED_1A_0C
 **Owner appointment:** 2026-11-24 09:34 +08:00 (supersedes previous review-only assignment)
@@ -10,7 +10,7 @@ The existing filename is retained for compatibility. Its old independent-reviewe
 
 ## 1. Current governance
 
-**ACTIVE Owner decision — 2026-11-24 09:34 +08:00:** **ChatGPT GPT-6 Sol (web)** and **Gemini 4 Neon (web)** are coequal, Owner-appointed **combined 1-A + Controller 0-C** role holders. Both independently audit code, strategy, architecture, QA and progress, plan/replan the project, challenge each other's conclusions, route local engineering and produce complete ready-to-forward next-task prompts. Neither is a permanent primary, backup, or review-only role. This supersedes the 2026-11-23 Neon-primary/Sol-review-only arrangement.
+**ACTIVE Owner decision — 2026-11-24 09:34 +08:00:** **ChatGPT GPT-6.2 Sol (web)** and **Gemini 4 Neon (web)** are coequal, Owner-appointed **combined 1-A + Controller 0-C** role holders. Both independently audit code, strategy, architecture, QA and progress, plan/replan the project, challenge each other's conclusions, route local engineering and produce complete ready-to-forward next-task prompts. Neither is a permanent primary, backup, or review-only role. This supersedes the 2026-11-23 Neon-primary/Sol-review-only arrangement.
 
 **One project queue, two collaborating Controllers:** both may independently propose tasks and scoped dispositions; reconcile the same canonical evidence and unique task IDs before starting work. For each actual dispatched package, identify one accountable 0-C (either web model) and one independent reviewer (normally the other web model); roles may rotate by task, not by model hierarchy. The accountable 0-C records one final scoped disposition after resolving material findings. Neither may overwrite a peer's receipt, manufacture a signature, launch a duplicate task or claim peer agreement not evidenced. Review disagreements remain visible; the Owner decides material unresolved priorities or scope. A missing peer response is not an automatic veto on independently authorized bounded routine OFFLINE work. Do not invent a blanket two-signature requirement or new approval layer; independent QA remains required where the established task contract requires it.
 
