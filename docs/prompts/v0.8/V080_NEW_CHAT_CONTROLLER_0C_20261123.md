@@ -1,7 +1,7 @@
-# Retired duplicate — 2026-11-23
+# Compatibility entrypoint — superseded by coequal web Controller bootstraps (2026-11-26)
 
-This Chinese-language duplicate is **NOT** the canonical Controller bootstrap. It is deliberately retired to prevent two conflicting new-chat sources.
+Use the appropriate complete English bootstrap:
+- [ChatGPT GPT-6.2 Sol WEB](V080_NEW_CHAT_CHATGPT_GPT6_SOL_INDEPENDENT_REVIEW_20261123.md)
+- [Gemini 4 Neon WEB](V080_GEMINI_NEON_WEB_FUSED_1A_0C_20261123.md)
 
-Use the **original canonical file revised in place**: [V080_NEW_CHAT_CONTROLLER_0C_20261118.md](V080_NEW_CHAT_CONTROLLER_0C_20261118.md).
-
-The canonical updated bootstrap gives instructions to the agent **in English** and requires the responding Controller to speak **Chinese to the Owner**. It includes the 2026-11-23 P0A/P0B acceptances and the actual AGY Neon S3 OFFLINE dispatch. This pointer grants no dispatch or live permission.
+Both are coequal combined 1-A/0-C. Current [checkpoint](../../project/V080_CURRENT_CHECKPOINT_AND_ROADMAP_20261126.md) and [Owner-confirmed T3 protocol](../../project/V080_T3_OWNER_CONFIRMED_REMOTE_DISPATCH_20261126.md) are controlling. Default read-only; no automatic dispatch. This pointer grants no authorization. Previous bootstrap retained in Git history.
