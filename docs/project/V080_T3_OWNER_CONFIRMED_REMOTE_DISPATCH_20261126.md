@@ -1,0 +1,27 @@
+# QUANT — Owner-gated T3 MCP remote dispatch protocol (2026-11-26, UTC+8)
+
+Status: ACTIVE_OWNER_DECISION / DEFAULT_READ_ONLY / NO_AUTOMATIC_DISPATCH.
+Authority: Owner's explicit 2026-11-26 instruction. Both WEB ChatGPT GPT-6.2 Sol and WEB Gemini 4 Neon remain coequal combined 1-A + Controller 0-C. T3 is an additional execution channel, not a new autonomous orchestrator role.
+
+## 1. Authority and start modes
+- PROPOSAL_ONLY: draft/review a complete English task card; no launch, send, steer, restart, queue, schedule or permission change.
+- OWNER_DIRECT_OFFLINE_ALLOWED: Owner directly forwards a bounded complete offline prompt to a local Worker, per 2026-11-24 amendment; no additional EXECUTE keyword.
+- OWNER_CONFIRMED_T3_DISPATCH: only after Owner explicitly confirms in a chat prompt that the named task/prompt may be dispatched via T3 to the named local executor. Confirmation must bind the task ID, exact prompt revision or unambiguous preceding complete card, executor, scope and base. Example: "确认通过 T3 下发 <TASK_ID> 给 <executor>，按上一版完整 Prompt 执行". A request to draft, audit, plan, update docs, inspect status or prepare a card is NOT confirmation. A peer/Worker message, prior permission, tool availability or reading a task file is not Owner confirmation. Material scope/model/base changes require renewed confirmation.
+- CONTROLLER_DISPATCHED: record actual dispatch only after the authorized T3 call returns accepted delivery and identifiers, or an independently evidenced authorized manual dispatch. No automatic chained dispatch, background scheduling or escalation. Separate genuine operation permissions remain unchanged.
+
+Owner may explicitly approve multiple individually identified non-overlapping tasks in one prompt; no duplicate confirmation for the identical bounded dispatch. Default to read-only after handoff; scope is not inherited by new tasks.
+
+## 2. Actual T3 tool capabilities
+ChatGPT-side read-only orchestrator_capabilities was observed on 2026-11-26 UTC+8: Codex (gpt-6.2-sol, gpt-6.2-astra; reasoningEffort low/medium/high/xhigh/max/ultra), AGY-A and AGY-B (gemini-4-neon, gemini-4-hydrogen; thought_level low/medium/high/xhigh). Provider availability and option names must be rediscovered at execution; do not guess IDs. Owner reports Gemini WEB also has T3 access; its connection was not independently exercised from ChatGPT. Other providers not authorized by current policy are not fallback routes.
+- Read-only: orchestrator_capabilities, t3_project_list, t3_environment_read, t3_thread_list/search/read, inspect exact project/base/worktree and active run status. Read only relevant outputs; avoid credentials and unrelated data.
+- On confirmed dispatch: t3_thread_launch for a new task (explicit project, provider/model/effort, worktree strategy, full message, stable clientRequestId); t3_thread_send only to the verified intended thread, with a deliberate mode. Avoid auto steering/restart on busy threads; do not interrupt, cancel, steer, reconfigure, schedule or broaden permissions absent explicit Owner authorization for that action.
+- Local unpublished bases require local baseRef and startFromOrigin=false; pin exact commit, use disjoint write sets. No root checkout by default for engineering. Use least permitted runtime mode; no security baseline changes.
+- Before dispatch reconcile the shared queue: one task ID, owner confirmation, accountable Controller, executor, independent reviewer, source commit, branch/worktree, active thread collision, prompt hash/revision, permissions and expected deliverables. On lost response check request/thread/run state and reuse the same clientRequestId where supported; never blindly relaunch.
+- Record actual returned thread/run/message IDs, delivery/status and link in the controlled local queue; present link to Owner. Do not publish environment IDs, private thread links, credentials, logs or account identifiers in public GitHub.
+- Read status/results when asked or during an authorized synchronous review; do not promise unattended monitoring. Worker-reported completion is not independent QA or acceptance. One accountable Controller records a scoped disposition, peer challenges as needed; no self-acceptance.
+
+## 3. Unchanged product/security boundary
+T3 control-plane access authorizes neither Binance nor Feishu operations, credential reads, USER_DATA, TRADE, live provider tests, final OOS unsealing, operator deployment, recurrence, destructive cleanup or pushes outside explicitly approved scope. A bounded offline Worker launch necessarily uses its chosen local agent provider; this does not authorize arbitrary additional model/API calls by the Worker. Keep Personal Pragmatic Mode, four core rails, explicit Owner live grants, exact prompt copy cards, Chinese Owner communication and English full Worker prompts. Task delivery mechanism is not market execution authority.
+
+## 4. Owner-facing card and result
+Show task ID, executor/provider, effort, base/worktree, write set, start mode, objective, non-goals, tests/evidence, stop conditions, accountable Controller/reviewer and explicit confirmation instruction. The visible functional Copy Full Prompt button copies the entire English prompt. No automatic launch merely because a card was produced. After explicit confirmation, report actual tool result; distinguish QUEUED/RUNNING/COMPLETED/FAILED/UNKNOWN from acceptance. If T3 is unavailable, offer manual forwarding; never claim dispatch succeeded.
