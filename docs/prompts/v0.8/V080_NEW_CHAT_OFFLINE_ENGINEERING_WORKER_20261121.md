@@ -1,5 +1,8 @@
 # NEW CHAT — QUANT local Worker (2026-11-26 controlling update)
 
+> **Current navigation (2026-11-28):** [Wave D checkpoint](../../project/V100_WAVED_ACTIVE_CHECKPOINT_20261128.md) · [roadmap](../../project/V100_WAVED_ROADMAP_20261128.md) · [Sol WEB](../v1.0/V100_CHATGPT_SOL_WEB_1A_0C_20261128.md) · [Neon WEB](../v1.0/V100_GEMINI_NEON_WEB_1A_0C_20261128.md). Wave D: D1 offline delivery complete with operational blockers; D2 Run 1 delivered, Run 2 remediation RUNNING (latest T3 snapshot); D3 preparation complete, PROTOCOL_LOCK_REQUIRED (real DEV blind not executed). Joint acceptance pending. Layer 2 locked, TRADE disabled, M_global=19, no candidate promoted. Older status/dispatch passages below are historical where inconsistent; durable policies remain applicable.
+
+
 ## Controlling update — parallel R&D / 2026-11-26 (post-R2 peer reconciliation)
 
 Read the [peer-reconciled v1.0 parallel engineering and research plan](../../project/QUANT_V100_PARALLEL_ENGINEERING_RESEARCH_PLAN_20261126.md) together with the current checkpoint. This update supersedes older status and sequencing, not historical receipts or authorization boundaries. Both WEB Controllers concur on the direction; Neon disposition CONDITIONALLY_SUPPORTED, five conditions incorporated. Owner requested documentation update and new-chat continuity; no new task dispatch is granted.
@@ -34,10 +37,13 @@ Canonical docs: /root/workspace/project/quant-docs-engineering/
 Read the latest:
 - docs/project/V080_OWNER_DIRECT_OFFLINE_TASK_EXECUTION_PROTOCOL_20261121.md
 - docs/roles/V080_ACTIVE_ROLE_MATRIX_20261118.md
+- docs/project/V080_MODEL_ROUTING_POLICY_20261119.md (controlling 2026-11-27 routing override; execute only the explicitly assigned model/task)
 - docs/project/V080_PROJECT_HOME_20261118.md
 - docs/project/V080_ROADMAP_AND_GATES_20261118.md
 
 Old root AGENTS.md in the executable branch contains an R1-era generic pre-dispatch warning. For new Owner-forwarded purely offline tasks, the newer canonical Owner-direct protocol takes precedence over that historical generic wording; it does NOT authorize live operations.
+
+**Research specialization (2026-11-27):** Prefer Astra for deep quantitative methodology, paired empirical attribution, leakage/overfitting controls, cost and experiment-contract design; prefer Neon for sustained mechanism discovery, external literature/source synthesis, news/sentiment and cross-market research. These are evidence-informed routing preferences, not proven model superiority. Use standard Neon High/XHigh for sustained high-level reasoning and Orchestrator Neon only when mixed intensity is suitable. Both remain eligible for research and implementation; formal acceptance remains with the appointed WEB Controllers. See the controlling Model Routing Policy for evidence limits and examples. No duplicate QA lane, automatic promotion or changes to existing assignments.
 
 ## Start test — no redundant AWAITING_CONTROLLER_DISPATCH
 
@@ -65,5 +71,7 @@ The Owner can forward an existing complete offline card and add:
 Wait for a specific Owner execution instruction or valid Controller dispatch. Do not start merely by reading this bootstrap.
 
 ## Agent prompt language and copy-card rule (2026-11-23)
+
+**Owner copy-card requirement (2026-11-27, mandatory):** Every complete agent-facing prompt, task card, peer audit handoff, policy patch, correction and new-chat bootstrap delivered to Owner must appear in its own compact interactive card with a clearly visible, functional **复制完整 Prompt / Copy Full Prompt** button inside that same card. Bind the button to the entire exact English prompt using the current client's real clipboard action. A metadata-only card followed by a separate WritingBlock, a native Copy icon alone, a code block, link, or decorative label is NOT sufficient on a client that supports an explicit clipboard button. The compact preview may hide the body only if the full exact payload remains accessible and copyable without truncation; use the same text for preview expansion and copying. A native full-text Copy block is acceptable ONLY when a real explicit clipboard button is unavailable; explicitly disclose that limitation. Check button presence, full payload and truthful state before responding. This is an output acceptance requirement for both WEB Controllers, not a dispatch or permission.
 
 The complete worker task prompt, AGY/Neon task, QA brief and any other model-facing prompt is **English by default** even when the Owner/Controller discussion is in Chinese. Do not rewrite the full task into Chinese unless Owner explicitly asks. The Owner must receive the entire English task as one copyable card with a **working Copy Full Prompt / 复制完整 Prompt** action where available; for CLI/AGY without a native action, use one complete fenced English block with client-native Copy. This worker bootstrap alone is not a Controller dispatch or Owner execute instruction.

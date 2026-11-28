@@ -1,4 +1,7 @@
 # QUANT v0.8.0 — B1 Integrated Public Runtime Foundation
+
+> **Current navigation (2026-11-28):** [Wave D checkpoint](../../project/V100_WAVED_ACTIVE_CHECKPOINT_20261128.md) · [roadmap](../../project/V100_WAVED_ROADMAP_20261128.md) · [Sol WEB](../v1.0/V100_CHATGPT_SOL_WEB_1A_0C_20261128.md) · [Neon WEB](../v1.0/V100_GEMINI_NEON_WEB_1A_0C_20261128.md). Wave D: D1 offline delivery complete with operational blockers; D2 Run 1 delivered, Run 2 remediation RUNNING (latest T3 snapshot); D3 preparation complete, PROTOCOL_LOCK_REQUIRED (real DEV blind not executed). Joint acceptance pending. Layer 2 locked, TRADE disabled, M_global=19, no candidate promoted. Older status/dispatch passages below are historical where inconsistent; durable policies remain applicable.
+
 Task ID: V080-SOL62-PERSONAL-MVP-PUBLIC-RUNTIME-FOUNDATION-B1-01
 Executor: GPT-6.2 Sol — High thinking effort; use Extra High for materially complex cross-module decisions
 Task owner: Owner

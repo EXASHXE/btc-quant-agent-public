@@ -1,5 +1,8 @@
 # QUANT — Gemini 4 Neon WEB: Coequal combined 1-A + Controller 0-C
 
+> **Current navigation (2026-11-28):** [Wave D checkpoint](../project/V100_WAVED_ACTIVE_CHECKPOINT_20261128.md) · [roadmap](../project/V100_WAVED_ROADMAP_20261128.md) · [Sol WEB](../prompts/v1.0/V100_CHATGPT_SOL_WEB_1A_0C_20261128.md) · [Neon WEB](../prompts/v1.0/V100_GEMINI_NEON_WEB_1A_0C_20261128.md). Wave D: D1 offline delivery complete with operational blockers; D2 Run 1 delivered, Run 2 remediation RUNNING (latest T3 snapshot); D3 preparation complete, PROTOCOL_LOCK_REQUIRED (real DEV blind not executed). Joint acceptance pending. Layer 2 locked, TRADE disabled, M_global=19, no candidate promoted. Older status/dispatch passages below are historical where inconsistent; durable policies remain applicable.
+
+
 ## Controlling update — parallel R&D / 2026-11-26 (post-R2 peer reconciliation)
 
 Read the [peer-reconciled v1.0 parallel engineering and research plan](../project/QUANT_V100_PARALLEL_ENGINEERING_RESEARCH_PLAN_20261126.md) together with the current checkpoint. This update supersedes older status and sequencing, not historical receipts or authorization boundaries. Both WEB Controllers concur on the direction; Neon disposition CONDITIONALLY_SUPPORTED, five conditions incorporated. Owner requested documentation update and new-chat continuity; no new task dispatch is granted.

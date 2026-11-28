@@ -1,0 +1,49 @@
+{
+  "schema": "quant-docs/wave-d-public-register/v2",
+  "observation": "2026-11-28 afternoon UTC+8",
+  "privacy": "Private T3 identifiers, links, logs and worktrees omitted. Exact records retained locally.",
+  "runs": [
+    {
+      "lane": "D1",
+      "task": "TASK-S5-HERMES-ACTIVE-AGENT-20261128",
+      "status": "completed",
+      "ordinal": 5,
+      "requested_model": "gpt-6.2-sol",
+      "executed_model": null,
+      "branch": "feat/s5-unified-release-20261127-r2",
+      "delivered_candidate": "0d539f6cd29681c703a7196209cda770250b84ee",
+      "disposition": "READY_FOR_INDEPENDENT_WEB_QA_WITH_BOUNDED_OPERATIONAL_BLOCKER",
+      "completed_utc": "2026-11-28T08:20:27.436Z",
+      "independent_qa": "PENDING",
+      "raw_evidence": "PRIVATE_LOCAL_OR_T3"
+    },
+    {
+      "lane": "D2",
+      "task": "TASK-S9-D2-FIX-AND-REGRESSION-20261128",
+      "status": "running",
+      "ordinal": 2,
+      "requested_model": "gemini-4-neon",
+      "executed_model": null,
+      "branch": "feat/waved-s9-strategy-runtime-20261128",
+      "delivered_candidate": "a27cf2d9f19edb857fcd24bf3cddf8457f53916d",
+      "disposition": "FIX_REQUIRED_BEFORE_ACCEPTANCE / REMEDIATION_ACTIVE",
+      "completed_utc": null,
+      "independent_qa": "FIX_REQUIRED_REPORTED_IN_RUN2_AUTHORIZATION",
+      "raw_evidence": "PRIVATE_LOCAL_OR_T3"
+    },
+    {
+      "lane": "D3",
+      "task": "TASK-QRKP-WAVE3-PREPARATION-20261128",
+      "status": "completed",
+      "ordinal": 1,
+      "requested_model": "gemini-4-neon",
+      "executed_model": null,
+      "branch": "feat/waved-qrkp-wave3-preparation-20261128",
+      "delivered_candidate": "46574583e913e11893712e17eee257db7c235579",
+      "disposition": "PROTOCOL_LOCK_REQUIRED",
+      "completed_utc": "2026-11-28T07:21:09.612Z",
+      "independent_qa": "PENDING",
+      "raw_evidence": "PRIVATE_LOCAL_OR_T3"
+    }
+  ]
+}

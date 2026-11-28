@@ -1,5 +1,11 @@
 # Research Registry Policy (v0.3.12)
 
+> **Current navigation (2026-11-28):** [Wave D checkpoint](project/V100_WAVED_ACTIVE_CHECKPOINT_20261128.md) · [roadmap](project/V100_WAVED_ROADMAP_20261128.md) · [Sol WEB](prompts/v1.0/V100_CHATGPT_SOL_WEB_1A_0C_20261128.md) · [Neon WEB](prompts/v1.0/V100_GEMINI_NEON_WEB_1A_0C_20261128.md). Wave D: D1 offline delivery complete with operational blockers; D2 Run 1 delivered, Run 2 remediation RUNNING (latest T3 snapshot); D3 preparation complete, PROTOCOL_LOCK_REQUIRED (real DEV blind not executed). Joint acceptance pending. Layer 2 locked, TRADE disabled, M_global=19, no candidate promoted. Older status/dispatch passages below are historical where inconsistent; durable policies remain applicable.
+
+
+> Current 2026-11-28 status: Use [Wave D checkpoint](project/V100_WAVED_ACTIVE_CHECKPOINT_20261128.md), [current roadmap](project/V100_WAVED_ROADMAP_20261128.md), [Sol WEB bootstrap](prompts/v1.0/V100_CHATGPT_SOL_WEB_1A_0C_20261128.md) and [Neon WEB bootstrap](prompts/v1.0/V100_GEMINI_NEON_WEB_1A_0C_20261128.md) for current state. Wave C closed per Controller handoff; S7 empirical Run 2 completed and scoped accepted, 0/6 advancement; QRKP R4/R7 Rev02 sealed. Product development base 03af5397; S7 research base 3baa0ebb. Owner dispatched D1/D2/D3, original runs delivered; D2 remediation active, joint QA pending. Runtime proof/Field/recurrence not enabled, Layer 2 locked, TRADE disabled, M_global=19, no candidate promoted. Do not redispatch. Historical sections below are retained, not current gate instructions.
+
+
 `configs/research_registry.json` is the sole machine-readable source of research qualification for normal Runtime. Missing files, parse failures, unknown components, invalid schema, or missing evidence fail closed.
 
 ## Current state
